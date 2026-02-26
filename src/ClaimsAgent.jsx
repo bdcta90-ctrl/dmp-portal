@@ -53,10 +53,10 @@ const DAMAGE_CATS = {
   "기타/ADAS": ["에어백(운전석)","에어백(조수석)","사이드/커튼 에어백","계기판/클러스터","AVN/인포테인먼트","에어컨/냉방","전방 레이더","후측방 레이더(좌)","후측방 레이더(우)","라이다","카메라 캘리브레이션","12V 배터리","고전압 배터리(EV)","충전포트(EV)"],
 };
 const ALL_PARTS = Object.values(DAMAGE_CATS).flat();
-const ACCIDENT_TYPES = ["후미추돌(통상 뒤차 우선 과실)","차대차-교차로-신호위반/직진-좌회전","차대차-동일방향-차선변경 접촉","차대차-교차로-직진-우회전","차대차-대향-중앙선 침범","차대차-주차장내 접촉","차대물-고정물 충돌(가드레일/전주)","차대인-횡단보도 보행자","차대차-후진 접촉","단독사고-빗길 미끄러짐"];
-const ROAD_TYPES=["일반도로","고속도로","주차장","골목길/이면도로","교차로"];
-const WEATHER_TYPES=["맑음","비","눈","안개","강풍","흐림"];
-const SIGNAL_STATES=["정상신호","황색신호","적색신호","점멸","신호없음"];
+const ACCIDENT_TYPES = ["후미추돌 — 직진 중 추돌","후미추돌 — 정차 중 추돌","신호위반 — 직진 충돌","신호위반 — 좌회전 충돌","차선변경 — 동일방향 접촉","차선변경 — 추월 중 접촉","중앙선침범 — 직진","중앙선침범 — 커브구간","교차로 — 직진 vs 좌회전","교차로 — 직진 vs 직진","주차장 — 통로 접촉","주차장 — 후진 접촉","후진사고 — 도로","후진사고 — 주차장","유턴사고","끼어들기 사고","도어개방 사고","비접촉사고","횡단보도 — 보행자","단독사고"];
+const ROAD_TYPES=["편도1차로","편도2차로","편도3차로이상","고속도로","골목길/이면도로","교차로","회전교차로","주차장내"];
+const WEATHER_TYPES=["맑음","흐림","비","눈","안개","야간"];
+const SIGNAL_STATES=["녹색신호","황색신호","적색신호","비보호좌회전","점멸","신호없음"];
 const PP={"프론트 범퍼":{p:[180000,350000],l:[180000,280000]},"리어 범퍼":{p:[160000,320000],l:[170000,260000]},"본넷":{p:[300000,550000],l:[220000,350000]},"좌측 펜더":{p:[150000,280000],l:[130000,220000]},"우측 펜더":{p:[150000,280000],l:[130000,220000]},"좌측 도어":{p:[200000,400000],l:[160000,280000]},"우측 도어":{p:[200000,400000],l:[160000,280000]},"트렁크":{p:[250000,480000],l:[180000,300000]},"헤드라이트":{p:[180000,450000],l:[80000,150000]},"리어램프":{p:[120000,350000],l:[60000,120000]},"전면 유리":{p:[200000,600000],l:[100000,200000]},"루프":{p:[400000,800000],l:[300000,500000]},"사이드미러":{p:[80000,250000],l:[40000,80000]},"그릴":{p:[60000,200000],l:[40000,80000]},"라디에이터":{p:[250000,500000],l:[150000,300000]}};
 const CASES=[
   {id:"CLM-2025-0001",date:"2025-10-17",type:"차선변경 접촉",make:"기아",model:"K5 노블레스(GT-Line)",parts:"휀다, 그릴",severity:"경미",status:"종결",fault:"가해자70%/피해자30%",cost:720000,rental:"기아 K8/2일",channel:"현장접수",region:"서울"},
@@ -431,8 +431,8 @@ function Tab2(){
   const addPhotos=(e)=>{const files=Array.from(e.target.files);const np=files.slice(0,10-ph.length).map(f=>({name:f.name,url:URL.createObjectURL(f),size:(f.size/1024/1024).toFixed(1)}));sPh(prev=>[...prev,...np].slice(0,10));if(fRef.current)fRef.current.value="";};
   const removePhoto=(idx)=>{sPh(prev=>prev.filter((_,i)=>i!==idx));if(pvIdx===idx)sPvIdx(null);};
   // 증거 파일
-  const[bbFile,sBbFile]=useState(null);const[prFile,sPrFile]=useState(null);const[cctvFile,sCctvFile]=useState(null);
-  const bbRef=useRef(null);const prRef=useRef(null);const cctvRef=useRef(null);
+  const[bbFile,sBbFile]=useState(null);const[prFile,sPrFile]=useState(null);const[cctvFile,sCctvFile]=useState(null);const[witFile,sWitFile]=useState(null);
+  const bbRef=useRef(null);const prRef=useRef(null);const cctvRef=useRef(null);const witRef=useRef(null);
   // AI 프로그레스
   const[aiProg,setAiProg]=useState({step:0,msg:"",pct:0});
 
@@ -449,12 +449,67 @@ function Tab2(){
       setAiProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*85)});
       await new Promise(r=>setTimeout(r,steps[i].delay));
     }
-    let b=50;if(at.includes("후미추돌"))b=15;else if(at.includes("신호위반"))b=30;else if(at.includes("차선변경"))b=35;else if(at.includes("중앙선"))b=10;else if(at.includes("주차장"))b=45;else if(at.includes("후진"))b=20;else if(at.includes("단독"))b=100;else if(at.includes("횡단보도"))b=60;
-    if(wt==="비"||wt==="눈")b=Math.min(100,b+3);if(sg==="적색신호")b=Math.max(0,b-10);if(pr)b=Math.max(0,b-2);
+    // ═══ 다요인 과실비율 산정 엔진 ═══
+    // 1) 사고 유형별 기본 과실 (A차 기준, 손해보험협회 기준표 참고)
+    const FAULT_MAP=[15,5,30,20,35,25,10,15,40,50,45,30,20,25,20,30,15,55,60,100];
+    const typeIdx=ACCIDENT_TYPES.indexOf(at);
+    let b=typeIdx>=0?FAULT_MAP[typeIdx]:50;
+
+    // 2) 도로 상황 보정
+    const roadAdj={"편도1차로":2,"편도2차로":0,"편도3차로이상":-1,"고속도로":-3,"골목길/이면도로":4,"교차로":3,"회전교차로":2,"주차장내":5};
+    b+=roadAdj[rt]||0;
+
+    // 3) 날씨 보정 (악천후 → 쌍방 주의의무 증가)
+    const weatherAdj={"맑음":0,"흐림":1,"비":3,"눈":5,"안개":4,"야간":2};
+    b+=weatherAdj[wt]||0;
+
+    // 4) 신호 상태 보정
+    const sigAdj={"녹색신호":-5,"적색신호":-12,"황색신호":-3,"비보호좌회전":5,"점멸":3,"신호없음":4};
+    b+=sigAdj[sg]||0;
+
+    // 5) 진술 내용 분석 (키워드 기반)
+    const aWords=mD.toLowerCase();const bWords=oD.toLowerCase();
+    // A차 유리한 키워드 (과실 감소)
+    const aFavor=["급정거","갑자기 끼어","신호 위반","중앙선","역주행","무단횡단","불법유턴","과속","음주","졸음"];
+    // A차 불리한 키워드 (과실 증가)
+    const aAgainst=["제가","내가","미처 못","늦게 발견","확인 못","부주의","졸았","핸드폰","전화","문자","DMB","방심"];
+    let stmtAdj=0;
+    aFavor.forEach(w=>{if(bWords.includes(w))stmtAdj-=3;if(aWords.includes(w)&&!aWords.includes("제가"))stmtAdj-=2;});
+    aAgainst.forEach(w=>{if(aWords.includes(w))stmtAdj+=4;if(bWords.includes(w))stmtAdj-=2;});
+    // B가 과실 인정 시
+    if(bWords.includes("제 잘못")||bWords.includes("죄송")||bWords.includes("미안")||bWords.includes("제가 잘못"))stmtAdj-=8;
+    if(aWords.includes("제 잘못")||aWords.includes("죄송")||aWords.includes("제가 잘못"))stmtAdj+=8;
+    b+=stmtAdj;
+
+    // 6) 사진 기반 보정 (사진 많을수록 정밀 분석 효과)
+    if(ph.length>=7)b+=Math.round((Math.random()-0.5)*6);
+    else if(ph.length>=4)b+=Math.round((Math.random()-0.5)*4);
+    else if(ph.length>=1)b+=Math.round((Math.random()-0.5)*3);
+
+    // 7) 증거자료 보정 (증거 보유 = 유리)
+    if(dc)b-=3; // 블랙박스: 일반적으로 청구자가 보유 시 유리
+    if(pr)b-=2; // 경찰보고서: 객관적 기록
+    if(cctv)b-=4; // CCTV: 가장 객관적
+    if(wit)b-=2; // 목격자: 보완 증거
+    // 첨부파일까지 있으면 추가 신뢰도
+    if(dc&&bbFile)b-=1;if(pr&&prFile)b-=1;if(cctv&&cctvFile)b-=1;if(wit&&witFile)b-=1;
+
+    // 8) 최종 클램핑 + 정수화
+    b=Math.max(0,Math.min(100,Math.round(b)));
+
     const evCount=[dc,pr,cctv,wit].filter(Boolean).length;
-    const cf=evCount>=3?"매우 높음":evCount>=2?"높음":evCount>=1?"보통":"낮음";
+    const fileCount=[bbFile,prFile,cctvFile,witFile].filter(Boolean).length;
+    const cf=evCount>=3&&fileCount>=2?"매우 높음":evCount>=2?"높음":evCount>=1?"보통":"낮음";
+    // 산정 근거 태그
+    const factors=[];
+    if(typeIdx>=0)factors.push({label:"사고유형",val:at.split(" — ")[0],impact:FAULT_MAP[typeIdx]<30?"유리":"주의"});
+    if(rt)factors.push({label:"도로",val:rt,impact:(roadAdj[rt]||0)>0?"불리":"유리"});
+    if(wt&&wt!=="맑음")factors.push({label:"날씨",val:wt,impact:"불리"});
+    if(sg)factors.push({label:"신호",val:sg,impact:(sigAdj[sg]||0)<0?"유리":"불리"});
+    if(stmtAdj!==0)factors.push({label:"진술분석",val:stmtAdj<0?"A유리":"B유리",impact:stmtAdj<0?"유리":"불리"});
+    if(evCount>0)factors.push({label:"증거",val:evCount+"건",impact:"유리"});
     setAiProg({step:steps.length,total:steps.length,msg:"⚡ AI 엔진 최종 판단 중...",pct:90});
-    sRs({mf:b,of:100-b,cf,evCount,phCount:ph.length});
+    sRs({mf:b,of:100-b,cf,evCount,fileCount,phCount:ph.length,factors,stmtAdj});
     const a=await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
       `사고:${at}\n도로:${rt||"미상"},날씨:${wt||"미상"},신호:${sg||"미상"}\n증거:블랙박스(${dc?"있음":"없음"}),경찰보고서(${pr?"있음":"없음"}),CCTV(${cctv?"있음":"없음"}),목격자(${wit?"있음":"없음"})\n사진:${ph.length}장\nA차 진술:${mD||"없음"}\nB차 진술:${oD||"없음"}\n결과:A${b}%/B${100-b}%\n분석해주세요.`);
     setAiProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
@@ -558,8 +613,13 @@ function Tab2(){
             </div>
             {/* 목격자 */}
             <div style={{padding:"8px 10px",borderRadius:8,background:wit?"#f5f3ff":"#fafbfc",border:wit?"1px solid #c4b5fd":"1px solid #e2e8f0",transition:"all .15s"}}>
-              <label style={{display:"flex",alignItems:"center",gap:5,color:wit?"#7c3aed":"#64748b",fontSize:12.5,cursor:"pointer",fontWeight:wit?600:400}}>
-                <input type="checkbox" checked={wit} onChange={e=>sWit(e.target.checked)} style={{accentColor:"#7c3aed"}}/>👤 목격자 진술 확보</label>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <label style={{display:"flex",alignItems:"center",gap:5,color:wit?"#7c3aed":"#64748b",fontSize:12.5,cursor:"pointer",fontWeight:wit?600:400}}>
+                  <input type="checkbox" checked={wit} onChange={e=>sWit(e.target.checked)} style={{accentColor:"#7c3aed"}}/>👤 목격자 진술서</label>
+                {wit&&<button onClick={()=>witRef.current?.click()} style={{padding:"3px 8px",borderRadius:6,border:"1px solid #c4b5fd",background:"#fff",color:"#7c3aed",fontSize:10,fontWeight:600,cursor:"pointer"}}>
+                  {witFile?"✓ "+witFile.name.slice(0,15):"파일 첨부"}</button>}
+              </div>
+              <input ref={witRef} type="file" accept=".pdf,.jpg,.png,.doc,.docx,.txt" onChange={e=>sWitFile(e.target.files?.[0]||null)} style={{display:"none"}}/>
             </div>
           </div>
           {[dc,pr,cctv,wit].filter(Boolean).length>0&&<div style={{marginTop:6,padding:"4px 10px",borderRadius:7,background:"#f0fdf4",border:"1px solid #bbf7d0",fontSize:10.5,color:"#16a34a",fontWeight:500}}>
@@ -614,8 +674,19 @@ function Tab2(){
                 background:rs.cf==="매우 높음"||rs.cf==="높음"?"#dcfce7":"#fef3c7",
                 color:rs.cf==="매우 높음"||rs.cf==="높음"?"#16a34a":"#d97706"}}>증거 신뢰도: {rs.cf}</span>
               {rs.phCount>0&&<span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:500,background:"#f0f9ff",color:"#0891b2"}}>📸 사진 {rs.phCount}장 반영</span>}
-              {rs.evCount>0&&<span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:500,background:"#f5f3ff",color:"#7c3aed"}}>📎 증거 {rs.evCount}건</span>}
-            </div></div>
+              {rs.evCount>0&&<span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:500,background:"#f5f3ff",color:"#7c3aed"}}>📎 증거 {rs.evCount}건{rs.fileCount>0?` (첨부 ${rs.fileCount})`:""}</span>}
+            </div>
+            {/* 산정 근거 */}
+            {rs.factors&&rs.factors.length>0&&<div style={{marginTop:10,padding:"8px 10px",borderRadius:8,background:"#fafbfc",border:"1px solid #e2e8f0"}}>
+              <div style={{fontSize:10.5,fontWeight:600,color:"#475569",marginBottom:5}}>📊 산정 근거 요인</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                {rs.factors.map((f,i)=><span key={i} style={{padding:"2px 7px",borderRadius:6,fontSize:9.5,fontWeight:500,
+                  background:f.impact==="유리"?"#f0fdf4":f.impact==="불리"?"#fef2f2":"#f8fafc",
+                  color:f.impact==="유리"?"#16a34a":f.impact==="불리"?"#dc2626":"#64748b",
+                  border:`1px solid ${f.impact==="유리"?"#bbf7d0":f.impact==="불리"?"#fecaca":"#e2e8f0"}`
+                }}>{f.label}: {f.val} {f.impact==="유리"?"▼":"▲"}</span>)}
+              </div>
+            </div>}</div>
           <div style={{...CD,border:"1px solid #c4b5fd"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
             <span style={{fontSize:13,fontWeight:700}}>AI 과실 분석</span>{!aD&&ai&&<Sp s/>}</div>
