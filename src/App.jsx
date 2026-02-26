@@ -1721,7 +1721,6 @@ async function sendToSheets(data) {
   try {
     await fetch(SHEETS_URL, {
       method: "POST",
-      
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
@@ -1889,7 +1888,7 @@ export default function DMPPortal() {
               style={{ position: "relative", borderRadius: 16, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", cursor: "pointer", transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)", boxShadow: "0 4px 30px rgba(0,0,0,0.3)", opacity: visibleCards.has(mvp.id) ? 1 : 0, transform: visibleCards.has(mvp.id) ? "translateY(0)" : "translateY(40px)" }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-6px) scale(1.01)"; e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,229,160,0.12)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 4px 30px rgba(0,0,0,0.3)"; }}
-              onClick={() => { logEvent("MVP체험", mvp.title, mvp.category); setActiveMvp(mvp.component); }}>
+              onClick={() => { logEvent("MVP체험", mvp.title, mvp.category); setTimeout(() => setActiveMvp(mvp.component), 300); }}>
               <div style={{ position: "absolute", inset: 0, opacity: 0.4, background: mvp.gradient }} />
               <div style={{ position: "relative", padding: 28, zIndex: 1 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
