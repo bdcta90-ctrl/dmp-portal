@@ -50,17 +50,36 @@ const MVPS = [
 export default function App() {
   const [page, setPage] = useState("portal");
   const [requestModal, setRequestModal] = useState(false);
+  const [listModal, setListModal] = useState(false);
   const [reqForm, setReqForm] = useState({ name: "", team: "", email: "", category: "", title: "", desc: "", deadline: "" });
   const [reqDone, setReqDone] = useState(false);
+  const [requests, setRequests] = useState([
+    { id: 1, title: "AI방화벽", category: "Security", desc: "내부 네트워크 이상 트래픽을 AI로 탐지하고 자동 차단하는 방화벽 대시보드", name: "편길동", team: "Axbd", email: "hgd@kt.com@", date: "2026. 2. 26.", status: "접수" },
+  ]);
+  const [statusDropId, setStatusDropId] = useState(null);
+  const STATUSES = ["접수", "검토중", "진행중", "완료", "보류"];
+  const STATUS_COLORS = { "접수": "#10b981", "검토중": "#f59e0b", "진행중": "#3b82f6", "완료": "#6366f1", "보류": "#ef4444" };
+  const CAT_COLORS = { "Security": "#10b981", "Finance": "#6366f1", "AI / ML": "#f43f5e", "Data": "#06b6d4", "DevOps": "#f59e0b", "기타": "#94a3b8" };
 
   if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
 
   const handleRequest = () => {
     if (!reqForm.name.trim() || !reqForm.team.trim() || !reqForm.email.trim() || !reqForm.title.trim() || !reqForm.desc.trim()) return;
+    setRequests(prev => [...prev, {
+      id: Date.now(), title: reqForm.title, category: reqForm.category || "기타", desc: reqForm.desc,
+      name: reqForm.name, team: reqForm.team, email: reqForm.email,
+      date: new Date().toLocaleDateString("ko-KR"), status: "접수"
+    }]);
     setReqDone(true);
     setTimeout(() => { setRequestModal(false); setReqDone(false); setReqForm({ name: "", team: "", email: "", category: "", title: "", desc: "", deadline: "" }); }, 2000);
   };
+
+  const changeStatus = (id, status) => {
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+    setStatusDropId(null);
+  };
+  const deleteRequest = (id) => { setRequests(prev => prev.filter(r => r.id !== id)); };
 
   const formReady = reqForm.name.trim() && reqForm.team.trim() && reqForm.email.trim() && reqForm.title.trim() && reqForm.desc.trim();
   const inputStyle = { width: "100%", padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
@@ -124,11 +143,11 @@ export default function App() {
                       <label style={labelStyle}>카테고리</label>
                       <select value={reqForm.category} onChange={e => setReqForm({ ...reqForm, category: e.target.value })} style={{ ...inputStyle, appearance: "auto", cursor: "pointer" }}>
                         <option value="" style={{ background: "#1a1a2e" }}>선택해주세요</option>
-                        <option value="AI/ML" style={{ background: "#1a1a2e" }}>AI/ML</option>
-                        <option value="데이터분석" style={{ background: "#1a1a2e" }}>데이터분석</option>
-                        <option value="업무자동화" style={{ background: "#1a1a2e" }}>업무자동화</option>
-                        <option value="고객경험" style={{ background: "#1a1a2e" }}>고객경험</option>
-                        <option value="보안/관제" style={{ background: "#1a1a2e" }}>보안/관제</option>
+                        <option value="Security" style={{ background: "#1a1a2e" }}>Security</option>
+                        <option value="Finance" style={{ background: "#1a1a2e" }}>Finance</option>
+                        <option value="AI / ML" style={{ background: "#1a1a2e" }}>AI / ML</option>
+                        <option value="Data" style={{ background: "#1a1a2e" }}>Data</option>
+                        <option value="DevOps" style={{ background: "#1a1a2e" }}>DevOps</option>
                         <option value="기타" style={{ background: "#1a1a2e" }}>기타</option>
                       </select>
                     </div>
@@ -158,6 +177,69 @@ export default function App() {
         </div>
       )}
 
+      {/* MVP 의뢰 목록 Modal */}
+      {listModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", backdropFilter: "blur(8px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => { setListModal(false); setStatusDropId(null); }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#16161e", borderRadius: 20, padding: 32, width: 640, maxHeight: "80vh", display: "flex", flexDirection: "column", border: "1px solid rgba(255,255,255,.08)", boxShadow: "0 24px 64px rgba(0,0,0,.4)", animation: "fadeIn .3s" }}>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>📋 MVP 의뢰 목록</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>총 {requests.length}건의 의뢰가 있습니다</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <button onClick={() => { setListModal(false); setRequestModal(true); }} style={{ padding: "6px 14px", borderRadius: 8, background: "transparent", border: "1.5px solid #10b981", color: "#10b981", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>+ 새 의뢰</button>
+                <button onClick={() => setListModal(false)} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, width: 32, height: 32, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✕</button>
+              </div>
+            </div>
+            {/* List */}
+            <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
+              {requests.length === 0 && (
+                <div style={{ textAlign: "center", padding: "48px 0", color: "rgba(255,255,255,.25)", fontSize: 14 }}>등록된 의뢰가 없습니다</div>
+              )}
+              {requests.map(req => {
+                const sc = STATUS_COLORS[req.status] || "#10b981";
+                return (
+                  <div key={req.id} style={{ background: "rgba(255,255,255,.03)", borderRadius: 14, padding: "18px 20px", border: "1px solid rgba(255,255,255,.06)", position: "relative" }}>
+                    {/* Title + Category + Status */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 16, fontWeight: 700 }}>{req.title}</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, color: CAT_COLORS[req.category] || "#f59e0b", border: `1px solid ${(CAT_COLORS[req.category] || "#f59e0b")}40`, background: `${(CAT_COLORS[req.category] || "#f59e0b")}10` }}>{req.category}</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, position: "relative" }}>
+                        <button onClick={() => setStatusDropId(statusDropId === req.id ? null : req.id)} style={{ padding: "4px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", background: sc, color: "#fff", border: "none", fontFamily: "inherit" }}>{req.status}</button>
+                        <button onClick={() => deleteRequest(req.id)} style={{ width: 24, height: 24, borderRadius: 6, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontFamily: "inherit" }}>✕</button>
+                        {/* Status Dropdown */}
+                        {statusDropId === req.id && (
+                          <div style={{ position: "absolute", top: "100%", right: 30, marginTop: 4, background: "#1e1e2e", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", padding: "6px 0", zIndex: 10, minWidth: 100, boxShadow: "0 8px 24px rgba(0,0,0,.4)" }}>
+                            {STATUSES.map(s => (
+                              <div key={s} onClick={() => changeStatus(req.id, s)} style={{ padding: "8px 16px", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, color: req.status === s ? STATUS_COLORS[s] : "rgba(255,255,255,.6)", fontWeight: req.status === s ? 700 : 400, background: req.status === s ? `${STATUS_COLORS[s]}10` : "transparent" }}
+                                onMouseEnter={e => { if (req.status !== s) e.currentTarget.style.background = "rgba(255,255,255,.05)"; }}
+                                onMouseLeave={e => { if (req.status !== s) e.currentTarget.style.background = "transparent"; }}>
+                                {req.status === s && "✔"} {s}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* Desc */}
+                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)", marginBottom: 10, lineHeight: 1.6 }}>{req.desc}</div>
+                    {/* Meta */}
+                    <div style={{ display: "flex", gap: 16, fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+                      <span>의뢰자 <strong style={{ color: "rgba(255,255,255,.6)" }}>{req.name} ({req.team})</strong></span>
+                      <span>이메일 <strong style={{ color: "rgba(255,255,255,.6)" }}>{req.email}</strong></span>
+                      <span>신청일 <strong style={{ color: "rgba(255,255,255,.6)" }}>{req.date}</strong></span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(10,10,15,.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 32px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: 1200, margin: "0 auto" }}>
@@ -172,8 +254,10 @@ export default function App() {
             <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>
               <span style={{ color: "#10b981", fontWeight: 700 }}>{MVPS.filter(m => m.status === "Live").length}</span> MVPs
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>
-              📋 의뢰 목록 <span style={{ background: "#10b981", color: "#fff", padding: "0 5px", borderRadius: 6, fontSize: 10, fontWeight: 700, marginLeft: 2 }}>3</span>
+            <div onClick={() => setListModal(true)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.5)", cursor: "pointer", transition: "all .2s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(16,185,129,.3)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.08)"}>
+              📋 의뢰 목록 <span style={{ background: "#10b981", color: "#fff", padding: "0 5px", borderRadius: 6, fontSize: 10, fontWeight: 700, marginLeft: 2 }}>{requests.length}</span>
             </div>
             <button onClick={() => setRequestModal(true)} style={{ padding: "7px 16px", borderRadius: 8, background: "transparent", border: "1.5px solid #10b981", color: "#10b981", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .2s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#10b981"; e.currentTarget.style.color = "#fff"; }}
