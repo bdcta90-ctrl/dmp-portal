@@ -1715,6 +1715,23 @@ const MVP_LIST = [
 
 const CAT_COLORS = { Security: "#0a84ff", Finance: "#00E5A0", AI: "#c77dff", Data: "#ffd166", DevOps: "#ff6b6b" };
 
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzauEgPU4-WFj_pexS5KLmHyCxOd6BGSMc5UKb1HTm-iPD1kvK0-9LqgGpvRDMc1dhI/exec";
+
+async function sendToSheets(data) {
+  try {
+    await fetch(SHEETS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch (e) { console.log("Sheets API error:", e); }
+}
+
+function logEvent(event, mvp, detail) {
+  sendToSheets({ type: "log", event, mvp, detail: detail || "" });
+}
+
 export default function DMPPortal() {
   const [activeMvp, setActiveMvp] = useState(null);
   const [showRequestForm, setShowRequestForm] = useState(false);
@@ -1742,22 +1759,45 @@ export default function DMPPortal() {
     return () => observer.disconnect();
   }, []);
 
-  // Load saved requests on mount
+  // Load requests from Google Sheets on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("dmp-requests");
-      if (saved) setRequests(JSON.parse(saved));
-    } catch {}
+    (async () => {
+      try {
+        const res = await fetch(SHEETS_URL);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setRequests(data.map((r, i) => ({
+            id: Date.now() + i,
+            name: r["이름"] || "",
+            team: r["소속팀"] || "",
+            email: r["이메일"] || "",
+            category: r["카테고리"] || "",
+            title: r["MVP제목"] || "",
+            description: r["상세설명"] || "",
+            deadline: r["희망완료일"] || "",
+            status: r["상태"] || "접수",
+            submittedAt: r["신청일시"] || "",
+          })));
+        }
+      } catch (e) { console.log("Failed to load requests:", e); }
+    })();
+    logEvent("페이지방문", "Portal", "포탈 접속");
   }, []);
-
-  // Save requests on change
-  useEffect(() => {
-    try { localStorage.setItem("dmp-requests", JSON.stringify(requests)); } catch {}
-  }, [requests]);
 
   const handleSubmit = () => {
     const newReq = { ...formData, id: Date.now(), submittedAt: new Date().toISOString(), status: "접수" };
     setRequests((prev) => [newReq, ...prev]);
+    sendToSheets({
+      type: "request",
+      name: formData.name,
+      team: formData.team,
+      email: formData.email,
+      category: formData.category,
+      title: formData.title,
+      description: formData.description,
+      deadline: formData.deadline,
+    });
+    logEvent("의뢰제출", formData.title, `${formData.name}(${formData.team})`);
     setFormSubmitted(true);
     setTimeout(() => { setFormSubmitted(false); setShowRequestForm(false); setFormData({ name: "", team: "", email: "", title: "", description: "", category: "", deadline: "" }); }, 2500);
   };
@@ -1849,7 +1889,7 @@ export default function DMPPortal() {
               style={{ position: "relative", borderRadius: 16, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", cursor: "pointer", transition: "all 0.4s cubic-bezier(0.16,1,0.3,1)", boxShadow: "0 4px 30px rgba(0,0,0,0.3)", opacity: visibleCards.has(mvp.id) ? 1 : 0, transform: visibleCards.has(mvp.id) ? "translateY(0)" : "translateY(40px)" }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-6px) scale(1.01)"; e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,229,160,0.12)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "0 4px 30px rgba(0,0,0,0.3)"; }}
-              onClick={() => setActiveMvp(mvp.component)}>
+              onClick={() => { logEvent("MVP체험", mvp.title, mvp.category); setActiveMvp(mvp.component); }}>
               <div style={{ position: "absolute", inset: 0, opacity: 0.4, background: mvp.gradient }} />
               <div style={{ position: "relative", padding: 28, zIndex: 1 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
