@@ -803,7 +803,8 @@ function exportToExcel(events) {
 
 // Main App
 
-export default function SecurityDashboard() {
+export default function SecurityDashboard(props) {
+  var onBack = props && props.onBack;
   var stEmp = useState(function() { return generateAllEmployees(); });
   var employees = stEmp[0];
   var stEvents = useState([]);
@@ -900,7 +901,11 @@ export default function SecurityDashboard() {
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(10,10,15,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "12px 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg,#0a84ff,#5e5ce6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, boxShadow: "0 4px 15px rgba(10,132,255,0.3)" }}>S</div>
+            {onBack && <button onClick={onBack} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",padding:"5px 12px",borderRadius:7,fontSize:11,fontWeight:500,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              손해사정
+            </button>}
+            <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg,#ff2d55,#ff6b35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, boxShadow: "0 4px 15px rgba(255,45,85,0.3)" }}>S</div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700 }}>내부 정보 유출 위험자 식별 <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400, fontSize: 11 }}>AI Decision Support</span></div>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>이상행위 탐지 / 의도 추론 / 조치 추천 / 활성 임직원 {employees.length.toLocaleString()}명</div>
