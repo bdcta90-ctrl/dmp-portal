@@ -1715,7 +1715,7 @@ const MVP_LIST = [
 
 const CAT_COLORS = { Security: "#0a84ff", Finance: "#00E5A0", AI: "#c77dff", Data: "#ffd166", DevOps: "#ff6b6b" };
 
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbzauEgPU4-WFj_pexS5KLmHyCxOd6BGSMc5UKb1HTm-iPD1kvK0-9LqgGpvRDMc1dhI/exec";
+const SHEETS_URL = "/api/sheets";
 
 async function sendToSheets(data) {
   try {
