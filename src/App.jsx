@@ -1763,7 +1763,9 @@ export default function DMPPortal() {
     (async () => {
       try {
         const res = await fetch(SHEETS_URL);
-        const data = await res.json();
+             const text = await res.text();
+             console.log("Sheets response:", text);
+             const data = JSON.parse(text);
         if (Array.isArray(data) && data.length > 0) {
           setRequests(data.map((r, i) => ({
             id: Date.now() + i,
@@ -1776,7 +1778,7 @@ export default function DMPPortal() {
             deadline: r["희망완료일"] || "",
             status: r["상태"] || "접수",
             submittedAt: r["신청일시"] || "",
-          })));
+          }))).reverse();
         }
       } catch (e) { console.log("Failed to load requests:", e); }
     })();
