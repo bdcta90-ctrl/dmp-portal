@@ -2,164 +2,255 @@ import { useState } from "react";
 import ClaimsAgentMVP from "./ClaimsAgent.jsx";
 import SecurityDashboard from "./SecurityDashboard.jsx";
 
-const agents = [
-  {
-    id: "claims",
-    title: "AI 손해사정 Agent",
-    sub: "Auto Claims · 견적·과실·처리방법",
-    desc: "사고 접수부터 견적 산정, 과실비율 분석, 최적 처리방법 추천까지 손해사정 업무 전 과정을 AI가 지원합니다.",
-    icon: "🚗",
-    color: "#0891b2",
-    gradient: "linear-gradient(135deg,#0891b2,#7c3aed)",
-    tags: ["견적 산정", "과실 분석", "처리 제안", "판례 매칭"],
-    status: "운영 중",
-  },
+const MVPS = [
   {
     id: "security",
-    title: "정보유출 탐지 Agent",
-    sub: "Insider Threat · 이상행위 탐지",
-    desc: "1,800명 임직원의 실시간 행동을 모니터링하여 내부 정보 유출 위험자를 AI가 자동 식별하고 조치를 추천합니다.",
+    category: "SECURITY",
+    catColor: "#10b981",
     icon: "🛡️",
-    color: "#ff2d55",
-    gradient: "linear-gradient(135deg,#ff2d55,#ff6b35)",
-    tags: ["실시간 탐지", "위험도 분석", "조치 추천", "Excel 리포트"],
-    status: "운영 중",
+    iconBg: "linear-gradient(135deg,#ef4444,#f97316)",
+    title: "내부 정보 유출 위험자 식별",
+    desc: "1,800명 임직원 이상행위 탐지 · AI 의도 추론 · 조치 추천까지 제공하는 실시간 보안 위험 모니터링 대시보드",
+    tags: ["보안관제", "AI분석", "실시간"],
+    date: "2025.02",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(16,185,129,0.08),rgba(6,182,212,0.06))",
+    border: "rgba(16,185,129,0.2)",
   },
   {
-    id: "coming1",
-    title: "계약 분석 Agent",
-    sub: "Contract Analysis · 조항 검토",
-    desc: "계약서를 업로드하면 핵심 조항, 리스크 포인트, 누락 사항을 AI가 자동 분석합니다.",
-    icon: "📋",
-    color: "#6366f1",
-    gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-    tags: ["조항 분석", "리스크 탐지", "비교 검토"],
-    status: "준비 중",
+    id: "stockpilot",
+    category: "FINANCE",
+    catColor: "#6366f1",
+    icon: "📊",
+    iconBg: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+    title: "StockPilot 통합 자산관리",
+    desc: "주식 포트폴리오 · 부동산/자동차 · 지출/연말정산 · AI진단 · 글로벌 시세까지 통합 관리하는 자산 관리 프로그램",
+    tags: ["자산관리", "포트폴리오", "AI진단"],
+    date: "2025.02",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(99,102,241,0.08),rgba(139,92,246,0.06))",
+    border: "rgba(99,102,241,0.2)",
   },
   {
-    id: "coming2",
-    title: "고객 상담 Agent",
-    sub: "Customer Support · 상담 자동화",
-    desc: "고객 문의를 자동 분류하고 최적의 응대 스크립트와 해결 방안을 AI가 실시간으로 제안합니다.",
-    icon: "💬",
-    color: "#059669",
-    gradient: "linear-gradient(135deg,#059669,#10b981)",
-    tags: ["자동 분류", "스크립트 생성", "감정 분석"],
-    status: "준비 중",
+    id: "claims",
+    category: "AI",
+    catColor: "#f43f5e",
+    icon: "🚗",
+    iconBg: "linear-gradient(135deg,#f43f5e,#fb923c)",
+    title: "AI 자동차 손해사정 Agent",
+    desc: "견적 산정 · 과실비율 분석 · 처리방법 제안까지 AI가 의사결정을 지원하는 자동차 손해사정 포탈",
+    tags: ["AI Agent", "손해사정", "AI진단"],
+    date: "2025.02",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(244,63,94,0.08),rgba(251,146,60,0.06))",
+    border: "rgba(244,63,94,0.2)",
   },
 ];
 
 export default function App() {
-  const [page, setPage] = useState("portal"); // "portal" | "claims" | "security"
+  const [page, setPage] = useState("portal");
+  const [requestModal, setRequestModal] = useState(false);
+  const [reqForm, setReqForm] = useState({ title: "", desc: "", requester: "", dept: "" });
+  const [reqDone, setReqDone] = useState(false);
 
   if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
 
-  // DMP Portal
-  return (
-    <div style={{ width: "100%", minHeight: "100vh", fontFamily: "'Noto Sans KR',-apple-system,sans-serif", background: "linear-gradient(155deg,#f8fafc,#f0f9ff 30%,#faf5ff 60%,#f0fdf4 90%)", color: "#0f172a" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
-        @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}`}</style>
+  const handleRequest = () => {
+    if (!reqForm.title.trim()) return;
+    setReqDone(true);
+    setTimeout(() => { setRequestModal(false); setReqDone(false); setReqForm({ title: "", desc: "", requester: "", dept: "" }); }, 2000);
+  };
 
-      {/* Header */}
-      <div style={{ padding: "16px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #e2e8f0", background: "rgba(255,255,255,.85)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#0891b2,#7c3aed,#059669)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 16, fontWeight: 800, boxShadow: "0 4px 12px rgba(8,145,178,.25)" }}>D</div>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: -.3 }}>
-              <span style={{ background: "linear-gradient(135deg,#0891b2,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>DMP</span>
-              <span style={{ color: "#334155", marginLeft: 6 }}>AI Agent Portal</span>
-            </div>
-            <div style={{ color: "#94a3b8", fontSize: 10, letterSpacing: .5, marginTop: 1 }}>Decision Making Platform · kt ds AX BD팀</div>
+  return (
+    <div style={{ width: "100%", minHeight: "100vh", fontFamily: "'Pretendard',-apple-system,'Noto Sans KR',sans-serif", background: "#0a0a0f", color: "#fff", position: "relative" }}>
+      <style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes gridPulse{0%,100%{opacity:.03}50%{opacity:.06}}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.25)}`}</style>
+
+      {/* BG Grid */}
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px)", backgroundSize: "60px 60px", animation: "gridPulse 4s ease infinite" }} />
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, background: "radial-gradient(ellipse at 30% 20%,rgba(16,185,129,0.06) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(99,102,241,0.04) 0%,transparent 50%)" }} />
+
+      {/* MVP 제작 의뢰 Modal */}
+      {requestModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", backdropFilter: "blur(8px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => !reqDone && setRequestModal(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#16161e", borderRadius: 20, padding: 32, width: 480, border: "1px solid rgba(255,255,255,.08)", boxShadow: "0 24px 64px rgba(0,0,0,.4)", animation: "fadeIn .3s" }}>
+            {reqDone ? (
+              <div style={{ textAlign: "center", padding: "32px 0" }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>의뢰가 접수되었습니다!</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>AX BD팀이 빠르게 검토 후 연락드리겠습니다.</div>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                  <div>
+                    <div style={{ fontSize: 18, fontWeight: 700 }}>새로운 MVP 제작 의뢰</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>아이디어를 현실로 만들어보세요</div>
+                  </div>
+                  <button onClick={() => setRequestModal(false)} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, width: 32, height: 32, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✕</button>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>MVP 제목 *</label>
+                    <input value={reqForm.title} onChange={e => setReqForm({ ...reqForm, title: e.target.value })} placeholder="예: AI 고객 상담 자동화 시스템" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>상세 설명</label>
+                    <textarea value={reqForm.desc} onChange={e => setReqForm({ ...reqForm, desc: e.target.value })} placeholder="어떤 문제를 해결하고 싶은지 자유롭게 설명해주세요" rows={4} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }} />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>의뢰자</label>
+                      <input value={reqForm.requester} onChange={e => setReqForm({ ...reqForm, requester: e.target.value })} placeholder="이름" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>소속 부서</label>
+                      <input value={reqForm.dept} onChange={e => setReqForm({ ...reqForm, dept: e.target.value })} placeholder="팀/부서명" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                    </div>
+                  </div>
+                </div>
+                <button onClick={handleRequest} style={{ width: "100%", marginTop: 20, padding: "13px 0", borderRadius: 12, border: "none", background: reqForm.title.trim() ? "#10b981" : "rgba(255,255,255,.06)", color: reqForm.title.trim() ? "#fff" : "rgba(255,255,255,.25)", fontSize: 14, fontWeight: 700, cursor: reqForm.title.trim() ? "pointer" : "default", transition: "all .2s", fontFamily: "inherit" }}>
+                  의뢰 제출하기
+                </button>
+              </>
+            )}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ padding: "5px 12px", borderRadius: 20, background: "#f0fdf4", border: "1px solid #bbf7d0", fontSize: 11, color: "#16a34a", fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
-            System Active
+      )}
+
+      {/* Header */}
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(10,10,15,.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 32px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff", boxShadow: "0 4px 15px rgba(16,185,129,.3)" }}>DMP</div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>Deny MVP Portal</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>kt ds AX BD · Rapid Prototyping Hub</div>
+            </div>
           </div>
-          <div style={{ fontSize: 11, color: "#94a3b8", fontFamily: "'DM Mono',monospace" }}>
-            {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+              <span style={{ color: "#10b981", fontWeight: 700 }}>{MVPS.filter(m => m.status === "Live").length}</span> MVPs
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+              📋 의뢰 목록 <span style={{ background: "#10b981", color: "#fff", padding: "0 5px", borderRadius: 6, fontSize: 10, fontWeight: 700, marginLeft: 2 }}>3</span>
+            </div>
+            <button onClick={() => setRequestModal(true)} style={{ padding: "7px 16px", borderRadius: 8, background: "transparent", border: "1.5px solid #10b981", color: "#10b981", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all .2s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#10b981"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#10b981"; }}>
+              + MVP 제작 의뢰
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Hero */}
-      <div style={{ padding: "48px 40px 32px", textAlign: "center", animation: "fadeIn .6s ease" }}>
-        <div style={{ fontSize: 13, color: "#0891b2", fontWeight: 600, letterSpacing: 1, marginBottom: 8 }}>AI-POWERED DECISION SUPPORT</div>
-        <h1 style={{ fontSize: 32, fontWeight: 800, margin: "0 0 10px", letterSpacing: -1, lineHeight: 1.3 }}>
-          업무별 <span style={{ background: "linear-gradient(135deg,#0891b2,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI Agent</span>를 선택하세요
+      {/* Hero Section */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 32px 56px", animation: "fadeInUp .7s ease" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 20, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", marginBottom: 20, fontSize: 12, color: "#10b981", fontWeight: 600 }}>
+          🚀 AX Business Development
+        </div>
+        <h1 style={{ fontSize: 48, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.2, letterSpacing: -1.5, fontFamily: "'Space Grotesk','Pretendard',sans-serif" }}>
+          Build Fast,<br />
+          <span style={{ background: "linear-gradient(135deg,#10b981,#06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Validate Faster.</span>
         </h1>
-        <p style={{ color: "#64748b", fontSize: 14.5, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
-          각 Agent는 업무 도메인에 특화된 AI 분석·추천·자동화 기능을 제공합니다.
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.8, maxWidth: 520 }}>
+          AX 사업개발팀이 만든 MVP를 직접 체험해보세요.<br />
+          카드를 클릭하면 실제 작동하는 MVP를 바로 사용할 수 있습니다.
         </p>
       </div>
 
-      {/* Agent Cards Grid */}
-      <div style={{ padding: "0 40px 48px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 960, margin: "0 auto" }}>
-        {agents.map((a, idx) => {
-          const isActive = a.status === "운영 중";
-          return (
-            <div
-              key={a.id}
-              onClick={() => isActive && setPage(a.id)}
-              style={{
-                background: "#fff", borderRadius: 18, padding: "28px 26px", border: "1px solid #e2e8f0",
-                cursor: isActive ? "pointer" : "default", transition: "all .25s", position: "relative", overflow: "hidden",
-                opacity: isActive ? 1 : .55, animation: `fadeIn ${.3 + idx * .12}s ease`,
-              }}
-              onMouseEnter={e => { if (isActive) { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 32px ${a.color}15`; e.currentTarget.style.borderColor = a.color + "40"; }}}
-              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
-            >
-              {/* Status Badge */}
-              <div style={{ position: "absolute", top: 16, right: 16, display: "flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 12, background: isActive ? "#f0fdf4" : "#f8fafc", border: `1px solid ${isActive ? "#bbf7d0" : "#e2e8f0"}`, fontSize: 10, fontWeight: 600, color: isActive ? "#16a34a" : "#94a3b8" }}>
-                {isActive && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#4ade80" }} />}
-                {a.status}
+      {/* MVP SHOWCASE */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 40px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: "rgba(255,255,255,.25)", marginBottom: 24 }}>MVP SHOWCASE</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+          {MVPS.map((mvp, idx) => {
+            const isClickable = mvp.id === "claims" || mvp.id === "security";
+            return (
+              <div
+                key={mvp.id}
+                onClick={() => isClickable && setPage(mvp.id)}
+                style={{
+                  background: mvp.gradient, borderRadius: 18, padding: "24px 22px", border: `1px solid ${mvp.border}`,
+                  cursor: isClickable ? "pointer" : "default", transition: "all .3s", position: "relative", overflow: "hidden",
+                  animation: `fadeInUp ${.4 + idx * .15}s ease`,
+                }}
+                onMouseEnter={e => { if (isClickable) { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = `0 16px 40px rgba(0,0,0,.3)`; e.currentTarget.style.borderColor = mvp.catColor + "60"; }}}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = mvp.border; }}
+              >
+                {/* Category + Status */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <span style={{ padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, letterSpacing: 1, border: `1px solid ${mvp.catColor}40`, color: mvp.catColor, background: mvp.catColor + "10" }}>{mvp.category}</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#10b981", fontWeight: 600 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981", animation: "pulse 2s infinite" }} />
+                    {mvp.status}
+                  </div>
+                </div>
+
+                {/* Icon */}
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: mvp.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16, boxShadow: `0 6px 20px rgba(0,0,0,.3)`, animation: "float 3s ease-in-out infinite" }}>
+                  {mvp.icon}
+                </div>
+
+                {/* Title + Desc */}
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>{mvp.title}</div>
+                <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.4)", lineHeight: 1.7, marginBottom: 18, minHeight: 44 }}>{mvp.desc}</div>
+
+                {/* Tags + Date */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                    {mvp.tags.map((t, i) => (
+                      <span key={i} style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.35)", border: "1px solid rgba(255,255,255,.06)" }}>{t}</span>
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.2)", fontFamily: "'DM Mono',monospace" }}>{mvp.date}</span>
+                </div>
               </div>
+            );
+          })}
+        </div>
+      </div>
 
-              {/* Icon + Title */}
-              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: a.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, boxShadow: `0 6px 20px ${a.color}25`, animation: isActive ? "float 3s ease-in-out infinite" : "none" }}>
-                  {a.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: "#0f172a" }}>{a.title}</div>
-                  <div style={{ fontSize: 11.5, color: "#94a3b8", marginTop: 1 }}>{a.sub}</div>
-                </div>
-              </div>
+      {/* New MVP Request Card */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 20px" }}>
+        <div
+          onClick={() => setRequestModal(true)}
+          style={{ background: "rgba(255,255,255,.02)", borderRadius: 18, padding: "24px 22px", border: "1px dashed rgba(255,255,255,.1)", cursor: "pointer", transition: "all .3s", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 120, gap: 8 }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(16,185,129,.4)"; e.currentTarget.style.background = "rgba(16,185,129,.03)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.1)"; e.currentTarget.style.background = "rgba(255,255,255,.02)"; }}
+        >
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(16,185,129,.1)", border: "1px solid rgba(16,185,129,.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", fontSize: 20 }}>+</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>새로운 MVP 제작 의뢰</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>아이디어를 현실로 만들어보세요</div>
+        </div>
+      </div>
 
-              {/* Description */}
-              <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7, margin: "0 0 16px" }}>{a.desc}</p>
-
-              {/* Tags */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 18 }}>
-                {a.tags.map((t, i) => (
-                  <span key={i} style={{ padding: "3px 10px", borderRadius: 12, fontSize: 10.5, fontWeight: 600, background: a.color + "08", color: a.color, border: `1px solid ${a.color}15` }}>{t}</span>
-                ))}
-              </div>
-
-              {/* CTA */}
-              {isActive ? (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "10px 0", borderRadius: 10, background: a.gradient, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: .3 }}>
-                  Agent 실행
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-                </div>
-              ) : (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "10px 0", borderRadius: 10, background: "#f8fafc", color: "#94a3b8", fontSize: 13, fontWeight: 600, border: "1px solid #e2e8f0" }}>
-                  Coming Soon
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {/* Bottom CTA */}
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 32px 24px", textAlign: "center" }}>
+        <div style={{ background: "linear-gradient(135deg,rgba(16,185,129,.06),rgba(6,182,212,.04))", borderRadius: 24, padding: "48px 40px", border: "1px solid rgba(16,185,129,.12)" }}>
+          <h2 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 10px" }}>MVP가 필요하신가요?</h2>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 24, lineHeight: 1.7 }}>
+            아이디어만 있으면 됩니다. AX BD팀이 빠르게 <span style={{ color: "#10b981", fontWeight: 600 }}>프로토타입</span>을 만들어드립니다.
+          </p>
+          <button onClick={() => setRequestModal(true)} style={{ padding: "14px 36px", borderRadius: 12, border: "none", background: "#10b981", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 8px 24px rgba(16,185,129,.3)", transition: "all .2s" }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(16,185,129,.4)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(16,185,129,.3)"; }}>
+            MVP 제작 의뢰하기
+          </button>
+        </div>
       </div>
 
       {/* Footer */}
-      <div style={{ padding: "20px 40px", borderTop: "1px solid #e2e8f0", textAlign: "center", color: "#94a3b8", fontSize: 11 }}>
-        © 2025 kt ds AX BD팀 · DMP AI Agent Portal · Prototype v1.0
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 32px 32px", textAlign: "center", color: "rgba(255,255,255,.15)", fontSize: 11 }}>
+        © 2025 kt ds AX BD · Deny MVP Portal · Rapid Prototyping Hub
       </div>
     </div>
   );
