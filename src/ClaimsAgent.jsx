@@ -796,6 +796,7 @@ function Tab3(){
   const[summary,setSummary]=useState(null);const[sumText,setSumText]=useState("");const{displayed:tS,done:sD}=useTW(sumText);
   const[proposals,setProposals]=useState(null);
   const[selIdx,setSelIdx]=useState(null);const[detText,setDetText]=useState("");const{displayed:tD,done:dD}=useTW(detText);
+  const[detData,setDetData]=useState(null);const[openStep,setOpenStep]=useState(null);
   // 고객 성향
   const[custPref,setCustPref]=useState("");
   // intake Q&A
@@ -922,13 +923,202 @@ function Tab3(){
     return{idx:1,reason:"종합적으로 비용·기간·품질을 고려하면 제휴 센터가 가장 균형 잡힌 선택입니다."};
   };
 
-  const showDet=async idx=>{setSelIdx(idx);setDetText("");setStage("detail");
+  const showDet=async idx=>{setSelIdx(idx);setDetText("");setDetData(null);setOpenStep(null);setStage("detail");
     const p=proposals[idx];
     let fullInput=input;Object.entries(intakeAs).forEach(([k,v])=>{if(v&&v.trim())fullInput+=`\n${k}: ${v}`;});
-    const r=await callAI("손해사정 전문 AI. 선택된 방법의 미리보기+절차를 안내하세요.\n## 미리보기\n- 상세비용,타임라인\n## 다음 절차\n- Step별 안내\n## 고객 스크립트\n## 유의사항",
-      `사고건:\n${fullInput}\n방법:${p.title}(${p.subtitle})\n비용:${p.cost},기간:${p.period}\n고객성향:${CUST_PREFS.find(x=>x.id===custPref)?.short||"미파악"}\n상세+절차 안내해주세요.`);
+    // 비용 파싱
+    const costMatch=fullInput.match(/(\d{1,3}[,.]?\d{3}[,.]?\d{0,3})/);
+    const baseCost=costMatch?parseInt(costMatch[1].replace(/[,.]/g,"")):selCase?.cost||2000000;
+    const carMatch=fullInput.match(/차량[:\s]*([^\n]*)/)||fullInput.match(/(현대|기아|제네시스|BMW|벤츠|아우디|볼보|테슬라|포르쉐|토요타|렉서스|혼다)[^\n]*/i);
+    const carName=carMatch?carMatch[1].trim():"확인필요";
+    // 차량 가액 추정 (연식 기반)
+    const yrMatch=fullInput.match(/(\d{4})년/);
+    const yr=yrMatch?parseInt(yrMatch[1]):2022;
+    const age=2026-yr;
+    const estValue=age<=1?45000000:age<=3?35000000:age<=5?25000000:age<=7?18000000:12000000;
+    // 방법별 비용 산출
+    const methodCosts=buildMethodCosts(idx,baseCost,estValue,carName,age,fullInput);
+    // 방법별 기간 근거
+    const timeline=buildTimeline(idx,baseCost,fullInput);
+    // 방법별 절차+체크리스트
+    const steps=buildSteps(idx,custPref);
+    setDetData({methodCosts,timeline,steps,carName,estValue,age,baseCost});
+    // AI 보충 분석 (고객 스크립트 + 유의사항)
+    const r=await callAI("손해사정 전문 AI. 선택된 방법에 대해 고객 상담 스크립트와 유의사항만 제시하세요.\n## 고객 스크립트\n- 전화/대면 시 사용할 멘트\n## 유의사항\n- 주의할 점",
+      `사고건:\n${fullInput}\n방법:${p.title}(${p.subtitle})\n비용:${p.cost},기간:${p.period}\n고객성향:${CUST_PREFS.find(x=>x.id===custPref)?.short||"미파악"}\n스크립트+유의사항만 간결하게.`);
     setDetText(r);};
-  const reset=()=>{setStage("idle");setSelCase(null);setInput("");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});setCustPref("");setIntakeProg({step:0,msg:"",pct:0})};
+
+  // ═══ 비용 상세 산출 ═══
+  const buildMethodCosts=(idx,base,carValue,car,age,txt)=>{
+    // 파손 부위 파싱
+    const parts=[];
+    const partKeywords=[
+      {name:"프론트범퍼",partsCost:180000,laborCost:120000,paintCost:150000},
+      {name:"리어범퍼",partsCost:170000,laborCost:110000,paintCost:140000},
+      {name:"본넷(후드)",partsCost:350000,laborCost:80000,paintCost:180000},
+      {name:"프론트펜더",partsCost:250000,laborCost:90000,paintCost:160000},
+      {name:"리어쿼터패널",partsCost:400000,laborCost:180000,paintCost:200000},
+      {name:"프론트도어",partsCost:380000,laborCost:100000,paintCost:170000},
+      {name:"리어도어",partsCost:360000,laborCost:100000,paintCost:170000},
+      {name:"사이드미러",partsCost:220000,laborCost:40000,paintCost:0},
+      {name:"헤드라이트",partsCost:450000,laborCost:50000,paintCost:0},
+      {name:"테일라이트",partsCost:280000,laborCost:40000,paintCost:0},
+      {name:"트렁크",partsCost:320000,laborCost:80000,paintCost:160000},
+      {name:"루프패널",partsCost:500000,laborCost:200000,paintCost:220000},
+      {name:"전면유리",partsCost:350000,laborCost:80000,paintCost:0},
+    ];
+    const tl=txt.toLowerCase();
+    partKeywords.forEach(pk=>{
+      if(tl.includes(pk.name.replace("(후드)",""))||tl.includes(pk.name.split("(")[0]))parts.push({...pk});
+    });
+    if(tl.includes("범퍼")&&!parts.find(p=>p.name.includes("범퍼")))parts.push(partKeywords[0]);
+    if(tl.includes("미러")&&!parts.find(p=>p.name.includes("미러")))parts.push(partKeywords[7]);
+    if(tl.includes("도어")&&!parts.find(p=>p.name.includes("도어")))parts.push(partKeywords[5]);
+    if(parts.length===0){// fallback: 총 비용 기준 역산
+      const est=Math.round(base*0.4);
+      parts.push({name:"주요 파손부위(종합)",partsCost:est,laborCost:Math.round(base*0.3),paintCost:Math.round(base*0.3)});
+    }
+    // 방법별 배율
+    const mult=idx===0?0.72:idx===1?0.85:1.0;
+    const partsMult=idx===2?1.0:idx===1?0.8:0.7; // OEM vs 대체 vs 미수선
+    const laborMult=idx===2?1.0:idx===1?0.85:0;
+    const paintMult=idx===2?1.0:idx===1?0.9:0;
+    const breakdown=parts.map(p=>({
+      name:p.name,
+      parts:idx===0?0:Math.round(p.partsCost*partsMult),
+      labor:Math.round(p.laborCost*laborMult),
+      paint:Math.round(p.paintCost*paintMult),
+      subtotal:idx===0?0:Math.round(p.partsCost*partsMult+p.laborCost*laborMult+p.paintCost*paintMult),
+      note:idx===0?"현금정산":(idx===1?"대체부품 적용":"OEM 순정부품")
+    }));
+    const totalParts=breakdown.reduce((s,b)=>s+b.parts,0);
+    const totalLabor=breakdown.reduce((s,b)=>s+b.labor,0);
+    const totalPaint=breakdown.reduce((s,b)=>s+b.paint,0);
+    const totalRepair=totalParts+totalLabor+totalPaint;
+    const cashAmount=idx===0?Math.round(base*mult):0;
+    return{breakdown,totalParts,totalLabor,totalPaint,totalRepair:idx===0?cashAmount:totalRepair,
+      carValue,car,age,partType:idx===0?"해당없음(현금정산)":idx===1?"대체부품(OEM 호환)":"OEM 순정부품",
+      laborRate:idx===2?"공식센터 공임단가":"제휴센터 할인단가",isCash:idx===0};
+  };
+
+  // ═══ 기간 근거 ═══
+  const buildTimeline=(idx,cost,txt)=>{
+    if(idx===0)return{total:"3~5일",phases:[
+      {name:"보험사 접수·견적 확인",days:"1일",reason:"사고 접수 후 견적서를 보험사에 제출하여 현금 정산 금액을 확정합니다"},
+      {name:"협의금 산정·합의",days:"1~2일",reason:"보험사 손해사정팀에서 미수선 협의금을 산정합니다. 견적 대비 70~80% 수준이 일반적이며, 감가상각과 시세를 반영합니다"},
+      {name:"합의서 작성·입금",days:"1~2일",reason:"합의서 서명 후 영업일 기준 1~2일 내 고객 계좌로 입금됩니다"},
+    ],note:"미수선 처리는 실제 수리를 하지 않으므로 가장 빠른 종결이 가능합니다"};
+    if(idx===1)return{total:"5~7일",phases:[
+      {name:"보험사 접수·제휴센터 배정",days:"0.5일",reason:"보험사 협력정비망 중 고객 지역·차종에 맞는 최적 센터를 배정합니다"},
+      {name:"입고·정밀 견적",days:"0.5~1일",reason:"입고 후 리프트 점검으로 숨겨진 파손을 확인합니다. 기존 견적과 차이가 있으면 보험사에 추가 승인을 요청합니다"},
+      {name:"부품 수급",days:"1~2일",reason:cost>3000000?"수리비가 고액이라 다수 부품 주문이 필요합니다. 대체부품(OEM 호환)은 순정 대비 수급이 빠릅니다":"대체부품은 국내 재고가 풍부하여 대부분 당일~익일 수급됩니다"},
+      {name:"수리·도장 작업",days:"2~3일",reason:"판금 → 도장 → 조립 순서로 진행됩니다. 도장 후 최소 12시간 건조가 필요합니다"},
+      {name:"품질 검수·출고",days:"0.5일",reason:"수리 품질 최종 검수, 세차 후 고객에게 인도합니다"},
+    ],note:"제휴 센터는 보험사와 직접 정산하므로 고객 부담금 없이 진행됩니다"};
+    return{total:cost>5000000?"21~30일":"14~21일",phases:[
+      {name:"보험사 접수·공식센터 예약",days:"1~3일",reason:"공식 서비스센터는 예약 대기가 있습니다. 성수기(연말, 장마철)에는 대기가 더 길어질 수 있습니다"},
+      {name:"입고·공식 견적 산출",days:"1~2일",reason:"제조사 진단 장비로 정밀 점검합니다. 공식 견적은 OEM 부품가 + 공식 공임단가로 산출되어 제휴센터 대비 15~30% 높습니다"},
+      {name:"OEM 부품 수급",days:"3~7일",reason:cost>5000000?"고가 수리로 다량의 순정부품이 필요합니다. 해외 수입 부품의 경우 통관·물류에 5~7일 소요됩니다":"순정부품 국내 재고 확인 후 발주합니다. 재고 부품은 2~3일, 해외발주는 5~7일 소요됩니다"},
+      {name:"수리·도장 작업",days:"5~10일",reason:"공식센터는 제조사 매뉴얼에 따른 정밀 수리를 진행합니다. 도장은 OEM 도료 사용, 3단계 건조(프라이머→베이스→클리어) 과정을 거칩니다"},
+      {name:"ADAS 캘리브레이션",days:"1~2일",reason:"범퍼·유리 관련 수리 시 전방카메라, 레이더 등 ADAS 센서 캘리브레이션이 필수입니다. 제조사 전용 장비가 필요합니다"},
+      {name:"최종 검수·출고",days:"1일",reason:"제조사 품질 기준에 따른 최종 점검, 시운전 후 고객 인도합니다"},
+    ],note:`공식센터 처리기간이 긴 이유: ①OEM 부품 수급 대기 ②제조사 매뉴얼 준수 ③ADAS 캘리브레이션. 이 기간 동안 대차비가 지속 발생(일 약 ${F(70000)})하므로 보험사와 사전 협의가 중요합니다`};
+  };
+
+  // ═══ 절차별 체크리스트 ═══
+  const buildSteps=(idx,pref)=>{
+    const common=[
+      {title:"보험사 접수 확인",emoji:"📋",checklist:[
+        {item:"사고 접수번호 확인",detail:"보험사 콜센터(1588-xxxx) 또는 모바일 앱에서 접수번호를 발급받습니다"},
+        {item:"담당 손해사정사 배정 확인",detail:"접수 후 1시간 내 담당자가 배정됩니다. 미배정 시 보험사에 재확인"},
+        {item:"사고 접수 서류 확인",detail:"사고 사실 확인서, 차량등록증 사본, 운전면허증 사본 준비"},
+        {item:"블랙박스 영상 확보",detail:"사고 당시 블랙박스 영상을 SD카드에서 추출하여 보관 (덮어쓰기 방지)"},
+        {item:"상대방 정보 확인",detail:"상대 차량번호, 보험사, 연락처, 운전자 정보를 기록"},
+      ]},
+    ];
+    if(idx===0)return[...common,
+      {title:"미수선 견적 산출",emoji:"💰",checklist:[
+        {item:"정비소 견적서 발급",detail:"공인 정비소에서 공식 견적서를 발급받습니다. 부품비·공임비·도장비가 항목별로 명기되어야 합니다"},
+        {item:"견적서 보험사 제출",detail:"견적서를 담당 손해사정사에게 팩스 또는 모바일로 전송"},
+        {item:"차량 시세 확인",detail:"보험개발원 차량가액 조회 또는 중고차 시세를 확인하여 감가 근거를 준비합니다"},
+        {item:"미수선 협의금 확인",detail:"보험사 산정 협의금이 견적 대비 70~80% 미만이면 재협의 요청"},
+      ]},
+      {title:"합의 진행",emoji:"🤝",checklist:[
+        {item:"합의금 최종 확인",detail:"미수선 협의금 = 수리비 견적 × 적용률(통상 70~80%). 차량 연식, 감가, 부위별 적정성 확인"},
+        {item:"합의서 작성",detail:"보험사 양식의 합의서에 합의금액, 지급방법, 면책사항 확인 후 서명"},
+        {item:"고객 계좌 확인",detail:"입금 계좌(예금주, 은행, 계좌번호) 정확히 확인"},
+        {item:"향후 수리 의사 재확인",detail:"미수선 합의 후 추가 수리 요청 불가함을 고객에게 명확히 안내"},
+      ]},
+      {title:"종결 처리",emoji:"✅",checklist:[
+        {item:"합의금 입금 확인",detail:"합의서 서명 후 영업일 1~2일 내 입금. 미입금 시 보험사 경리팀 확인"},
+        {item:"사건 종결 처리",detail:"보험사 시스템에서 사건 종결 처리. 종결 확인서를 고객에게 발송"},
+        {item:"고객 만족도 확인",detail:"종결 후 1일 내 고객에게 만족도 확인 연락"},
+      ]},
+    ];
+    if(idx===1)return[...common,
+      {title:"제휴센터 배정·입고",emoji:"🏭",checklist:[
+        {item:"제휴센터 선정",detail:"고객 거주지 인근, 해당 차종 수리 경험이 있는 제휴센터를 선정합니다"},
+        {item:"입고 일정 조율",detail:"고객과 센터의 가용 일정을 확인하여 입고일을 확정합니다"},
+        {item:"대차 수배",detail:"입고 당일부터 대차(렌트카)를 준비합니다. 동급 차량 또는 고객 희망 차종 확인"},
+        {item:"입고 시 체크",detail:"고객 차량 외관 상태를 사진으로 기록(기존 스크래치 등), 차량 내 귀중품 확인"},
+        {item:"정밀 견적 확인",detail:"리프트 점검 후 숨겨진 파손 확인. 추가 파손 시 보험사 추가 승인 요청"},
+      ]},
+      {title:"수리 진행 모니터링",emoji:"🔧",checklist:[
+        {item:"부품 수급 현황 확인",detail:"주문된 부품의 입고 예정일을 확인하고, 지연 시 대안 부품을 검토합니다"},
+        {item:"수리 진행 상황 점검",detail:"1~2일 간격으로 센터에 수리 진행률을 확인합니다"},
+        {item:"도장 품질 중간점검",detail:"도장 작업 완료 후 색상 매칭, 오렌지필, 이물질 혼입 여부를 확인합니다"},
+        {item:"고객 중간 안내",detail:"고객에게 수리 진행 상황을 SMS 또는 전화로 안내합니다 (입고 후 3일차)"},
+      ]},
+      {title:"출고·검수",emoji:"🚗",checklist:[
+        {item:"수리 완료 검수",detail:"수리 부위 외관, 틈새(갭), 단차, 도장 품질, 부품 장착 상태를 꼼꼼히 확인"},
+        {item:"ADAS 센서 점검",detail:"범퍼·유리 관련 수리 시 전방카메라, 주차센서, 어라운드뷰 정상 작동 확인"},
+        {item:"시운전 확인",detail:"주행 중 이상 소음, 진동, 얼라인먼트 이상 여부를 확인합니다"},
+        {item:"대차 반납 조율",detail:"출고일에 맞춰 대차 반납을 조율합니다. 대차 기간 = 입고일~출고일"},
+        {item:"수리 보증서 발급",detail:"제휴센터 수리 보증서를 발급받아 고객에게 전달합니다"},
+        {item:"고객 인도·만족도 확인",detail:"출고 시 수리 내역을 고객에게 설명하고, 추후 이상 시 연락처를 안내합니다"},
+      ]},
+      {title:"정산·종결",emoji:"✅",checklist:[
+        {item:"보험사 정산 요청",detail:"수리 명세서와 세금계산서를 보험사에 제출하여 정산을 요청합니다"},
+        {item:"대차비 정산 확인",detail:"대차 기간과 일일 요금을 확인하여 정산합니다"},
+        {item:"사건 종결 처리",detail:"모든 정산 완료 후 사건을 종결 처리합니다"},
+      ]},
+    ];
+    return[...common,
+      {title:"공식센터 예약·입고",emoji:"🏢",checklist:[
+        {item:"공식센터 예약",detail:"제조사 공식 서비스센터에 수리 예약을 합니다. 예약 대기 현황을 확인하세요"},
+        {item:"보험사 사전 승인",detail:"공식센터 견적은 제휴 대비 15~30% 높습니다. 보험사에 공식센터 수리를 사전 승인받습니다"},
+        {item:"입고 시 차량 상태 기록",detail:"입고 전 차량 전체를 사진/영상으로 기록합니다"},
+        {item:"대차 준비",detail:"공식센터 수리기간이 길므로(14~30일) 대차를 사전 준비합니다. 보험사 대차 기준 확인"},
+        {item:"정밀 진단",detail:"제조사 전용 진단 장비로 차량 전체를 스캔합니다. 숨겨진 전자장비 오류도 확인됩니다"},
+      ]},
+      {title:"OEM 부품 수급·수리",emoji:"🔧",checklist:[
+        {item:"OEM 부품 발주 확인",detail:"순정부품 재고 확인 → 국내 미재고 시 해외 본사 발주. 발주 후 예상 입고일을 확인합니다"},
+        {item:"수리 진행 모니터링",detail:"2~3일 간격으로 수리 진행률을 확인합니다. 부품 지연 시 보험사에 기간 연장을 보고합니다"},
+        {item:"고객 중간 보고",detail:"고객에게 주 1회 이상 수리 상황을 안내합니다. 기간이 길어지면 고객 불만이 커지므로 선제적 안내가 중요합니다"},
+        {item:"도장 품질 확인",detail:"OEM 도료 사용 여부, 3단계 건조 과정(프라이머→베이스코트→클리어코트) 준수 확인"},
+        {item:"대차비 관리",detail:"수리 기간이 길어질수록 대차비가 누적됩니다. 보험사와 대차비 한도를 사전 협의하세요"},
+      ]},
+      {title:"ADAS 캘리브레이션·검수",emoji:"📡",checklist:[
+        {item:"ADAS 캘리브레이션 실시",detail:"범퍼/유리/미러 관련 수리 시 필수. 전방카메라, 레이더, 라이다 등의 센서를 재보정합니다"},
+        {item:"캘리브레이션 결과 확인",detail:"제조사 전용 장비로 보정 결과를 출력하여 보관합니다"},
+        {item:"전자장비 전체 스캔",detail:"수리 후 차량 전체 ECU 스캔으로 오류 코드 없음을 확인합니다"},
+        {item:"시운전·로드테스트",detail:"자동 긴급제동(AEB), 차선이탈경고(LDW) 등 ADAS 기능 정상 작동을 확인합니다"},
+      ]},
+      {title:"출고·최종 검수",emoji:"🚗",checklist:[
+        {item:"외관 품질 검수",detail:"수리 부위 외관, 틈새, 단차, 도장 품질을 제조사 기준으로 최종 확인합니다"},
+        {item:"수리 보증서 발급",detail:"공식센터 수리 보증서(보통 1~2년)를 발급받아 고객에게 전달합니다"},
+        {item:"고객 인도·설명",detail:"수리 내역, 교체 부품 목록, ADAS 보정 결과를 고객에게 상세히 설명합니다"},
+        {item:"대차 반납",detail:"출고 당일 대차를 반납하고, 대차 기간 최종 정산"},
+      ]},
+      {title:"정산·종결",emoji:"✅",checklist:[
+        {item:"공식센터 정산",detail:"수리 명세서, 부품 교체 내역서, ADAS 캘리브레이션 비용을 보험사에 제출"},
+        {item:"대차비 정산",detail:"총 대차일수 × 일일단가를 계산하여 정산. 보험사 한도 초과 시 고객 부담금 발생 여부 확인"},
+        {item:"추가비용 검토",detail:"견인비, 야간수당, 긴급출동비 등 부대비용 누락 없이 정산"},
+        {item:"사건 종결",detail:"모든 정산 완료 후 종결 처리. 고객에게 종결 안내 및 만족도 확인"},
+      ]},
+    ];
+  };
+  const reset=()=>{setStage("idle");setSelCase(null);setInput("");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setDetData(null);setOpenStep(null);setSumText("");setIntakeQs([]);setIntakeAs({});setCustPref("");setIntakeProg({step:0,msg:"",pct:0})};
 
   const CI=[IC.cs,IC.wr,IC.sh],CC=["#0891b2","#7c3aed","#2563eb"],CB=["#ecfeff","#f5f3ff","#eff6ff"],CR=["#a5f3fc","#c4b5fd","#bfdbfe"];
 
@@ -1108,7 +1298,7 @@ function Tab3(){
 
       {/* ═══ DETAIL ═══ */}
       {stage==="detail"&&proposals&&selIdx!==null&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
-        <button onClick={()=>{setStage("result");setSelIdx(null);setDetText("")}} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 12px",borderRadius:9,fontSize:12,background:"none",border:"1px solid #e2e8f0",cursor:"pointer",color:"#64748b",marginBottom:12}}>{IC.bk} 3가지 방법 보기</button>
+        <button onClick={()=>{setStage("result");setSelIdx(null);setDetText("");setDetData(null);setOpenStep(null)}} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 12px",borderRadius:9,fontSize:12,background:"none",border:"1px solid #e2e8f0",cursor:"pointer",color:"#64748b",marginBottom:12}}>{IC.bk} 3가지 방법 보기</button>
         <div style={{background:CB[selIdx],borderRadius:15,padding:"16px 20px",border:`2px solid ${CC[selIdx]}`,marginBottom:12,display:"flex",alignItems:"center",gap:12}}>
           <div style={{width:40,height:40,borderRadius:11,background:`${CC[selIdx]}10`,display:"flex",alignItems:"center",justifyContent:"center",color:CC[selIdx]}}>{CI[selIdx]}</div>
           <div style={{flex:1}}><div style={{fontSize:16,fontWeight:700,color:"#0f172a"}}>({selIdx+1}) {proposals[selIdx].title}</div><div style={{fontSize:12,color:"#64748b"}}>{proposals[selIdx].subtitle}</div></div>
@@ -1116,12 +1306,127 @@ function Tab3(){
             <div style={{textAlign:"center"}}><div style={{fontSize:9.5,color:"#94a3b8",fontWeight:600}}>비용</div><div style={{fontSize:16,fontWeight:700,color:CC[selIdx],fontFamily:"'DM Mono',monospace"}}>{proposals[selIdx].cost}</div></div>
             <div style={{width:1,height:30,background:"#e2e8f0"}}/>
             <div style={{textAlign:"center"}}><div style={{fontSize:9.5,color:"#94a3b8",fontWeight:600}}>기간</div><div style={{fontSize:16,fontWeight:700,color:"#334155"}}>{proposals[selIdx].period}</div></div></div></div>
-        <div style={{...CD,border:`1px solid ${CR[selIdx]}`}}>
+
+        {/* 비용 상세 산출 */}
+        {detData&&<div style={{...CD,border:`1px solid ${CR[selIdx]}`,marginBottom:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:12}}>
+            <span style={{fontSize:15}}>💰</span>
+            <span style={{fontSize:14,fontWeight:700}}>비용 상세 산출 근거</span></div>
+          {/* 차량 기본 정보 */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:12}}>
+            <div style={{background:"#f8fafc",borderRadius:8,padding:"8px 10px",border:"1px solid #e2e8f0"}}>
+              <div style={{fontSize:9.5,color:"#94a3b8",fontWeight:600}}>차량</div>
+              <div style={{fontSize:12,fontWeight:600,color:"#0f172a"}}>{detData.carName}</div></div>
+            <div style={{background:"#f8fafc",borderRadius:8,padding:"8px 10px",border:"1px solid #e2e8f0"}}>
+              <div style={{fontSize:9.5,color:"#94a3b8",fontWeight:600}}>추정 차량가액</div>
+              <div style={{fontSize:12,fontWeight:600,color:"#0f172a"}}>{F(detData.estValue)}</div></div>
+            <div style={{background:"#f8fafc",borderRadius:8,padding:"8px 10px",border:"1px solid #e2e8f0"}}>
+              <div style={{fontSize:9.5,color:"#94a3b8",fontWeight:600}}>부품 유형</div>
+              <div style={{fontSize:12,fontWeight:600,color:"#0f172a"}}>{detData.methodCosts.partType}</div></div>
+          </div>
+          {/* 비용 테이블 */}
+          {!detData.methodCosts.isCash?<>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:11.5,marginBottom:10}}>
+              <thead><tr style={{borderBottom:"2px solid #e2e8f0"}}>
+                <th style={{textAlign:"left",padding:"7px 8px",color:"#94a3b8",fontSize:10,fontWeight:600}}>파손 부위</th>
+                <th style={{textAlign:"right",padding:"7px 8px",color:"#3b82f6",fontSize:10,fontWeight:600}}>부품비</th>
+                <th style={{textAlign:"right",padding:"7px 8px",color:"#7c3aed",fontSize:10,fontWeight:600}}>공임비</th>
+                <th style={{textAlign:"right",padding:"7px 8px",color:"#d97706",fontSize:10,fontWeight:600}}>도장비</th>
+                <th style={{textAlign:"right",padding:"7px 8px",color:"#0f172a",fontSize:10,fontWeight:700}}>소계</th>
+              </tr></thead>
+              <tbody>{detData.methodCosts.breakdown.map((b,i)=><tr key={i} style={{borderBottom:"1px solid #f1f5f9"}}>
+                <td style={{padding:"6px 8px",color:"#334155",fontSize:11}}>{b.name}<div style={{fontSize:9,color:"#94a3b8"}}>{b.note}</div></td>
+                <td style={{padding:"6px 8px",textAlign:"right",color:"#3b82f6",fontFamily:"'DM Mono',monospace",fontSize:11}}>{F(b.parts)}</td>
+                <td style={{padding:"6px 8px",textAlign:"right",color:"#7c3aed",fontFamily:"'DM Mono',monospace",fontSize:11}}>{F(b.labor)}</td>
+                <td style={{padding:"6px 8px",textAlign:"right",color:"#d97706",fontFamily:"'DM Mono',monospace",fontSize:11}}>{F(b.paint)}</td>
+                <td style={{padding:"6px 8px",textAlign:"right",fontWeight:700,fontFamily:"'DM Mono',monospace",fontSize:11}}>{F(b.subtotal)}</td>
+              </tr>)}</tbody>
+            </table>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6}}>
+              <div style={{background:"#eff6ff",borderRadius:7,padding:"7px 9px",textAlign:"center",border:"1px solid #bfdbfe"}}>
+                <div style={{fontSize:9,color:"#3b82f6",fontWeight:600}}>부품비 합계</div>
+                <div style={{fontSize:13,fontWeight:700,color:"#3b82f6",fontFamily:"'DM Mono',monospace"}}>{F(detData.methodCosts.totalParts)}</div></div>
+              <div style={{background:"#f5f3ff",borderRadius:7,padding:"7px 9px",textAlign:"center",border:"1px solid #c4b5fd"}}>
+                <div style={{fontSize:9,color:"#7c3aed",fontWeight:600}}>공임비 합계</div>
+                <div style={{fontSize:13,fontWeight:700,color:"#7c3aed",fontFamily:"'DM Mono',monospace"}}>{F(detData.methodCosts.totalLabor)}</div></div>
+              <div style={{background:"#fffbeb",borderRadius:7,padding:"7px 9px",textAlign:"center",border:"1px solid #fde68a"}}>
+                <div style={{fontSize:9,color:"#d97706",fontWeight:600}}>도장비 합계</div>
+                <div style={{fontSize:13,fontWeight:700,color:"#d97706",fontFamily:"'DM Mono',monospace"}}>{F(detData.methodCosts.totalPaint)}</div></div>
+              <div style={{background:"#f0fdf4",borderRadius:7,padding:"7px 9px",textAlign:"center",border:"1px solid #bbf7d0"}}>
+                <div style={{fontSize:9,color:"#059669",fontWeight:700}}>총 수리비</div>
+                <div style={{fontSize:13,fontWeight:800,color:"#059669",fontFamily:"'DM Mono',monospace"}}>{F(detData.methodCosts.totalRepair)}</div></div>
+            </div>
+          </>:<div style={{background:"#ecfeff",borderRadius:9,padding:"12px 14px",border:"1px solid #a5f3fc"}}>
+            <div style={{fontSize:12,fontWeight:600,color:"#0891b2",marginBottom:4}}>미수선 현금정산 산출 기준</div>
+            <div style={{fontSize:11.5,color:"#475569",lineHeight:1.7}}>
+              수리비 견적 {F(detData.baseCost)} × 미수선 적용률 (72%) = <strong style={{color:"#0891b2"}}>{F(detData.methodCosts.totalRepair)}</strong><br/>
+              차량가액 {F(detData.estValue)} 대비 수리비 비중 {Math.round(detData.baseCost/detData.estValue*100)}% — {detData.baseCost/detData.estValue>0.5?"수리비가 차량가액의 50%를 초과하므로 전손 처리 검토가 필요합니다":"정상 범위 내 미수선 처리 가능"}
+            </div></div>}
+          <div style={{marginTop:8,fontSize:10,color:"#94a3b8",lineHeight:1.5}}>
+            * 차량가액은 보험개발원 기준 {detData.age}년 경과 차량의 평균 시세를 참고한 추정치입니다. 실제 가액은 보험사 조회 결과에 따릅니다.
+          </div>
+        </div>}
+
+        {/* 소요기간 근거 */}
+        {detData&&detData.timeline&&<div style={{...CD,border:`1px solid ${CR[selIdx]}`,marginBottom:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:12}}>
+            <span style={{fontSize:15}}>⏱️</span>
+            <span style={{fontSize:14,fontWeight:700}}>소요기간 상세 근거</span>
+            <span style={{marginLeft:"auto",fontSize:13,fontWeight:700,color:CC[selIdx],fontFamily:"'DM Mono',monospace"}}>총 {detData.timeline.total}</span></div>
+          <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:10}}>
+            {detData.timeline.phases.map((ph,i)=><div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 10px",borderRadius:8,background:i%2===0?"#f8fafc":"#fff",border:"1px solid #f1f5f9"}}>
+              <div style={{minWidth:56,textAlign:"center"}}>
+                <div style={{fontSize:13,fontWeight:700,color:CC[selIdx],fontFamily:"'DM Mono',monospace"}}>{ph.days}</div></div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:600,color:"#0f172a"}}>{ph.name}</div>
+                <div style={{fontSize:11,color:"#64748b",lineHeight:1.5,marginTop:2}}>{ph.reason}</div></div>
+            </div>)}
+          </div>
+          {detData.timeline.note&&<div style={{padding:"8px 11px",borderRadius:7,background:"#fef3c7",border:"1px solid #fde68a",fontSize:11,color:"#92400e",lineHeight:1.5}}>💡 {detData.timeline.note}</div>}
+        </div>}
+
+        {/* 절차별 체크리스트 (인터랙티브) */}
+        {detData&&detData.steps&&<div style={{...CD,border:`1px solid ${CR[selIdx]}`,marginBottom:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:12}}>
+            <span style={{fontSize:15}}>📋</span>
+            <span style={{fontSize:14,fontWeight:700}}>처리 절차 · 체크리스트</span>
+            <span style={{fontSize:10,color:"#94a3b8",marginLeft:4}}>각 단계를 클릭하면 상세 체크리스트가 표시됩니다</span></div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {detData.steps.map((step,sIdx)=><div key={sIdx} style={{borderRadius:10,border:openStep===sIdx?`2px solid ${CC[selIdx]}`:"1px solid #e2e8f0",overflow:"hidden",transition:"all .2s"}}>
+              <div onClick={()=>setOpenStep(openStep===sIdx?null:sIdx)}
+                style={{display:"flex",alignItems:"center",gap:8,padding:"10px 12px",cursor:"pointer",
+                  background:openStep===sIdx?`${CC[selIdx]}08`:"#fafbfc",transition:"all .15s"}}
+                onMouseEnter={e=>{if(openStep!==sIdx)e.currentTarget.style.background="#f0f9ff"}}
+                onMouseLeave={e=>{if(openStep!==sIdx)e.currentTarget.style.background="#fafbfc"}}>
+                <div style={{width:28,height:28,borderRadius:8,background:openStep===sIdx?CC[selIdx]:"#e2e8f0",display:"flex",alignItems:"center",justifyContent:"center",color:openStep===sIdx?"#fff":"#94a3b8",fontSize:12,fontWeight:700,transition:"all .2s"}}>{sIdx+1}</div>
+                <span style={{fontSize:16}}>{step.emoji}</span>
+                <span style={{flex:1,fontSize:13,fontWeight:600,color:openStep===sIdx?CC[selIdx]:"#334155"}}>{step.title}</span>
+                <span style={{fontSize:10,color:"#94a3b8",background:"#f1f5f9",padding:"2px 7px",borderRadius:8}}>{step.checklist.length}항목</span>
+                <span style={{color:"#94a3b8",transform:openStep===sIdx?"rotate(90deg)":"none",transition:"transform .2s"}}>{IC.arr}</span>
+              </div>
+              {openStep===sIdx&&<div style={{padding:"0 12px 12px",background:`${CC[selIdx]}04`}}>
+                <div style={{display:"flex",flexDirection:"column",gap:5,paddingTop:6}}>
+                  {step.checklist.map((cl,cIdx)=><div key={cIdx} style={{display:"flex",gap:8,alignItems:"flex-start",padding:"8px 10px",borderRadius:8,background:"#fff",border:"1px solid #e2e8f0"}}>
+                    <div style={{minWidth:20,height:20,borderRadius:5,border:`2px solid ${CC[selIdx]}`,display:"flex",alignItems:"center",justifyContent:"center",marginTop:1}}>
+                      <span style={{fontSize:10,color:CC[selIdx]}}>✓</span></div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:12,fontWeight:600,color:"#0f172a",marginBottom:2}}>{cl.item}</div>
+                      <div style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{cl.detail}</div></div>
+                  </div>)}
+                </div>
+              </div>}
+            </div>)}
+          </div>
+        </div>}
+
+        {/* AI 보충 (고객 스크립트 + 유의사항) */}
+        {detText&&<div style={{...CD,border:`1px solid ${CR[selIdx]}`,marginBottom:12}}>
           <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:CC[selIdx],display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
-            <span style={{fontSize:13,fontWeight:700}}>상세 미리보기 · 절차 안내</span>{!dD&&<Sp s/>}</div>
-          <div style={{fontSize:12.5}}><RT text={tD}/></div></div>
-        <div style={{padding:"12px 14px",background:"#fff",borderRadius:11,border:"1px solid #e2e8f0",marginTop:12}}>
+            <span style={{fontSize:13,fontWeight:700}}>AI 보충 분석</span>{!dD&&<Sp s/>}</div>
+          <div style={{fontSize:12.5}}><RT text={tD}/></div></div>}
+
+        <div style={{padding:"12px 14px",background:"#fff",borderRadius:11,border:"1px solid #e2e8f0",marginTop:0,marginBottom:12}}>
           <div style={{fontSize:11,color:"#94a3b8",fontWeight:600,marginBottom:8}}>다른 방법 확인</div>
           <div style={{display:"flex",gap:8}}>
             {proposals.map((p,idx)=>idx!==selIdx&&<button key={idx} onClick={()=>showDet(idx)} style={{flex:1,padding:"9px 12px",borderRadius:9,cursor:"pointer",background:CB[idx],border:`1px solid ${CR[idx]}`,display:"flex",alignItems:"center",gap:6,transition:"all .15s"}}
