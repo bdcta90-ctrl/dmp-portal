@@ -50,17 +50,21 @@ const MVPS = [
 export default function App() {
   const [page, setPage] = useState("portal");
   const [requestModal, setRequestModal] = useState(false);
-  const [reqForm, setReqForm] = useState({ title: "", desc: "", requester: "", dept: "" });
+  const [reqForm, setReqForm] = useState({ name: "", team: "", email: "", category: "", title: "", desc: "", deadline: "" });
   const [reqDone, setReqDone] = useState(false);
 
   if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
 
   const handleRequest = () => {
-    if (!reqForm.title.trim()) return;
+    if (!reqForm.name.trim() || !reqForm.team.trim() || !reqForm.email.trim() || !reqForm.title.trim() || !reqForm.desc.trim()) return;
     setReqDone(true);
-    setTimeout(() => { setRequestModal(false); setReqDone(false); setReqForm({ title: "", desc: "", requester: "", dept: "" }); }, 2000);
+    setTimeout(() => { setRequestModal(false); setReqDone(false); setReqForm({ name: "", team: "", email: "", category: "", title: "", desc: "", deadline: "" }); }, 2000);
   };
+
+  const formReady = reqForm.name.trim() && reqForm.team.trim() && reqForm.email.trim() && reqForm.title.trim() && reqForm.desc.trim();
+  const inputStyle = { width: "100%", padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
+  const labelStyle = { fontSize: 12, color: "rgba(255,255,255,.5)", fontWeight: 600, marginBottom: 6, display: "block" };
 
   return (
     <div style={{ width: "100%", minHeight: "100vh", fontFamily: "'Pretendard',-apple-system,'Noto Sans KR',sans-serif", background: "#0a0a0f", color: "#fff", position: "relative" }}>
@@ -82,7 +86,7 @@ export default function App() {
       {/* MVP 제작 의뢰 Modal */}
       {requestModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", backdropFilter: "blur(8px)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => !reqDone && setRequestModal(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: "#16161e", borderRadius: 20, padding: 32, width: 480, border: "1px solid rgba(255,255,255,.08)", boxShadow: "0 24px 64px rgba(0,0,0,.4)", animation: "fadeIn .3s" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#16161e", borderRadius: 20, padding: 32, width: 520, maxHeight: "85vh", overflowY: "auto", border: "1px solid rgba(255,255,255,.08)", boxShadow: "0 24px 64px rgba(0,0,0,.4)", animation: "fadeIn .3s" }}>
             {reqDone ? (
               <div style={{ textAlign: "center", padding: "32px 0" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
@@ -91,34 +95,61 @@ export default function App() {
               </div>
             ) : (
               <>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
                   <div>
-                    <div style={{ fontSize: 18, fontWeight: 700 }}>새로운 MVP 제작 의뢰</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>아이디어를 현실로 만들어보세요</div>
+                    <div style={{ fontSize: 22, fontWeight: 800 }}>MVP 제작 의뢰</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)", marginTop: 4 }}>아이디어를 알려주시면 빠르게 프로토타입을 만들어드립니다.</div>
                   </div>
-                  <button onClick={() => setRequestModal(false)} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, width: 32, height: 32, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✕</button>
+                  <button onClick={() => setRequestModal(false)} style={{ background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, width: 32, height: 32, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>✕</button>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>MVP 제목 *</label>
-                    <input value={reqForm.title} onChange={e => setReqForm({ ...reqForm, title: e.target.value })} placeholder="예: AI 고객 상담 자동화 시스템" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>상세 설명</label>
-                    <textarea value={reqForm.desc} onChange={e => setReqForm({ ...reqForm, desc: e.target.value })} placeholder="어떤 문제를 해결하고 싶은지 자유롭게 설명해주세요" rows={4} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.6 }} />
-                  </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {/* 이름 / 소속 팀 */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
-                      <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>의뢰자</label>
-                      <input value={reqForm.requester} onChange={e => setReqForm({ ...reqForm, requester: e.target.value })} placeholder="이름" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                      <label style={labelStyle}>이름 *</label>
+                      <input value={reqForm.name} onChange={e => setReqForm({ ...reqForm, name: e.target.value })} placeholder="홍길동" style={inputStyle} />
                     </div>
                     <div>
-                      <label style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600, marginBottom: 4, display: "block" }}>소속 부서</label>
-                      <input value={reqForm.dept} onChange={e => setReqForm({ ...reqForm, dept: e.target.value })} placeholder="팀/부서명" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+                      <label style={labelStyle}>소속 팀 *</label>
+                      <input value={reqForm.team} onChange={e => setReqForm({ ...reqForm, team: e.target.value })} placeholder="AX사업본부" style={inputStyle} />
                     </div>
                   </div>
+                  {/* 이메일 / 카테고리 */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={labelStyle}>이메일 *</label>
+                      <input value={reqForm.email} onChange={e => setReqForm({ ...reqForm, email: e.target.value })} placeholder="user@ktds.co.kr" type="email" style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>카테고리</label>
+                      <select value={reqForm.category} onChange={e => setReqForm({ ...reqForm, category: e.target.value })} style={{ ...inputStyle, appearance: "auto", cursor: "pointer" }}>
+                        <option value="" style={{ background: "#1a1a2e" }}>선택해주세요</option>
+                        <option value="AI/ML" style={{ background: "#1a1a2e" }}>AI/ML</option>
+                        <option value="데이터분석" style={{ background: "#1a1a2e" }}>데이터분석</option>
+                        <option value="업무자동화" style={{ background: "#1a1a2e" }}>업무자동화</option>
+                        <option value="고객경험" style={{ background: "#1a1a2e" }}>고객경험</option>
+                        <option value="보안/관제" style={{ background: "#1a1a2e" }}>보안/관제</option>
+                        <option value="기타" style={{ background: "#1a1a2e" }}>기타</option>
+                      </select>
+                    </div>
+                  </div>
+                  {/* MVP 제목 */}
+                  <div>
+                    <label style={labelStyle}>MVP 제목 *</label>
+                    <input value={reqForm.title} onChange={e => setReqForm({ ...reqForm, title: e.target.value })} placeholder="예: AI 기반 고객 이탈 예측 대시보드" style={inputStyle} />
+                  </div>
+                  {/* 상세 설명 */}
+                  <div>
+                    <label style={labelStyle}>상세 설명 *</label>
+                    <textarea value={reqForm.desc} onChange={e => setReqForm({ ...reqForm, desc: e.target.value })} placeholder="만들고자 하는 MVP의 핵심 기능과 목적을 설명해주세요..." rows={5} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} />
+                  </div>
+                  {/* 희망 완료일 */}
+                  <div>
+                    <label style={labelStyle}>희망 완료일</label>
+                    <input value={reqForm.deadline} onChange={e => setReqForm({ ...reqForm, deadline: e.target.value })} type="date" style={{ ...inputStyle, width: "50%", colorScheme: "dark" }} />
+                  </div>
                 </div>
-                <button onClick={handleRequest} style={{ width: "100%", marginTop: 20, padding: "13px 0", borderRadius: 12, border: "none", background: reqForm.title.trim() ? "#10b981" : "rgba(255,255,255,.06)", color: reqForm.title.trim() ? "#fff" : "rgba(255,255,255,.25)", fontSize: 14, fontWeight: 700, cursor: reqForm.title.trim() ? "pointer" : "default", transition: "all .2s", fontFamily: "inherit" }}>
+                <button onClick={handleRequest} style={{ width: "100%", marginTop: 24, padding: "15px 0", borderRadius: 12, border: "none", background: formReady ? "#10b981" : "rgba(255,255,255,.06)", color: formReady ? "#fff" : "rgba(255,255,255,.25)", fontSize: 15, fontWeight: 700, cursor: formReady ? "pointer" : "default", transition: "all .2s", fontFamily: "inherit" }}>
                   의뢰 제출하기
                 </button>
               </>
