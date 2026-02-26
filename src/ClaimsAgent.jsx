@@ -419,34 +419,186 @@ function Tab1(){
       </div></div>);
 }
 
-// ═══ TAB 2: 과실 ═══
+// ═══ TAB 2: 과실 (확장) ═══
 function Tab2(){
   const[at,sAt]=useState("");const[rt,sRt]=useState("");const[wt,sWt]=useState("");const[sg,sSg]=useState("");
-  const[mD,sMd]=useState("");const[oD,sOd]=useState("");const[dc,sDc]=useState(false);const[pr,sPr]=useState(false);
+  const[mD,sMd]=useState("");const[oD,sOd]=useState("");
+  const[dc,sDc]=useState(false);const[pr,sPr]=useState(false);const[cctv,sCctv]=useState(false);const[wit,sWit]=useState(false);
   const[rs,sRs]=useState(null);const[ld,sLd]=useState(false);const[ai,sAi]=useState("");
   const{displayed:tA,done:aD}=useTW(ai);
+  // 사진
+  const[ph,sPh]=useState([]);const[pvIdx,sPvIdx]=useState(null);const fRef=useRef(null);
+  const addPhotos=(e)=>{const files=Array.from(e.target.files);const np=files.slice(0,10-ph.length).map(f=>({name:f.name,url:URL.createObjectURL(f),size:(f.size/1024/1024).toFixed(1)}));sPh(prev=>[...prev,...np].slice(0,10));if(fRef.current)fRef.current.value="";};
+  const removePhoto=(idx)=>{sPh(prev=>prev.filter((_,i)=>i!==idx));if(pvIdx===idx)sPvIdx(null);};
+  // 증거 파일
+  const[bbFile,sBbFile]=useState(null);const[prFile,sPrFile]=useState(null);const[cctvFile,sCctvFile]=useState(null);
+  const bbRef=useRef(null);const prRef=useRef(null);const cctvRef=useRef(null);
+  // AI 프로그레스
+  const[aiProg,setAiProg]=useState({step:0,msg:"",pct:0});
+
   const calc=async()=>{if(!at)return;sLd(true);sRs(null);sAi("");
+    const steps=[
+      {msg:"📋 사고 유형 및 상황 분석 중...",delay:600},
+      {msg:"📸 업로드된 사진 "+ph.length+"장 분석 중...",delay:ph.length?800:300},
+      {msg:"🔍 블랙박스·증거자료 검토 중...",delay:(dc||pr||cctv)?700:300},
+      {msg:"⚖️ 판례 데이터베이스 매칭 중...",delay:800},
+      {msg:"📊 과실 비율 산정 중...",delay:700},
+      {msg:"🤖 AI 종합 판단 리포트 생성 중...",delay:500},
+    ];
+    for(let i=0;i<steps.length;i++){
+      setAiProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*85)});
+      await new Promise(r=>setTimeout(r,steps[i].delay));
+    }
     let b=50;if(at.includes("후미추돌"))b=15;else if(at.includes("신호위반"))b=30;else if(at.includes("차선변경"))b=35;else if(at.includes("중앙선"))b=10;else if(at.includes("주차장"))b=45;else if(at.includes("후진"))b=20;else if(at.includes("단독"))b=100;else if(at.includes("횡단보도"))b=60;
     if(wt==="비"||wt==="눈")b=Math.min(100,b+3);if(sg==="적색신호")b=Math.max(0,b-10);if(pr)b=Math.max(0,b-2);
-    sRs({mf:b,of:100-b,cf:dc?"높음":"보통"});
+    const evCount=[dc,pr,cctv,wit].filter(Boolean).length;
+    const cf=evCount>=3?"매우 높음":evCount>=2?"높음":evCount>=1?"보통":"낮음";
+    setAiProg({step:steps.length,total:steps.length,msg:"⚡ AI 엔진 최종 판단 중...",pct:90});
+    sRs({mf:b,of:100-b,cf,evCount,phCount:ph.length});
     const a=await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
-      `사고:${at}\n도로:${rt||"미상"},날씨:${wt||"미상"},신호:${sg||"미상"}\n결과:A${b}%/B${100-b}%\n분석해주세요.`);
-    sAi(a);sLd(false);};
+      `사고:${at}\n도로:${rt||"미상"},날씨:${wt||"미상"},신호:${sg||"미상"}\n증거:블랙박스(${dc?"있음":"없음"}),경찰보고서(${pr?"있음":"없음"}),CCTV(${cctv?"있음":"없음"}),목격자(${wit?"있음":"없음"})\n사진:${ph.length}장\nA차 진술:${mD||"없음"}\nB차 진술:${oD||"없음"}\n결과:A${b}%/B${100-b}%\n분석해주세요.`);
+    setAiProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
+    await new Promise(r=>setTimeout(r,400));
+    sAi(a);sLd(false);setAiProg({step:0,msg:"",pct:0});};
+
+  const photoGuides=[
+    {emoji:"🚗",label:"사고 전체 모습",desc:"양 차량이 보이는 전체 장면"},
+    {emoji:"🔍",label:"파손 부위 근접",desc:"파손된 부분을 가까이 촬영"},
+    {emoji:"🛣️",label:"주변 도로 상황",desc:"도로 표시선, 신호등, 교차로 등"},
+    {emoji:"📍",label:"차량 위치/각도",desc:"사고 후 차량 정지 위치"},
+    {emoji:"🔢",label:"상대 번호판",desc:"상대 차량 번호판 (필요시)"},
+  ];
+
   return(
-    <div style={{display:"grid",gridTemplateColumns:"340px 1fr",gap:20,height:"100%"}}>
-      <div style={{overflowY:"auto",paddingRight:8}}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"100%"}}>
+      {/* Photo Preview Modal */}
+      {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
+        <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"85vw",maxHeight:"85vh",display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <button onClick={()=>sPvIdx(null)} style={{position:"absolute",top:-10,right:-10,width:30,height:30,borderRadius:"50%",background:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,.2)",zIndex:10,color:"#64748b"}}>{IC.x}</button>
+          <img src={ph[pvIdx].url} style={{maxWidth:"85vw",maxHeight:"70vh",borderRadius:12,objectFit:"contain",boxShadow:"0 16px 48px rgba(0,0,0,.3)"}}/>
+          <div style={{background:"rgba(255,255,255,.95)",borderRadius:8,padding:"6px 16px",display:"flex",alignItems:"center",gap:14}}>
+            <span style={{fontSize:12.5,fontWeight:600}}>{ph[pvIdx].name}</span>
+            <span style={{fontSize:11,color:"#94a3b8"}}>{ph[pvIdx].size}MB · {pvIdx+1}/{ph.length}</span></div>
+          {ph.length>1&&<div style={{display:"flex",gap:5}}>{ph.map((p,i)=><img key={i} src={p.url} onClick={e=>{e.stopPropagation();sPvIdx(i)}} style={{width:48,height:48,borderRadius:6,objectFit:"cover",cursor:"pointer",border:i===pvIdx?"3px solid #7c3aed":"3px solid transparent",opacity:i===pvIdx?1:.5}}/>)}</div>}
+          {ph.length>1&&<>
+            <button onClick={e=>{e.stopPropagation();sPvIdx((pvIdx-1+ph.length)%ph.length)}} style={{position:"absolute",left:-18,top:"44%",width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,.9)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 3px 10px rgba(0,0,0,.12)"}}>{IC.bk}</button>
+            <button onClick={e=>{e.stopPropagation();sPvIdx((pvIdx+1)%ph.length)}} style={{position:"absolute",right:-18,top:"44%",width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,.9)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 3px 10px rgba(0,0,0,.12)"}}>{IC.arr}</button>
+          </>}
+        </div></div>}
+
+      {/* ═══ LEFT: 입력 ═══ */}
+      <div style={{overflowY:"auto",paddingRight:6}}>
         <div style={CD}><h3 style={ST}>사고 유형</h3><select value={at} onChange={e=>sAt(e.target.value)} style={SL}><option value="">선택</option>{ACCIDENT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+
         <div style={CD}><h3 style={ST}>사고 상황</h3><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <SB label="도로" value={rt} onChange={sRt} opts={ROAD_TYPES}/><SB label="날씨" value={wt} onChange={sWt} opts={WEATHER_TYPES}/>
           <SB label="신호" value={sg} onChange={sSg} opts={SIGNAL_STATES}/></div></div>
-        <div style={CD}><h3 style={ST}>진술</h3><label style={LB}>A차량(청구자)</label><textarea value={mD} onChange={e=>sMd(e.target.value)} placeholder="사고 상황..." style={TA} rows={2}/>
-          <label style={{...LB,marginTop:8}}>B차량(상대방)</label><textarea value={oD} onChange={e=>sOd(e.target.value)} placeholder="상대방 진술..." style={TA} rows={2}/></div>
-        <div style={CD}><h3 style={ST}>증거</h3><div style={{display:"flex",gap:12}}>
-          <label style={{display:"flex",alignItems:"center",gap:4,color:"#64748b",fontSize:12.5,cursor:"pointer"}}><input type="checkbox" checked={dc} onChange={e=>sDc(e.target.checked)} style={{accentColor:"#0891b2"}}/>블랙박스</label>
-          <label style={{display:"flex",alignItems:"center",gap:4,color:"#64748b",fontSize:12.5,cursor:"pointer"}}><input type="checkbox" checked={pr} onChange={e=>sPr(e.target.checked)} style={{accentColor:"#0891b2"}}/>경찰보고서</label></div></div>
+
+        {/* 사고 사진 업로드 */}
+        <div style={CD}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <h3 style={{...ST,margin:0}}>{IC.up}<span>사고 현장 사진</span></h3>
+            <span style={{fontSize:10,color:ph.length>=10?"#dc2626":"#94a3b8",fontWeight:600}}>{ph.length}/10</span></div>
+          {/* 가이드 */}
+          {ph.length===0&&<div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+            {photoGuides.map((g,i)=><div key={i} style={{padding:"4px 8px",borderRadius:7,background:"#f8fafc",border:"1px solid #e2e8f0",fontSize:10,color:"#64748b",display:"flex",alignItems:"center",gap:3}}>
+              <span>{g.emoji}</span><span style={{fontWeight:600}}>{g.label}</span></div>)}
+          </div>}
+          <div onClick={()=>ph.length<10&&fRef.current?.click()} style={{
+            border:"2px dashed "+(ph.length>=10?"#fca5a5":"#c4b5fd"),borderRadius:10,padding:ph.length?10:14,textAlign:"center",
+            cursor:ph.length>=10?"not-allowed":"pointer",color:ph.length>=10?"#f87171":"#7c3aed",fontSize:12,background:ph.length>=10?"#fef2f2":"#faf5ff",
+          }}><input ref={fRef} type="file" accept="image/*" multiple onChange={addPhotos} style={{display:"none"}}/>
+            {!ph.length?<div><div style={{marginBottom:4,color:"#c4b5fd"}}>{IC.up}</div><div style={{fontWeight:600}}>클릭하여 사고 사진 업로드</div><div style={{fontSize:10,color:"#94a3b8",marginTop:2}}>사고 전체 모습, 파손 부위, 도로 상황 등</div></div>:
+             ph.length<10?<span style={{fontSize:11}}>+ 추가 ({10-ph.length}장 남음)</span>:<span style={{fontSize:11}}>최대 10장 완료</span>}
+          </div>
+          {ph.length>0&&<div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:5,marginTop:8}}>
+            {ph.map((p,i)=><div key={i} style={{position:"relative",aspectRatio:"1",borderRadius:8,overflow:"hidden",border:"1px solid #e2e8f0",cursor:"pointer"}} onClick={()=>sPvIdx(i)}>
+              <img src={p.url} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+              <button onClick={e=>{e.stopPropagation();removePhoto(i)}} style={{position:"absolute",top:2,right:2,width:16,height:16,borderRadius:"50%",background:"rgba(0,0,0,.5)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",padding:0}}>{IC.x}</button>
+              <div style={{position:"absolute",bottom:2,left:2,background:"rgba(0,0,0,.5)",color:"#fff",fontSize:8,fontWeight:600,padding:"1px 4px",borderRadius:5}}>{i+1}</div>
+            </div>)}
+          </div>}
+        </div>
+
+        <div style={CD}><h3 style={ST}>진술</h3><label style={LB}>A차량(청구자)</label><textarea value={mD} onChange={e=>sMd(e.target.value)} placeholder="사고 당시 상황을 상세히 기술해주세요..." style={TA} rows={2}/>
+          <label style={{...LB,marginTop:8}}>B차량(상대방)</label><textarea value={oD} onChange={e=>sOd(e.target.value)} placeholder="상대방의 진술 내용..." style={TA} rows={2}/></div>
+
+        {/* 증거 */}
+        <div style={CD}><h3 style={ST}>증거자료</h3>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {/* 블랙박스 */}
+            <div style={{padding:"8px 10px",borderRadius:8,background:dc?"#f5f3ff":"#fafbfc",border:dc?"1px solid #c4b5fd":"1px solid #e2e8f0",transition:"all .15s"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <label style={{display:"flex",alignItems:"center",gap:5,color:dc?"#7c3aed":"#64748b",fontSize:12.5,cursor:"pointer",fontWeight:dc?600:400}}>
+                  <input type="checkbox" checked={dc} onChange={e=>sDc(e.target.checked)} style={{accentColor:"#7c3aed"}}/>📹 블랙박스 영상</label>
+                {dc&&<button onClick={()=>bbRef.current?.click()} style={{padding:"3px 8px",borderRadius:6,border:"1px solid #c4b5fd",background:"#fff",color:"#7c3aed",fontSize:10,fontWeight:600,cursor:"pointer"}}>
+                  {bbFile?"✓ "+bbFile.name.slice(0,15):"파일 첨부"}</button>}
+              </div>
+              <input ref={bbRef} type="file" accept="video/*,.mp4,.avi" onChange={e=>sBbFile(e.target.files?.[0]||null)} style={{display:"none"}}/>
+            </div>
+            {/* 경찰보고서 */}
+            <div style={{padding:"8px 10px",borderRadius:8,background:pr?"#f5f3ff":"#fafbfc",border:pr?"1px solid #c4b5fd":"1px solid #e2e8f0",transition:"all .15s"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <label style={{display:"flex",alignItems:"center",gap:5,color:pr?"#7c3aed":"#64748b",fontSize:12.5,cursor:"pointer",fontWeight:pr?600:400}}>
+                  <input type="checkbox" checked={pr} onChange={e=>sPr(e.target.checked)} style={{accentColor:"#7c3aed"}}/>📄 경찰 보고서</label>
+                {pr&&<button onClick={()=>prRef.current?.click()} style={{padding:"3px 8px",borderRadius:6,border:"1px solid #c4b5fd",background:"#fff",color:"#7c3aed",fontSize:10,fontWeight:600,cursor:"pointer"}}>
+                  {prFile?"✓ "+prFile.name.slice(0,15):"파일 첨부"}</button>}
+              </div>
+              <input ref={prRef} type="file" accept=".pdf,.jpg,.png,.doc,.docx" onChange={e=>sPrFile(e.target.files?.[0]||null)} style={{display:"none"}}/>
+            </div>
+            {/* CCTV */}
+            <div style={{padding:"8px 10px",borderRadius:8,background:cctv?"#f5f3ff":"#fafbfc",border:cctv?"1px solid #c4b5fd":"1px solid #e2e8f0",transition:"all .15s"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <label style={{display:"flex",alignItems:"center",gap:5,color:cctv?"#7c3aed":"#64748b",fontSize:12.5,cursor:"pointer",fontWeight:cctv?600:400}}>
+                  <input type="checkbox" checked={cctv} onChange={e=>sCctv(e.target.checked)} style={{accentColor:"#7c3aed"}}/>📷 CCTV / 도로 카메라</label>
+                {cctv&&<button onClick={()=>cctvRef.current?.click()} style={{padding:"3px 8px",borderRadius:6,border:"1px solid #c4b5fd",background:"#fff",color:"#7c3aed",fontSize:10,fontWeight:600,cursor:"pointer"}}>
+                  {cctvFile?"✓ "+cctvFile.name.slice(0,15):"파일 첨부"}</button>}
+              </div>
+              <input ref={cctvRef} type="file" accept="video/*,image/*,.pdf" onChange={e=>sCctvFile(e.target.files?.[0]||null)} style={{display:"none"}}/>
+            </div>
+            {/* 목격자 */}
+            <div style={{padding:"8px 10px",borderRadius:8,background:wit?"#f5f3ff":"#fafbfc",border:wit?"1px solid #c4b5fd":"1px solid #e2e8f0",transition:"all .15s"}}>
+              <label style={{display:"flex",alignItems:"center",gap:5,color:wit?"#7c3aed":"#64748b",fontSize:12.5,cursor:"pointer",fontWeight:wit?600:400}}>
+                <input type="checkbox" checked={wit} onChange={e=>sWit(e.target.checked)} style={{accentColor:"#7c3aed"}}/>👤 목격자 진술 확보</label>
+            </div>
+          </div>
+          {[dc,pr,cctv,wit].filter(Boolean).length>0&&<div style={{marginTop:6,padding:"4px 10px",borderRadius:7,background:"#f0fdf4",border:"1px solid #bbf7d0",fontSize:10.5,color:"#16a34a",fontWeight:500}}>
+            ✓ 증거 {[dc,pr,cctv,wit].filter(Boolean).length}건 확보 — 과실 산정 신뢰도 향상</div>}
+        </div>
+
         <button onClick={calc} disabled={ld||!at} style={{...BT,background:ld?"#e2e8f0":"#7c3aed",opacity:!at?.4:1}}>{ld?<Sp/>:"과실비율 산정"}</button>
       </div>
-      <div style={{overflowY:"auto"}}>{!rs&&!ld&&<Em text="사고 유형 입력 후 실행하세요"/>}
+
+      {/* ═══ RIGHT: 결과 ═══ */}
+      <div style={{overflowY:"auto"}}>
+        {!rs&&!ld&&!aiProg.step&&<Em text="사고 유형과 상황을 입력 후 실행하세요"/>}
+
+        {/* AI 프로그레스 */}
+        {ld&&aiProg.step>0&&!rs&&<div style={{animation:"fadeIn .3s"}}>
+          <div style={{...CD,border:"2px solid #c4b5fd",background:"linear-gradient(135deg,#faf5ff,#f5f3ff)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",gap:7}}>
+                <div style={{width:22,height:22,border:"2.5px solid #ede9fe",borderTop:"2.5px solid #7c3aed",borderRadius:"50%",animation:"spin .7s linear infinite"}}/>
+                <span style={{fontSize:13,fontWeight:700,color:"#7c3aed"}}>AI 과실 분석 진행 중</span>
+              </div>
+              <span style={{fontSize:12,fontWeight:700,color:"#7c3aed",fontFamily:"'DM Mono',monospace"}}>{aiProg.pct}%</span>
+            </div>
+            <div style={{height:7,borderRadius:4,background:"#ede9fe",overflow:"hidden",marginBottom:10}}>
+              <div style={{height:"100%",borderRadius:4,background:"linear-gradient(90deg,#8b5cf6,#7c3aed,#6d28d9)",transition:"width .5s ease",width:`${aiProg.pct}%`}}/>
+            </div>
+            <div style={{fontSize:12,color:"#475569",fontWeight:500,marginBottom:8}}>{aiProg.msg}</div>
+            <div style={{display:"flex",gap:3}}>
+              {Array.from({length:aiProg.total||6}).map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<(aiProg.step||0)?"#7c3aed":"#e2e8f0",transition:"background .3s"}}/>)}
+            </div>
+            {/* 분석 요소 요약 */}
+            <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:10}}>
+              {at&&<span style={{padding:"3px 8px",borderRadius:12,fontSize:10,background:"#f5f3ff",border:"1px solid #ddd6fe",color:"#7c3aed",fontWeight:500}}>📋 {at.split("(")[0]}</span>}
+              {ph.length>0&&<span style={{padding:"3px 8px",borderRadius:12,fontSize:10,background:"#f0f9ff",border:"1px solid #bae6fd",color:"#0891b2",fontWeight:500}}>📸 사진 {ph.length}장</span>}
+              {[dc&&"블랙박스",pr&&"경찰보고서",cctv&&"CCTV",wit&&"목격자"].filter(Boolean).map((e,i)=><span key={i} style={{padding:"3px 8px",borderRadius:12,fontSize:10,background:"#f0fdf4",border:"1px solid #bbf7d0",color:"#16a34a",fontWeight:500}}>✓ {e}</span>)}
+            </div>
+          </div>
+        </div>}
+
         {rs&&<div style={{animation:"fadeIn .4s"}}>
           <div style={{...CD,border:"2px solid #c4b5fd"}}>
             <h3 style={{color:"#0f172a",fontSize:15.5,fontWeight:700,margin:"0 0 14px"}}>과실 산정 결과</h3>
@@ -457,7 +609,13 @@ function Tab2(){
             <div style={{height:9,borderRadius:5,background:"#f1f5f9",overflow:"hidden",display:"flex"}}>
               <div style={{width:`${rs.mf}%`,background:"linear-gradient(90deg,#3b82f6,#60a5fa)",transition:"width 1s"}}/>
               <div style={{width:`${rs.of}%`,background:"linear-gradient(90deg,#ef4444,#f87171)",transition:"width 1s"}}/></div>
-            <div style={{marginTop:8}}><span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:600,background:rs.cf==="높음"?"#dcfce7":"#fef3c7",color:rs.cf==="높음"?"#16a34a":"#d97706"}}>증거 신뢰도: {rs.cf}</span></div></div>
+            <div style={{display:"flex",gap:6,marginTop:8,flexWrap:"wrap"}}>
+              <span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:600,
+                background:rs.cf==="매우 높음"||rs.cf==="높음"?"#dcfce7":"#fef3c7",
+                color:rs.cf==="매우 높음"||rs.cf==="높음"?"#16a34a":"#d97706"}}>증거 신뢰도: {rs.cf}</span>
+              {rs.phCount>0&&<span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:500,background:"#f0f9ff",color:"#0891b2"}}>📸 사진 {rs.phCount}장 반영</span>}
+              {rs.evCount>0&&<span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:500,background:"#f5f3ff",color:"#7c3aed"}}>📎 증거 {rs.evCount}건</span>}
+            </div></div>
           <div style={{...CD,border:"1px solid #c4b5fd"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
             <span style={{fontSize:13,fontWeight:700}}>AI 과실 분석</span>{!aD&&ai&&<Sp s/>}</div>
