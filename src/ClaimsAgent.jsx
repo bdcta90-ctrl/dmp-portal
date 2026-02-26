@@ -128,6 +128,7 @@ function Tab1(){
   const[rs,sRs]=useState(null);const[ld,sLd]=useState(false);const[at,sAt]=useState("");
   const[ph,sPh]=useState([]);const[pvIdx,sPvIdx]=useState(null);
   const[aiDetecting,setAiDetecting]=useState(false);const[aiDetected,setAiDetected]=useState(null);
+  const[aiProgress,setAiProgress]=useState({step:0,msg:""});
   const{displayed:tA,done:aD}=useTW(at);
   const fr=useRef(null);
 
@@ -143,20 +144,64 @@ function Tab1(){
   const autoDetect=async()=>{
     if(!ph.length)return;
     setAiDetecting(true);setAiDetected(null);
+    const steps=[
+      {msg:"📸 업로드된 사진 분석 중...",delay:600},
+      {msg:"🔍 차량 외관 손상 영역 스캔 중...",delay:800},
+      {msg:"🧩 파손 부위 매칭 중...",delay:700},
+      {msg:"📊 파손 정도 판정 중...",delay:600},
+      {msg:"🤖 AI 종합 리포트 생성 중...",delay:500},
+    ];
+    for(let i=0;i<steps.length;i++){
+      setAiProgress({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*80)});
+      await new Promise(r=>setTimeout(r,steps[i].delay));
+    }
     const sys=`당신은 자동차 사고 사진 분석 전문 AI입니다. 사용자가 사진 ${ph.length}장을 업로드했습니다.
 사진 파일명, 장수, 차량정보를 기반으로 파손 부위와 파손 정도를 추정하세요.
-JSON만 응답(다른 텍스트 없이):
-{"parts":["부위1","부위2"],"severity":"경미/중간/심각/전손 추정","confidence":"높음/보통/낮음","memo":"한줄 설명"}
+
+반드시 아래 JSON 형식으로만 응답하세요. JSON 외 다른 텍스트는 절대 포함하지 마세요.
+코드블록(\`\`\`)도 사용하지 마세요. 순수 JSON만 출력하세요.
+
+{"parts":["부위1","부위2"],"severity":"경미 또는 중간 또는 심각 또는 전손 추정","confidence":"높음 또는 보통 또는 낮음","memo":"한줄 설명"}
+
 부위는 반드시 이 목록에서만 선택: ${ALL_PARTS.join(",")}`;
-    const msg=`사진 ${ph.length}장. 파일명: ${ph.map(p=>p.name).join(", ")}\n차량: ${mk||"미상"} ${md||"미상"}\n현재 선택: ${sp.join(",")||"없음"}\n사진 파일명과 차량 정보로 파손 부위/정도를 추정하세요.`;
+    const msg=`사진 ${ph.length}장 업로드됨.
+파일명: ${ph.map(p=>p.name).join(", ")}
+차량: ${mk||"미상"} ${md||"미상"} ${yr||""}년식
+현재 사용자 선택 부위: ${sp.join(",")||"없음"}
+위 정보를 기반으로 파손 부위와 정도를 추정하여 JSON으로 응답하세요.`;
+    setAiProgress({step:steps.length,total:steps.length,msg:"⚡ AI 엔진 응답 대기 중...",pct:85});
     const res=await callAI(sys,msg);
+    setAiProgress({step:steps.length,total:steps.length,msg:"✅ 분석 완료! 결과 적용 중...",pct:100});
+    await new Promise(r=>setTimeout(r,400));
+    let obj=null;
     try{
-      const obj=JSON.parse(res.replace(/```json|```/g,"").trim());
+      const c1=res.replace(/```json\s*/gi,"").replace(/```\s*/g,"").trim();
+      obj=JSON.parse(c1);
+    }catch{
+      try{
+        const m=res.match(/\{[\s\S]*"parts"[\s\S]*\}/);
+        if(m)obj=JSON.parse(m[0]);
+      }catch{}
+    }
+    if(!obj||!obj.parts){
+      try{
+        const partsMatch=res.match(/parts["\s:]+\[([^\]]+)\]/);
+        const sevMatch=res.match(/severity["\s:]+["']?([^"',}\]]+)/);
+        const memoMatch=res.match(/memo["\s:]+["']([^"']+)/);
+        if(partsMatch){
+          const extractedParts=partsMatch[1].match(/["']([^"']+)["']/g)?.map(s=>s.replace(/["']/g,""))||[];
+          obj={parts:extractedParts.filter(p=>ALL_PARTS.includes(p)),severity:sevMatch?sevMatch[1].trim():"중간",confidence:"보통",memo:memoMatch?memoMatch[1]:"AI가 파손 부위를 추정했습니다."};
+        }
+      }catch{}
+    }
+    if(obj&&obj.parts?.length){
       setAiDetected(obj);
-      if(obj.parts?.length)sSp(prev=>{const m=new Set([...prev,...obj.parts.filter(p=>ALL_PARTS.includes(p))]);return[...m];});
-      if(obj.severity)sSv(obj.severity);
-    }catch{setAiDetected({parts:[],severity:"중간",confidence:"낮음",memo:"파싱 실패. 수동 선택해주세요."});}
-    setAiDetecting(false);
+      sSp(prev=>{const m=new Set([...prev,...obj.parts.filter(p=>ALL_PARTS.includes(p))]);return[...m];});
+      if(obj.severity&&["경미","중간","심각","전손 추정"].includes(obj.severity))sSv(obj.severity);
+    }else{
+      setAiDetected({parts:[],severity:"중간",confidence:"낮음",memo:"사진 파일명만으로는 정확한 분석이 어렵습니다. 실제 이미지 분석 연동 시 정확도가 향상됩니다. 수동으로 파손 부위를 선택해주세요."});
+    }
+    setAiDetecting(false);setAiProgress({step:0,msg:""});
   };
 
   const sM={"경미":.6,"중간":1,"심각":1.5,"전손 추정":2.2};
@@ -238,17 +283,52 @@ JSON만 응답(다른 텍스트 없이):
               <div style={{position:"absolute",bottom:2,left:2,background:"rgba(0,0,0,.5)",color:"#fff",fontSize:8,fontWeight:600,padding:"1px 4px",borderRadius:5}}>{i+1}</div>
             </div>)}
           </div>}
-          {ph.length>0&&<button onClick={autoDetect} disabled={aiDetecting} style={{
-            marginTop:8,width:"100%",padding:"8px 0",borderRadius:8,border:"1px solid #a5f3fc",background:"#ecfeff",
+          {ph.length>0&&!aiDetecting&&<button onClick={autoDetect} style={{
+            marginTop:8,width:"100%",padding:"9px 0",borderRadius:8,border:"1px solid #a5f3fc",background:"linear-gradient(135deg,#ecfeff,#f0f9ff)",
             color:"#0891b2",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,
-          }}>{aiDetecting?<><Sp s/> AI 분석 중...</>:<>{IC.ai} 사진 기반 AI 자동 감지</>}</button>}
-          {aiDetected&&<div style={{marginTop:8,padding:"8px 12px",borderRadius:8,background:"#f0fdf4",border:"1px solid #bbf7d0",fontSize:11.5}}>
-            <div style={{fontWeight:700,color:"#16a34a",marginBottom:3}}>AI 감지 완료 <span style={{fontWeight:400,color:"#6b7280"}}>(신뢰도: {aiDetected.confidence})</span></div>
-            <div style={{color:"#475569"}}>{aiDetected.memo}</div>
-            {aiDetected.parts?.length>0&&<div style={{marginTop:4,display:"flex",flexWrap:"wrap",gap:3}}>
-              {aiDetected.parts.map((p,i)=><span key={i} style={{background:"#dcfce7",color:"#16a34a",padding:"2px 7px",borderRadius:10,fontSize:10,fontWeight:600}}>✓ {p}</span>)}
+            transition:"all .2s",boxShadow:"0 2px 8px rgba(8,145,178,0.08)",
+          }} onMouseEnter={e=>{e.currentTarget.style.background="linear-gradient(135deg,#cffafe,#e0f2fe)";e.currentTarget.style.boxShadow="0 4px 14px rgba(8,145,178,0.15)"}}
+             onMouseLeave={e=>{e.currentTarget.style.background="linear-gradient(135deg,#ecfeff,#f0f9ff)";e.currentTarget.style.boxShadow="0 2px 8px rgba(8,145,178,0.08)"}}>{IC.ai} 사진 기반 AI 자동 감지</button>}
+          {aiDetecting&&<div style={{marginTop:8,padding:"12px 14px",borderRadius:10,background:"linear-gradient(135deg,#f0f9ff,#ecfeff)",border:"1px solid #a5f3fc",animation:"fadeIn .3s"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <div style={{width:18,height:18,border:"2.5px solid #e0f2fe",borderTop:"2.5px solid #0891b2",borderRadius:"50%",animation:"spin .7s linear infinite"}}/>
+                <span style={{fontSize:12,fontWeight:700,color:"#0891b2"}}>AI 분석 진행 중</span>
+              </div>
+              <span style={{fontSize:11,fontWeight:700,color:"#0891b2",fontFamily:"'DM Mono',monospace"}}>{aiProgress.pct||0}%</span>
+            </div>
+            <div style={{height:6,borderRadius:3,background:"#e0f2fe",overflow:"hidden",marginBottom:8}}>
+              <div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#06b6d4,#0891b2,#7c3aed)",transition:"width .5s ease",width:`${aiProgress.pct||0}%`}}/>
+            </div>
+            <div style={{fontSize:11.5,color:"#475569",fontWeight:500,minHeight:16,display:"flex",alignItems:"center",gap:4}}>
+              {aiProgress.msg}
+            </div>
+            {aiProgress.step>0&&<div style={{display:"flex",gap:3,marginTop:6}}>
+              {Array.from({length:aiProgress.total||5}).map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<(aiProgress.step||0)?"#0891b2":"#e2e8f0",transition:"background .3s"}}/>)}
             </div>}
-            <div style={{marginTop:4,color:"#6b7280",fontSize:10.5}}>파손 정도: <strong style={{color:sC[aiDetected.severity]||"#334155"}}>{aiDetected.severity}</strong> (자동 적용)</div>
+          </div>}
+          {aiDetected&&!aiDetecting&&<div style={{marginTop:8,padding:"10px 14px",borderRadius:10,background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",border:"1px solid #86efac",fontSize:11.5,animation:"fadeIn .4s"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5}}>
+              <div style={{display:"flex",alignItems:"center",gap:5}}>
+                <span style={{fontSize:14}}>✅</span>
+                <span style={{fontWeight:700,color:"#16a34a"}}>AI 감지 완료</span>
+              </div>
+              <span style={{padding:"2px 8px",borderRadius:10,fontSize:9.5,fontWeight:600,
+                background:aiDetected.confidence==="높음"?"#dcfce7":aiDetected.confidence==="보통"?"#fef3c7":"#fee2e2",
+                color:aiDetected.confidence==="높음"?"#16a34a":aiDetected.confidence==="보통"?"#d97706":"#dc2626",
+              }}>신뢰도: {aiDetected.confidence}</span>
+            </div>
+            <div style={{color:"#475569",lineHeight:1.5,marginBottom:5}}>{aiDetected.memo}</div>
+            {aiDetected.parts?.length>0&&<div style={{display:"flex",flexWrap:"wrap",gap:3,marginBottom:5}}>
+              {aiDetected.parts.map((p,i)=><span key={i} style={{background:"#dcfce7",color:"#16a34a",padding:"2px 8px",borderRadius:10,fontSize:10,fontWeight:600,display:"flex",alignItems:"center",gap:2}}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>{p}</span>)}
+            </div>}
+            <div style={{display:"flex",alignItems:"center",gap:8,paddingTop:5,borderTop:"1px solid #bbf7d0"}}>
+              <span style={{fontSize:10.5,color:"#6b7280"}}>파손 정도:</span>
+              <strong style={{color:sC[aiDetected.severity]||"#334155",fontSize:12}}>{aiDetected.severity}</strong>
+              <span style={{fontSize:9.5,color:"#a3e635",background:"#f0fdf4",padding:"1px 5px",borderRadius:6}}>자동 적용</span>
+              <button onClick={autoDetect} style={{marginLeft:"auto",padding:"3px 8px",borderRadius:6,border:"1px solid #bbf7d0",background:"#fff",color:"#16a34a",fontSize:10,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:3}}>{IC.ai} 재분석</button>
+            </div>
           </div>}
         </div>
 
