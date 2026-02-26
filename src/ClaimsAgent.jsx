@@ -788,7 +788,7 @@ function Tab2(){
       </div></div>);
 }
 
-// ═══ TAB 3: 처리 방법 (CARD) ═══
+// ═══ TAB 3: 처리 방법 (확장) ═══
 function Tab3(){
   const[stage,setStage]=useState("idle");
   const[selCase,setSelCase]=useState(null);const[modal,setModal]=useState(false);const[csQ,setCsQ]=useState("");
@@ -796,30 +796,139 @@ function Tab3(){
   const[summary,setSummary]=useState(null);const[sumText,setSumText]=useState("");const{displayed:tS,done:sD}=useTW(sumText);
   const[proposals,setProposals]=useState(null);
   const[selIdx,setSelIdx]=useState(null);const[detText,setDetText]=useState("");const{displayed:tD,done:dD}=useTW(detText);
+  // 고객 성향
+  const[custPref,setCustPref]=useState("");
+  // intake Q&A
+  const[intakeQs,setIntakeQs]=useState([]);const[intakeAs,setIntakeAs]=useState({});
+  const[intakeProg,setIntakeProg]=useState({step:0,msg:"",pct:0});
+
+  const CUST_PREFS=[
+    {id:"cash",label:"💰 현금 수령 선호",desc:"미수선 처리로 최대 보상금 확보",short:"현금선호"},
+    {id:"fast",label:"⚡ 빠른 수리 희망",desc:"최단 기간 내 수리 완료 우선",short:"빠른수리"},
+    {id:"quality",label:"🏆 품질 최우선",desc:"공식 서비스센터 · OEM 부품 고집",short:"품질우선"},
+    {id:"balance",label:"⚖️ 비용·품질 균형",desc:"합리적 비용으로 품질 보증 수리",short:"균형형"},
+    {id:"insurance",label:"🏢 보험사 비용 절감",desc:"렌트비·수리비 최소화 (보험사 관점)",short:"보험사관점"},
+    {id:"unknown",label:"❓ 아직 파악 안됨",desc:"고객 성향 미파악 상태",short:"미파악"},
+  ];
 
   const filtered=CASES.filter(c=>!csQ||c.id.toLowerCase().includes(csQ.toLowerCase())||c.model.includes(csQ)||c.type.includes(csQ));
   const loadCase=c=>{setSelCase(c);setModal(false);setInput(`사고ID: ${c.id}\n사고일: ${c.date}\n유형: ${c.type}\n차량: ${c.make} ${c.model}\n파손: ${c.parts}\n정도: ${c.severity}\n과실: ${c.fault}\n수리비: ${F(c.cost)}\n렌트: ${c.rental}\n상태: ${c.status}\n지역: ${c.region}`);
-    setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");};
+    setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});};
 
-  const analyze=async()=>{if(!input.trim())return;setStage("loading");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");
-    const sR=await callAI("손해사정 전문 AI. JSON만 응답:\n{\"업무영역\":\"\",\"핵심쟁점\":\"\",\"차량\":\"\",\"추정비용\":\"\",\"긴급도\":\"높음/보통/낮음\",\"주의사항\":\"\"}",input);
+  // intake 분석: 누락 정보 파악
+  const analyzeIntake=async()=>{if(!input.trim())return;setStage("intake-loading");
+    const steps=[
+      {msg:"📋 접수 내용 파싱 중...",delay:500},
+      {msg:"🔍 필수 정보 항목 점검 중...",delay:600},
+      {msg:"📊 누락 정보 식별 중...",delay:500},
+    ];
+    for(let i=0;i<steps.length;i++){
+      setIntakeProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*90)});
+      await new Promise(r=>setTimeout(r,steps[i].delay));
+    }
+    // 필수 항목 체크
+    const txt=input.toLowerCase();
+    const missing=[];
+    if(!txt.includes("차량")&&!txt.includes("차종")&&!txt.match(/[a-z]\d|아반떼|소나타|그랜저|k\d|gv/i))
+      missing.push({key:"vehicle",q:"차량 정보 (제조사, 모델명, 연식)가 누락되었습니다. 어떤 차량인가요?",hint:"예: 현대 아반떼 CN7 2022년식"});
+    if(!txt.includes("파손")&&!txt.includes("손상")&&!txt.includes("부위")&&!txt.includes("범퍼")&&!txt.includes("미러")&&!txt.includes("도어"))
+      missing.push({key:"damage",q:"파손 부위와 정도가 확인되지 않았습니다. 어떤 부위가 어느 정도 파손되었나요?",hint:"예: 프론트범퍼 교체, 좌측 펜더 판금도장"});
+    if(!txt.includes("수리비")&&!txt.includes("견적")&&!txt.match(/\d{2,},?\d{3}/))
+      missing.push({key:"cost",q:"예상 수리비(견적)가 확인되지 않았습니다. 산출된 견적이 있나요?",hint:"예: 약 280만원 / 아직 미산출"});
+    if(!txt.includes("과실")&&!txt.match(/\d+\s*[:%]/))
+      missing.push({key:"fault",q:"과실 비율이 확인되지 않았습니다. 과실 비율이 어떻게 되나요?",hint:"예: 상대 100%, 쌍방 50:50, 미산정"});
+    if(!txt.includes("렌트")&&!txt.includes("대차"))
+      missing.push({key:"rental",q:"대차(렌트) 사용 여부가 확인되지 않았습니다. 현재 대차를 사용 중인가요?",hint:"예: 대차 사용 중 (일 7만원) / 미사용"});
+    if(!txt.includes("보험")&&!txt.includes("자차")&&!txt.includes("삼자"))
+      missing.push({key:"insurance",q:"보험 처리 유형이 확인되지 않았습니다. 어떤 보험으로 처리되나요?",hint:"예: 상대 삼자배책 / 자차보험 / 미정"});
+    setIntakeProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료",pct:100});
+    await new Promise(r=>setTimeout(r,300));
+    if(missing.length>0){setIntakeQs(missing);setStage("intake-qa");}
+    else{setIntakeQs([]);setStage("intake-qa");/* no questions but proceed to pref selection */}
+  };
+
+  // 최종 분석
+  const runAnalysis=async()=>{setStage("loading");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");
+    // 보충 정보 합산
+    let fullInput=input;
+    Object.entries(intakeAs).forEach(([k,v])=>{if(v&&v.trim())fullInput+=`\n${k}: ${v}`;});
+    if(custPref)fullInput+=`\n고객성향: ${CUST_PREFS.find(p=>p.id===custPref)?.short||custPref}`;
+    const steps=[
+      {msg:"📋 접수 내용 종합 분석 중...",delay:600},
+      {msg:"🔍 차량·파손·비용 데이터 매칭 중...",delay:700},
+      {msg:"⚖️ 고객 성향 기반 최적안 산출 중...",delay:800},
+      {msg:"💰 비용 비교 분석 중...",delay:600},
+      {msg:"🤖 AI 처리방법 리포트 생성 중...",delay:500},
+    ];
+    for(let i=0;i<steps.length;i++){
+      setIntakeProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*85)});
+      await new Promise(r=>setTimeout(r,steps[i].delay));
+    }
+    const sR=await callAI("손해사정 전문 AI. JSON만 응답:\n{\"업무영역\":\"\",\"핵심쟁점\":\"\",\"차량\":\"\",\"추정비용\":\"\",\"긴급도\":\"높음/보통/낮음\",\"주의사항\":\"\"}",fullInput);
     let sO;try{sO=JSON.parse(sR.replace(/```json|```/g,"").trim())}catch{sO={업무영역:"자동차 손해사정",핵심쟁점:"수리 방법 결정",차량:"확인 필요",추정비용:"산정 중",긴급도:"보통",주의사항:""}}
     setSummary(sO);
-    const nR=await callAI("손해사정 전문 AI. 2-3줄로 사고건을 정리해주세요.",`정리:\n${input}`);setSumText(nR);
-    const c=selCase?.cost||2000000;
-    const pR=await callAI("손해사정 전문 AI. 3가지 처리방법 JSON배열만:\n[{\"title\":\"\",\"subtitle\":\"\",\"cost\":\"금액\",\"period\":\"기간\",\"satisfaction\":4.5,\"pros\":[],\"cons\":[],\"recommended\":false}]\n순서:(1)미수선(2)제휴(3)공식",input);
+    setIntakeProg({step:steps.length,total:steps.length,msg:"📊 리포트 작성 중...",pct:92});
+    const nR=await callAI("손해사정 전문 AI. 2-3줄로 사고건을 정리해주세요.",`정리:\n${fullInput}`);setSumText(nR);
+    // 비용 산출
+    const costMatch=fullInput.match(/(\d{1,3}[,.]?\d{3}[,.]?\d{0,3})/);
+    const c=costMatch?parseInt(costMatch[1].replace(/[,.]/g,"")):selCase?.cost||2000000;
+    const rentalMatch=fullInput.match(/렌트[:\s]*([^\n]*)/i)||fullInput.match(/대차[:\s]*([^\n]*)/i);
+    const hasRental=rentalMatch?!rentalMatch[1].includes("미사용")&&!rentalMatch[1].includes("없"):selCase?.rental==="사용중";
+    const rentalDaily=hasRental?70000:0;
+    // 스마트 추천 엔진
+    const rec=calcRecommendation(custPref,c,hasRental,rentalDaily);
+    const pR=await callAI("손해사정 전문 AI. 3가지 처리방법 JSON배열만:\n[{\"title\":\"\",\"subtitle\":\"\",\"cost\":\"금액\",\"period\":\"기간\",\"satisfaction\":4.5,\"pros\":[],\"cons\":[],\"recommended\":false}]\n순서:(1)미수선(2)제휴(3)공식",fullInput);
     let pA;try{pA=JSON.parse(pR.replace(/```json|```/g,"").trim())}catch{
-      pA=[{title:"미수선 처리",subtitle:"현금정산(협의금)",cost:F(Math.round(c*.7)),period:"3~5일",satisfaction:3.8,pros:["빠른 종결","고객 자유도"],cons:["수리 미보장"],recommended:false},
-        {title:"제휴 서비스 센터",subtitle:"보험사 협력정비망",cost:F(Math.round(c*.85)),period:"5~7일",satisfaction:4.2,pros:["비용 절감","품질 보증"],cons:["일부 대체부품"],recommended:true},
-        {title:"공식 서비스 센터",subtitle:"제조사 공식 AS",cost:F(c),period:"7~14일",satisfaction:4.7,pros:["OEM 부품","최고 품질"],cons:["비용 최대"],recommended:false}]}
-    setProposals(pA);setStage("result");};
+      pA=[
+        {title:"미수선 처리",subtitle:"현금정산(협의금)",cost:F(Math.round(c*.72)),period:"3~5일",satisfaction:3.8,
+         pros:["빠른 종결","현금 수령","고객 자유도"],cons:["수리 미보장","감가 우려"],recommended:false,
+         rentalSave:F(rentalDaily*0),totalCost:F(Math.round(c*.72))},
+        {title:"제휴 서비스 센터",subtitle:"보험사 협력정비망",cost:F(Math.round(c*.85)),period:"5~7일",satisfaction:4.2,
+         pros:["비용 절감 15%","품질 보증","대차 지원"],cons:["일부 대체부품 사용"],recommended:false,
+         rentalSave:hasRental?F(rentalDaily*20)+"↓":"해당없음",totalCost:F(Math.round(c*.85+rentalDaily*6))},
+        {title:"공식 서비스 센터",subtitle:"제조사 공식 AS",cost:F(c),period:"14~30일",satisfaction:4.7,
+         pros:["OEM 순정부품","최고 품질","보증 유지"],cons:["비용 최대","대기 길음"],recommended:false,
+         rentalSave:hasRental?F(rentalDaily*30):"해당없음",totalCost:F(Math.round(c+rentalDaily*25))}]}
+    // 추천 적용
+    pA[rec.idx].recommended=true;pA[rec.idx].recReason=rec.reason;
+    setProposals(pA);
+    setIntakeProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
+    await new Promise(r=>setTimeout(r,400));
+    setStage("result");setIntakeProg({step:0,msg:"",pct:0});};
+
+  // 스마트 추천 엔진
+  const calcRecommendation=(pref,cost,hasRental,rentalDaily)=>{
+    // 0=미수선, 1=제휴, 2=공식
+    if(pref==="cash")return{idx:0,reason:"고객이 현금 수령을 선호합니다. 미수선 처리로 빠르게 현금 정산이 가능합니다."};
+    if(pref==="quality")return{idx:2,reason:"고객이 품질을 최우선으로 합니다. OEM 순정 부품과 공식 서비스를 권장합니다."};
+    if(pref==="fast"){
+      if(cost<1500000)return{idx:0,reason:"소액 수리 + 빠른 처리 요구. 미수선 현금 정산이 가장 빠릅니다."};
+      return{idx:1,reason:"빠른 수리를 원하지만 수리가 필요한 규모입니다. 제휴 센터가 가장 빠르게 수리를 완료합니다."};
+    }
+    if(pref==="insurance"){
+      if(cost>5000000&&hasRental)return{idx:1,reason:`수리비 ${F(cost)} + 렌트비(일 ${F(rentalDaily)})가 동시 발생합니다. 공식 센터 대비 처리기간이 절반으로 줄어 렌트비를 대폭 절감할 수 있습니다.`};
+      if(cost>3000000)return{idx:1,reason:`수리비가 고액(${F(cost)})입니다. 제휴 센터 이용 시 수리비 15% 절감 + 처리기간 단축으로 총 비용을 최소화할 수 있습니다.`};
+      if(cost<1000000)return{idx:0,reason:`소액 사고(${F(cost)})입니다. 미수선 처리로 렌트·수리 비용 모두 절감하는 것이 보험사에 가장 유리합니다.`};
+      return{idx:1,reason:"보험사 비용 절감 관점에서 제휴 센터가 수리비·렌트비·처리기간 모두 최적입니다."};
+    }
+    if(pref==="balance"){
+      if(cost<1500000)return{idx:1,reason:"합리적 비용으로 품질 보증 수리가 가능합니다. 비용 대비 만족도가 가장 높습니다."};
+      return{idx:1,reason:"비용과 품질의 균형을 고려할 때, 제휴 센터가 가장 합리적인 선택입니다."};
+    }
+    // unknown / default: 비용 기반 자동 판단
+    if(cost>8000000)return{idx:2,reason:`고가 수리(${F(cost)})로 OEM 부품 사용이 권장됩니다. 다만 보험사 협의 시 제휴 센터 대안도 제시하세요.`};
+    if(cost>3000000&&hasRental)return{idx:1,reason:`수리비 ${F(cost)} + 대차 사용 중으로, 처리기간 단축이 총 비용 절감의 핵심입니다.`};
+    if(cost<1000000)return{idx:0,reason:`소액(${F(cost)})이므로 미수선 처리가 효율적입니다. 고객에게 현금 정산 옵션을 먼저 제안하세요.`};
+    return{idx:1,reason:"종합적으로 비용·기간·품질을 고려하면 제휴 센터가 가장 균형 잡힌 선택입니다."};
+  };
 
   const showDet=async idx=>{setSelIdx(idx);setDetText("");setStage("detail");
     const p=proposals[idx];
+    let fullInput=input;Object.entries(intakeAs).forEach(([k,v])=>{if(v&&v.trim())fullInput+=`\n${k}: ${v}`;});
     const r=await callAI("손해사정 전문 AI. 선택된 방법의 미리보기+절차를 안내하세요.\n## 미리보기\n- 상세비용,타임라인\n## 다음 절차\n- Step별 안내\n## 고객 스크립트\n## 유의사항",
-      `사고건:\n${input}\n방법:${p.title}(${p.subtitle})\n비용:${p.cost},기간:${p.period}\n상세+절차 안내해주세요.`);
+      `사고건:\n${fullInput}\n방법:${p.title}(${p.subtitle})\n비용:${p.cost},기간:${p.period}\n고객성향:${CUST_PREFS.find(x=>x.id===custPref)?.short||"미파악"}\n상세+절차 안내해주세요.`);
     setDetText(r);};
-  const reset=()=>{setStage("idle");setSelCase(null);setInput("");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("")};
+  const reset=()=>{setStage("idle");setSelCase(null);setInput("");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});setCustPref("");setIntakeProg({step:0,msg:"",pct:0})};
 
   const CI=[IC.cs,IC.wr,IC.sh],CC=["#0891b2","#7c3aed","#2563eb"],CB=["#ecfeff","#f5f3ff","#eff6ff"],CR=["#a5f3fc","#c4b5fd","#bfdbfe"];
 
@@ -854,26 +963,112 @@ function Tab3(){
         {stage!=="idle"&&<button onClick={reset} style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:3,padding:"5px 10px",borderRadius:7,fontSize:11,background:"none",border:"1px solid #e2e8f0",cursor:"pointer",color:"#94a3b8"}}>{IC.rf} 초기화</button>}
       </div>
 
+      {/* ═══ IDLE: 입력 ═══ */}
       {stage==="idle"&&<div style={{flex:1,display:"flex",flexDirection:"column"}}>
         <div style={{...CD,flex:1,display:"flex",flexDirection:"column"}}><h3 style={ST}>사고건 내용 입력</h3>
-          <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder={"사고건을 입력하세요...\n예: 520d 양쪽 사이드미러+범퍼 파손\n또는 '사고건 불러오기'로 기존 접수건 선택"} style={{...TA,flex:1,minHeight:140,resize:"none"}}/>
+          <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder={"사고건을 입력하세요...\n예: 520d 양쪽 사이드미러+범퍼 파손\n또는 '사고건 불러오기'로 기존 접수건 선택"} style={{...TA,flex:1,minHeight:120,resize:"none"}}/>
           <div style={{display:"flex",gap:5,marginTop:10,flexWrap:"wrap"}}>
             {["520d 사이드미러+범퍼 파손","GV80 전면 5부위 심각","아반떼 후미추돌"].map((q,i)=>
               <button key={i} onClick={()=>setInput(q)} style={{padding:"4px 10px",borderRadius:14,fontSize:11,cursor:"pointer",background:"#f8fafc",color:"#94a3b8",border:"1px solid #e2e8f0",transition:"all .15s"}}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor="#059669";e.currentTarget.style.color="#059669"}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor="#e2e8f0";e.currentTarget.style.color="#94a3b8"}}>{q}</button>)}</div></div>
-        <button onClick={analyze} disabled={!input.trim()} style={{...BT,marginTop:10,background:!input.trim()?"#e2e8f0":"#059669",opacity:!input.trim()?.4:1}}>AI 분석 시작</button></div>}
+        <button onClick={analyzeIntake} disabled={!input.trim()} style={{...BT,marginTop:10,background:!input.trim()?"#e2e8f0":"#059669",opacity:!input.trim()?.4:1}}>접수 내용 분석</button></div>}
 
-      {stage==="loading"&&<div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}>
-        <Sp/><div style={{color:"#94a3b8",fontSize:13}}>사고건 분석 중...</div>
-        <div style={{display:"flex",gap:5}}>{["접수 분석","방법 산출","비용 비교"].map((t,i)=>
-          <span key={i} style={{padding:"3px 9px",borderRadius:10,fontSize:10.5,background:"#fff",color:"#94a3b8",border:"1px solid #e2e8f0",animation:`fadeIn ${.3+i*.3}s ease`}}>{t}</span>)}</div></div>}
+      {/* ═══ INTAKE LOADING ═══ */}
+      {stage==="intake-loading"&&<div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14}}>
+        <div style={{...CD,border:"2px solid #86efac",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",width:400,maxWidth:"100%"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:7}}>
+              <div style={{width:22,height:22,border:"2.5px solid #bbf7d0",borderTop:"2.5px solid #059669",borderRadius:"50%",animation:"spin .7s linear infinite"}}/>
+              <span style={{fontSize:13,fontWeight:700,color:"#059669"}}>접수 내용 사전 분석</span>
+            </div>
+            <span style={{fontSize:12,fontWeight:700,color:"#059669",fontFamily:"'DM Mono',monospace"}}>{intakeProg.pct}%</span>
+          </div>
+          <div style={{height:6,borderRadius:3,background:"#dcfce7",overflow:"hidden",marginBottom:8}}>
+            <div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#22c55e,#059669)",transition:"width .5s ease",width:`${intakeProg.pct}%`}}/></div>
+          <div style={{fontSize:12,color:"#475569",fontWeight:500}}>{intakeProg.msg}</div>
+        </div></div>}
 
+      {/* ═══ INTAKE Q&A ═══ */}
+      {stage==="intake-qa"&&<div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
+        {/* 누락 정보 질문 */}
+        {intakeQs.length>0&&<div style={{...CD,border:"2px solid #fde68a",background:"linear-gradient(135deg,#fffbeb,#fef3c7)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:10}}>
+            <div style={{width:24,height:24,borderRadius:"50%",background:"#f59e0b",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13}}>?</div>
+            <span style={{fontSize:14,fontWeight:700,color:"#92400e"}}>추가 정보가 필요합니다</span>
+            <span style={{fontSize:10.5,color:"#b45309",background:"#fef3c7",padding:"2px 8px",borderRadius:10,border:"1px solid #fde68a"}}>{intakeQs.length}건</span>
+          </div>
+          <div style={{fontSize:12,color:"#92400e",marginBottom:12,lineHeight:1.6}}>
+            아래 항목의 정보가 부족합니다. 확인 가능한 내용을 입력해주세요.<br/>
+            <span style={{fontSize:11,color:"#b45309"}}>* 정보가 없으면 "없음" 또는 "확인불가"로 입력하시면 해당 사항을 감안하여 진행합니다.</span>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {intakeQs.map((q,i)=><div key={q.key} style={{padding:"10px 12px",borderRadius:10,background:"#fff",border:"1px solid #fde68a"}}>
+              <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:6}}>
+                <span style={{width:20,height:20,borderRadius:"50%",background:"#fef3c7",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#d97706"}}>{i+1}</span>
+                <span style={{fontSize:12,fontWeight:600,color:"#334155"}}>{q.q}</span>
+              </div>
+              <input value={intakeAs[q.key]||""} onChange={e=>setIntakeAs(prev=>({...prev,[q.key]:e.target.value}))}
+                placeholder={q.hint} style={{...IN,width:"100%",fontSize:12,background:"#fffbeb",border:"1px solid #fde68a"}}/>
+            </div>)}
+          </div>
+        </div>}
+
+        {intakeQs.length===0&&<div style={{...CD,border:"2px solid #86efac",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:7}}>
+            <span style={{fontSize:18}}>✅</span>
+            <span style={{fontSize:14,fontWeight:700,color:"#059669"}}>접수 내용이 충분합니다</span>
+          </div>
+          <div style={{fontSize:12,color:"#475569",marginTop:6}}>필수 정보가 모두 확인되었습니다. 아래에서 고객 성향을 선택 후 분석을 시작하세요.</div>
+        </div>}
+
+        {/* 고객 성향 선택 */}
+        <div style={{...CD,border:"1px solid #e2e8f0"}}>
+          <h3 style={{...ST,marginBottom:8}}>🎯 고객 성향 선택</h3>
+          <div style={{fontSize:11,color:"#64748b",marginBottom:10}}>고객의 수리 선호도에 따라 AI가 최적의 처리 방법을 추천합니다</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}}>
+            {CUST_PREFS.map(p=><div key={p.id} onClick={()=>setCustPref(p.id)}
+              style={{padding:"10px 11px",borderRadius:10,border:custPref===p.id?"2px solid #059669":"1px solid #e2e8f0",
+                background:custPref===p.id?"#f0fdf4":"#fafbfc",cursor:"pointer",transition:"all .15s"}}>
+              <div style={{fontSize:12.5,fontWeight:custPref===p.id?700:500,color:custPref===p.id?"#059669":"#334155",marginBottom:2}}>{p.label}</div>
+              <div style={{fontSize:10,color:"#94a3b8"}}>{p.desc}</div>
+            </div>)}
+          </div>
+        </div>
+
+        <button onClick={runAnalysis} disabled={!custPref} style={{...BT,background:!custPref?"#e2e8f0":"#059669",opacity:!custPref?.4:1}}>
+          {!custPref?"고객 성향을 선택해주세요":"AI 처리 방법 분석 시작"}</button>
+      </div>}
+
+      {/* ═══ LOADING ═══ */}
+      {stage==="loading"&&<div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14}}>
+        <div style={{...CD,border:"2px solid #86efac",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",width:420,maxWidth:"100%"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:7}}>
+              <div style={{width:22,height:22,border:"2.5px solid #bbf7d0",borderTop:"2.5px solid #059669",borderRadius:"50%",animation:"spin .7s linear infinite"}}/>
+              <span style={{fontSize:13,fontWeight:700,color:"#059669"}}>AI 처리 방법 분석 진행 중</span>
+            </div>
+            <span style={{fontSize:12,fontWeight:700,color:"#059669",fontFamily:"'DM Mono',monospace"}}>{intakeProg.pct}%</span>
+          </div>
+          <div style={{height:7,borderRadius:4,background:"#dcfce7",overflow:"hidden",marginBottom:8}}>
+            <div style={{height:"100%",borderRadius:4,background:"linear-gradient(90deg,#22c55e,#059669,#047857)",transition:"width .5s ease",width:`${intakeProg.pct}%`}}/></div>
+          <div style={{fontSize:12,color:"#475569",fontWeight:500,marginBottom:8}}>{intakeProg.msg}</div>
+          <div style={{display:"flex",gap:3}}>
+            {Array.from({length:intakeProg.total||5}).map((_,i)=><div key={i} style={{flex:1,height:3,borderRadius:2,background:i<(intakeProg.step||0)?"#059669":"#e2e8f0",transition:"background .3s"}}/>)}</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:5,marginTop:10}}>
+            {custPref&&<span style={{padding:"3px 8px",borderRadius:12,fontSize:10,background:"#f0fdf4",border:"1px solid #bbf7d0",color:"#059669",fontWeight:500}}>🎯 {CUST_PREFS.find(p=>p.id===custPref)?.label}</span>}
+            {Object.values(intakeAs).filter(Boolean).length>0&&<span style={{padding:"3px 8px",borderRadius:12,fontSize:10,background:"#fffbeb",border:"1px solid #fde68a",color:"#d97706",fontWeight:500}}>📋 보충정보 {Object.values(intakeAs).filter(Boolean).length}건</span>}
+          </div>
+        </div></div>}
+
+      {/* ═══ RESULT ═══ */}
       {stage==="result"&&summary&&<div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
         <div style={{...CD,border:"2px solid #86efac",marginBottom:0}}>
           <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:10}}>
             <div style={{width:24,height:24,borderRadius:"50%",background:"#059669",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
-            <span style={{fontSize:14,fontWeight:700}}>접수 내용 분석</span>{!sD&&<Sp s/>}</div>
+            <span style={{fontSize:14,fontWeight:700}}>접수 내용 분석</span>{!sD&&<Sp s/>}
+            {custPref&&<span style={{marginLeft:"auto",padding:"3px 9px",borderRadius:10,fontSize:10,fontWeight:600,background:"#f0fdf4",color:"#059669",border:"1px solid #bbf7d0"}}>🎯 {CUST_PREFS.find(p=>p.id===custPref)?.short}</span>}
+          </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7,marginBottom:10}}>
             {[{l:"업무영역",v:summary.업무영역},{l:"차량",v:summary.차량},{l:"추정비용",v:summary.추정비용},{l:"긴급도",v:summary.긴급도}].map((x,i)=>
               <div key={i} style={{background:"#f0fdf4",borderRadius:9,padding:"8px 11px",border:"1px solid #bbf7d0"}}>
@@ -886,10 +1081,10 @@ function Tab3(){
         {proposals&&<div style={{animation:"fadeIn .5s"}}>
           <h3 style={{...ST,fontSize:13,margin:"4px 0 10px"}}>처리 방법 3가지 — 카드를 선택하세요</h3>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-            {proposals.map((p,idx)=><div key={idx} onClick={()=>showDet(idx)} style={{background:CB[idx],borderRadius:15,padding:"18px 16px",border:`2px solid ${CR[idx]}`,cursor:"pointer",transition:"all .2s",position:"relative"}}
+            {proposals.map((p,idx)=><div key={idx} onClick={()=>showDet(idx)} style={{background:CB[idx],borderRadius:15,padding:"18px 16px",border:`2px solid ${p.recommended?CC[idx]:CR[idx]}`,cursor:"pointer",transition:"all .2s",position:"relative",boxShadow:p.recommended?`0 4px 16px ${CC[idx]}20`:"none"}}
               onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";e.currentTarget.style.boxShadow=`0 8px 24px ${CC[idx]}12`;e.currentTarget.style.borderColor=CC[idx]}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor=CR[idx]}}>
-              {p.recommended&&<div style={{position:"absolute",top:9,right:9,background:CC[idx],color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:9.5,fontWeight:700}}>추천</div>}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=p.recommended?`0 4px 16px ${CC[idx]}20`:"none";e.currentTarget.style.borderColor=p.recommended?CC[idx]:CR[idx]}}>
+              {p.recommended&&<div style={{position:"absolute",top:9,right:9,background:CC[idx],color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:9.5,fontWeight:700}}>AI 추천</div>}
               <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:12}}>
                 <div style={{width:36,height:36,borderRadius:10,background:`${CC[idx]}10`,display:"flex",alignItems:"center",justifyContent:"center",color:CC[idx]}}>{CI[idx]}</div>
                 <div><div style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{p.title}</div><div style={{fontSize:10.5,color:"#64748b"}}>{p.subtitle}</div></div></div>
@@ -904,12 +1099,14 @@ function Tab3(){
                 <span style={{color:"#f59e0b",display:"flex",gap:1}}>{[1,2,3,4,5].map(s=><span key={s} style={{opacity:s<=Math.round(p.satisfaction)?1:.2}}>{IC.st}</span>)}</span>
                 <span style={{fontSize:11,fontWeight:600,color:"#64748b",marginLeft:3}}>{p.satisfaction}</span></div>
               <div style={{fontSize:11,color:"#64748b"}}>{p.pros?.slice(0,2).map((x,i)=><span key={i} style={{marginRight:5}}>✓ {x}</span>)}</div>
+              {p.recommended&&p.recReason&&<div style={{marginTop:8,padding:"5px 8px",borderRadius:7,background:"rgba(255,255,255,.6)",border:`1px solid ${CR[idx]}`,fontSize:10,color:"#475569",lineHeight:1.5}}>💡 {p.recReason}</div>}
               <div style={{marginTop:10,display:"flex",alignItems:"center",justifyContent:"center",gap:4,padding:"7px 0",borderTop:`1px solid ${CR[idx]}`,color:CC[idx],fontSize:12,fontWeight:600}}>
                 미리보기 · 절차 확인 {IC.arr}</div>
             </div>)}
           </div></div>}
       </div>}
 
+      {/* ═══ DETAIL ═══ */}
       {stage==="detail"&&proposals&&selIdx!==null&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
         <button onClick={()=>{setStage("result");setSelIdx(null);setDetText("")}} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 12px",borderRadius:9,fontSize:12,background:"none",border:"1px solid #e2e8f0",cursor:"pointer",color:"#64748b",marginBottom:12}}>{IC.bk} 3가지 방법 보기</button>
         <div style={{background:CB[selIdx],borderRadius:15,padding:"16px 20px",border:`2px solid ${CC[selIdx]}`,marginBottom:12,display:"flex",alignItems:"center",gap:12}}>
