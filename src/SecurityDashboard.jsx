@@ -266,22 +266,29 @@ function LiveRiskChart(props) {
       ctx.clearRect(0, 0, w, h);
       var data = dataRef.current;
       if (data.length < 2) { animId = requestAnimationFrame(drawFn); return; }
-      ctx.strokeStyle = "rgba(255,255,255,0.04)";
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
       ctx.lineWidth = 1;
       for (var y = 0; y < h; y += h / 5) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
       [80, 60, 40].forEach(function(th, idx) {
         var yy = h - (th / 100) * h;
-        ctx.strokeStyle = ["rgba(255,45,85,0.15)", "rgba(255,149,0,0.12)", "rgba(255,204,0,0.08)"][idx];
-        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = ["rgba(255,45,85,0.25)", "rgba(255,149,0,0.2)", "rgba(255,204,0,0.12)"][idx];
+        ctx.setLineDash([6, 4]);
+        ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke();
         ctx.setLineDash([]);
+        // threshold labels
+        ctx.fillStyle = ["rgba(255,45,85,0.5)", "rgba(255,149,0,0.4)", "rgba(255,204,0,0.3)"][idx];
+        ctx.font = Math.round(h / 14) + "px 'DM Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.fillText(["심각","높음","주의"][idx] + " " + th, 4, yy - 4);
       });
       var pts = data.map(function(d, i) { return { x: (i / (data.length - 1)) * w, y: h - (d.score / 100) * h * 0.9 - h * 0.05 }; });
       var avgScore = data.reduce(function(s, d) { return s + d.score; }, 0) / data.length;
       var baseColor = avgScore >= 70 ? "255,45,85" : avgScore >= 50 ? "255,149,0" : avgScore >= 30 ? "255,204,0" : "48,209,88";
       var grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, "rgba(" + baseColor + ",0.3)");
-      grad.addColorStop(1, "rgba(" + baseColor + ",0.0)");
+      grad.addColorStop(0, "rgba(" + baseColor + ",0.5)");
+      grad.addColorStop(0.5, "rgba(" + baseColor + ",0.15)");
+      grad.addColorStop(1, "rgba(" + baseColor + ",0.02)");
       ctx.beginPath();
       ctx.moveTo(pts[0].x, pts[0].y);
       for (var i = 1; i < pts.length; i++) {
@@ -296,16 +303,19 @@ function LiveRiskChart(props) {
         var cx2 = (pts[j - 1].x + pts[j].x) / 2;
         ctx.bezierCurveTo(cx2, pts[j - 1].y, cx2, pts[j].y, pts[j].x, pts[j].y);
       }
-      ctx.strokeStyle = "rgba(" + baseColor + ",0.8)";
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgb(" + baseColor + ")";
+      ctx.lineWidth = 3.5;
+      ctx.shadowColor = "rgba(" + baseColor + ",0.6)";
+      ctx.shadowBlur = 8;
       ctx.stroke();
+      ctx.shadowBlur = 0;
       var last = pts[pts.length - 1];
-      ctx.beginPath(); ctx.arc(last.x, last.y, 6, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(" + baseColor + ",0.4)"; ctx.fill();
-      ctx.beginPath(); ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(last.x, last.y, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(" + baseColor + ",0.3)"; ctx.fill();
+      ctx.beginPath(); ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
       ctx.fillStyle = "rgb(" + baseColor + ")"; ctx.fill();
-      ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.font = Math.round(h / 12) + "px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.font = Math.round(h / 12) + "px 'DM Mono', monospace";
       ctx.textAlign = "right";
       [0, 25, 50, 75, 100].forEach(function(v) {
         var yy = h - (v / 100) * h * 0.9 - h * 0.05;
@@ -318,16 +328,16 @@ function LiveRiskChart(props) {
   }, [events.length]);
 
   return <div style={{position:"relative"}}>
-    <canvas ref={canvasRef} style={{ width: "100%", height: 90, display: "block" }} />
-    {analyzing && <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(2px)",borderRadius:8,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,animation:"fadeIn 0.3s"}}>
+    <canvas ref={canvasRef} style={{ width: "100%", height: 180, display: "block" }} />
+    {analyzing && <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(3px)",borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,animation:"fadeIn 0.3s"}}>
       <div style={{display:"flex",alignItems:"center",gap:6}}>
-        <div style={{width:14,height:14,border:"2px solid rgba(10,132,255,0.3)",borderTop:"2px solid #0a84ff",borderRadius:"50%",animation:"spin 0.7s linear infinite"}}/>
-        <span style={{fontSize:10,fontWeight:600,color:"#0a84ff",letterSpacing:0.5}}>AI 위험도 분석 중</span>
+        <div style={{width:16,height:16,border:"2.5px solid rgba(10,132,255,0.3)",borderTop:"2.5px solid #5ac8fa",borderRadius:"50%",animation:"spin 0.7s linear infinite"}}/>
+        <span style={{fontSize:12,fontWeight:700,color:"#5ac8fa",letterSpacing:0.5}}>AI 위험도 분석 중</span>
       </div>
-      <div style={{width:"70%",height:3,borderRadius:2,background:"rgba(255,255,255,0.1)",overflow:"hidden"}}>
-        <div style={{height:"100%",borderRadius:2,background:"linear-gradient(90deg,#0a84ff,#5ac8fa)",transition:"width 0.4s ease",width:analysisPct+"%"}}/>
+      <div style={{width:"60%",height:4,borderRadius:3,background:"rgba(255,255,255,0.08)",overflow:"hidden"}}>
+        <div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#0a84ff,#5ac8fa,#30d158)",transition:"width 0.4s ease",width:analysisPct+"%"}}/>
       </div>
-      <div style={{fontSize:9,color:"rgba(255,255,255,0.6)",fontWeight:500}}>{analysisMsg}</div>
+      <div style={{fontSize:10,color:"rgba(255,255,255,0.7)",fontWeight:500}}>{analysisMsg}</div>
     </div>}
   </div>;
 }
@@ -439,19 +449,45 @@ function MessageModal(props) {
   var msg = stMsg[0], setMsg = stMsg[1];
   var stSent = useState(false);
   var sent = stSent[0], setSent = stSent[1];
+  var stAiPhase = useState(0); // 0=generating, 1=done
+  var aiPhase = stAiPhase[0], setAiPhase = stAiPhase[1];
+  var stAiProgress = useState(0);
+  var aiProgress = stAiProgress[0], setAiProgress = stAiProgress[1];
+  var stAiStep = useState("");
+  var aiStep = stAiStep[0], setAiStep = stAiStep[1];
+  var stRevealedCount = useState(0);
+  var revealedCount = stRevealedCount[0], setRevealedCount = stRevealedCount[1];
 
   var rLabel = recipientType === "user" ? user.name+" (본인)" : user.managerId+" ("+user.name+"의 팀장)";
   var presets = recipientType === "user"
-    ? ["보안 이벤트가 탐지되어 안내드립니다. 업무 목적이었는지 확인 부탁드립니다.","접근 기록이 남았습니다. 무관한 접근이었다면 보안팀에 알려주세요.","계정에서 이상 접근이 감지되었습니다. 본인이 아닌 경우 비밀번호를 변경해 주세요."]
-    : ["팀원의 보안 이상행위가 탐지되었습니다. 최근 업무 상황 확인 요청드립니다.","팀원의 고위험 보안 이벤트 감지, 면담 진행 권고드립니다.","보안관제센터입니다. 팀원 관련 긴급 사안입니다. 확인 후 회신 부탁드립니다."];
+    ? ["[자동생성] "+user.name+"님, 금일 "+user.department+"에서 보안 이벤트가 탐지되었습니다. 업무 목적이었는지 확인 부탁드립니다.","[자동생성] "+user.name+"님의 계정에서 비정상 접근이 감지되었습니다. 본인 행위가 아닌 경우 즉시 비밀번호를 변경해 주세요.","[자동생성] 보안관제 알림: "+user.name+"님의 접근 기록이 정책 위반으로 분류되었습니다. 사유서 제출을 요청드립니다."]
+    : ["[자동생성] "+user.managerId+"님, 팀원 "+user.name+"의 보안 이상행위가 탐지되었습니다. 최근 업무 상황 확인 및 면담을 요청드립니다.","[자동생성] "+user.managerId+"님, "+user.name+"("+user.department+") 고위험 보안 이벤트 감지. 업무 연관성 확인 후 결과 회신 부탁드립니다.","[자동생성] 보안관제센터입니다. "+user.name+" 관련 긴급 사안 발생. "+user.managerId+"님의 즉시 확인 및 조치가 필요합니다."];
+
+  // AI 생성 애니메이션
+  useEffect(function() {
+    var steps = [
+      {msg:"🔍 "+user.name+" 이벤트 이력 분석 중...",pct:15},
+      {msg:"🧠 "+user.department+" 부서 보안 정책 확인 중...",pct:35},
+      {msg:"📋 "+(recipientType==="user"?"본인 통보":"팀장 보고")+" 템플릿 매칭 중...",pct:60},
+      {msg:"✍️ 상황 맞춤 메시지 생성 중...",pct:85},
+      {msg:"✅ AI 메시지 생성 완료",pct:100}
+    ];
+    var i=0;
+    var iv = setInterval(function() {
+      if(i<steps.length) { setAiStep(steps[i].msg); setAiProgress(steps[i].pct); i++; }
+      else { clearInterval(iv); setAiPhase(1); var j=0; var rv=setInterval(function(){ j++; setRevealedCount(j); if(j>=presets.length) clearInterval(rv); },300); }
+    },600);
+    setAiStep(steps[0].msg); setAiProgress(steps[0].pct);
+    return function(){ clearInterval(iv); };
+  },[]);
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={function(e){if(e.target===e.currentTarget)onClose()}}>
       <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.7)",backdropFilter:"blur(8px)"}}/>
-      <div style={{position:"relative",width:"min(520px,90vw)",background:"#12121a",border:"1px solid rgba(255,255,255,0.08)",borderRadius:18}}>
+      <div style={{position:"relative",width:"min(540px,90vw)",background:"#12121a",border:"1px solid rgba(255,255,255,0.08)",borderRadius:18}}>
         {sent ? (
           <div style={{padding:48,textAlign:"center",animation:"fadeIn 0.4s"}}>
-            <div style={{fontSize:48,marginBottom:12}}>OK</div>
+            <div style={{fontSize:48,marginBottom:12}}>✅</div>
             <div style={{fontSize:16,fontWeight:700,color:"#30d158"}}>전송 완료</div>
             <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",marginTop:8}}>{rLabel}에게 전송됨</div>
           </div>
@@ -459,21 +495,53 @@ function MessageModal(props) {
           <div>
             <div style={{padding:"22px 26px 14px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
               <div style={{display:"flex",justifyContent:"space-between"}}>
-                <div style={{fontSize:16,fontWeight:700}}>메시지 보내기</div>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{width:28,height:28,borderRadius:8,background:recipientType==="user"?"rgba(10,132,255,0.15)":"rgba(255,159,10,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>{recipientType==="user"?"👤":"👥"}</div>
+                  <div>
+                    <div style={{fontSize:16,fontWeight:700}}>AI 메시지 생성</div>
+                    <div style={{fontSize:10,color:"rgba(255,255,255,0.35)"}}>상황 분석 기반 자동 메시지 추천</div>
+                  </div>
+                </div>
                 <button onClick={onClose} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"rgba(255,255,255,0.5)",width:32,height:32,borderRadius:8,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>X</button>
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"7px 12px"}}>
                 <span style={{fontSize:10,color:"rgba(255,255,255,0.35)",fontWeight:600}}>수신:</span>
-                <span style={{fontSize:12,color:"#0a84ff",fontWeight:600}}>{rLabel}</span>
+                <span style={{fontSize:12,color:recipientType==="user"?"#0a84ff":"#ff9f0a",fontWeight:600}}>{rLabel}</span>
               </div>
             </div>
             <div style={{padding:"14px 26px"}}>
-              <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:600,marginBottom:6}}>빠른 선택</div>
-              {presets.map(function(p,i){return(
-                <button key={i} onClick={function(){setMsg(p)}} style={{display:"block",width:"100%",background:msg===p?"rgba(10,132,255,0.12)":"rgba(255,255,255,0.03)",border:"1px solid "+(msg===p?"rgba(10,132,255,0.3)":"rgba(255,255,255,0.06)"),color:msg===p?"#0a84ff":"rgba(255,255,255,0.55)",padding:"9px 12px",borderRadius:8,fontSize:11,cursor:"pointer",textAlign:"left",lineHeight:1.5,marginBottom:5}}>{p}</button>
-              )})}
-              <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:600,margin:"12px 0 6px"}}>직접 작성</div>
-              <textarea value={msg} onChange={function(e){setMsg(e.target.value)}} placeholder="메시지 입력..." rows={3} style={{width:"100%",background:"rgba(0,0,0,0.3)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:12,color:"#fff",fontSize:12,lineHeight:1.5,resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>
+              {/* AI 생성 중 로딩 */}
+              {aiPhase===0 && (
+                <div style={{background:"rgba(10,132,255,0.05)",border:"1px solid rgba(10,132,255,0.15)",borderRadius:12,padding:"20px 18px",marginBottom:12,animation:"fadeIn 0.3s"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                    <div style={{width:18,height:18,border:"2px solid rgba(10,132,255,0.3)",borderTop:"2px solid #0a84ff",borderRadius:"50%",animation:"spin 0.7s linear infinite"}}/>
+                    <span style={{fontSize:12,fontWeight:700,color:"#0a84ff"}}>AI가 메시지를 생성하고 있습니다</span>
+                  </div>
+                  <div style={{width:"100%",height:4,borderRadius:3,background:"rgba(255,255,255,0.06)",overflow:"hidden",marginBottom:8}}>
+                    <div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#0a84ff,#5ac8fa)",transition:"width 0.5s ease",width:aiProgress+"%"}}/>
+                  </div>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.5)",fontWeight:500}}>{aiStep}</div>
+                </div>
+              )}
+
+              {/* AI 생성 완료 - 빠른 선택 */}
+              {aiPhase===1 && (
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+                    <span style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:600}}>AI 추천 메시지</span>
+                    <span style={{fontSize:9,padding:"2px 6px",borderRadius:6,background:"rgba(10,132,255,0.12)",color:"#0a84ff",fontWeight:700}}>AI 생성</span>
+                  </div>
+                  {presets.map(function(p,i){
+                    var isRevealed = i < revealedCount;
+                    return(
+                      <button key={i} onClick={function(){setMsg(p)}} style={{display:"block",width:"100%",background:msg===p?"rgba(10,132,255,0.12)":"rgba(255,255,255,0.03)",border:"1px solid "+(msg===p?"rgba(10,132,255,0.3)":"rgba(255,255,255,0.06)"),color:msg===p?"#0a84ff":"rgba(255,255,255,0.55)",padding:"10px 14px",borderRadius:10,fontSize:11.5,cursor:isRevealed?"pointer":"default",textAlign:"left",lineHeight:1.6,marginBottom:6,opacity:isRevealed?1:0,transform:isRevealed?"translateY(0)":"translateY(8px)",transition:"all 0.4s ease",position:"relative",overflow:"hidden"}}>{isRevealed && <span style={{position:"absolute",top:4,right:8,fontSize:8,color:"rgba(10,132,255,0.5)",fontWeight:600}}>#{i+1}</span>}{p.replace("[자동생성] ","")}</button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:600,margin:"14px 0 6px"}}>직접 작성</div>
+              <textarea value={msg} onChange={function(e){setMsg(e.target.value)}} placeholder="메시지를 직접 입력하거나 위 AI 추천을 선택하세요..." rows={3} style={{width:"100%",background:"rgba(0,0,0,0.3)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:12,color:"#fff",fontSize:12,lineHeight:1.5,resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>
             </div>
             <div style={{padding:"0 26px 22px",display:"flex",gap:10,justifyContent:"flex-end"}}>
               <button onClick={onClose} style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",color:"rgba(255,255,255,0.6)",padding:"9px 18px",borderRadius:10,fontSize:12,cursor:"pointer"}}>취소</button>
@@ -927,12 +995,40 @@ export default function SecurityDashboard(props) {
       </div>
 
       <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
-        {/* Stats */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-          <StatCard label="오늘 총 이벤트" value={totalToday} icon="E" color="#0a84ff" sub="실시간 집계" />
-          <StatCard label="심각 (80+)" value={crit} icon="!" color="#ff2d55" sub="즉시 조치 필요" />
-          <StatCard label="높음 (60-79)" value={high} icon="W" color="#ff9500" sub="주의 모니터링" />
-          <StatCard label="활성 사용자" value={active} icon="U" color="#5e5ce6" sub={"전체 " + employees.length.toLocaleString() + "명 중"} />
+        {/* Real-time Risk Chart - HERO */}
+        <div style={Object.assign({}, panelStyle, { padding: "16px 18px", marginBottom: 16, border: "1px solid rgba(10,132,255,0.15)", background: "rgba(10,132,255,0.04)" })}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a84ff", boxShadow: "0 0 10px #0a84ff, 0 0 20px rgba(10,132,255,0.3)", animation: "pulse 1.5s infinite" }} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>실시간 위험도 추이</span>
+              <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 8, background: "rgba(10,132,255,0.15)", color: "#5ac8fa", fontWeight: 700 }}>AI 분석</span>
+            </div>
+            {/* Compact stats inline */}
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ width: 6, height: 6, borderRadius: 2, background: "#0a84ff" }} />
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>이벤트</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#0a84ff", fontFamily: "'DM Mono',monospace" }}>{totalToday}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ width: 6, height: 6, borderRadius: 2, background: "#ff2d55" }} />
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>심각</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#ff2d55", fontFamily: "'DM Mono',monospace" }}>{crit}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ width: 6, height: 6, borderRadius: 2, background: "#ff9500" }} />
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>높음</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#ff9500", fontFamily: "'DM Mono',monospace" }}>{high}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ width: 6, height: 6, borderRadius: 2, background: "#5e5ce6" }} />
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>활성</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#5e5ce6", fontFamily: "'DM Mono',monospace" }}>{active}</span>
+                <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)" }}>/{employees.length.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+          <LiveRiskChart events={events} />
         </div>
 
         {/* Search & Filters */}
@@ -960,22 +1056,6 @@ export default function SecurityDashboard(props) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 16 }}>
           {/* Feed */}
           <div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
-              <div style={Object.assign({}, panelStyle, { padding: "10px 12px" })}>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>위험도 타임라인</div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 48 }}>
-                  {events.slice(-40).map(function(e, i, a) {
-                    var h = Math.max(3, (e.riskScore / 100) * 48);
-                    var c = e.riskScore >= 80 ? "#ff2d55" : e.riskScore >= 60 ? "#ff9500" : e.riskScore >= 40 ? "#ffcc00" : "#30d158";
-                    return <div key={e.id} style={{ width: 5, height: h, borderRadius: 2, background: c, opacity: 0.5 + (i / a.length) * 0.5, transition: "height 0.5s cubic-bezier(0.22,1,0.36,1)" }} />;
-                  })}
-                </div>
-              </div>
-              <div style={Object.assign({}, panelStyle, { padding: "10px 12px" })}>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>실시간 위험도 추이</div>
-                <LiveRiskChart events={events} />
-              </div>
-            </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 600 }}>실시간 이벤트 피드</span>
               <span style={{ fontSize: 10, color: "#0a84ff", background: "rgba(10,132,255,0.1)", padding: "2px 7px", borderRadius: 10 }}>{filtered.length}건</span>
