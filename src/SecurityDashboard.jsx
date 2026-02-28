@@ -869,6 +869,275 @@ function exportToExcel(events) {
   XLSX.writeFile(wb, "보안이벤트_" + new Date().toISOString().slice(0, 10) + ".xlsx");
 }
 
+// ═══════════════════════════════════════════════════
+// AI ChatBot for Security Dashboard
+// ═══════════════════════════════════════════════════
+
+function SecurityChatBot(props) {
+  var events = props.events, employees = props.employees, onSelectEvent = props.onSelectEvent, onClose = props.onClose;
+  var stMessages = useState([{role:"ai",text:"안녕하세요! 보안관제 AI 어시스턴트입니다.\n\n이벤트 데이터를 자연어로 질의할 수 있습니다. 예시:\n• \"위험점수 80점 이상 인원 정리해줘\"\n• \"외부 공유 링크 생성된 이벤트 목록\"\n• \"USB 복사 이벤트 보여줘\"\n• \"기밀 자산 접근 목록\"",type:"text",ts:new Date()}]);
+  var messages = stMessages[0], setMessages = stMessages[1];
+  var stInput = useState("");
+  var input = stInput[0], setInput = stInput[1];
+  var stTyping = useState(false);
+  var typing = stTyping[0], setTyping = stTyping[1];
+  var stTypingMsg = useState("");
+  var typingMsg = stTypingMsg[0], setTypingMsg = stTypingMsg[1];
+  var chatEndRef = useRef(null);
+
+  useEffect(function() {
+    if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, typing]);
+
+  // Parse natural language query and filter events
+  var processQuery = function(query) {
+    var q = query.toLowerCase();
+    var result = { filtered: [], description: "", columns: [] };
+
+    // Parse risk score threshold
+    var scoreMatch = q.match(/(\d+)\s*점?\s*이상/) || q.match(/위험.*?(\d+)/);
+    var minScore = scoreMatch ? parseInt(scoreMatch[1]) : null;
+
+    // Parse time range
+    var timeMatch = q.match(/(\d{1,2})\s*시.*?(\d{1,2})\s*시/);
+    var startHour = null, endHour = null;
+    if (timeMatch) {
+      startHour = parseInt(timeMatch[1]);
+      endHour = parseInt(timeMatch[2]);
+      if (q.indexOf("오후") >= 0 && startHour < 12) startHour += 12;
+      if (q.indexOf("오전") >= 0 && startHour === 12) startHour = 0;
+    }
+
+    // Parse event type keywords
+    var eventTypeMatch = null;
+    var typeKeywords = [
+      { keywords: ["외부 공유", "공유 링크", "링크 생성", "외부공유"], type: "Share Link Created" },
+      { keywords: ["usb", "외부 저장", "저장장치"], type: "Copy to USB" },
+      { keywords: ["다운로드", "download"], type: "File Download" },
+      { keywords: ["출력", "프린트", "인쇄"], type: "Print" },
+      { keywords: ["권한 상승", "권한상승", "escalation"], type: "Permission Escalation" },
+      { keywords: ["대량 조회", "대량조회", "bulk"], type: "Bulk Query" },
+      { keywords: ["삭제", "변조", "delete"], type: "Delete/Modify" },
+      { keywords: ["파일 열람", "파일열람", "열람"], type: "File Open" },
+      { keywords: ["ai 업로드", "외부 ai", "chatgpt", "외부ai"], type: "External AI Upload" },
+    ];
+    typeKeywords.forEach(function(tk) {
+      tk.keywords.forEach(function(kw) { if (q.indexOf(kw) >= 0) eventTypeMatch = tk.type; });
+    });
+
+    // Parse severity keywords
+    var severityMatch = null;
+    if (q.indexOf("심각") >= 0 || q.indexOf("critical") >= 0) severityMatch = "critical";
+    else if (q.indexOf("높음") >= 0 || q.indexOf("high") >= 0) severityMatch = "high";
+    else if (q.indexOf("주의") >= 0 || q.indexOf("medium") >= 0) severityMatch = "medium";
+
+    // Parse asset classification
+    var assetClass = null;
+    if (q.indexOf("기밀") >= 0 || q.indexOf("최고기밀") >= 0) assetClass = q.indexOf("최고기밀") >= 0 ? "최고기밀" : "기밀";
+    else if (q.indexOf("대외비") >= 0) assetClass = "대외비";
+
+    // Parse department
+    var deptMatch = null;
+    var knownDepts = [];
+    employees.forEach(function(e) { if (knownDepts.indexOf(e.department) === -1) knownDepts.push(e.department); });
+    knownDepts.forEach(function(d) { if (q.indexOf(d.toLowerCase()) >= 0 || q.indexOf(d) >= 0) deptMatch = d; });
+
+    // Parse employee name
+    var nameMatch = null;
+    employees.forEach(function(e) { if (q.indexOf(e.name) >= 0) nameMatch = e.name; });
+
+    // Filter events
+    var filtered = events.filter(function(e) {
+      if (minScore !== null && e.riskScore < minScore) return false;
+      if (startHour !== null && endHour !== null) {
+        var h = e.timestamp.getHours();
+        if (h < startHour || h > endHour) return false;
+      }
+      if (eventTypeMatch && e.eventType.type !== eventTypeMatch) return false;
+      if (severityMatch && e.eventType.severity !== severityMatch) return false;
+      if (assetClass && e.asset.classification !== assetClass) return false;
+      if (deptMatch && e.employee.department !== deptMatch) return false;
+      if (nameMatch && e.employee.name !== nameMatch) return false;
+      return true;
+    });
+
+    // Sort by risk score descending
+    filtered.sort(function(a, b) { return b.riskScore - a.riskScore; });
+
+    // Build description
+    var descParts = [];
+    if (startHour !== null) descParts.push(startHour + "시~" + endHour + "시");
+    if (minScore !== null) descParts.push("위험점수 " + minScore + "점 이상");
+    if (eventTypeMatch) {
+      var etLabel = ""; EVENT_TYPES.forEach(function(et) { if (et.type === eventTypeMatch) etLabel = et.label; });
+      descParts.push("\"" + etLabel + "\"");
+    }
+    if (severityMatch) descParts.push("심각도: " + severityMatch);
+    if (assetClass) descParts.push("자산등급: " + assetClass);
+    if (deptMatch) descParts.push("부서: " + deptMatch);
+    if (nameMatch) descParts.push("이름: " + nameMatch);
+
+    // Determine result type
+    var isLinkQuery = eventTypeMatch === "Share Link Created" && (q.indexOf("링크 목록") >= 0 || q.indexOf("링크 정리") >= 0 || q.indexOf("목록") >= 0);
+
+    result.filtered = filtered;
+    result.description = descParts.length > 0 ? descParts.join(", ") + " 조건으로 검색" : "전체 이벤트 검색";
+    result.isLinkList = isLinkQuery;
+    return result;
+  };
+
+  var handleSend = function() {
+    if (!input.trim() || typing) return;
+    var userMsg = input.trim();
+    setInput("");
+    setMessages(function(prev) { return prev.concat([{ role: "user", text: userMsg, ts: new Date() }]); });
+    setTyping(true);
+
+    // AI typing simulation
+    var steps = ["🔍 쿼리 분석 중...", "📊 이벤트 데이터 필터링...", "🧠 결과 정리 중..."];
+    var si = 0;
+    setTypingMsg(steps[0]);
+    var iv = setInterval(function() {
+      si++;
+      if (si < steps.length) setTypingMsg(steps[si]);
+      else {
+        clearInterval(iv);
+        setTyping(false);
+        var result = processQuery(userMsg);
+        if (result.filtered.length === 0) {
+          setMessages(function(prev) { return prev.concat([{ role: "ai", text: "조건에 맞는 이벤트가 없습니다.\n\n조건: " + result.description + "\n\n다른 조건으로 다시 질의해 주세요.", type: "text", ts: new Date() }]); });
+        } else {
+          setMessages(function(prev) { return prev.concat([{ role: "ai", text: "총 **" + result.filtered.length + "건** 검색되었습니다.\n조건: " + result.description, type: "table", data: result.filtered, isLinkList: result.isLinkList, ts: new Date() }]); });
+        }
+      }
+    }, 700);
+  };
+
+  var handleKeyDown = function(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } };
+
+  var sevColors = { low: "#30d158", medium: "#ffcc00", high: "#ff9500", critical: "#ff2d55" };
+
+  return (
+    <div style={{ position: "fixed", bottom: 20, right: 20, width: 440, height: "70vh", maxHeight: 640, background: "#0e0e18", border: "1px solid rgba(10,132,255,0.2)", borderRadius: 20, display: "flex", flexDirection: "column", zIndex: 150, boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(10,132,255,0.08)", animation: "fadeIn 0.3s" }}>
+      {/* Header */}
+      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#0a84ff,#5e5ce6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🤖</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>보안관제 AI 어시스턴트</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>자연어로 이벤트 데이터를 분석합니다</div>
+          </div>
+        </div>
+        <button onClick={onClose} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, width: 28, height: 28, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+      </div>
+
+      {/* Messages */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 8px", display: "flex", flexDirection: "column", gap: 12 }}>
+        {messages.map(function(m, idx) {
+          var isAi = m.role === "ai";
+          return (
+            <div key={idx} style={{ display: "flex", justifyContent: isAi ? "flex-start" : "flex-end" }}>
+              <div style={{ maxWidth: "90%", padding: m.type === "table" ? "12px 14px" : "10px 14px", borderRadius: isAi ? "4px 14px 14px 14px" : "14px 4px 14px 14px", background: isAi ? "rgba(255,255,255,0.04)" : "rgba(10,132,255,0.15)", border: "1px solid " + (isAi ? "rgba(255,255,255,0.06)" : "rgba(10,132,255,0.25)"), fontSize: 12, lineHeight: 1.7, color: isAi ? "rgba(255,255,255,0.75)" : "#fff", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                {m.type === "table" ? (
+                  <div>
+                    <div style={{ marginBottom: 10, fontSize: 12, lineHeight: 1.6 }}>{m.text.split("**").map(function(part, pi) { return pi % 2 === 1 ? <strong key={pi} style={{ color: "#5ac8fa" }}>{part}</strong> : part; })}</div>
+                    {m.isLinkList ? (
+                      /* Link list mode */
+                      <div style={{ maxHeight: 260, overflowY: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
+                          <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>시간</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>사용자</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>자산</th>
+                            <th style={{ textAlign: "center", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>위험도</th>
+                          </tr></thead>
+                          <tbody>{m.data.slice(0, 20).map(function(ev) {
+                            return (
+                              <tr key={ev.id} onClick={function() { onSelectEvent(ev.id); }} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "background 0.2s" }}
+                                onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.08)"; }}
+                                onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}>
+                                <td style={{ padding: "6px", color: "rgba(255,255,255,0.5)", fontFamily: "'DM Mono',monospace" }}>{ev.timestamp.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}</td>
+                                <td style={{ padding: "6px" }}><span style={{ color: "#fff", fontWeight: 600 }}>{ev.employee.name}</span><span style={{ color: "rgba(255,255,255,0.3)", marginLeft: 4 }}>{ev.employee.department}</span></td>
+                                <td style={{ padding: "6px", color: "rgba(255,255,255,0.5)" }}>{ev.asset.name}</td>
+                                <td style={{ padding: "6px", textAlign: "center" }}><span style={{ padding: "1px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, color: sevColors[ev.eventType.severity], background: sevColors[ev.eventType.severity] + "15" }}>{ev.riskScore}</span></td>
+                              </tr>
+                            );
+                          })}</tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      /* Standard table mode */
+                      <div style={{ maxHeight: 260, overflowY: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
+                          <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>#</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>이름</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>부서</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>행위</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>대상</th>
+                            <th style={{ textAlign: "center", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>위험도</th>
+                            <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>시간</th>
+                          </tr></thead>
+                          <tbody>{m.data.slice(0, 20).map(function(ev, ei) {
+                            var sc = sevColors[ev.eventType.severity] || "#fff";
+                            return (
+                              <tr key={ev.id} onClick={function() { onSelectEvent(ev.id); }} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "background 0.2s" }}
+                                onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.08)"; }}
+                                onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}>
+                                <td style={{ padding: "6px", color: "rgba(255,255,255,0.3)", fontFamily: "'DM Mono',monospace" }}>{ei + 1}</td>
+                                <td style={{ padding: "6px", fontWeight: 600 }}>{ev.employee.name}</td>
+                                <td style={{ padding: "6px", color: "rgba(255,255,255,0.45)" }}>{ev.employee.department}</td>
+                                <td style={{ padding: "6px" }}><span style={{ color: sc }}>{ev.eventType.icon} {ev.eventType.label}</span></td>
+                                <td style={{ padding: "6px", color: "rgba(255,255,255,0.45)", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ev.asset.name}</td>
+                                <td style={{ padding: "6px", textAlign: "center" }}><span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 10, fontWeight: 700, color: sc, background: sc + "18", border: "1px solid " + sc + "30" }}>{ev.riskScore}</span></td>
+                                <td style={{ padding: "6px", color: "rgba(255,255,255,0.35)", fontFamily: "'DM Mono',monospace", fontSize: 9 }}>{ev.timestamp.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}</td>
+                              </tr>
+                            );
+                          })}</tbody>
+                        </table>
+                        {m.data.length > 20 && <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 6 }}>외 {m.data.length - 20}건 더 있음</div>}
+                      </div>
+                    )}
+                    <div style={{ marginTop: 8, fontSize: 10, color: "rgba(10,132,255,0.6)" }}>💡 행을 클릭하면 해당 이벤트의 상세 정보를 확인할 수 있습니다</div>
+                  </div>
+                ) : (
+                  <span>{m.text}</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        {typing && (
+          <div style={{ display: "flex", justifyContent: "flex-start" }}>
+            <div style={{ padding: "10px 14px", borderRadius: "4px 14px 14px 14px", background: "rgba(10,132,255,0.06)", border: "1px solid rgba(10,132,255,0.15)", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 14, height: 14, border: "2px solid rgba(10,132,255,0.3)", borderTop: "2px solid #0a84ff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+              <span style={{ fontSize: 11, color: "#5ac8fa", fontWeight: 500 }}>{typingMsg}</span>
+            </div>
+          </div>
+        )}
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* Quick actions */}
+      <div style={{ padding: "6px 16px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
+        {["위험점수 80점 이상 정리", "외부 공유 링크 목록", "USB 복사 이벤트", "심각 등급 이벤트", "기밀 자산 접근"].map(function(q) {
+          return <button key={q} onClick={function() { setInput(q); }} style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", fontSize: 10, cursor: "pointer", transition: "all 0.2s" }}
+            onMouseEnter={function(e) { e.currentTarget.style.borderColor = "rgba(10,132,255,0.3)"; e.currentTarget.style.color = "#5ac8fa"; }}
+            onMouseLeave={function(e) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}>
+            {q}
+          </button>;
+        })}
+      </div>
+
+      {/* Input */}
+      <div style={{ padding: "10px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.06)", flexShrink: 0, display: "flex", gap: 8, alignItems: "flex-end" }}>
+        <textarea value={input} onChange={function(e) { setInput(e.target.value); }} onKeyDown={handleKeyDown} placeholder="이벤트 데이터를 질의하세요..." rows={1} style={{ flex: 1, padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", fontSize: 12, lineHeight: 1.5, resize: "none", outline: "none", fontFamily: "'Pretendard',sans-serif", boxSizing: "border-box" }} />
+        <button onClick={handleSend} disabled={!input.trim() || typing} style={{ width: 38, height: 38, borderRadius: 10, border: "none", background: input.trim() && !typing ? "linear-gradient(135deg,#0a84ff,#5e5ce6)" : "rgba(255,255,255,0.04)", color: input.trim() && !typing ? "#fff" : "rgba(255,255,255,0.2)", fontSize: 16, cursor: input.trim() && !typing ? "pointer" : "default", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>↑</button>
+      </div>
+    </div>
+  );
+}
+
 // Main App
 
 export default function SecurityDashboard(props) {
@@ -889,6 +1158,8 @@ export default function SecurityDashboard(props) {
   var guideModal = stGuide[0], setGuideModal = stGuide[1];
   var stMessage = useState(null);
   var messageModal = stMessage[0], setMessageModal = stMessage[1];
+  var stChatOpen = useState(false);
+  var chatOpen = stChatOpen[0], setChatOpen = stChatOpen[1];
   var stSearch = useState("");
   var searchText = stSearch[0], setSearchText = stSearch[1];
   var stSeverity = useState("all");
@@ -964,6 +1235,19 @@ export default function SecurityDashboard(props) {
 
       {guideModal && <ActionGuideModal action={guideModal.action} event={guideModal.event} onClose={function() { setGuideModal(null); }} />}
       {messageModal && <MessageModal user={messageModal.user} recipientType={messageModal.recipientType} onClose={function() { setMessageModal(null); }} />}
+
+      {/* AI ChatBot */}
+      {chatOpen && <SecurityChatBot events={events} employees={employees} onSelectEvent={function(evId) { setChatOpen(false); setExpandedId(evId); }} onClose={function() { setChatOpen(false); }} />}
+
+      {/* Floating Chat Button */}
+      {!chatOpen && (
+        <button onClick={function() { setChatOpen(true); }} style={{ position: "fixed", bottom: 24, right: 24, width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#0a84ff,#5e5ce6)", border: "none", color: "#fff", fontSize: 24, cursor: "pointer", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 28px rgba(10,132,255,0.4), 0 0 20px rgba(10,132,255,0.15)", transition: "all 0.2s", animation: "fadeIn 0.4s" }}
+          onMouseEnter={function(e) { e.currentTarget.style.transform = "scale(1.08)"; }}
+          onMouseLeave={function(e) { e.currentTarget.style.transform = "scale(1)"; }}>
+          🤖
+          <div style={{ position: "absolute", top: -4, right: -4, width: 14, height: 14, borderRadius: "50%", background: "#30d158", border: "2px solid #0e0e18", animation: "pulse 2s infinite" }} />
+        </button>
+      )}
 
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(10,10,15,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "12px 24px" }}>
