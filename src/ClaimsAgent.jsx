@@ -236,6 +236,139 @@ const UC_PROCESS_AI_ANALYSIS = `## 🤖 AI 종합 분석 — 교차로 골목길
 > **자사 주장(30:70) 관철 시 vs 타사 주장(70:30) 수용 시 → 최대 ₩12,900,000 차이 발생**`;
 
 const UC_PROCESS_SUMMARY = `{"업무영역":"자동차 손해사정","핵심쟁점":"교차로 골목길 충돌 — 과실 분쟁 + 고액 수리비 + 대인 5명","차량":"자사 그랜저 / 타사 BMW 7시리즈","추정비용":"자사 총 손실 ₩15,000,000~24,000,000 범위","긴급도":"높음 — 과실 합의 + 수리비 검증 + 대인 합의 동시 진행 필요","주의사항":"타사 수리비 과다 청구 가능성 높음, 렌트 등급 반드시 정정, 대인 일괄 합의 추진"}`;
+
+// ═══ USE CASE 시나리오 상세 설명 ═══
+const UC_SCENARIOS = {
+  uc1: {
+    title: "Case 1 — 교차로 골목길 충돌 사고",
+    color: "#059669",
+    badge: "처리 방법 제안 Agent",
+    sections: [
+      { icon: "🚗", title: "사고 상황",
+        items: [
+          "교차로 골목길에서 국산차와 외제차가 동시 진입 중 충돌",
+          "양측 모두 '내가 먼저 진입했다', '상대방이 과속했다', '내 도로가 주도로다'라고 주장",
+          "사실관계가 불명확하고, 블랙박스·CCTV 등 객관적 증거가 부족한 상태",
+        ]},
+      { icon: "👤", title: "자사 고객 (A) — 현대 그랜저",
+        items: [
+          "수리 견적: ₩5,000,000",
+          "렌트: 그랜저 동급 이용 예정 (적정 수준)",
+          "대인 접수: 운전자 + 동승자 1명 = 총 2명",
+          "과실 주장: 자사 30% : 타사 70%",
+        ]},
+      { icon: "🚙", title: "타사 고객 (B) — BMW 7시리즈",
+        items: [
+          "수리 견적: ₩25,000,000 청구 (고가 외제차)",
+          "렌트: BMW 7시리즈 동급 렌트 요구 (일 ₩350,000~400,000 수준)",
+          "대인 접수: 운전자 + 동승자 2명 = 총 3명",
+          "과실 주장: 자사 70% : 타사 30%",
+        ]},
+      { icon: "⚠️", title: "핵심 쟁점 (손해사정사가 어려움을 느끼는 부분)",
+        items: [
+          "과실 비율이 30:70 ↔ 70:30으로 극단적 대립 → 합의까지 장기화 우려",
+          "BMW 7시리즈 수리비 ₩25,000,000의 적정성 검증이 어려움 (OEM 부품 단가 불투명)",
+          "BMW 7시리즈 렌트 비용이 매우 높아 보험사 손실 급증 가능",
+          "대인 5명 동시 처리 시 합의금 총액 관리가 복잡",
+          "자사 고객 만족 + 보험사 손실 최소화라는 상충되는 목표의 균형",
+        ]},
+      { icon: "🤖", title: "AI가 해결해 주는 가치",
+        highlight: true,
+        items: [
+          "유사 사고 데이터 분석으로 적정 과실 비율(50:50 근사) 도출",
+          "BMW 7시리즈 부품별 단가 데이터로 수리비 과다 청구 식별 (₩5M~8M 절감 가능)",
+          "렌트 등급 정정 근거(판례 '동종·동급 원칙') 자동 제시",
+          "시나리오별 자사 총 손실 시뮬레이션 → 최적 협상 전략 3가지 제안",
+        ]},
+    ]
+  },
+  uc2: {
+    title: "Case 2 — 주차장 신차 충돌 사고",
+    color: "#3b82f6",
+    badge: "견적 산정 Agent",
+    sections: [
+      { icon: "🚗", title: "사고 상황",
+        items: [
+          "자사 고객이 주차장에서 빠져나오던 중 속력을 내다 미끄러져 주차된 타사 차량을 충돌",
+          "자사 고객의 100% 과실 사고 (주정차 차량 충돌)",
+          "타사 차량의 앞 부분이 심하게 파손됨",
+        ]},
+      { icon: "😡", title: "타사 고객 — 제네시스 GV80 프레스티지 (출고 3개월 신차)",
+        items: [
+          "차량가액 약 ₩65,000,000의 프리미엄 SUV",
+          "출고 후 겨우 3개월, 추정 주행거리 3,000km 이하의 거의 새 차",
+          "매우 화가 난 상태 — 신차가 사고 차량이 되어 감가 우려",
+          "렌트: 벤츠 E-Class 요구 (GV80 동급이 아닌 상위 세단 요구)",
+          "타사 보험사가 공식 서비스 센터 이용을 주장하며 수리견적 + 렌트 포함 총 ₩10,000,000 청구",
+        ]},
+      { icon: "😟", title: "자사 고객 입장",
+        items: [
+          "₩10,000,000이라는 금액에 납득하지 못하는 상황",
+          "\"주차된 차를 살짝 친 건데 왜 이렇게 비싸냐\"는 반응",
+          "보험료 할증에 대한 걱정까지 겹쳐 심리적 부담이 큰 상태",
+        ]},
+      { icon: "⚠️", title: "핵심 쟁점 (손해사정사가 어려움을 느끼는 부분)",
+        items: [
+          "검증 수단이 제한적 — 유사 사고 사례와 파손 사진밖에 없음",
+          "공식 서비스센터 vs 제휴 정비망 선택에 대한 법적 근거 판단이 애매",
+          "신차(3개월) 감가 청구 가능성 대비가 필요하나 산정 기준이 복잡",
+          "렌트 등급 부적정(벤츠 E → GV80 동급)의 법적 논리 구성",
+          "자사 고객에게 '정당한 비용'임을 납득시킬 충분한 근거 필요",
+        ]},
+      { icon: "🤖", title: "AI가 해결해 주는 가치",
+        highlight: true,
+        items: [
+          "부품별 단가 데이터로 타사 청구 ₩10,000,000 vs AI 적정 ₩6,380,000 비교 분석",
+          "항목별 차이 금액과 절감 가능액을 테이블로 명확하게 시각화",
+          "신차 감가 청구 가능성을 판례 기반(대법원 2017다251234)으로 사전 분석",
+          "자사 고객 설명용 '납득 자료' 자동 생성 → 유사 사고 5건 평균 수리비 제시",
+          "대안 시나리오 3개(적극 협상/절충/수용)와 각각의 총 비용 비교",
+        ]},
+    ]
+  },
+  uc3: {
+    title: "Case 3 — 차선변경 중 직진차량 충돌 사고",
+    color: "#7c3aed",
+    badge: "과실 산정 Agent",
+    sections: [
+      { icon: "🚗", title: "사고 상황",
+        items: [
+          "자사 고객이 편도 2차로 도로에서 차선변경 중 뒤에서 직진하던 타사 차량과 충돌",
+          "자사 차량의 우측 후방과 타사 차량의 좌측 전방이 접촉 → 차선변경 미완료 상태에서 충돌 추정",
+          "블랙박스, CCTV, 목격자 등 객관적 증거가 없는 상태",
+        ]},
+      { icon: "👤", title: "자사 고객 (A) — 차선변경 차량",
+        items: [
+          "\"사이드미러로 확인하고 안전하게 진입했다\"고 주장",
+          "\"타사 차량이 갑자기 속력을 올려서 충돌한 것\"이라고 주장",
+          "양 보험사 협의안(9:1)에는 동의하나, 대인 접수도 고민 중",
+        ]},
+      { icon: "🚙", title: "타사 고객 (B) — 직진 차량",
+        items: [
+          "\"A차가 깜박이를 켜자마자 바로 끼어들었다, 피할 수 없었다\"고 주장",
+          "자사 10 : 타사 0 (100% A차 과실) 주장 — 양 보험사 협의안(9:1) 거부",
+          "대인 접수 의향 있음 — 측면 충돌로 경추 통증 호소",
+        ]},
+      { icon: "⚠️", title: "핵심 쟁점 (손해사정사가 어려움을 느끼는 부분)",
+        items: [
+          "양 보험사는 9:1 합의했으나 타사 고객이 10:0 주장하며 거부 → 교착 상태",
+          "타사 고객의 10:0 주장이 법적으로 타당한지 판단 근거가 필요",
+          "쌍방 대인 접수 시 과실 상계를 고려한 합의금 시뮬레이션이 복잡",
+          "자사 고객도 대인 접수를 고민 중 → 접수 시 실익이 있는지 분석 필요",
+          "증거 없이 진술만으로 과실 비율의 미세 조정(85:15 vs 90:10)을 논리적으로 설명하기 어려움",
+        ]},
+      { icon: "🤖", title: "AI가 해결해 주는 가치",
+        highlight: true,
+        items: [
+          "8개 요소 다요인 분석으로 최적 과실 비율(85:15) 도출 — 단순 기준표보다 정밀",
+          "타사 10:0 주장을 판례(대법원 2018다456789)로 논리적 반박 자료 자동 생성",
+          "쌍방 대인 접수 시 과실 상계를 반영한 합의금 테이블 자동 산출",
+          "3가지 협상 전략(85:15 주장 / 90:10+대인 취하 / 분쟁조정) 비용·리스크 비교",
+          "실무 화법 추천 → \"판례상 직진차에도 전방주시의무가 있어 10:0은 인정 불가\"",
+        ]},
+    ]
+  },
+};
 const ROAD_TYPES=["편도1차로","편도2차로","편도3차로이상","고속도로","골목길/이면도로","교차로","회전교차로","주차장내"];
 const WEATHER_TYPES=["맑음","흐림","비","눈","안개","야간"];
 const SIGNAL_STATES=["녹색신호","황색신호","적색신호","비보호좌회전","점멸","신호없음"];
@@ -440,6 +573,51 @@ function RT({text}){if(!text)return null;
   }
   return<div style={{lineHeight:1.75}}>{result}</div>;
 }
+function ScenarioModal({id,onClose}){
+  const sc=UC_SCENARIOS[id];
+  if(!sc)return null;
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",backdropFilter:"blur(5px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s"}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:20,width:680,maxWidth:"92vw",maxHeight:"82vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,.15)"}}>
+        {/* Header */}
+        <div style={{padding:"22px 28px 16px",borderBottom:"1px solid #f1f5f9",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:36,height:36,borderRadius:10,background:`${sc.color}12`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>📋</div>
+            <div>
+              <div style={{fontSize:16,fontWeight:800,color:"#0f172a"}}>{sc.title}</div>
+              <span style={{fontSize:10,fontWeight:700,color:sc.color,background:`${sc.color}12`,padding:"2px 8px",borderRadius:6}}>{sc.badge}</span>
+            </div>
+          </div>
+          <button onClick={onClose} style={{width:32,height:32,borderRadius:8,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"#94a3b8",fontSize:16,fontWeight:700}}>✕</button>
+        </div>
+        {/* Body */}
+        <div style={{overflowY:"auto",padding:"20px 28px 28px"}}>
+          {sc.sections.map((sec,si)=>(
+            <div key={si} style={{marginBottom:18,background:sec.highlight?"linear-gradient(135deg,#f0fdf4,#ecfdf5)":"#fafbfc",borderRadius:14,padding:"16px 18px",border:sec.highlight?`2px solid ${sc.color}30`:"1px solid #f1f5f9"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                <span style={{fontSize:17}}>{sec.icon}</span>
+                <span style={{fontSize:13.5,fontWeight:700,color:sec.highlight?sc.color:"#0f172a"}}>{sec.title}</span>
+                {sec.highlight&&<span style={{fontSize:9,fontWeight:700,color:"#fff",background:sc.color,padding:"2px 8px",borderRadius:6}}>핵심 가치</span>}
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {sec.items.map((item,ii)=>(
+                  <div key={ii} style={{display:"flex",gap:8,alignItems:"flex-start",fontSize:12.5,lineHeight:1.65,color:sec.highlight?"#065f46":"#475569"}}>
+                    <span style={{color:sec.highlight?sc.color:"#94a3b8",marginTop:2,fontSize:7,flexShrink:0}}>{sec.highlight?"★":"●"}</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div style={{background:"#f8fafc",borderRadius:10,padding:"12px 16px",border:"1px solid #e2e8f0",textAlign:"center"}}>
+            <span style={{fontSize:11,color:"#94a3b8"}}>💡 </span>
+            <span style={{fontSize:11,color:"#64748b"}}>위 버튼으로 Use Case를 불러온 후 분석을 실행하면, AI가 위 상황을 종합 분석한 리포트를 생성합니다.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function Sp({s}){return<div style={{width:s?13:17,height:s?13:17,border:"2px solid #e2e8f0",borderTop:"2px solid #0891b2",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/>;}
 function Em({text}){return<div style={{height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#94a3b8",gap:10,minHeight:260}}><div style={{width:48,height:48,borderRadius:14,background:"#f8fafc",display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid #e2e8f0"}}>{IC.car}</div><div style={{fontSize:13,textAlign:"center",maxWidth:280}}>{text}</div></div>;}
 function SB({label,value,onChange,opts}){return<div><label style={LB}>{label}</label><select value={value} onChange={e=>onChange(e.target.value)} style={SL}><option value="">선택</option>{opts.map(o=><option key={o} value={o}>{o}</option>)}</select></div>;}
@@ -465,7 +643,7 @@ function Tab1(){
   const[aiProgress,setAiProgress]=useState({step:0,msg:""});
   const{displayed:tA,done:aD}=useTW(at);
   const fr=useRef(null);
-  const[useCase,setUseCase]=useState(null);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);
 
   const loadUC2=()=>{
     setOrigin("국산");sMk("제네시스");sMd("GV80");sYr("2025");sMl("3000");
@@ -571,8 +749,12 @@ function Tab1(){
         <div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc2"?"#1e40af":"#64748b"}}>Use Case 데모</div>
         <div style={{fontSize:9.5,color:"#94a3b8"}}>Case 2: 주차장 사고 — GV80 신차(3개월) 수리비 ₩10,000,000 검증</div></div>
       </div>
-      <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
+      <div style={{display:"flex",gap:6,alignItems:"center"}}>
+        <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
+        <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
+      </div>
     </div>
+    {scenarioOpen&&<ScenarioModal id="uc2" onClose={()=>setScenarioOpen(false)}/>}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"calc(100% - 58px)"}}>
       {/* Photo Preview Modal */}
       {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
@@ -777,7 +959,7 @@ function Tab2(){
   const bbRef=useRef(null);const prRef=useRef(null);const cctvRef=useRef(null);const witRef=useRef(null);
   // AI 프로그레스
   const[aiProg,setAiProg]=useState({step:0,msg:"",pct:0});
-  const[useCase,setUseCase]=useState(null);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);
 
   const loadUC3=()=>{
     sAt("차선변경 — 동일방향 접촉");sRt("편도2차로");sWt("맑음");sSg("신호없음");
@@ -883,8 +1065,12 @@ function Tab2(){
         <div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc3"?"#5b21b6":"#64748b"}}>Use Case 데모</div>
         <div style={{fontSize:9.5,color:"#94a3b8"}}>Case 3: 차선변경 사고 — 과실 9:1 vs 10:0 분쟁 + 쌍방 대인</div></div>
       </div>
-      <button onClick={()=>{if(useCase==="uc3"){setUseCase(null);sAt("");sRt("");sWt("");sSg("");sMd("");sOd("");sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setAiProg({step:0,msg:"",pct:0});}else{loadUC3();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc3"?"#ef4444":"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc3"?"초기화":"Case 3 불러오기"}</button>
+      <div style={{display:"flex",gap:6,alignItems:"center"}}>
+        <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
+        <button onClick={()=>{if(useCase==="uc3"){setUseCase(null);sAt("");sRt("");sWt("");sSg("");sMd("");sOd("");sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setAiProg({step:0,msg:"",pct:0});}else{loadUC3();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc3"?"#ef4444":"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc3"?"초기화":"Case 3 불러오기"}</button>
+      </div>
     </div>
+    {scenarioOpen&&<ScenarioModal id="uc3" onClose={()=>setScenarioOpen(false)}/>}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"calc(100% - 58px)"}}>
       {/* Photo Preview Modal */}
       {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
@@ -1068,7 +1254,7 @@ function Tab3(){
   // intake Q&A
   const[intakeQs,setIntakeQs]=useState([]);const[intakeAs,setIntakeAs]=useState({});
   const[intakeProg,setIntakeProg]=useState({step:0,msg:"",pct:0});
-  const[useCase,setUseCase]=useState(null);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);
 
   const loadUC1=()=>{
     setInput(`[교차로 골목길 충돌 사고 — Case 1]
@@ -1422,8 +1608,12 @@ function Tab3(){
         <div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc1"?"#065f46":"#64748b"}}>Use Case 데모</div>
         <div style={{fontSize:9.5,color:"#94a3b8"}}>Case 1: 교차로 충돌 — 그랜저 vs BMW 7시리즈, 과실 분쟁 + 고액 수리비 + 대인 5명</div></div>
       </div>
-      <button onClick={()=>{if(useCase==="uc1"){setUseCase(null);setInput("");setCustPref("");setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});}else{loadUC1();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc1"?"#ef4444":"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc1"?"초기화":"Case 1 불러오기"}</button>
+      <div style={{display:"flex",gap:6,alignItems:"center"}}>
+        <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
+        <button onClick={()=>{if(useCase==="uc1"){setUseCase(null);setInput("");setCustPref("");setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});}else{loadUC1();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc1"?"#ef4444":"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc1"?"초기화":"Case 1 불러오기"}</button>
+      </div>
     </div>
+    {scenarioOpen&&<ScenarioModal id="uc1" onClose={()=>setScenarioOpen(false)}/>}
     <div style={{display:"flex",flexDirection:"column",height:"calc(100% - 58px)"}}>
       {modal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.2)",backdropFilter:"blur(3px)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setModal(false)}>
         <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:18,padding:24,width:580,maxHeight:"68vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 16px 48px rgba(0,0,0,.1)"}}>
