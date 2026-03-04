@@ -112,6 +112,88 @@ const UC_ESTIMATE_RESPONSE = `## 🤖 AI 견적 검증 리포트 — GV80 3.5T A
 
 ※ 유사 사고 사례 3건 참조: CLM-2024-0891(GV80/전면충돌/₩6,200,000), CLM-2024-1203(팰리세이드/전면/₩5,800,000), CLM-2025-0042(GV80/대향충돌/₩5,200,000)`;
 
+const UC_ESTIMATE_SELF = `## 🤖 AI 견적 분석 리포트 — 자사 고객 차량
+
+### 📋 차량 정보
+| 항목 | 내용 |
+|------|------|
+| 차종 | **현대 그랜저 캘리그래피 블랙잉크 3.5 가솔린 AWD** |
+| 출고일 | 2025년 6월 (약 9개월) |
+| 추정 주행거리 | 약 12,000~15,000km |
+| 차량가액 | 약 **₩52,000,000** |
+| 보험 처리 | 자차보험 (자사 고객 100% 과실) |
+
+### 📊 자사 차량 파손 분석
+
+> **사고 상황**: 주차장에서 빠져나오며 미끄러져 주차된 GV80 충돌. 자사 차량은 **우측 전면부**가 GV80에 접촉하며 파손됨.
+
+| 파손 부위 | 손상도 | 수리 방법 | 예상 비용 |
+|----------|--------|----------|----------|
+| 프론트 범퍼(우측) | 중간 | 판금 도장 수리 | **₩380,000** |
+| 우 헤드라이트 | 경미 | 크랙 시 교체 | **₩420,000** |
+| 우 프론트 펜더 | 경미~중간 | 판금 도장 수리 | **₩350,000** |
+| 우 안개등/DRL | 경미 | 점검 후 결정 | **₩80,000** |
+| 공임 (탈거/조립) | — | — | **₩280,000** |
+| 도장 (2면) | — | — | **₩320,000** |
+| **합계** | | | **₩1,830,000** |
+
+### 🔧 수리 방법 권고
+
+**판금 도장 수리 권장** (교체 불필요)
+- 범퍼·펜더 모두 변형 깊이 5mm 이하로 추정 → **판금 수리로 충분**
+- 출고 9개월 차량이나, 파손 정도가 경미하여 **감가 청구 대상은 아님**
+- 제휴 서비스센터 이용 시 추가 **10~15% 절감 가능** (₩1,550,000~1,650,000)
+
+### 🚗 자사 고객 렌트(대차)
+| 항목 | 내용 |
+|------|------|
+| 대차 차종 | 그랜저 동급 (적정) |
+| 일 렌트비 | ₩90,000~110,000 |
+| 예상 수리 기간 | 5~7일 |
+| **렌트 총 비용** | **₩550,000~770,000** |
+
+### 💡 자차보험 처리 안내
+- 자사 고객은 **100% 과실**이므로 자차보험으로 처리
+- 자기부담금: **₩200,000~500,000** (보험 조건에 따라 상이)
+- ⚠️ 자사 고객에게는 **"본인 부담은 자기부담금(₩20~50만원)뿐이며, 나머지는 보험 처리"**로 안내
+- 향후 보험료 할증: 사고 1건 기준 **약 10~15% 할증** 예상 (연간 ₩80,000~150,000 추가)`;
+
+const UC_ESTIMATE_TOTAL = `## 📊 보험사 총 지출 요약 — Case 2 종합
+
+### 💰 자사 보험사 총 예상 지출
+
+| 구분 | 항목 | 최소 | 적정 | 타사 청구 |
+|------|------|------|------|----------|
+| **타사 차량 (GV80)** | 수리비 | ₩5,200,000 | ₩6,380,000 | ₩8,000,000 |
+| | 렌트비 (GV80 동급) | ₩840,000 | ₩980,000 | ₩2,000,000 |
+| **자사 차량 (그랜저)** | 수리비 | ₩1,550,000 | ₩1,830,000 | — |
+| | 렌트비 (그랜저 동급) | ₩550,000 | ₩660,000 | — |
+| **대인 배상** | 해당 없음 | ₩0 | ₩0 | — |
+| | | | | |
+| **합계** | | **₩8,140,000** | **₩9,850,000** | **₩10,000,000+α** |
+
+### 📈 시나리오별 총 비용 비교
+
+| 시나리오 | 타사 차량 | 자사 차량 | 총 비용 | **절감액** |
+|---------|----------|----------|---------|----------|
+| **A. 타사 청구 그대로 수용** | ₩10,000,000 | ₩1,830,000 | ₩11,830,000 | — |
+| **B. 렌트 정정만** (AI 권고) | ₩8,980,000 | ₩1,830,000 | ₩10,810,000 | **▼ ₩1,020,000** |
+| **C. 수리비+렌트 협상** (AI 적정) | ₩7,360,000 | ₩1,830,000 | ₩9,190,000 | **▼ ₩2,640,000** |
+| **D. 최대 절감** (제휴센터+렌트) | ₩6,040,000 | ₩1,550,000 | ₩7,590,000 | **▼ ₩4,240,000** |
+
+### ✅ AI 최종 권고
+
+> **C안 (수리비+렌트 협상)** 추천 — 총 **₩9,190,000**
+> 
+> 타사 청구 대비 **₩2,640,000 절감**하면서도, 출고 3개월 신차 특수성을 인정하여 합의 도출 가능.
+> 자사 고객에게는 **"본인 부담은 자기부담금 ₩20~50만원뿐"**으로 안내하여 심리적 부담 경감.
+
+### 🗣️ 자사 고객 안내 스크립트
+
+> "고객님, 상대방 차량 수리비는 저희가 전문 검증하여 **적정 금액으로 협의** 진행하고 있습니다.
+> 고객님 차량 수리비도 보험으로 처리되며, **실제 본인 부담은 자기부담금(약 20~50만원)** 수준입니다.
+> 보험료 할증은 연간 약 8~15만원 정도로 예상되며, 전체적으로 가장 합리적인 방향으로 처리해 드리겠습니다."`;
+
 const UC_FAULT_RESPONSE = `## ⚖️ AI 과실 종합 분석 리포트 — 차선변경 사고
 
 ### 📋 사고 개요
@@ -763,12 +845,12 @@ function Tab1(){
   const[aiProgress,setAiProgress]=useState({step:0,msg:""});
   const{displayed:tA,done:aD}=useTW(at);
   const fr=useRef(null);
-  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[vehTab,setVehTab]=useState(0);
 
   const loadUC2=()=>{
     setOrigin("국산");sMk("제네시스");sMd("GV80");sYr("2025");sMl("3000");
     sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터","전방 카메라/센서"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc2");
+    sSv("심각");sRs(null);sAt("");setUseCase("uc2");setVehTab(0);
     setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 전면부 광범위 파손 — 범퍼 ASSY 교체, 본넷 교체, 헤드라이트 교체 필요. 라디에이터 서포트 손상 의심."});
   };
 
@@ -871,7 +953,7 @@ function Tab1(){
       </div>
       <div style={{display:"flex",gap:6,alignItems:"center"}}>
         <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
-        <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
+        <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");setVehTab(0);}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
       </div>
     </div>
     {scenarioOpen&&<ScenarioModal id="uc2" onClose={()=>setScenarioOpen(false)}/>}
@@ -1061,7 +1143,16 @@ function Tab1(){
           <div style={{...CD,border:"1px solid #a5f3fc"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:"#0891b2",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
             <span style={{fontSize:13,fontWeight:700}}>AI 분석</span>{!aD&&at&&<Sp s/>}</div>
-            <div style={{fontSize:12.5}}><RT text={tA}/></div></div>
+            {/* Vehicle Tab Selector for Case 2 */}
+            {useCase==="uc2"&&aD&&<div style={{display:"flex",gap:0,marginBottom:12,background:"#f1f5f9",borderRadius:10,padding:3}}>
+              {[{l:"🚙 타사 차량 (GV80)",sub:"₩10,000,000 청구 검증"},{l:"🚗 자사 차량 (그랜저)",sub:"수리비 + 렌트 + 자차보험"},{l:"📊 보험사 총 지출 요약",sub:"합산 비용 · 시나리오 비교"}].map((t,i)=>
+                <button key={i} onClick={()=>setVehTab(i)} style={{flex:1,padding:"8px 6px",borderRadius:8,border:"none",cursor:"pointer",background:vehTab===i?"#fff":"transparent",boxShadow:vehTab===i?"0 1px 4px rgba(0,0,0,0.08)":"none",transition:"all .2s",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                  <span style={{fontSize:11,fontWeight:vehTab===i?700:500,color:vehTab===i?(i===0?"#0891b2":i===1?"#7c3aed":"#059669"):"#94a3b8"}}>{t.l}</span>
+                  <span style={{fontSize:8.5,color:vehTab===i?"#64748b":"#cbd5e1"}}>{t.sub}</span>
+                </button>
+              )}
+            </div>}
+            <div style={{fontSize:12.5}}><RT text={useCase==="uc2"&&aD?(vehTab===0?tA:vehTab===1?UC_ESTIMATE_SELF:UC_ESTIMATE_TOTAL):tA}/></div></div>
         </div>}
       </div></div></>);
 }
