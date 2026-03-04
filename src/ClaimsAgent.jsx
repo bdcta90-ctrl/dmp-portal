@@ -620,6 +620,126 @@ function ScenarioModal({id,onClose}){
 }
 function Sp({s}){return<div style={{width:s?13:17,height:s?13:17,border:"2px solid #e2e8f0",borderTop:"2px solid #0891b2",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/>;}
 function Em({text}){return<div style={{height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#94a3b8",gap:10,minHeight:260}}><div style={{width:48,height:48,borderRadius:14,background:"#f8fafc",display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid #e2e8f0"}}>{IC.car}</div><div style={{fontSize:13,textAlign:"center",maxWidth:280}}>{text}</div></div>;}
+function GV80DamageDiagram(){
+  const[hoveredPart,setHoveredPart]=useState(null);
+  const[animPhase,setAnimPhase]=useState(0);
+  useEffect(()=>{
+    const timers=[];
+    timers.push(setTimeout(()=>setAnimPhase(1),300));
+    timers.push(setTimeout(()=>setAnimPhase(2),800));
+    timers.push(setTimeout(()=>setAnimPhase(3),1300));
+    timers.push(setTimeout(()=>setAnimPhase(4),1800));
+    timers.push(setTimeout(()=>setAnimPhase(5),2200));
+    timers.push(setTimeout(()=>setAnimPhase(6),2600));
+    return()=>timers.forEach(clearTimeout);
+  },[]);
+  const parts=[
+    {id:"bumper",label:"프론트 범퍼 ASSY",severity:"교체 필요",cost:"₩1,350,000",x:60,y:215,w:280,h:55,rx:8,phase:1,color:"#dc2626",labelX:200,labelY:255,anchor:"middle"},
+    {id:"hood",label:"본넷(후드)",severity:"교체 필요",cost:"₩980,000",x:90,y:100,w:220,h:105,rx:14,phase:2,color:"#f97316",labelX:200,labelY:145,anchor:"middle"},
+    {id:"headlightL",label:"좌 헤드라이트(LED)",severity:"교체 필요",cost:"₩1,350,000",x:55,y:155,w:58,h:55,rx:6,phase:3,color:"#dc2626",labelX:20,labelY:150,anchor:"start"},
+    {id:"grill",label:"프론트 그릴",severity:"교체 필요",cost:"₩350,000",x:140,y:195,w:120,h:22,rx:4,phase:4,color:"#f59e0b",labelX:200,labelY:206,anchor:"middle"},
+    {id:"radiator",label:"라디에이터 서포트",severity:"손상 의심",cost:"₩300,000",x:120,y:170,w:160,h:25,rx:4,phase:5,color:"#f97316",labelX:370,labelY:180,anchor:"start"},
+    {id:"camera",label:"전방 카메라/레이더",severity:"캘리브레이션",cost:"₩300,000",x:185,y:82,w:30,h:16,rx:4,phase:6,color:"#8b5cf6",labelX:370,labelY:88,anchor:"start"},
+  ];
+  return(
+    <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",borderRadius:14,padding:"16px 14px 12px",border:"1px solid rgba(8,145,178,0.3)"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:"#dc2626",animation:"pulse 1.5s infinite"}}/>
+          <span style={{fontSize:11,fontWeight:700,color:"#f1f5f9"}}>AI 파손 감지 결과</span>
+          <span style={{fontSize:9,padding:"2px 6px",borderRadius:5,background:"rgba(8,145,178,0.2)",color:"#22d3ee",fontWeight:700}}>GV80 3.5T AWD</span>
+        </div>
+        <span style={{fontSize:9,color:"#64748b",fontFamily:"'DM Mono',monospace"}}>감지 부위: 6개</span>
+      </div>
+      <svg viewBox="0 0 400 290" style={{width:"100%",height:"auto"}}>
+        <defs>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#475569"/><stop offset="100%" stopColor="#334155"/>
+          </linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glowRed"><feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#dc2626" floodOpacity="0.6"/></filter>
+          <filter id="glowOrange"><feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#f97316" floodOpacity="0.5"/></filter>
+        </defs>
+        {/* Vehicle body outline */}
+        <rect x="55" y="70" width="290" height="210" rx="30" fill="url(#bodyGrad)" stroke="#64748b" strokeWidth="1.5"/>
+        {/* Windshield */}
+        <path d="M 110 72 Q 200 60 290 72 L 280 98 Q 200 92 120 98 Z" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
+        {/* Hood lines */}
+        <line x1="200" y1="98" x2="200" y2="195" stroke="#475569" strokeWidth="0.8" strokeDasharray="3,3"/>
+        <line x1="120" y1="130" x2="280" y2="130" stroke="#475569" strokeWidth="0.5" strokeDasharray="2,4"/>
+        {/* Headlights */}
+        <rect x="58" y="158" width="52" height="48" rx="8" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
+        <rect x="290" y="158" width="52" height="48" rx="8" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
+        {/* Grill */}
+        <rect x="142" y="198" width="116" height="18" rx="4" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
+        {[0,1,2,3,4].map(i=><line key={i} x1={152+i*22} y1="200" x2={152+i*22} y2="214" stroke="#475569" strokeWidth="0.8"/>)}
+        {/* Bumper bottom */}
+        <rect x="65" y="220" width="270" height="45" rx="10" fill="#2d3748" stroke="#475569" strokeWidth="1"/>
+        {/* Fog lights */}
+        <circle cx="95" cy="242" r="12" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
+        <circle cx="305" cy="242" r="12" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
+        {/* Camera/sensor */}
+        <rect x="188" y="85" width="24" height="12" rx="3" fill="#334155" stroke="#475569" strokeWidth="0.8"/>
+        {/* Genesis logo */}
+        <circle cx="200" cy="150" r="14" fill="none" stroke="#64748b" strokeWidth="1"/>
+        <text x="200" y="154" textAnchor="middle" fontSize="10" fontWeight="700" fill="#64748b">G</text>
+        {/* License plate area */}
+        <rect x="165" y="248" width="70" height="16" rx="2" fill="#1e293b" stroke="#475569" strokeWidth="0.6"/>
+
+        {/* Damage overlays - animated */}
+        {parts.map(p=>animPhase>=p.phase&&(
+          <g key={p.id} style={{cursor:"pointer"}} onMouseEnter={()=>setHoveredPart(p.id)} onMouseLeave={()=>setHoveredPart(null)}>
+            <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={p.rx}
+              fill={p.color+"20"} stroke={p.color} strokeWidth={hoveredPart===p.id?2.5:1.5}
+              strokeDasharray={hoveredPart===p.id?"":"4,2"}
+              filter={hoveredPart===p.id?(p.color==="#dc2626"?"url(#glowRed)":"url(#glowOrange)"):""}
+              style={{animation:"fadeIn 0.5s ease-out"}}/>
+            {/* Scan line animation */}
+            {animPhase===p.phase&&<rect x={p.x} y={p.y} width={p.w} height="2" rx="1" fill={p.color} opacity="0.8">
+              <animate attributeName="y" from={p.y} to={p.y+p.h} dur="0.5s" fill="freeze"/>
+              <animate attributeName="opacity" from="0.8" to="0" dur="0.5s" fill="freeze"/>
+            </rect>}
+          </g>
+        ))}
+
+        {/* Labels with leader lines */}
+        {parts.map(p=>animPhase>=p.phase&&hoveredPart===p.id&&(
+          <g key={p.id+"label"} style={{animation:"fadeIn 0.2s"}}>
+            <rect x={p.labelX-(p.anchor==="start"?0:75)} y={p.labelY-28} width={150} height={32} rx={6}
+              fill="rgba(15,23,42,0.92)" stroke={p.color} strokeWidth="1"/>
+            <text x={p.labelX-(p.anchor==="start"?-8:67)} y={p.labelY-14} fontSize="9" fontWeight="700" fill={p.color}>{p.label}</text>
+            <text x={p.labelX-(p.anchor==="start"?-8:67)} y={p.labelY-4} fontSize="8" fill="#94a3b8">{p.severity} · {p.cost}</text>
+          </g>
+        ))}
+
+        {/* Scanning overlay text */}
+        {animPhase<6&&<text x="200" y="20" textAnchor="middle" fontSize="10" fontWeight="600" fill="#22d3ee" opacity="0.8" style={{animation:"pulse 1s infinite"}}>
+          {animPhase<2?"🔍 전면부 스캔 중...":animPhase<4?"🧠 파손 영역 분석 중...":"📊 손상도 판정 중..."}
+        </text>}
+        {animPhase>=6&&<text x="200" y="20" textAnchor="middle" fontSize="10" fontWeight="700" fill="#4ade80">✅ 감지 완료 — 6개 부위 · 파손 부위에 마우스를 올려보세요</text>}
+      </svg>
+      {/* Bottom legend */}
+      <div style={{display:"flex",gap:10,justifyContent:"center",marginTop:6,flexWrap:"wrap"}}>
+        {[{c:"#dc2626",l:"심각 (교체)"},{c:"#f97316",l:"높음 (교체/수리)"},{c:"#f59e0b",l:"중간 (교체)"},{c:"#8b5cf6",l:"캘리브레이션"}].map(v=>
+          <div key={v.l} style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:8,height:8,borderRadius:2,background:v.c}}/>
+            <span style={{fontSize:9,color:"#94a3b8"}}>{v.l}</span>
+          </div>
+        )}
+      </div>
+      {/* Cost summary */}
+      <div style={{marginTop:8,background:"rgba(8,145,178,0.08)",borderRadius:8,padding:"8px 12px",border:"1px solid rgba(8,145,178,0.2)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <span style={{fontSize:10,color:"#94a3b8"}}>AI 감지 총 예상 수리비</span>
+        </div>
+        <div style={{display:"flex",alignItems:"baseline",gap:4}}>
+          <span style={{fontSize:15,fontWeight:800,color:"#22d3ee",fontFamily:"'DM Mono',monospace"}}>₩4,630,000</span>
+          <span style={{fontSize:9,color:"#64748b"}}>부품+공임 (도장 별도)</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 function SB({label,value,onChange,opts}){return<div><label style={LB}>{label}</label><select value={value} onChange={e=>onChange(e.target.value)} style={SL}><option value="">선택</option>{opts.map(o=><option key={o} value={o}>{o}</option>)}</select></div>;}
 function IB({label,value,onChange,ph}){return<div><label style={LB}>{label}</label><input type="number" value={value} onChange={e=>onChange(e.target.value)} placeholder={ph} style={IN}/></div>;}
 function MC({label,value,ac,big}){return<div style={{background:"#fff",borderRadius:10,padding:"10px 12px",border:big?`2px solid ${ac}`:"1px solid #e2e8f0"}}><div style={{color:"#94a3b8",fontSize:10,fontWeight:600,marginBottom:2}}>{label}</div><div style={{color:ac||"#0f172a",fontSize:big?15:13,fontWeight:700,fontFamily:"'DM Mono',monospace"}}>{value}</div></div>;}
@@ -864,6 +984,9 @@ function Tab1(){
             </div>
           </div>}
         </div>
+
+        {/* AI 파손 감지 다이어그램 - Case 2 전용 */}
+        {useCase==="uc2"&&<div style={CD}><GV80DamageDiagram/></div>}
 
         {/* 파손 부위 - 카테고리 */}
         <div style={CD}>
@@ -1935,7 +2058,7 @@ export default function ClaimsAgentMVP({ onBack }){
   return(
     <div style={{width:"100%",height:"100vh",fontFamily:"'Noto Sans KR',-apple-system,sans-serif",background:"linear-gradient(155deg,#f8fafc,#f0f9ff 40%,#faf5ff 70%,#f8fafc)",color:"#0f172a",display:"flex",flexDirection:"column",overflow:"hidden"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
-        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
         select option{background:#fff;color:#0f172a}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}button:active{transform:scale(.98)}`}</style>
       <div style={{padding:"12px 26px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.85)",backdropFilter:"blur(10px)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
