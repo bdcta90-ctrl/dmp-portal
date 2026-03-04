@@ -1142,9 +1142,9 @@ function Tab1(){
             </div></div>
           <div style={{...CD,border:"1px solid #a5f3fc"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:"#0891b2",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
-            <span style={{fontSize:13,fontWeight:700}}>AI 분석</span>{!aD&&at&&<Sp s/>}</div>
+            <span style={{fontSize:13,fontWeight:700}}>AI 분석</span>{!aD&&at&&vehTab===0&&<Sp s/>}</div>
             {/* Vehicle Tab Selector for Case 2 */}
-            {useCase==="uc2"&&aD&&<div style={{display:"flex",gap:0,marginBottom:12,background:"#f1f5f9",borderRadius:10,padding:3}}>
+            {useCase==="uc2"&&at&&<div style={{display:"flex",gap:0,marginBottom:12,background:"#f1f5f9",borderRadius:10,padding:3}}>
               {[{l:"🚙 타사 차량 (GV80)",sub:"₩10,000,000 청구 검증"},{l:"🚗 자사 차량 (그랜저)",sub:"수리비 + 렌트 + 자차보험"},{l:"📊 보험사 총 지출 요약",sub:"합산 비용 · 시나리오 비교"}].map((t,i)=>
                 <button key={i} onClick={()=>setVehTab(i)} style={{flex:1,padding:"8px 6px",borderRadius:8,border:"none",cursor:"pointer",background:vehTab===i?"#fff":"transparent",boxShadow:vehTab===i?"0 1px 4px rgba(0,0,0,0.08)":"none",transition:"all .2s",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
                   <span style={{fontSize:11,fontWeight:vehTab===i?700:500,color:vehTab===i?(i===0?"#0891b2":i===1?"#7c3aed":"#059669"):"#94a3b8"}}>{t.l}</span>
@@ -1152,7 +1152,7 @@ function Tab1(){
                 </button>
               )}
             </div>}
-            <div style={{fontSize:12.5}}><RT text={useCase==="uc2"&&aD?(vehTab===0?tA:vehTab===1?UC_ESTIMATE_SELF:UC_ESTIMATE_TOTAL):tA}/></div></div>
+            <div style={{fontSize:12.5}}>{useCase==="uc2"&&vehTab===1?<RT text={UC_ESTIMATE_SELF}/>:useCase==="uc2"&&vehTab===2?<RT text={UC_ESTIMATE_TOTAL}/>:<RT text={tA}/>}</div></div>
         </div>}
       </div></div></>);
 }
