@@ -54,188 +54,6 @@ const DAMAGE_CATS = {
 };
 const ALL_PARTS = Object.values(DAMAGE_CATS).flat();
 const ACCIDENT_TYPES = ["후미추돌 — 직진 중 추돌","후미추돌 — 정차 중 추돌","신호위반 — 직진 충돌","신호위반 — 좌회전 충돌","차선변경 — 동일방향 접촉","차선변경 — 추월 중 접촉","중앙선침범 — 직진","중앙선침범 — 커브구간","교차로 — 직진 vs 좌회전","교차로 — 직진 vs 직진","주차장 — 통로 접촉","주차장 — 후진 접촉","후진사고 — 도로","후진사고 — 주차장","유턴사고","끼어들기 사고","도어개방 사고","비접촉사고","횡단보도 — 보행자","단독사고"];
-
-// ═══ USE CASE 데모 데이터 ═══
-const UC_ESTIMATE_RESPONSE = `## 🤖 AI 견적 검증 리포트 — GV80 프레스티지 (출고 3개월 신차)
-
-### 📊 타사 청구 견적 vs AI 산정 견적 비교
-
-| 항목 | 타사 청구 | AI 최소 견적 | AI 적정 견적 | **차이(절감 가능액)** |
-|------|----------|-------------|-------------|---------------------|
-| 프론트 범퍼 ASSY (상+하) | ₩1,800,000 | ₩1,050,000 | ₩1,350,000 | **▼ ₩450,000~750,000** |
-| 본넷(후드) 교체 | ₩1,200,000 | ₩850,000 | ₩980,000 | **▼ ₩220,000~350,000** |
-| 좌 헤드라이트(LED) | ₩1,500,000 | ₩1,200,000 | ₩1,350,000 | **▼ ₩150,000~300,000** |
-| 프론트 그릴 교체 | ₩450,000 | ₩280,000 | ₩350,000 | **▼ ₩100,000~170,000** |
-| 라디에이터 서포트 | ₩380,000 | ₩220,000 | ₩300,000 | **▼ ₩80,000~160,000** |
-| 전방 카메라/레이더 캘리브레이션 | ₩350,000 | ₩250,000 | ₩300,000 | **▼ ₩50,000~100,000** |
-| 공임 (탈거/조립/전체) | ₩1,200,000 | ₩700,000 | ₩900,000 | **▼ ₩300,000~500,000** |
-| 도장 (4면 이상) | ₩1,120,000 | ₩650,000 | ₩850,000 | **▼ ₩270,000~470,000** |
-| 렌트비 (벤츠 E-Class, 14일) | ₩2,000,000 | — | — | *(별도 검토)* |
-| **총계** | **₩10,000,000** | **₩5,200,000** | **₩6,380,000** | **▼ ₩3,620,000~4,800,000** |
-
-### ⚠️ 핵심 쟁점 식별
-
-**1. 🚨 렌트카 등급 부적정 — 벤츠 E-Class 요구**
-- GV80 프레스티지의 동급 렌트는 **GV80 또는 동급 국산 SUV**가 적정
-- 벤츠 E-Class는 **세단형으로 차종 불일치**, 등급 역시 과도
-- 💡 **AI 권고**: 대차 기준은 "동종·동급" 원칙 (대법원 2016다234567). 벤츠 E-Class → **GV80 또는 팰리세이드 대차**로 변경 시 일 ₩70,000~80,000 절감 → 14일 기준 **약 ₩980,000~1,120,000 절감 가능**
-
-**2. 🔧 공식 서비스센터 vs 제휴 정비망**
-- 출고 3개월 신차 → 보증 유지 관점에서 공식 서비스센터 요구에 **일정 부분 타당성 있음**
-- 그러나 사고 수리는 제조사 보증과 별개 (자동차관리법 제57조)
-- 💡 **AI 권고**: "보증 유지" 명목의 공식센터 고집은 법적 근거 약함. 단, 출고 3개월 감안하여 **순정부품 사용 조건으로 제휴 정비망** 제안 → 수리비 **15~20% 절감**
-
-**3. 📈 신차 감가 청구 가능성 대비**
-- 출고 3개월, 주행거리 추정 3,000km 이하 → **신차 감가 청구 가능성 매우 높음**
-- 대법원 판례(2017다251234): 출고 1년 이내, 수리비가 차량가액의 10% 초과 시 감가 인정
-- GV80 프레스티지 차량가액 약 65,000,000원, 수리비 10% = 6,500,000원 → **초과 가능성 있음**
-- 💡 **AI 권고**: 감가 청구 시 **차량가액의 10~15% (₩6,500,000~9,750,000)** 추가 청구 가능. 선제적 협상 필요
-
-### 💰 자사 고객 설명 자료 (납득용)
-
-> **"수리비 ₩6,380,000 + 렌트비 ₩980,000 = 총 ₩7,360,000으로 협의 가능합니다."**
-> 
-> 타사 청구 ₩10,000,000 대비 **₩2,640,000 절감**이며, 이는 다음 근거에 기반합니다:
-> - 유사 사고 5건 평균 수리비: ₩5,800,000~₩7,200,000 (AI 데이터 분석)
-> - 렌트 등급 정정: 벤츠 E-Class → GV80 동급 (법적 "동종동급" 원칙)
-> - 순정부품 보장으로 품질 타협 없음
-
-### 🔄 대안 시나리오
-
-| 시나리오 | 총 비용 | 자사 부담 | 비고 |
-|---------|---------|----------|------|
-| **A. 적극 협상** (제휴센터+동급렌트) | ₩7,360,000 | ₩7,360,000 | 최대 절감, 타사 반발 가능 |
-| **B. 절충안** (공식센터+동급렌트) | ₩8,600,000 | ₩8,600,000 | 신차 감안 양보, 합의 용이 |
-| **C. 타사 수용** (청구 그대로) | ₩10,000,000 | ₩10,000,000 | 리스크 없음, 비용 최대 |
-
-**✅ AI 최종 권고: B안 (절충안)** — 출고 3개월 신차 특수성을 인정하되, 렌트 등급을 정정하여 ₩1,400,000 절감. 자사 고객에게는 "순정부품+공식센터 보장"으로 충분히 설명 가능.
-
-※ 유사 사고 사례 3건 참조: CLM-2024-0891(GV80/전면충돌/₩6,200,000), CLM-2024-1203(팰리세이드/전면/₩5,800,000), CLM-2025-0042(GV80/대향충돌/₩5,200,000)`;
-
-const UC_FAULT_RESPONSE = `## ⚖️ AI 과실 종합 분석 리포트 — 차선변경 사고
-
-### 📋 사고 개요
-| 항목 | A차 (자사 고객) | B차 (타사 고객) |
-|------|---------------|---------------|
-| 행위 | 차선변경 진입 | 직진 주행 |
-| 주장 | "사이드미러 확인 후 진입, B차가 갑자기 가속" | "A차가 깜박이와 동시에 끼어들었다" |
-| 손상 | 우측 후방 | 좌측 전방 |
-
-### 🔍 AI 다요인 과실 분석 (8개 요소 종합)
-
-**1️⃣ 기본 과실 (손해보험협회 기준표)**
-- 사고유형: **차선변경 — 동일방향 접촉**
-- 기준표 기본 과실: **A차 70% : B차 30%**
-
-**2️⃣ 수정요소 분석**
-
-| 수정요소 | 적용 여부 | A차 과실 조정 | 근거 |
-|---------|----------|-------------|------|
-| 방향지시등 미점등/동시점등 | **적용 가능** | **+10~15%** | B차 주장 "깜박이와 동시 진입" → 충분한 예고 없이 차선변경 |
-| B차 속도 위반/급가속 | **입증 필요** | -5~10% | A차 주장이나 블랙박스 없이 입증 곤란 |
-| 안전거리 미확보 | 중립 | 0% | 쌍방 주장 상충 |
-| 차선변경 완료 직전 충돌 | **적용 가능** | +5% | 피해부위(A 우측후방) → 차선변경 미완료 상태 추정 |
-
-**3️⃣ 📊 AI 종합 과실 산정**
-
-> ### **🎯 AI 판정: A차(자사) 85% : B차(타사) 15%**
-> *(양 보험사 협의안 90:10 대비 자사에 5% 유리)*
-
-**산정 근거:**
-- 기본 70% + 방향지시등 미비 +10% + 차선변경 미완료 +5% = **85%**
-- B차 급가속 주장은 증거 부재로 반영 불가 (블랙박스·CCTV 미확보)
-
-### ⚡ 타사 고객 "10:0 주장" 대응 분석
-
-**타사 주장의 법적 타당성 검토:**
-- 대법원 2018다456789: "차선변경 차량이 직진 차량의 진로를 방해한 경우에도, **직진 차량의 전방주시의무 및 속도조절의무**는 면제되지 않는다"
-- 💡 **10:0은 법적으로 인정받기 극히 어려움** — 직진 차량에도 최소 **5~15%** 주의의무 존재
-- B차의 **급가속 의혹**이 있어 10:0은 더욱 부적절
-
-### 🏥 대인 접수 분석
-
-| 항목 | B차(타사) 대인 접수 | A차(자사) 대인 접수 |
-|------|-------------------|-------------------|
-| 접수 의향 | ✅ 접수 예정 | ⚠️ 접수 고민 중 |
-| 상해 가능성 | 측면 충돌 → 경추 통증 가능 | 차선변경측 → 충격 비교적 작음 |
-| 예상 등급 | 14급 (경추 염좌) | 14급 가능 |
-| 예상 합의금 | ₩3,000,000~5,000,000 | ₩2,000,000~3,500,000 |
-| 과실 상계 | A과실 85% 적용 | B과실 15% 적용 |
-| **자사 부담** | **₩2,550,000~4,250,000** | **₩300,000~525,000** |
-
-### 🔄 최적 협상 전략
-
-**[1안] 85:15 + 쌍방 대인 (AI 권고안)**
-- A과실 85%로 양 보험사 협의안(90:10)보다 **5% 유리하게 확보**
-- 자사 고객도 대인 접수 → B과실 15% 상계로 일부 보상 수령
-- 타사 고객 10:0 주장 → "판례상 직진차 주의의무 존재" 근거로 반박
-- **자사 총 예상 비용: ₩2,850,000~4,775,000**
-
-**[2안] 90:10 수용 + 대인 상호 취하 유도**
-- 양 보험사 원안 수용하되, 대인 접수를 쌍방 취하하도록 유도
-- 대인 취하 시 양측 합의금 절감 → **자사 총 비용 대폭 감소**
-- 💡 타사에 "쌍방 대인 취하" 패키지 제안이 효과적
-
-**[3안] 분쟁조정 (과실심의위원회)**
-- 블랙박스·CCTV 등 추가 증거 확보 후 과실심의위원회 회부
-- 증거에 따라 **80:20까지 유리하게 조정 가능**
-- ⚠️ 소요기간 2~4주, 결과 불확실성 존재
-
-**✅ AI 최종 권고: 1안 우선 시도 → 타사 거부 시 2안으로 전환**
-- 핵심 화법: "판례와 과실 기준표에 따르면 직진 차량에도 전방주시의무가 있어 10:0은 인정되지 않습니다. 85:15가 양측 모두에게 공정한 비율입니다."`;
-
-const UC_PROCESS_RESPONSE = `[{"title":"🏆 최적안: 쌍방 절충 패키지","subtitle":"과실 50:50 근사 + 각자 동급 렌트 + 대인 합리화","cost":"₩18,700,000","period":"협상 3~5일 + 수리 14~21일","satisfaction":4.5,"pros":["과실 50:50 근사 협상으로 쌍방 수용 가능","BMW 렌트 → 5시리즈(동급)로 정정, 일 ₩50,000 절감","타사 수리비 ₩25,000,000 → ₩18,000,000으로 협상 (제휴센터+순정부품)","대인 5명 → 경상 합의 패키지로 총 ₩8,000,000 이내 처리","**자사 보험사 총 손실: 약 ₩15,000,000 (최대 ₩8,500,000 절감)**"],"cons":["타사 고객이 공식 BMW센터 고집 시 추가 협상 필요","과실 50:50 합의까지 시간 소요 가능"],"recommended":true},{"title":"⚡ 신속안: 자사 유리 과실 + 비용 최소화","subtitle":"과실 30(자사):70(타사) 주장 관철 + 수리비 검증","cost":"₩11,200,000","period":"협상 5~7일 + 수리 14일","satisfaction":3.8,"pros":["교차로 진입 우선권 + 주도로 주장 근거로 30:70 관철","타사 수리비 ₩25,000,000 중 자사 부담 30%=₩7,500,000만 인정","BMW 렌트 동급 정정(5시리즈) + 기간 단축","**자사 보험사 총 손실: 약 ₩11,200,000 (최대 ₩13,000,000 절감)**","자사 고객 수리비 ₩5,000,000은 타사 70% 부담=₩3,500,000 회수"],"cons":["타사와 과실 분쟁 장기화 가능","타사 고객 강력 반발 예상 (7:3 주장 중이므로)","과실심의위원회 회부 리스크"],"recommended":false},{"title":"🤝 안전안: 과실 40:60 타협 + 대인 일괄 합의","subtitle":"적정 과실 합의 + 전체 건 일괄 패키지 종결","cost":"₩14,800,000","period":"협상 2~3일 + 수리 14~21일","satisfaction":4.2,"pros":["과실 40(자사):60(타사)로 양측 모두 1차 주장에서 양보한 형태","BMW 수리비 적정 검증 후 ₩20,000,000 수준 합의","대인 5명(타사3+자사2) 일괄 합의로 건당 관리 효율화","렌트: 양측 동급 차량으로 각 14일 이내","**자사 보험사 총 손실: 약 ₩14,800,000**","빠른 종결로 추가 분쟁 비용 방지"],"cons":["자사 고객이 40% 과실에 불만 가능","타사 7:3 주장 대비 자사에 소폭 불리"]}]`;
-
-const UC_PROCESS_AI_ANALYSIS = `## 🤖 AI 종합 분석 — 교차로 골목길 충돌 사고
-
-### 📋 사고 개요
-| 구분 | 자사 고객 (A) | 타사 고객 (B) |
-|------|-------------|-------------|
-| **차량** | 현대 그랜저 | BMW 7시리즈 |
-| **수리비** | ₩5,000,000 | ₩25,000,000 (청구) |
-| **렌트** | 그랜저 (동급) | BMW 7시리즈 (요구) |
-| **대인** | 2명 (운전자+동승자1) | 3명 (운전자+동승자2) |
-| **과실 주장** | 3(자사):7(타사) | 7(자사):3(타사) |
-
-### ⚠️ AI가 식별한 핵심 쟁점 5가지
-
-**1. 🚧 "주도로" 분쟁 — 데이터 기반 판별 필요**
-- 양측 모두 "내 길이 주도로"라고 주장 → **도로 폭·교통량 데이터 확인 필수**
-- 💡 AI 분석: 교차로 골목길 사고 시 도로 폭이 **1.5배 이상 넓은 도로가 주도로**로 인정 (손해보험협회 기준)
-- 주도로 진입차에 **10~15% 과실 감경** 적용
-
-**2. 💰 BMW 7시리즈 수리비 ₩25,000,000 적정성 검증**
-- BMW 7시리즈 OEM 부품 단가: 국산차 대비 **평균 2.8~3.5배**
-- 그러나 동일 손상도 기준, AI 유사사고 분석 결과 **적정 수리비 ₩17,000,000~20,000,000**
-- 💡 **₩5,000,000~8,000,000 과다 청구 가능성** → 세부 항목별 단가 검증 권고
-
-**3. 🚗 렌트카 등급 쟁점**
-- 타사 BMW 7시리즈 렌트 일 ₩350,000~400,000 → 14일 기준 **₩4,900,000~5,600,000**
-- 💡 대법원 판례: "동종·동급" 원칙이나, BMW 7시리즈급 렌트 자체가 시장에 희소
-- **AI 권고**: BMW 5시리즈 렌트(일 ₩200,000~250,000)로 협상 → **₩2,100,000~2,800,000 절감**
-
-**4. 🏥 대인 5명 (자사2+타사3) 처리 전략**
-- 총 대인 합의금 예상: **₩12,000,000~20,000,000**
-- 과실 비율에 따라 자사 부담 크게 변동
-- 💡 **"대인 일괄 합의 패키지"로 총액 관리** 필요
-
-**5. ⚖️ 과실 비율 — AI 판정 근거**
-- 교차로 골목길: 기본 과실 **50:50**
-- 속도 주장 (서로 상대방이 과속): 증거 없이는 중립
-- "먼저 진입" 주장: 선진입 차량에 **5~10% 유리** (입증 시)
-- 💡 **AI 판정: 45(자사):55(타사) ~ 50:50이 적정** (증거 추가 확보 시 조정 가능)
-
-### 💡 자사 보험사 손실 최소화 시뮬레이션
-
-| 시나리오 | 과실 | 자사 수리비 부담 | 타사 수리비 부담 | 렌트 | 대인 | **자사 총 손실** |
-|---------|------|----------------|----------------|------|------|----------------|
-| 타사 주장대로 | 70:30 | ₩3,500,000 | ₩17,500,000 | ₩5,600,000 | ₩14,000,000 | **₩24,100,000** |
-| AI 적정 판정 | 50:50 | ₩2,500,000 | ₩10,000,000 | ₩2,800,000 | ₩8,000,000 | **₩15,300,000** |
-| 자사 주장대로 | 30:70 | ₩1,500,000 | ₩7,500,000 | ₩2,100,000 | ₩5,000,000 | **₩11,200,000** |
-
-> **자사 주장(30:70) 관철 시 vs 타사 주장(70:30) 수용 시 → 최대 ₩12,900,000 차이 발생**`;
-
-const UC_PROCESS_SUMMARY = `{"업무영역":"자동차 손해사정","핵심쟁점":"교차로 골목길 충돌 — 과실 분쟁 + 고액 수리비 + 대인 5명","차량":"자사 그랜저 / 타사 BMW 7시리즈","추정비용":"자사 총 손실 ₩15,000,000~24,000,000 범위","긴급도":"높음 — 과실 합의 + 수리비 검증 + 대인 합의 동시 진행 필요","주의사항":"타사 수리비 과다 청구 가능성 높음, 렌트 등급 반드시 정정, 대인 일괄 합의 추진"}`;
 const ROAD_TYPES=["편도1차로","편도2차로","편도3차로이상","고속도로","골목길/이면도로","교차로","회전교차로","주차장내"];
 const WEATHER_TYPES=["맑음","흐림","비","눈","안개","야간"];
 const SIGNAL_STATES=["녹색신호","황색신호","적색신호","비보호좌회전","점멸","신호없음"];
@@ -382,64 +200,15 @@ const IC={
 };
 
 // ═══ SHARED ═══
-function RB({text}){
-  if(!text)return text;
-  const parts=text.split(/(\*\*.*?\*\*)/g);
-  return parts.map((p,i)=>{
-    if(p.startsWith("**")&&p.endsWith("**")){
-      const inner=p.slice(2,-2);
-      // Color highlights for key values
-      if(inner.startsWith("▼"))return<strong key={i} style={{color:"#dc2626",fontWeight:800}}>{inner}</strong>;
-      if(inner.startsWith("₩")||inner.match(/^\d.*원/))return<strong key={i} style={{color:"#0891b2",fontWeight:800}}>{inner}</strong>;
-      if(inner.match(/^\d+%/)||inner.match(/\d+:\d+/))return<strong key={i} style={{color:"#7c3aed",fontWeight:800}}>{inner}</strong>;
-      if(inner.startsWith("✅")||inner.startsWith("AI"))return<strong key={i} style={{color:"#059669",fontWeight:800}}>{inner}</strong>;
-      if(inner.startsWith("🎯"))return<strong key={i} style={{color:"#dc2626",fontWeight:800,fontSize:"105%"}}>{inner}</strong>;
-      return<strong key={i} style={{color:"#0f172a",fontWeight:700}}>{inner}</strong>;
-    }
-    return p;
-  });
-}
-function RT({text}){if(!text)return null;
-  const lines=text.split("\n");
-  const result=[];let i=0;
-  while(i<lines.length){
-    const l=lines[i];
-    // Table detection
-    if(l.includes("|")&&l.trim().startsWith("|")){
-      const tableLines=[];
-      while(i<lines.length&&lines[i].includes("|")&&lines[i].trim().startsWith("|")){tableLines.push(lines[i]);i++;}
-      if(tableLines.length>=2){
-        const parseRow=r=>r.split("|").filter((_,idx,arr)=>idx>0&&idx<arr.length-1).map(c=>c.trim());
-        const headers=parseRow(tableLines[0]);
-        const isSep=tableLines[1]&&tableLines[1].match(/^[\|\s\-:]+$/);
-        const dataStart=isSep?2:1;
-        result.push(<div key={"t"+i} style={{overflowX:"auto",margin:"8px 0"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:11,lineHeight:1.5}}>
-          <thead><tr style={{borderBottom:"2px solid #e2e8f0"}}>{headers.map((h,hi)=><th key={hi} style={{textAlign:"left",padding:"6px 8px",color:"#0f172a",fontWeight:700,background:"#f8fafc",fontSize:10.5,whiteSpace:"nowrap"}}>{RB({text:h})}</th>)}</tr></thead>
-          <tbody>{tableLines.slice(dataStart).map((row,ri)=>{const cells=parseRow(row);return<tr key={ri} style={{borderBottom:"1px solid #f1f5f9",background:ri%2===0?"#fff":"#fafbfc"}}>{cells.map((c,ci)=><td key={ci} style={{padding:"5px 8px",color:"#475569",fontSize:10.5}}>{RB({text:c})}</td>)}</tr>;})}</tbody>
-        </table></div>);
-        continue;
-      }
-    }
-    // Blockquote
-    if(l.startsWith("> ")){
-      const bqLines=[];
-      while(i<lines.length&&(lines[i].startsWith("> ")||lines[i].startsWith(">"))){bqLines.push(lines[i].replace(/^>\s?/,""));i++;}
-      result.push(<div key={"bq"+i} style={{borderLeft:"3px solid #0891b2",background:"#f0fdfa",padding:"10px 14px",margin:"8px 0",borderRadius:"0 8px 8px 0"}}>
-        {bqLines.map((bl,bi)=><div key={bi} style={{margin:"2px 0",color:"#134e4a",fontSize:12,fontWeight:bl.startsWith("**")?700:400}}>{RB({text:bl})}</div>)}
-      </div>);
-      continue;
-    }
-    if(l.startsWith("###"))result.push(<h4 key={i} style={{color:"#0891b2",margin:"11px 0 3px",fontSize:13,fontWeight:700}}>{RB({text:l.replace(/^###\s*/,"")})}</h4>);
-    else if(l.startsWith("##"))result.push(<h3 key={i} style={{color:"#0f172a",margin:"13px 0 5px",fontSize:14.5,fontWeight:700}}>{RB({text:l.replace(/^##\s*/,"")})}</h3>);
-    else if(l.startsWith("**")&&l.endsWith("**"))result.push(<p key={i} style={{fontWeight:700,color:"#0f172a",margin:"5px 0"}}>{RB({text:l})}</p>);
-    else if(l.startsWith("- ")||l.startsWith("• "))result.push(<div key={i} style={{paddingLeft:14,margin:"2px 0",color:"#475569"}}><span style={{color:"#0891b2",marginRight:7,fontSize:8}}>●</span>{RB({text:l.replace(/^[-•]\s*/,"")})}</div>);
-    else if(l.startsWith("※")||l.startsWith("⚠"))result.push(<p key={i} style={{color:"#d97706",margin:"4px 0",fontSize:12}}>{RB({text:l})}</p>);
-    else if(!l.trim())result.push(<div key={i} style={{height:4}}/>);
-    else result.push(<p key={i} style={{margin:"2px 0",color:"#475569"}}>{RB({text:l})}</p>);
-    i++;
-  }
-  return<div style={{lineHeight:1.75}}>{result}</div>;
-}
+function RT({text}){if(!text)return null;return<div style={{lineHeight:1.75}}>{text.split("\n").map((l,i)=>{
+  if(l.startsWith("###"))return<h4 key={i} style={{color:"#0891b2",margin:"11px 0 3px",fontSize:13,fontWeight:700}}>{l.replace(/^###\s*/,"")}</h4>;
+  if(l.startsWith("##"))return<h3 key={i} style={{color:"#0f172a",margin:"13px 0 5px",fontSize:14.5,fontWeight:700}}>{l.replace(/^##\s*/,"")}</h3>;
+  if(l.startsWith("**")&&l.endsWith("**"))return<p key={i} style={{fontWeight:700,color:"#0f172a",margin:"5px 0"}}>{l.replace(/\*\*/g,"")}</p>;
+  if(l.startsWith("- ")||l.startsWith("• "))return<div key={i} style={{paddingLeft:14,margin:"2px 0",color:"#475569"}}><span style={{color:"#0891b2",marginRight:7,fontSize:8}}>●</span>{l.replace(/^[-•]\s*/,"").replace(/\*\*(.*?)\*\*/g,"$1")}</div>;
+  if(l.startsWith("※")||l.startsWith("⚠"))return<p key={i} style={{color:"#d97706",margin:"4px 0",fontSize:12}}>{l}</p>;
+  if(!l.trim())return<div key={i} style={{height:4}}/>;
+  return<p key={i} style={{margin:"2px 0",color:"#475569"}}>{l.replace(/\*\*(.*?)\*\*/g,"$1")}</p>;
+})}</div>;}
 function Sp({s}){return<div style={{width:s?13:17,height:s?13:17,border:"2px solid #e2e8f0",borderTop:"2px solid #0891b2",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/>;}
 function Em({text}){return<div style={{height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#94a3b8",gap:10,minHeight:260}}><div style={{width:48,height:48,borderRadius:14,background:"#f8fafc",display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid #e2e8f0"}}>{IC.car}</div><div style={{fontSize:13,textAlign:"center",maxWidth:280}}>{text}</div></div>;}
 function SB({label,value,onChange,opts}){return<div><label style={LB}>{label}</label><select value={value} onChange={e=>onChange(e.target.value)} style={SL}><option value="">선택</option>{opts.map(o=><option key={o} value={o}>{o}</option>)}</select></div>;}
@@ -465,14 +234,6 @@ function Tab1(){
   const[aiProgress,setAiProgress]=useState({step:0,msg:""});
   const{displayed:tA,done:aD}=useTW(at);
   const fr=useRef(null);
-  const[useCase,setUseCase]=useState(null);
-
-  const loadUC2=()=>{
-    setOrigin("국산");sMk("제네시스");sMd("GV80");sYr("2025");sMl("3000");
-    sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터","전방 카메라/센서"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc2");
-    setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 전면부 광범위 파손 — 범퍼 ASSY 교체, 본넷 교체, 헤드라이트 교체 필요. 라디에이터 서포트 손상 의심."});
-  };
 
   const filteredMakes=VEHICLE_DB.filter(v=>origin==="전체"||v.origin===origin);
   const makeEntry=VEHICLE_DB.find(v=>v.make===mk);
@@ -558,22 +319,13 @@ function Tab1(){
     const bd=sp.map(p=>{const base=PP[p]||{p:[120000,280000],l:[80000,200000]};const pc=Math.round(R(base.p[0],base.p[1])*m);const lc=Math.round(R(base.l[0],base.l[1])*m);return{pt:p,pc,lc,t:pc+lc};});
     const tp=bd.reduce((s,b)=>s+b.pc,0),tl=bd.reduce((s,b)=>s+b.lc,0),pt=Math.round(sp.length*R(60000,160000)*m);
     sRs({bd,tp,tl,pt,gt:tp+tl+pt,vh:`${mk} ${md} ${yr||""}`});
-    const a=useCase==="uc2"?UC_ESTIMATE_RESPONSE:await callAI("당신은 자동차 손해사정 전문 AI입니다. 견적 분석을 간결하게 해주세요.",
+    const a=await callAI("당신은 자동차 손해사정 전문 AI입니다. 견적 분석을 간결하게 해주세요.",
       `차량:${mk} ${md} ${yr||"미상"}년식 (${isImport?"외산":"국산"}${isSuper?" 슈퍼카":""})\n파손:${sp.join(",")}(${sv})\n사진:${ph.length}장\n견적:부품${F(tp)},공임${F(tl)},도장${F(pt)},합계${F(tp+tl+pt)}\n\n견적 적정성, 수리vs교환, 미수선처리, ADAS캘리브레이션, 부품수급 등을 분석해주세요.`);
     sAt(a);sLd(false);
   };
 
-  return(<>
-    {/* Use Case Demo Button */}
-    <div style={{background:useCase==="uc2"?"linear-gradient(135deg,#eff6ff,#dbeafe)":"#f8fafc",borderRadius:12,padding:"10px 14px",marginBottom:12,border:useCase==="uc2"?"2px solid #3b82f6":"1px dashed #cbd5e1",display:"flex",alignItems:"center",justifyContent:"space-between",transition:"all .3s"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:15}}>📋</span>
-        <div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc2"?"#1e40af":"#64748b"}}>Use Case 데모</div>
-        <div style={{fontSize:9.5,color:"#94a3b8"}}>Case 2: 주차장 사고 — GV80 신차(3개월) 수리비 ₩10,000,000 검증</div></div>
-      </div>
-      <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
-    </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"calc(100% - 58px)"}}>
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"100%"}}>
       {/* Photo Preview Modal */}
       {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
         <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"85vw",maxHeight:"85vh",display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
@@ -758,7 +510,7 @@ function Tab1(){
             <span style={{fontSize:13,fontWeight:700}}>AI 분석</span>{!aD&&at&&<Sp s/>}</div>
             <div style={{fontSize:12.5}}><RT text={tA}/></div></div>
         </div>}
-      </div></div></>);
+      </div></div>);
 }
 
 // ═══ TAB 2: 과실 (확장) ═══
@@ -777,15 +529,6 @@ function Tab2(){
   const bbRef=useRef(null);const prRef=useRef(null);const cctvRef=useRef(null);const witRef=useRef(null);
   // AI 프로그레스
   const[aiProg,setAiProg]=useState({step:0,msg:"",pct:0});
-  const[useCase,setUseCase]=useState(null);
-
-  const loadUC3=()=>{
-    sAt("차선변경 — 동일방향 접촉");sRt("편도2차로");sWt("맑음");sSg("신호없음");
-    sMd("사이드미러로 확인 후 차선변경을 시도했으나, 상대 차량(B)이 갑자기 속력을 올려 충돌하였음. 방향지시등은 켠 상태였으며, 충분한 거리를 확보하고 진입하였다고 주장.");
-    sOd("A차가 깜박이를 킴과 동시에 바로 진입해왔다. 미처 피할 수 없었음. 나는 정상 속도로 직진 중이었고, 갑자기 끼어들어 충돌한 것이다. A차 과실 100%를 주장한다. 대인 접수도 하겠다.");
-    sDc(false);sPr(false);sCctv(false);sWit(false);
-    sRs(null);sAi("");setUseCase("uc3");
-  };
 
   const calc=async()=>{if(!at)return;sLd(true);sRs(null);sAi("");
     const steps=[
@@ -861,7 +604,7 @@ function Tab2(){
     if(evCount>0)factors.push({label:"증거",val:evCount+"건",impact:"유리"});
     setAiProg({step:steps.length,total:steps.length,msg:"⚡ AI 엔진 최종 판단 중...",pct:90});
     sRs({mf:b,of:100-b,cf,evCount,fileCount,phCount:ph.length,factors,stmtAdj});
-    const a=useCase==="uc3"?UC_FAULT_RESPONSE:await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
+    const a=await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
       `사고:${at}\n도로:${rt||"미상"},날씨:${wt||"미상"},신호:${sg||"미상"}\n증거:블랙박스(${dc?"있음":"없음"}),경찰보고서(${pr?"있음":"없음"}),CCTV(${cctv?"있음":"없음"}),목격자(${wit?"있음":"없음"})\n사진:${ph.length}장\nA차 진술:${mD||"없음"}\nB차 진술:${oD||"없음"}\n결과:A${b}%/B${100-b}%\n분석해주세요.`);
     setAiProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
     await new Promise(r=>setTimeout(r,400));
@@ -875,17 +618,8 @@ function Tab2(){
     {emoji:"🔢",label:"상대 번호판",desc:"상대 차량 번호판 (필요시)"},
   ];
 
-  return(<>
-    {/* Use Case Demo Button */}
-    <div style={{background:useCase==="uc3"?"linear-gradient(135deg,#f5f3ff,#ede9fe)":"#f8fafc",borderRadius:12,padding:"10px 14px",marginBottom:12,border:useCase==="uc3"?"2px solid #7c3aed":"1px dashed #cbd5e1",display:"flex",alignItems:"center",justifyContent:"space-between",transition:"all .3s"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:15}}>⚖️</span>
-        <div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc3"?"#5b21b6":"#64748b"}}>Use Case 데모</div>
-        <div style={{fontSize:9.5,color:"#94a3b8"}}>Case 3: 차선변경 사고 — 과실 9:1 vs 10:0 분쟁 + 쌍방 대인</div></div>
-      </div>
-      <button onClick={()=>{if(useCase==="uc3"){setUseCase(null);sAt("");sRt("");sWt("");sSg("");sMd("");sOd("");sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setAiProg({step:0,msg:"",pct:0});}else{loadUC3();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc3"?"#ef4444":"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc3"?"초기화":"Case 3 불러오기"}</button>
-    </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"calc(100% - 58px)"}}>
+  return(
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"100%"}}>
       {/* Photo Preview Modal */}
       {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
         <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"85vw",maxHeight:"85vh",display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
@@ -1051,7 +785,7 @@ function Tab2(){
             <div style={{width:22,height:22,borderRadius:"50%",background:"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
             <span style={{fontSize:13,fontWeight:700}}>AI 과실 분석</span>{!aD&&ai&&<Sp s/>}</div>
             <div style={{fontSize:12.5}}><RT text={tA}/></div></div></div>}
-      </div></div></>);
+      </div></div>);
 }
 
 // ═══ TAB 3: 처리 방법 (확장) ═══
@@ -1068,32 +802,6 @@ function Tab3(){
   // intake Q&A
   const[intakeQs,setIntakeQs]=useState([]);const[intakeAs,setIntakeAs]=useState({});
   const[intakeProg,setIntakeProg]=useState({step:0,msg:"",pct:0});
-  const[useCase,setUseCase]=useState(null);
-
-  const loadUC1=()=>{
-    setInput(`[교차로 골목길 충돌 사고 — Case 1]
-사고유형: 교차로 직진 vs 직진 (골목길)
-자사 고객 (A): 현대 그랜저
-  - 수리비: ₩5,000,000
-  - 렌트: 그랜저 (동급)
-  - 대인: 2명 (운전자 + 동승자 1명)
-  - 과실 주장: A 30% : B 70%
-  - 주장: "규정속도 준수, 내 도로가 주도로, 먼저 진입"
-타사 고객 (B): BMW 7시리즈
-  - 수리비: ₩25,000,000 (청구)
-  - 렌트: BMW 7시리즈 요구
-  - 대인: 3명 (운전자 + 동승자 2명)
-  - 과실 주장: A 70% : B 30%
-  - 주장: "빠른속도로 진입, 내 도로가 주도로, 먼저 진입"
-핵심쟁점:
-  1. 과실 분쟁 (30:70 vs 70:30)
-  2. BMW 수리비 적정성 (₩25,000,000)
-  3. BMW 7시리즈 렌트 적정성
-  4. 대인 5명 처리 (타사3+자사2)
-  5. 자사 보험사 손실 최소화 + 자사 고객 만족`);
-    setCustPref("insurance");setUseCase("uc1");
-    setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});
-  };
 
   const CUST_PREFS=[
     {id:"cash",label:"💰 현금 수령 선호",desc:"미수선 처리로 최대 보상금 확보",short:"현금선호"},
@@ -1157,11 +865,11 @@ function Tab3(){
       setIntakeProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*85)});
       await new Promise(r=>setTimeout(r,steps[i].delay));
     }
-    const sR=useCase==="uc1"?UC_PROCESS_SUMMARY:await callAI("손해사정 전문 AI. JSON만 응답:\n{\"업무영역\":\"\",\"핵심쟁점\":\"\",\"차량\":\"\",\"추정비용\":\"\",\"긴급도\":\"높음/보통/낮음\",\"주의사항\":\"\"}",fullInput);
+    const sR=await callAI("손해사정 전문 AI. JSON만 응답:\n{\"업무영역\":\"\",\"핵심쟁점\":\"\",\"차량\":\"\",\"추정비용\":\"\",\"긴급도\":\"높음/보통/낮음\",\"주의사항\":\"\"}",fullInput);
     let sO;try{sO=JSON.parse(sR.replace(/```json|```/g,"").trim())}catch{sO={업무영역:"자동차 손해사정",핵심쟁점:"수리 방법 결정",차량:"확인 필요",추정비용:"산정 중",긴급도:"보통",주의사항:""}}
     setSummary(sO);
     setIntakeProg({step:steps.length,total:steps.length,msg:"📊 리포트 작성 중...",pct:92});
-    const nR=useCase==="uc1"?UC_PROCESS_AI_ANALYSIS:await callAI("손해사정 전문 AI. 2-3줄로 사고건을 정리해주세요.",`정리:\n${fullInput}`);setSumText(nR);
+    const nR=await callAI("손해사정 전문 AI. 2-3줄로 사고건을 정리해주세요.",`정리:\n${fullInput}`);setSumText(nR);
     // 비용 산출
     const costMatch=fullInput.match(/(\d{1,3}[,.]?\d{3}[,.]?\d{0,3})/);
     const c=costMatch?parseInt(costMatch[1].replace(/[,.]/g,"")):selCase?.cost||2000000;
@@ -1170,7 +878,7 @@ function Tab3(){
     const rentalDaily=hasRental?70000:0;
     // 스마트 추천 엔진
     const rec=calcRecommendation(custPref,c,hasRental,rentalDaily);
-    const pR=useCase==="uc1"?UC_PROCESS_RESPONSE:await callAI("손해사정 전문 AI. 3가지 처리방법 JSON배열만:\n[{\"title\":\"\",\"subtitle\":\"\",\"cost\":\"금액\",\"period\":\"기간\",\"satisfaction\":4.5,\"pros\":[],\"cons\":[],\"recommended\":false}]\n순서:(1)미수선(2)제휴(3)공식",fullInput);
+    const pR=await callAI("손해사정 전문 AI. 3가지 처리방법 JSON배열만:\n[{\"title\":\"\",\"subtitle\":\"\",\"cost\":\"금액\",\"period\":\"기간\",\"satisfaction\":4.5,\"pros\":[],\"cons\":[],\"recommended\":false}]\n순서:(1)미수선(2)제휴(3)공식",fullInput);
     let pA;try{pA=JSON.parse(pR.replace(/```json|```/g,"").trim())}catch{
       pA=[
         {title:"미수선 처리",subtitle:"현금정산(협의금)",cost:F(Math.round(c*.72)),period:"3~5일",satisfaction:3.8,
@@ -1414,17 +1122,8 @@ function Tab3(){
 
   const CI=[IC.cs,IC.wr,IC.sh],CC=["#0891b2","#7c3aed","#2563eb"],CB=["#ecfeff","#f5f3ff","#eff6ff"],CR=["#a5f3fc","#c4b5fd","#bfdbfe"];
 
-  return(<>
-    {/* Use Case Demo Button */}
-    <div style={{background:useCase==="uc1"?"linear-gradient(135deg,#ecfdf5,#d1fae5)":"#f8fafc",borderRadius:12,padding:"10px 14px",marginBottom:12,border:useCase==="uc1"?"2px solid #059669":"1px dashed #cbd5e1",display:"flex",alignItems:"center",justifyContent:"space-between",transition:"all .3s"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:15}}>🚗</span>
-        <div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc1"?"#065f46":"#64748b"}}>Use Case 데모</div>
-        <div style={{fontSize:9.5,color:"#94a3b8"}}>Case 1: 교차로 충돌 — 그랜저 vs BMW 7시리즈, 과실 분쟁 + 고액 수리비 + 대인 5명</div></div>
-      </div>
-      <button onClick={()=>{if(useCase==="uc1"){setUseCase(null);setInput("");setCustPref("");setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});}else{loadUC1();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc1"?"#ef4444":"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc1"?"초기화":"Case 1 불러오기"}</button>
-    </div>
-    <div style={{display:"flex",flexDirection:"column",height:"calc(100% - 58px)"}}>
+  return(
+    <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
       {modal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.2)",backdropFilter:"blur(3px)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setModal(false)}>
         <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:18,padding:24,width:580,maxHeight:"68vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 16px 48px rgba(0,0,0,.1)"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
@@ -1735,7 +1434,7 @@ function Tab3(){
               <span style={{color:CC[idx]}}>{CI[idx]}</span><span style={{fontSize:12,fontWeight:600,color:"#334155"}}>{p.title}</span>
               <span style={{marginLeft:"auto",color:CC[idx]}}>{IC.arr}</span></button>)}</div></div>
       </div>}
-    </div></>);
+    </div>);
 }
 
 // ═══ MAIN ═══
