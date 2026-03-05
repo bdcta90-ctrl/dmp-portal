@@ -2023,20 +2023,22 @@ function Tab2(){
     const cf=evCount>=3&&fileCount>=2?"매우 높음":evCount>=2?"높음":evCount>=1?"보통":"낮음";
     // 산정 근거 태그
     const factors=[];
-    if(typeIdx>=0)factors.push({label:"사고유형",val:at.split(" — ")[0],impact:FAULT_MAP[typeIdx]<30?"유리":"주의"});
-    if(rt)factors.push({label:"도로",val:rt,impact:(roadAdj[rt]||0)>0?"불리":"유리"});
-    if(wt&&wt!=="맑음")factors.push({label:"날씨",val:wt,impact:"불리"});
-    if(sg)factors.push({label:"신호",val:sg,impact:(sigAdj[sg]||0)<0?"유리":"불리"});
-    if(stmtAdj!==0)factors.push({label:"진술분석",val:stmtAdj<0?"A유리":"B유리",impact:stmtAdj<0?"유리":"불리"});
-    if(evCount>0)factors.push({label:"증거",val:evCount+"건",impact:"유리"});
+    const baseFault=typeIdx>=0?FAULT_MAP[typeIdx]:50;
+    if(typeIdx>=0)factors.push({label:"기본 과실 (기준표)",val:"A "+baseFault+"% : B "+(100-baseFault)+"%",impact:baseFault>=50?"주의":"유리"});
+    if(rt)factors.push({label:"도로 보정",val:rt+" ("+(roadAdj[rt]>0?"+":"")+((roadAdj[rt]||0))+"%)",impact:(roadAdj[rt]||0)>0?"불리":"유리"});
+    if(wt&&wt!=="맑음")factors.push({label:"날씨 보정",val:wt+" (+"+(weatherAdj[wt]||0)+"%)",impact:"불리"});
+    if(sg)factors.push({label:"신호 보정",val:sg+" ("+(sigAdj[sg]>0?"+":"")+((sigAdj[sg]||0))+"%)",impact:(sigAdj[sg]||0)<0?"유리":"불리"});
+    if(stmtAdj!==0)factors.push({label:"진술 분석",val:(stmtAdj>0?"+":"")+stmtAdj+"% ("+(stmtAdj<0?"A유리":"B유리")+")",impact:stmtAdj<0?"유리":"불리"});
+    if(evCount>0)factors.push({label:"증거자료",val:evCount+"건 확보 (-"+(evCount*2+fileCount)+"% 감경)",impact:"유리"});
+    factors.push({label:"최종 산정",val:"A "+b+"% : B "+(100-b)+"%",impact:b>=50?"주의":"유리"});
     setAiProg({step:steps.length,total:steps.length,msg:"⚡ AI 엔진 최종 판단 중...",pct:90});
     // UC3 데모: AI 리포트와 정확히 일치하도록 85:15 강제 적용
     if(useCase==="uc3"){b=85;factors.length=0;
-      factors.push({label:"사고유형",val:"차선변경",impact:"주의"});
-      factors.push({label:"기본과실",val:"A 70% (기준표)",impact:"주의"});
-      factors.push({label:"방향지시등",val:"+10~15%",impact:"불리"});
-      factors.push({label:"차선변경 미완료",val:"+5%",impact:"불리"});
-      factors.push({label:"B차 급가속",val:"증거 부재",impact:"중립"});
+      factors.push({label:"기본 과실 (기준표)",val:"A 70% : B 30% (차선변경)",impact:"주의"});
+      factors.push({label:"방향지시등 보정",val:"+10~15% (동시 점등 진입)",impact:"불리"});
+      factors.push({label:"차선변경 미완료",val:"+5% (파손 부위 분석)",impact:"불리"});
+      factors.push({label:"B차 급가속 주장",val:"0% (증거 부재로 미반영)",impact:"중립"});
+      factors.push({label:"최종 산정",val:"A 85% : B 15%",impact:"주의"});
     }
     sRs({mf:b,of:100-b,cf,evCount,fileCount,phCount:ph.length,factors,stmtAdj});
     const a=useCase==="uc3"?UC_FAULT_RESPONSE:await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
@@ -2203,10 +2205,11 @@ function Tab2(){
 
         {rs&&<div style={{animation:"fadeIn .4s"}}>
           <div style={{...CD,border:"2px solid #c4b5fd"}}>
-            <h3 style={{color:"#0f172a",fontSize:15.5,fontWeight:700,margin:"0 0 14px"}}>과실 산정 결과</h3>
+            <h3 style={{color:"#0f172a",fontSize:15.5,fontWeight:700,margin:"0 0 4px"}}>과실 산정 결과</h3>
+            <div style={{fontSize:10,color:"#94a3b8",marginBottom:12}}>100% 기준 · 손해보험협회 기준표 + AI 다요인 보정</div>
             <div style={{display:"flex",alignItems:"center",gap:18,marginBottom:14}}>
               <div style={{flex:1,textAlign:"center"}}><div style={{fontSize:36,fontWeight:800,color:"#2563eb",fontFamily:"'DM Mono',monospace"}}>{rs.mf}%</div><div style={{color:"#94a3b8",fontSize:12}}>A (청구자)</div></div>
-              <div style={{width:1,height:44,background:"#e2e8f0"}}/>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}><div style={{width:1,height:30,background:"#e2e8f0"}}/><div style={{fontSize:9,color:"#cbd5e1",fontWeight:600}}>100%</div></div>
               <div style={{flex:1,textAlign:"center"}}><div style={{fontSize:36,fontWeight:800,color:"#dc2626",fontFamily:"'DM Mono',monospace"}}>{rs.of}%</div><div style={{color:"#94a3b8",fontSize:12}}>B (상대방)</div></div></div>
             <div style={{height:9,borderRadius:5,background:"#f1f5f9",overflow:"hidden",display:"flex"}}>
               <div style={{width:`${rs.mf}%`,background:"linear-gradient(90deg,#3b82f6,#60a5fa)",transition:"width 1s"}}/>
@@ -2219,14 +2222,22 @@ function Tab2(){
               {rs.evCount>0&&<span style={{padding:"2px 9px",borderRadius:10,fontSize:10.5,fontWeight:500,background:"#f5f3ff",color:"#7c3aed"}}>📎 증거 {rs.evCount}건{rs.fileCount>0?` (첨부 ${rs.fileCount})`:""}</span>}
             </div>
             {/* 산정 근거 */}
-            {rs.factors&&rs.factors.length>0&&<div style={{marginTop:10,padding:"8px 10px",borderRadius:8,background:"#fafbfc",border:"1px solid #e2e8f0"}}>
-              <div style={{fontSize:10.5,fontWeight:600,color:"#475569",marginBottom:5}}>📊 산정 근거 요인</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                {rs.factors.map((f,i)=><span key={i} style={{padding:"2px 7px",borderRadius:6,fontSize:9.5,fontWeight:500,
-                  background:f.impact==="유리"?"#f0fdf4":f.impact==="불리"?"#fef2f2":"#f8fafc",
-                  color:f.impact==="유리"?"#16a34a":f.impact==="불리"?"#dc2626":"#64748b",
-                  border:`1px solid ${f.impact==="유리"?"#bbf7d0":f.impact==="불리"?"#fecaca":"#e2e8f0"}`
-                }}>{f.label}: {f.val} {f.impact==="유리"?"▼":"▲"}</span>)}
+            {rs.factors&&rs.factors.length>0&&<div style={{marginTop:10,padding:"10px 12px",borderRadius:10,background:"#fafbfc",border:"1px solid #e2e8f0"}}>
+              <div style={{fontSize:10.5,fontWeight:600,color:"#475569",marginBottom:8}}>📊 산정 근거 요인 (100% 기준)</div>
+              <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                {rs.factors.map((f,i)=>{
+                  const isBase=f.label.includes("기본");const isFinal=f.label.includes("최종");
+                  return<div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 10px",borderRadius:8,
+                    background:isFinal?"linear-gradient(135deg,#f5f3ff,#ede9fe)":isBase?"#f0f9ff":"#fff",
+                    border:isFinal?"2px solid #c4b5fd":isBase?"1px solid #bae6fd":"1px solid #f1f5f9"}}>
+                    <span style={{fontSize:10,fontWeight:700,color:isFinal?"#7c3aed":isBase?"#0891b2":"#64748b",minWidth:110}}>{f.label}</span>
+                    <span style={{fontSize:10.5,fontWeight:isFinal?800:isBase?700:500,color:isFinal?"#7c3aed":isBase?"#0f172a":"#475569",flex:1}}>{f.val}</span>
+                    <span style={{fontSize:9,fontWeight:600,padding:"1px 6px",borderRadius:5,flexShrink:0,
+                      background:f.impact==="유리"?"#dcfce7":f.impact==="불리"?"#fef2f2":f.impact==="주의"?"#fef3c7":"#f8fafc",
+                      color:f.impact==="유리"?"#16a34a":f.impact==="불리"?"#dc2626":f.impact==="주의"?"#d97706":"#94a3b8"
+                    }}>{f.impact==="유리"?"▼ 유리":f.impact==="불리"?"▲ 불리":f.impact==="주의"?"⚠ 주의":"— 중립"}</span>
+                  </div>;
+                })}
               </div>
             </div>}</div>
           <div style={{...CD,border:"1px solid #c4b5fd"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
