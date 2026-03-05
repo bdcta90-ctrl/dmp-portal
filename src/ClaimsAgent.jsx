@@ -995,6 +995,198 @@ function ReportModal({onClose,caseData}){
     </div>
   );
 }
+function FaultReportModal({onClose}){
+  const now=new Date();const dateStr=now.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"});
+  const timeStr=now.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+  const[mode,setMode]=useState("view");
+  const[sendPhase,setSendPhase]=useState(0);
+  const[recipient,setRecipient]=useState("김영수 센터장");
+  const[sections,setSections]=useState([
+    {id:"basic",title:"1. 기본 사고 정보",icon:"📋",rows:[
+      ["보험사","kt ds 손해보험 (자사)"],["보험종목","자동차보험 (개인용)"],["접수번호","CLM-2025-"+String(Math.floor(Math.random()*9000)+1000)],
+      ["계약번호","AUTO-2025-"+String(Math.floor(Math.random()*90000)+10000)],["피보험자 (A차)","자사 고객 (차선변경 차량)"],
+      ["상대방 (B차)","타사 고객 (직진 차량)"],["손해사정 의뢰일",dateStr],["손해사정 담당자","AI 손해사정 Agent + 담당 사정사"],
+    ]},
+    {id:"overview",title:"2. 사고 개요",icon:"🚗",rows:[
+      ["사고일시",dateStr+" 오후"],["사고장소","편도 2차로 일반도로"],
+      ["사고유형","차선변경 — 동일방향 접촉 사고"],["날씨/도로","맑음 / 건조 노면"],["신호 상태","신호 없음 (일반 도로 구간)"],
+      ["신고일",dateStr],["사고접수 경위","자사 고객 직접 신고"],
+    ]},
+    {id:"desc",title:"3. 사고 경위",icon:"📝",editable:true,
+      text:dateStr+" 오후, 편도 2차로 도로에서 자사 고객(A차)이 1차로에서 2차로로 차선변경을 시도하던 중, 2차로에서 직진 중이던 타사 고객(B차)의 좌측 전면부와 A차의 우측 후방부가 접촉하는 사고가 발생함.\n\nA차 운전자 진술: \"사이드미러로 후방 확인 후 방향지시등을 켜고 안전하게 진입하였으나, B차가 갑자기 속력을 올려 충돌하였음.\"\n\nB차 운전자 진술: \"A차가 깜박이를 켜자마자 바로 끼어들었다. 미처 피할 수 없었다. 정상 속도로 직진 중이었으며, A차 100% 과실을 주장한다.\"\n\n양측 진술이 상충하며, 블랙박스·CCTV·목격자 등 객관적 증거는 확보되지 않은 상태임."},
+    {id:"field",title:"4. 현장 조사 결과",icon:"🔍",rows:[
+      ["현장조사일",dateStr],["조사 참여자","AI 과실 산정 Agent (자동 분석)"],
+      ["A차(자사) 손상","우측 후방부 접촉 파손 (리어쿼터패널, 리어범퍼)"],
+      ["B차(타사) 손상","좌측 전면부 접촉 파손 (프론트범퍼, 좌측펜더)"],
+      ["증거자료","블랙박스 미확보 / CCTV 미확보 / 목격자 없음"],
+      ["파손 방향 분석","A차 우측 후방 + B차 좌측 전방 → 차선변경 미완료 상태에서 충돌 추정"],
+    ]},
+    {id:"fault",title:"5. 과실 분석 결과",icon:"⚖️",subSections:[
+      {subtitle:"AI 다요인 과실 분석 (8개 요소)",items:[
+        ["기본 과실 (기준표)","차선변경 동일방향 접촉: A차 70% : B차 30%"],
+        ["방향지시등 보정","+10~15% (B차 주장: 깜박이와 동시 진입)"],
+        ["B차 급가속 주장","-5~10% 가능하나 증거 부재로 반영 불가"],
+        ["차선변경 미완료","+5% (파손 부위 분석: A 우측 후방 접촉)"],
+        ["AI 종합 판정","A차(자사) 85% : B차(타사) 15%"],
+      ]},
+      {subtitle:"과실 비율 비교",items:[
+        ["양 보험사 협의안","A차 90% : B차 10%"],
+        ["AI 판정","A차 85% : B차 15% (자사에 5% 유리)"],
+        ["타사 고객 주장","A차 100% : B차 0% (법적 근거 부족)"],
+      ]},
+      {subtitle:"대인 접수 분석",items:[
+        ["B차(타사) 대인","접수 예정 — 경추 통증 호소, 14급 추정, 합의금 ₩3,000,000~5,000,000"],
+        ["A차(자사) 대인","접수 고민 중 — 14급 가능, 합의금 ₩2,000,000~3,500,000"],
+        ["과실 상계 시 자사 부담","B차 대인: ₩2,550,000~4,250,000 / A차 대인 회수: ₩300,000~525,000"],
+      ]},
+    ]},
+    {id:"damage",title:"6. 손해 발생 내용",icon:"💰",rows:[
+      ["인적 손해","B차 운전자 경추 통증 호소 (14급 추정) / A차 운전자 접수 고민 중"],
+      ["A차(자사) 물적 손해","리어쿼터패널, 리어범퍼 파손 — 수리비 추정 ₩1,200,000~1,800,000"],
+      ["B차(타사) 물적 손해","프론트범퍼, 좌측펜더 파손 — 수리비 추정 ₩800,000~1,500,000"],
+      ["자사 보험사 예상 총 지출","물적 ₩2,500,000~3,500,000 + 대인 ₩2,550,000~4,250,000 = 약 ₩5,000,000~7,750,000"],
+    ]},
+    {id:"coverage",title:"7. 보험 적용 검토",icon:"🛡️",rows:[
+      ["담보 적용","자동차보험 대인배상 + 대물배상"],
+      ["면책 가능성","없음 (일반 과실 사고)"],
+      ["보상 가능성","보상 대상 — 과실 비율에 따라 쌍방 보상"],
+      ["주요 쟁점","과실 비율 분쟁 (85:15 vs 90:10 vs 100:0) / 쌍방 대인 접수 처리"],
+    ]},
+    {id:"plan",title:"8. 향후 조사 계획",icon:"📅",rows:[
+      ["과실 협상","85:15 기준으로 타사 협의 시도 → 거부 시 90:10+대인취하 패키지 제안"],
+      ["증거 추가 확보","주변 CCTV / 블랙박스(동승자·후행차량) 추가 확인"],
+      ["대인 처리","B차 대인: 14급 기준 합의 진행 / A차 대인: 접수 실익 분석 후 결정"],
+      ["타사 10:0 대응","판례(대법원 2018다456789) 기반 '직진차 주의의무' 논리로 반박"],
+      ["예상 종결","과실 합의 1~2주 + 대인 합의 2~4주 = 약 3~6주 내 종결 목표"],
+    ]},
+    {id:"remark",title:"9. 특이사항",icon:"⚠️",editable:true,
+      text:"• 타사 고객이 10:0(A차 100% 과실)을 강력히 주장하며 양 보험사 협의안(90:10) 거부 중\n  → 교착 상태 장기화 우려\n  → 대법원 2018다456789: '직진 차량에도 전방주시의무가 있어 10:0 인정 극히 곤란'\n\n• 타사 고객 대인 접수 예정 — 경추 통증 호소\n  → 합의금 ₩3,000,000~5,000,000 범위 예상\n  → 과실 85% 적용 시 자사 부담 ₩2,550,000~4,250,000\n\n• 자사 고객도 대인 접수 고민 중\n  → AI 분석: 접수 시 B과실 15% 상계로 ₩300,000~525,000 수령 가능\n  → 실익이 크지 않으나, 타사 대인 취하 협상 카드로 활용 가능\n\n• 증거 부재(블랙박스·CCTV·목격자 없음)가 핵심 리스크\n  → 증거 추가 확보 시 과실 80:20까지 조정 가능성\n  → 과실심의위원회 회부 시 2~4주 추가 소요\n\n• 보험 사기 의심 정황: 없음\n• 언론 보도 가능성: 없음"},
+    {id:"attach",title:"10. 첨부자료",icon:"📎",rows:[
+      ["AI 과실 분석 리포트","8개 요소 다요인 분석 완료 (첨부)"],
+      ["판례 참조 자료","대법원 2018다456789 차선변경 과실 판례 (첨부)"],
+      ["대인 합의금 시뮬레이션","과실 상계 반영 쌍방 합의금 테이블 (첨부)"],
+      ["협상 전략 3안","85:15 주장 / 90:10+대인취하 / 분쟁조정 (첨부)"],
+      ["사고 현장 사진","미확보 — 추후 제출"],
+      ["블랙박스 / CCTV","미확보 — 추가 확인 중"],
+    ]},
+  ]);
+  const updateText=(id,val)=>setSections(prev=>prev.map(s=>s.id===id?{...s,text:val}:s));
+  const updateRow=(id,ri,ci,val)=>setSections(prev=>prev.map(s=>{
+    if(s.id!==id)return s;const nr=[...s.rows];nr[ri]=[...nr[ri]];nr[ri][ci]=val;return{...s,rows:nr};
+  }));
+  const doSend=()=>{setSendPhase(1);setTimeout(()=>setSendPhase(2),2000);};
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(6px)",zIndex:250,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s"}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:22,width:780,maxWidth:"95vw",height:"88vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(0,0,0,.2)"}}>
+        <div style={{padding:"18px 26px 14px",borderBottom:"1px solid #f1f5f9",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:38,height:38,borderRadius:11,background:"linear-gradient(135deg,#7c3aed,#a855f7)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:19,color:"#fff"}}>⚖️</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:800,color:"#0f172a"}}>손해사정 일보(一報)</div>
+              <div style={{fontSize:10,color:"#94a3b8"}}>AI 자동 생성 · {dateStr} · Case 3 차선변경 과실 분쟁 사고</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:6,alignItems:"center"}}>
+            <div style={{display:"flex",background:"#f1f5f9",borderRadius:8,padding:2}}>
+              {[{l:"열람",m:"view"},{l:"수정",m:"edit"}].map(t=>
+                <button key={t.m} onClick={()=>setMode(t.m)} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:11,fontWeight:mode===t.m?700:500,background:mode===t.m?"#fff":"transparent",color:mode===t.m?"#7c3aed":"#94a3b8",cursor:"pointer",boxShadow:mode===t.m?"0 1px 3px rgba(0,0,0,.06)":"none"}}>{t.l}</button>
+              )}
+            </div>
+            <button onClick={()=>{setMode("view");setSendPhase(0);setTimeout(()=>setMode("send"),50);}} style={{padding:"5px 14px",borderRadius:8,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📤 센터장 전송</button>
+            <button onClick={onClose} style={{width:30,height:30,borderRadius:8,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"#94a3b8",fontSize:15}}>✕</button>
+          </div>
+        </div>
+        {mode==="send"?(
+          <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40}}>
+            {sendPhase===0&&<div style={{textAlign:"center",maxWidth:400,animation:"fadeIn .3s"}}>
+              <div style={{fontSize:40,marginBottom:16}}>📤</div>
+              <div style={{fontSize:16,fontWeight:700,marginBottom:20}}>일보 전송</div>
+              <div style={{background:"#f8fafc",borderRadius:12,padding:"16px 20px",border:"1px solid #e2e8f0",marginBottom:20,textAlign:"left"}}>
+                <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginBottom:6}}>수신자</div>
+                <input value={recipient} onChange={e=>setRecipient(e.target.value)} style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid #e2e8f0",fontSize:13,fontWeight:600,outline:"none",boxSizing:"border-box"}}/>
+                <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginTop:12,marginBottom:6}}>전송 내용</div>
+                <div style={{fontSize:12,color:"#475569",lineHeight:1.6}}>
+                  <div>• 손해사정 일보(一報) — Case 3 차선변경 과실 분쟁</div>
+                  <div>• AI 과실 분석 리포트 (8개 요소 다요인 분석)</div>
+                  <div>• 대인 합의금 시뮬레이션</div>
+                  <div>• 협상 전략 3안 비교</div>
+                  <div style={{marginTop:6,fontSize:11,color:"#94a3b8"}}>총 A4 약 3페이지 분량</div>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                <button onClick={()=>setMode("view")} style={{padding:"10px 24px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:13,fontWeight:600,cursor:"pointer"}}>취소</button>
+                <button onClick={doSend} style={{padding:"10px 28px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>📤 전송하기</button>
+              </div>
+            </div>}
+            {sendPhase===1&&<div style={{textAlign:"center",animation:"fadeIn .3s"}}>
+              <Sp/><div style={{marginTop:16,fontSize:14,fontWeight:600,color:"#7c3aed"}}>전송 중...</div>
+              <div style={{fontSize:12,color:"#94a3b8",marginTop:6}}>{recipient}에게 일보를 전송하고 있습니다</div>
+            </div>}
+            {sendPhase===2&&<div style={{textAlign:"center",animation:"fadeIn .4s"}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"#dcfce7",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:28}}>✅</div>
+              <div style={{fontSize:17,fontWeight:800,color:"#059669"}}>전송 완료</div>
+              <div style={{fontSize:13,color:"#64748b",marginTop:6}}>{recipient}에게 일보가 전송되었습니다</div>
+              <button onClick={()=>{setMode("view");setSendPhase(0);}} style={{marginTop:20,padding:"9px 24px",borderRadius:9,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:12,fontWeight:600,cursor:"pointer"}}>일보로 돌아가기</button>
+            </div>}
+          </div>
+        ):(
+          <div style={{flex:1,overflowY:"auto",padding:"20px 28px 30px"}}>
+            <div style={{textAlign:"center",marginBottom:20,paddingBottom:16,borderBottom:"2px solid #7c3aed"}}>
+              <div style={{fontSize:10,color:"#94a3b8",letterSpacing:2,fontWeight:600,marginBottom:4}}>CONFIDENTIAL</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#0f172a"}}>손해사정 일보(一報)</div>
+              <div style={{fontSize:12,color:"#64748b",marginTop:4}}>AI 자동 생성 · {dateStr} · 작성자: AI 과실 산정 Agent</div>
+              <div style={{display:"inline-flex",gap:6,marginTop:8}}>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#f5f3ff",color:"#7c3aed",fontWeight:700,border:"1px solid #c4b5fd"}}>1차 보고</span>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#fef2f2",color:"#dc2626",fontWeight:700,border:"1px solid #fca5a5"}}>과실 분쟁 중</span>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#f0fdf4",color:"#059669",fontWeight:700,border:"1px solid #86efac"}}>AI 분석 완료</span>
+              </div>
+            </div>
+            {sections.map((sec)=>(
+              <div key={sec.id} style={{marginBottom:16}}>
+                <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:8,padding:"8px 12px",background:"linear-gradient(135deg,#f8fafc,#f1f5f9)",borderRadius:10,border:"1px solid #e2e8f0"}}>
+                  <span style={{fontSize:15}}>{sec.icon}</span>
+                  <span style={{fontSize:13.5,fontWeight:700,color:"#0f172a"}}>{sec.title}</span>
+                </div>
+                {sec.rows&&<div style={{border:"1px solid #e2e8f0",borderRadius:10,overflow:"hidden"}}>
+                  {sec.rows.map((r,ri)=>(
+                    <div key={ri} style={{display:"flex",borderBottom:ri<sec.rows.length-1?"1px solid #f1f5f9":"none"}}>
+                      <div style={{width:175,flexShrink:0,padding:"8px 14px",background:"#f8fafc",fontSize:11.5,fontWeight:600,color:"#475569",borderRight:"1px solid #f1f5f9"}}>{mode==="edit"?<input value={r[0]} onChange={e=>updateRow(sec.id,ri,0,e.target.value)} style={{width:"100%",border:"none",background:"transparent",fontSize:11.5,fontWeight:600,color:"#475569",outline:"none"}}/>:r[0]}</div>
+                      <div style={{flex:1,padding:"8px 14px",fontSize:11.5,color:"#0f172a"}}>{mode==="edit"?<input value={r[1]} onChange={e=>updateRow(sec.id,ri,1,e.target.value)} style={{width:"100%",border:"none",background:"transparent",fontSize:11.5,color:"#0f172a",outline:"none"}}/>:r[1]}</div>
+                    </div>
+                  ))}
+                </div>}
+                {sec.editable&&(mode==="edit"?
+                  <textarea value={sec.text} onChange={e=>updateText(sec.id,e.target.value)} style={{width:"100%",minHeight:120,padding:14,borderRadius:10,border:"1px solid #e2e8f0",fontSize:12,lineHeight:1.75,color:"#334155",resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>:
+                  <div style={{padding:"12px 16px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fafbfc",fontSize:12,lineHeight:1.75,color:"#334155",whiteSpace:"pre-wrap"}}>{sec.text}</div>
+                )}
+                {sec.subSections&&sec.subSections.map((sub,ssi)=>(
+                  <div key={ssi} style={{marginBottom:10}}>
+                    <div style={{fontSize:11.5,fontWeight:700,color:"#475569",padding:"6px 12px",background:sub.subtitle.includes("AI 다요인")?"linear-gradient(135deg,#f5f3ff,#ede9fe)":"#f8fafc",borderRadius:"8px 8px 0 0",border:"1px solid #e2e8f0",borderBottom:"none"}}>{sub.subtitle}</div>
+                    <div style={{border:"1px solid #e2e8f0",borderRadius:"0 0 8px 8px",overflow:"hidden"}}>
+                      {sub.items.map((r,ri)=>(
+                        <div key={ri} style={{display:"flex",borderBottom:ri<sub.items.length-1?"1px solid #f1f5f9":"none"}}>
+                          <div style={{width:175,flexShrink:0,padding:"7px 14px",background:"#fafbfc",fontSize:11,fontWeight:600,color:"#64748b",borderRight:"1px solid #f1f5f9"}}>{r[0]}</div>
+                          <div style={{flex:1,padding:"7px 14px",fontSize:11,color:r[0].includes("AI 종합")||r[0].includes("AI 판정")?"#7c3aed":"#0f172a",fontWeight:r[0].includes("AI")||r[0].includes("합계")?700:400}}>{r[1]}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div style={{marginTop:20,paddingTop:16,borderTop:"2px solid #e2e8f0",textAlign:"center"}}>
+              <div style={{fontSize:10,color:"#94a3b8",lineHeight:1.6}}>
+                본 일보는 AI 과실 산정 Agent가 자동 생성한 1차 보고서입니다.<br/>
+                최종 과실 비율 확정 및 합의는 담당 손해사정사의 검토를 거쳐 진행됩니다.<br/>
+                <strong>kt ds AX 사업개발팀 · AI 손해사정 Agent v1.0</strong>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 function GV80DamageDiagram(){
   const[hoveredPart,setHoveredPart]=useState(null);
   const[animPhase,setAnimPhase]=useState(0);
@@ -1492,14 +1684,14 @@ function Tab2(){
   const bbRef=useRef(null);const prRef=useRef(null);const cctvRef=useRef(null);const witRef=useRef(null);
   // AI 프로그레스
   const[aiProg,setAiProg]=useState({step:0,msg:"",pct:0});
-  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);
 
   const loadUC3=()=>{
     sAt("차선변경 — 동일방향 접촉");sRt("편도2차로");sWt("맑음");sSg("신호없음");
     sMd("사이드미러로 확인 후 차선변경을 시도했으나, 상대 차량(B)이 갑자기 속력을 올려 충돌하였음. 방향지시등은 켠 상태였으며, 충분한 거리를 확보하고 진입하였다고 주장.");
     sOd("A차가 깜박이를 킴과 동시에 바로 진입해왔다. 미처 피할 수 없었음. 나는 정상 속도로 직진 중이었고, 갑자기 끼어들어 충돌한 것이다. A차 과실 100%를 주장한다. 대인 접수도 하겠다.");
     sDc(false);sPr(false);sCctv(false);sWit(false);
-    sRs(null);sAi("");setUseCase("uc3");
+    sRs(null);sAi("");setUseCase("uc3");setReportOpen(false);
   };
 
   const calc=async()=>{if(!at)return;sLd(true);sRs(null);sAi("");
@@ -1600,7 +1792,7 @@ function Tab2(){
       </div>
       <div style={{display:"flex",gap:6,alignItems:"center"}}>
         <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
-        <button onClick={()=>{if(useCase==="uc3"){setUseCase(null);sAt("");sRt("");sWt("");sSg("");sMd("");sOd("");sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setAiProg({step:0,msg:"",pct:0});}else{loadUC3();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc3"?"#ef4444":"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc3"?"초기화":"Case 3 불러오기"}</button>
+        <button onClick={()=>{if(useCase==="uc3"){setUseCase(null);sAt("");sRt("");sWt("");sSg("");sMd("");sOd("");sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setAiProg({step:0,msg:"",pct:0});setReportOpen(false);}else{loadUC3();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc3"?"#ef4444":"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc3"?"초기화":"Case 3 불러오기"}</button>
       </div>
     </div>
     {scenarioOpen&&<ScenarioModal id="uc3" onClose={()=>setScenarioOpen(false)}/>}
@@ -1769,7 +1961,20 @@ function Tab2(){
           <div style={{...CD,border:"1px solid #c4b5fd"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:"#7c3aed",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
             <span style={{fontSize:13,fontWeight:700}}>AI 과실 분석</span>{!aD&&ai&&<Sp s/>}</div>
-            <div style={{fontSize:12.5}}><RT text={tA}/></div></div></div>}
+            <div style={{fontSize:12.5}}><RT text={tA}/></div>
+            {/* 일보 버튼 - Case 3 */}
+            {useCase==="uc3"&&ai&&<div style={{marginTop:14,padding:"14px 16px",background:"linear-gradient(135deg,#f5f3ff,#ede9fe)",borderRadius:12,border:"1px solid #c4b5fd",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:18}}>📋</span>
+                <div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#5b21b6"}}>손해사정 일보(一報)</div>
+                  <div style={{fontSize:10,color:"#6b7280"}}>과실 분석 결과 기반 1차 보고서 · 열람 · 수정 · 전송</div>
+                </div>
+              </div>
+              <button onClick={()=>setReportOpen(true)} style={{padding:"8px 16px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📋 일보 열기</button>
+            </div>}
+            {reportOpen&&<FaultReportModal onClose={()=>setReportOpen(false)}/>}
+            </div></div>}
       </div></div></>);
 }
 
