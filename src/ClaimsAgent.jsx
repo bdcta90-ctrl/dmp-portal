@@ -1187,6 +1187,210 @@ function FaultReportModal({onClose}){
     </div>
   );
 }
+function ProcessReportModal({onClose}){
+  const now=new Date();const dateStr=now.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"});
+  const timeStr=now.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+  const[mode,setMode]=useState("view");
+  const[sendPhase,setSendPhase]=useState(0);
+  const[recipient,setRecipient]=useState("김영수 센터장");
+  const[sections,setSections]=useState([
+    {id:"basic",title:"1. 기본 사고 정보",icon:"📋",rows:[
+      ["보험사","kt ds 손해보험 (자사)"],["보험종목","자동차보험 (개인용)"],["접수번호","CLM-2025-"+String(Math.floor(Math.random()*9000)+1000)],
+      ["계약번호","AUTO-2025-"+String(Math.floor(Math.random()*90000)+10000)],["피보험자 (A차)","자사 고객 — 현대 그랜저"],
+      ["상대방 (B차)","타사 고객 — BMW 7시리즈"],["손해사정 의뢰일",dateStr],["손해사정 담당자","AI 손해사정 Agent + 담당 사정사"],
+    ]},
+    {id:"overview",title:"2. 사고 개요",icon:"🚗",rows:[
+      ["사고일시",dateStr+" 오후"],["사고장소","교차로 골목길"],
+      ["사고유형","교차로 직진 vs 직진 — 골목길 충돌"],["도로 상황","양측 모두 '내 도로가 주도로'라고 주장"],
+      ["신고일",dateStr],["사고접수 경위","자사 고객 직접 신고"],
+    ]},
+    {id:"desc",title:"3. 사고 경위",icon:"📝",editable:true,
+      text:dateStr+" 오후, 교차로 골목길에서 자사 고객(A차, 현대 그랜저)과 타사 고객(B차, BMW 7시리즈)이 각각 다른 방향에서 동시 진입하던 중 교차로 내에서 충돌하였음.\n\nA차(자사) 주장: \"규정속도를 준수하며 먼저 진입하였고, 내 도로가 주도로이다. 상대방이 빠른 속도로 진입했다.\"\nB차(타사) 주장: \"먼저 진입하였고, 내 도로가 주도로이다. 상대방이 빠른 속도로 왔다.\"\n\n양측 진술이 완전히 상충하며, 주도로 여부 및 선진입 사실에 대한 객관적 증거가 부족한 상태임."},
+    {id:"field",title:"4. 현장 조사 결과",icon:"🔍",rows:[
+      ["현장조사일",dateStr],["조사 참여자","AI 처리방법 제안 Agent (자동 분석)"],
+      ["A차(자사) 상태","현대 그랜저 — 측면부 파손, 수리비 ₩5,000,000"],
+      ["B차(타사) 상태","BMW 7시리즈 — 전면/측면부 심각 파손, 타사 청구 ₩25,000,000"],
+      ["증거자료","블랙박스·CCTV·목격자 미확보"],
+      ["대인 현황","A차측 2명(운전자+동승자1) + B차측 3명(운전자+동승자2) = 총 5명 대인 접수 예정"],
+    ]},
+    {id:"damage",title:"5. 손해 발생 내용",icon:"💰",subSections:[
+      {subtitle:"자사 차량 (현대 그랜저)",items:[
+        ["수리비","₩5,000,000"],["렌트","그랜저 동급 (적정)"],["대인","운전자 + 동승자 1명 = 2명"],
+        ["과실 주장","자사 30% : 타사 70%"],
+      ]},
+      {subtitle:"타사 차량 (BMW 7시리즈)",items:[
+        ["수리비 청구","₩25,000,000 (AI 적정 추정: ₩17,000,000~20,000,000)"],
+        ["렌트 요구","BMW 7시리즈 동급 (일 ₩350,000~400,000 — 부적정)"],
+        ["대인","운전자 + 동승자 2명 = 3명"],["과실 주장","자사 70% : 타사 30%"],
+      ]},
+      {subtitle:"AI 종합 손해 시뮬레이션",items:[
+        ["과실 AI 적정 판정","자사 45~50% : 타사 50~55%"],
+        ["타사 주장대로(70:30) 시","자사 총 손실 ₩24,100,000"],
+        ["AI 적정(50:50) 시","자사 총 손실 ₩15,300,000"],
+        ["자사 주장대로(30:70) 시","자사 총 손실 ₩11,200,000"],
+        ["절감 가능 범위","▼ ₩8,800,000~12,900,000"],
+      ]},
+    ]},
+    {id:"process",title:"6. 처리 방법 제안 (AI 분석)",icon:"🤖",subSections:[
+      {subtitle:"🏆 최적안: 쌍방 절충 패키지 (AI 권고)",items:[
+        ["과실 협상","50:50 근사로 쌍방 수용 가능"],
+        ["BMW 수리비","₩25,000,000 → ₩18,000,000으로 협상 (제휴센터+순정부품)"],
+        ["BMW 렌트","7시리즈 → 5시리즈(동급 정정), 일 ₩50,000 절감"],
+        ["대인 5명","경상 합의 패키지로 총 ₩8,000,000 이내"],
+        ["자사 총 손실","약 ₩15,000,000 (최대 ₩8,500,000 절감)"],
+      ]},
+      {subtitle:"⚡ 신속안: 자사 유리 과실 + 비용 최소화",items:[
+        ["과실","30:70 주장 관철"],["자사 총 손실","약 ₩11,200,000 (최대 ₩13,000,000 절감)"],
+        ["리스크","타사 강력 반발, 분쟁 장기화 가능"],
+      ]},
+      {subtitle:"🤝 안전안: 과실 40:60 타협 + 일괄 합의",items:[
+        ["과실","40:60 양측 양보"],["자사 총 손실","약 ₩14,800,000"],
+        ["장점","빠른 종결, 추가 분쟁 비용 방지"],
+      ]},
+    ]},
+    {id:"coverage",title:"7. 보험 적용 검토",icon:"🛡️",rows:[
+      ["담보 적용","자동차보험 대인배상 + 대물배상 (쌍방)"],
+      ["면책 가능성","없음 (일반 과실 사고)"],
+      ["보상 가능성","보상 대상 — 과실 비율에 따라 쌍방 보상"],
+      ["주요 쟁점","과실 분쟁(30:70 vs 70:30) / BMW 수리비 과다 청구 / 렌트 등급 / 대인 5명"],
+    ]},
+    {id:"plan",title:"8. 향후 조사 계획",icon:"📅",rows:[
+      ["과실 협상","AI 적정(50:50) 기준으로 타사 협의 → 거부 시 과실심의위 회부"],
+      ["BMW 수리비","부품별 단가 대조 검증 → ₩5,000,000~8,000,000 과다 청구 식별"],
+      ["렌트 정정","BMW 7시리즈 → 5시리즈 동급 (판례 '동종·동급 원칙')"],
+      ["대인 처리","5명 일괄 합의 패키지 추진 → 총액 관리"],
+      ["자사 고객 안내","과실 협상 진행 상황 및 본인 부담 범위 설명"],
+      ["예상 종결","과실 합의 1~2주 + 수리 2~3주 + 대인 2~4주 = 약 4~8주"],
+    ]},
+    {id:"remark",title:"9. 특이사항",icon:"⚠️",editable:true,
+      text:"• 과실 비율이 30:70 ↔ 70:30으로 극단적 대립 → 합의까지 장기화 우려\n  → AI 분석: 교차로 골목길 쌍방 진입 시 주도로 미확인이면 50:50이 적정\n  → 도로 폭 1.5배 이상 차이 시 주도로 인정(손해보험협회 기준)\n\n• BMW 7시리즈 수리비 ₩25,000,000의 적정성 의문\n  → AI 유사사고 분석: 적정 수리비 ₩17,000,000~20,000,000\n  → ₩5,000,000~8,000,000 과다 청구 가능성 높음\n\n• BMW 7시리즈 렌트 요구 (일 ₩350,000~400,000)\n  → 14일 기준 ₩4,900,000~5,600,000 → 부적정\n  → 5시리즈 동급(일 ₩200,000~250,000)으로 정정 시 ₩2,100,000~2,800,000 절감\n\n• 대인 5명(타사3+자사2) 동시 처리 필요\n  → 합의금 총액 ₩12,000,000~20,000,000 범위\n  → 일괄 합의 패키지로 총액 관리 필수\n\n• 자사 고객 심리: 30:70 과실 주장에 강한 확신\n  → 50:50 협의 시 고객 불만 가능 → 사전 설명 필요\n\n• 보험 사기 의심 정황: 없음\n• 언론 보도 가능성: 없음"},
+    {id:"attach",title:"10. 첨부자료",icon:"📎",rows:[
+      ["AI 종합 분석 리포트","쟁점 5가지 식별 + 손실 시뮬레이션 (첨부)"],
+      ["처리 방법 제안 3안","최적안/신속안/안전안 비교 분석 (첨부)"],
+      ["BMW 수리비 검증","부품별 타사 청구 vs AI 적정 비교 테이블 (첨부)"],
+      ["대인 합의금 시뮬레이션","과실별 5명 합의금 산출 (첨부)"],
+      ["사고 현장 사진","미확보 — 추후 제출"],
+      ["블랙박스 / CCTV","미확보 — 추가 확인 중"],
+    ]},
+  ]);
+  const updateText=(id,val)=>setSections(prev=>prev.map(s=>s.id===id?{...s,text:val}:s));
+  const updateRow=(id,ri,ci,val)=>setSections(prev=>prev.map(s=>{
+    if(s.id!==id)return s;const nr=[...s.rows];nr[ri]=[...nr[ri]];nr[ri][ci]=val;return{...s,rows:nr};
+  }));
+  const doSend=()=>{setSendPhase(1);setTimeout(()=>setSendPhase(2),2000);};
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(6px)",zIndex:250,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s"}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:22,width:780,maxWidth:"95vw",height:"88vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(0,0,0,.2)"}}>
+        <div style={{padding:"18px 26px 14px",borderBottom:"1px solid #f1f5f9",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:38,height:38,borderRadius:11,background:"linear-gradient(135deg,#059669,#10b981)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:19,color:"#fff"}}>🚗</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:800,color:"#0f172a"}}>손해사정 일보(一報)</div>
+              <div style={{fontSize:10,color:"#94a3b8"}}>AI 자동 생성 · {dateStr} · Case 1 교차로 골목길 충돌 · 그랜저 vs BMW 7시리즈</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:6,alignItems:"center"}}>
+            <div style={{display:"flex",background:"#f1f5f9",borderRadius:8,padding:2}}>
+              {[{l:"열람",m:"view"},{l:"수정",m:"edit"}].map(t=>
+                <button key={t.m} onClick={()=>setMode(t.m)} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:11,fontWeight:mode===t.m?700:500,background:mode===t.m?"#fff":"transparent",color:mode===t.m?"#059669":"#94a3b8",cursor:"pointer",boxShadow:mode===t.m?"0 1px 3px rgba(0,0,0,.06)":"none"}}>{t.l}</button>
+              )}
+            </div>
+            <button onClick={()=>{setMode("view");setSendPhase(0);setTimeout(()=>setMode("send"),50);}} style={{padding:"5px 14px",borderRadius:8,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📤 센터장 전송</button>
+            <button onClick={onClose} style={{width:30,height:30,borderRadius:8,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"#94a3b8",fontSize:15}}>✕</button>
+          </div>
+        </div>
+        {mode==="send"?(
+          <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40}}>
+            {sendPhase===0&&<div style={{textAlign:"center",maxWidth:400,animation:"fadeIn .3s"}}>
+              <div style={{fontSize:40,marginBottom:16}}>📤</div>
+              <div style={{fontSize:16,fontWeight:700,marginBottom:20}}>일보 전송</div>
+              <div style={{background:"#f8fafc",borderRadius:12,padding:"16px 20px",border:"1px solid #e2e8f0",marginBottom:20,textAlign:"left"}}>
+                <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginBottom:6}}>수신자</div>
+                <input value={recipient} onChange={e=>setRecipient(e.target.value)} style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid #e2e8f0",fontSize:13,fontWeight:600,outline:"none",boxSizing:"border-box"}}/>
+                <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginTop:12,marginBottom:6}}>전송 내용</div>
+                <div style={{fontSize:12,color:"#475569",lineHeight:1.6}}>
+                  <div>• 손해사정 일보(一報) — Case 1 교차로 충돌 (그랜저 vs BMW 7)</div>
+                  <div>• AI 종합 분석 + 처리 방법 3안 비교</div>
+                  <div>• BMW 수리비 검증 + 대인 5명 시뮬레이션</div>
+                  <div>• 손해 시뮬레이션 (시나리오 3개)</div>
+                  <div style={{marginTop:6,fontSize:11,color:"#94a3b8"}}>총 A4 약 4페이지 분량</div>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                <button onClick={()=>setMode("view")} style={{padding:"10px 24px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:13,fontWeight:600,cursor:"pointer"}}>취소</button>
+                <button onClick={doSend} style={{padding:"10px 28px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>📤 전송하기</button>
+              </div>
+            </div>}
+            {sendPhase===1&&<div style={{textAlign:"center",animation:"fadeIn .3s"}}>
+              <Sp/><div style={{marginTop:16,fontSize:14,fontWeight:600,color:"#059669"}}>전송 중...</div>
+              <div style={{fontSize:12,color:"#94a3b8",marginTop:6}}>{recipient}에게 일보를 전송하고 있습니다</div>
+            </div>}
+            {sendPhase===2&&<div style={{textAlign:"center",animation:"fadeIn .4s"}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"#dcfce7",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:28}}>✅</div>
+              <div style={{fontSize:17,fontWeight:800,color:"#059669"}}>전송 완료</div>
+              <div style={{fontSize:13,color:"#64748b",marginTop:6}}>{recipient}에게 일보가 전송되었습니다</div>
+              <button onClick={()=>{setMode("view");setSendPhase(0);}} style={{marginTop:20,padding:"9px 24px",borderRadius:9,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:12,fontWeight:600,cursor:"pointer"}}>일보로 돌아가기</button>
+            </div>}
+          </div>
+        ):(
+          <div style={{flex:1,overflowY:"auto",padding:"20px 28px 30px"}}>
+            <div style={{textAlign:"center",marginBottom:20,paddingBottom:16,borderBottom:"2px solid #059669"}}>
+              <div style={{fontSize:10,color:"#94a3b8",letterSpacing:2,fontWeight:600,marginBottom:4}}>CONFIDENTIAL</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#0f172a"}}>손해사정 일보(一報)</div>
+              <div style={{fontSize:12,color:"#64748b",marginTop:4}}>AI 자동 생성 · {dateStr} · 작성자: AI 처리방법 제안 Agent</div>
+              <div style={{display:"inline-flex",gap:6,marginTop:8}}>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#ecfdf5",color:"#059669",fontWeight:700,border:"1px solid #86efac"}}>1차 보고</span>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#fef3c7",color:"#d97706",fontWeight:700,border:"1px solid #fcd34d"}}>과실 분쟁 중</span>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#fef2f2",color:"#dc2626",fontWeight:700,border:"1px solid #fca5a5"}}>고액 건</span>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#f0fdf4",color:"#059669",fontWeight:700,border:"1px solid #86efac"}}>AI 분석 완료</span>
+              </div>
+            </div>
+            {sections.map((sec)=>(
+              <div key={sec.id} style={{marginBottom:16}}>
+                <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:8,padding:"8px 12px",background:"linear-gradient(135deg,#f8fafc,#f1f5f9)",borderRadius:10,border:"1px solid #e2e8f0"}}>
+                  <span style={{fontSize:15}}>{sec.icon}</span>
+                  <span style={{fontSize:13.5,fontWeight:700,color:"#0f172a"}}>{sec.title}</span>
+                </div>
+                {sec.rows&&<div style={{border:"1px solid #e2e8f0",borderRadius:10,overflow:"hidden"}}>
+                  {sec.rows.map((r,ri)=>(
+                    <div key={ri} style={{display:"flex",borderBottom:ri<sec.rows.length-1?"1px solid #f1f5f9":"none"}}>
+                      <div style={{width:175,flexShrink:0,padding:"8px 14px",background:"#f8fafc",fontSize:11.5,fontWeight:600,color:"#475569",borderRight:"1px solid #f1f5f9"}}>{mode==="edit"?<input value={r[0]} onChange={e=>updateRow(sec.id,ri,0,e.target.value)} style={{width:"100%",border:"none",background:"transparent",fontSize:11.5,fontWeight:600,color:"#475569",outline:"none"}}/>:r[0]}</div>
+                      <div style={{flex:1,padding:"8px 14px",fontSize:11.5,color:r[1].includes("▼")?"#dc2626":"#0f172a",fontWeight:r[1].includes("▼")||r[0].includes("총 손실")?700:400}}>{mode==="edit"?<input value={r[1]} onChange={e=>updateRow(sec.id,ri,1,e.target.value)} style={{width:"100%",border:"none",background:"transparent",fontSize:11.5,color:"#0f172a",outline:"none"}}/>:r[1]}</div>
+                    </div>
+                  ))}
+                </div>}
+                {sec.editable&&(mode==="edit"?
+                  <textarea value={sec.text} onChange={e=>updateText(sec.id,e.target.value)} style={{width:"100%",minHeight:140,padding:14,borderRadius:10,border:"1px solid #e2e8f0",fontSize:12,lineHeight:1.75,color:"#334155",resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>:
+                  <div style={{padding:"12px 16px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fafbfc",fontSize:12,lineHeight:1.75,color:"#334155",whiteSpace:"pre-wrap"}}>{sec.text}</div>
+                )}
+                {sec.subSections&&sec.subSections.map((sub,ssi)=>(
+                  <div key={ssi} style={{marginBottom:10}}>
+                    <div style={{fontSize:11.5,fontWeight:700,color:"#475569",padding:"6px 12px",background:sub.subtitle.includes("AI 권고")||sub.subtitle.includes("AI 종합")?"linear-gradient(135deg,#ecfdf5,#d1fae5)":"#f8fafc",borderRadius:"8px 8px 0 0",border:"1px solid #e2e8f0",borderBottom:"none"}}>{sub.subtitle}</div>
+                    <div style={{border:"1px solid #e2e8f0",borderRadius:"0 0 8px 8px",overflow:"hidden"}}>
+                      {sub.items.map((r,ri)=>(
+                        <div key={ri} style={{display:"flex",borderBottom:ri<sub.items.length-1?"1px solid #f1f5f9":"none"}}>
+                          <div style={{width:175,flexShrink:0,padding:"7px 14px",background:"#fafbfc",fontSize:11,fontWeight:600,color:"#64748b",borderRight:"1px solid #f1f5f9"}}>{r[0]}</div>
+                          <div style={{flex:1,padding:"7px 14px",fontSize:11,color:r[1].includes("▼")?"#dc2626":r[0].includes("자사 총")||r[0].includes("절감")?"#059669":"#0f172a",fontWeight:r[0].includes("총")||r[0].includes("절감")||r[0].includes("AI")?700:400}}>{r[1]}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div style={{marginTop:20,paddingTop:16,borderTop:"2px solid #e2e8f0",textAlign:"center"}}>
+              <div style={{fontSize:10,color:"#94a3b8",lineHeight:1.6}}>
+                본 일보는 AI 처리방법 제안 Agent가 자동 생성한 1차 보고서입니다.<br/>
+                최종 처리 방법 결정 및 합의는 담당 손해사정사의 검토를 거쳐 진행됩니다.<br/>
+                <strong>kt ds AX 사업개발팀 · AI 손해사정 Agent v1.0</strong>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 function GV80DamageDiagram(){
   const[hoveredPart,setHoveredPart]=useState(null);
   const[animPhase,setAnimPhase]=useState(0);
@@ -2022,7 +2226,7 @@ function Tab3(){
   // intake Q&A
   const[intakeQs,setIntakeQs]=useState([]);const[intakeAs,setIntakeAs]=useState({});
   const[intakeProg,setIntakeProg]=useState({step:0,msg:"",pct:0});
-  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);
 
   const loadUC1=()=>{
     setInput(`[교차로 골목길 충돌 사고 — Case 1]
@@ -2045,7 +2249,7 @@ function Tab3(){
   3. BMW 7시리즈 렌트 적정성
   4. 대인 5명 처리 (타사3+자사2)
   5. 자사 보험사 손실 최소화 + 자사 고객 만족`);
-    setCustPref("insurance");setUseCase("uc1");
+    setCustPref("insurance");setUseCase("uc1");setReportOpen(false);
     setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});
   };
 
@@ -2378,7 +2582,7 @@ function Tab3(){
       </div>
       <div style={{display:"flex",gap:6,alignItems:"center"}}>
         <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
-        <button onClick={()=>{if(useCase==="uc1"){setUseCase(null);setInput("");setCustPref("");setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});}else{loadUC1();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc1"?"#ef4444":"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc1"?"초기화":"Case 1 불러오기"}</button>
+        <button onClick={()=>{if(useCase==="uc1"){setUseCase(null);setInput("");setCustPref("");setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});setReportOpen(false);}else{loadUC1();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc1"?"#ef4444":"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc1"?"초기화":"Case 1 불러오기"}</button>
       </div>
     </div>
     {scenarioOpen&&<ScenarioModal id="uc1" onClose={()=>setScenarioOpen(false)}/>}
@@ -2693,6 +2897,18 @@ function Tab3(){
               <span style={{color:CC[idx]}}>{CI[idx]}</span><span style={{fontSize:12,fontWeight:600,color:"#334155"}}>{p.title}</span>
               <span style={{marginLeft:"auto",color:CC[idx]}}>{IC.arr}</span></button>)}</div></div>
       </div>}
+      {/* 일보 버튼 - Case 1 */}
+      {useCase==="uc1"&&proposals&&<div style={{padding:"14px 16px",background:"linear-gradient(135deg,#ecfdf5,#d1fae5)",borderRadius:12,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontSize:18}}>📋</span>
+          <div>
+            <div style={{fontSize:12,fontWeight:700,color:"#065f46"}}>손해사정 일보(一報)</div>
+            <div style={{fontSize:10,color:"#6b7280"}}>처리 방법 분석 기반 1차 보고서 · 열람 · 수정 · 전송</div>
+          </div>
+        </div>
+        <button onClick={()=>setReportOpen(true)} style={{padding:"8px 16px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📋 일보 열기</button>
+      </div>}
+      {reportOpen&&<ProcessReportModal onClose={()=>setReportOpen(false)}/>}
     </div></>);
 }
 
