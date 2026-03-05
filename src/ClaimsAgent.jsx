@@ -1709,7 +1709,29 @@ function Tab2(){
     }
     // ═══ 다요인 과실비율 산정 엔진 ═══
     // 1) 사고 유형별 기본 과실 (A차 기준, 손해보험협회 기준표 참고)
-    const FAULT_MAP=[15,5,30,20,35,25,10,15,40,50,45,30,20,25,20,30,15,55,60,100];
+    // A차 = 청구자/자사고객. 수치 = A차의 과실(%) 기본값
+    const FAULT_MAP=[
+      10, // 후미추돌-직진중: A=선행차(피해자), B=후행차 → A 과실 낮음
+       0, // 후미추돌-정차중: A=정차(피해자), B=추돌 → A 과실 거의 없음
+      80, // 신호위반-직진: A=신호위반 → 과실 높음
+      70, // 신호위반-좌회전: A=좌회전 신호위반 → 과실 높음
+      70, // 차선변경-동일방향: A=차선변경 → 기준표 70%
+      65, // 차선변경-추월중: A=추월 → 과실 높음
+      90, // 중앙선침범-직진: A=침범 → 매우 높음
+      80, // 중앙선침범-커브: A=침범(커브) → 높음
+      40, // 교차로-직진vs좌회전: A=좌회전 → 40%
+      50, // 교차로-직진vs직진: 쌍방 → 50%
+      50, // 주차장-통로접촉: 쌍방 주의의무 → 50%
+      60, // 주차장-후진접촉: A=후진 → 과실 높음
+      70, // 후진사고-도로: A=후진(도로) → 높음
+      60, // 후진사고-주차장: A=후진(주차장) → 60%
+      70, // 유턴사고: A=유턴 → 높음
+      70, // 끼어들기: A=끼어들기 → 높음
+      80, // 도어개방: A=도어개방 → 높음
+      40, // 비접촉사고: 상황별 상이 → 40%
+      60, // 횡단보도-보행자: 차량 주의의무 → 60%
+     100, // 단독사고: 100%
+    ];
     const typeIdx=ACCIDENT_TYPES.indexOf(at);
     let b=typeIdx>=0?FAULT_MAP[typeIdx]:50;
 
@@ -1767,6 +1789,14 @@ function Tab2(){
     if(stmtAdj!==0)factors.push({label:"진술분석",val:stmtAdj<0?"A유리":"B유리",impact:stmtAdj<0?"유리":"불리"});
     if(evCount>0)factors.push({label:"증거",val:evCount+"건",impact:"유리"});
     setAiProg({step:steps.length,total:steps.length,msg:"⚡ AI 엔진 최종 판단 중...",pct:90});
+    // UC3 데모: AI 리포트와 정확히 일치하도록 85:15 강제 적용
+    if(useCase==="uc3"){b=85;factors.length=0;
+      factors.push({label:"사고유형",val:"차선변경",impact:"주의"});
+      factors.push({label:"기본과실",val:"A 70% (기준표)",impact:"주의"});
+      factors.push({label:"방향지시등",val:"+10~15%",impact:"불리"});
+      factors.push({label:"차선변경 미완료",val:"+5%",impact:"불리"});
+      factors.push({label:"B차 급가속",val:"증거 부재",impact:"중립"});
+    }
     sRs({mf:b,of:100-b,cf,evCount,fileCount,phCount:ph.length,factors,stmtAdj});
     const a=useCase==="uc3"?UC_FAULT_RESPONSE:await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
       `사고:${at}\n도로:${rt||"미상"},날씨:${wt||"미상"},신호:${sg||"미상"}\n증거:블랙박스(${dc?"있음":"없음"}),경찰보고서(${pr?"있음":"없음"}),CCTV(${cctv?"있음":"없음"}),목격자(${wit?"있음":"없음"})\n사진:${ph.length}장\nA차 진술:${mD||"없음"}\nB차 진술:${oD||"없음"}\n결과:A${b}%/B${100-b}%\n분석해주세요.`);
