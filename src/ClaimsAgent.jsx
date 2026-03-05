@@ -798,6 +798,203 @@ function SmsModal({onClose}){
     </div>
   );
 }
+function ReportModal({onClose,caseData}){
+  const now=new Date();const dateStr=now.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"});
+  const timeStr=now.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+  const[mode,setMode]=useState("view");// view, edit, send
+  const[sendPhase,setSendPhase]=useState(0);// 0=form, 1=sending, 2=done
+  const[recipient,setRecipient]=useState("김영수 센터장");
+  const[sections,setSections]=useState([
+    {id:"basic",title:"1. 기본 사고 정보",icon:"📋",rows:[
+      ["보험사","kt ds 손해보험 (자사)"],["보험종목","자동차보험 (개인용)"],["접수번호","CLM-2025-"+String(Math.floor(Math.random()*9000)+1000)],
+      ["계약번호","AUTO-2025-"+String(Math.floor(Math.random()*90000)+10000)],["피보험자",caseData?.insured||"(자사 고객명)"],
+      ["상대방",caseData?.opponent||"(타사 고객명)"],["손해사정 의뢰일",dateStr],["손해사정 담당자","AI 손해사정 Agent + 담당 사정사"],
+    ]},
+    {id:"overview",title:"2. 사고 개요",icon:"🚗",rows:[
+      ["사고일시",caseData?.accidentDate||dateStr+" "+timeStr],["사고장소",caseData?.location||"서울시 강남구 역삼동 OO주차장 내"],
+      ["사고유형","주차장 내 주정차 차량 충돌 (단독 과실)"],["신고일",dateStr],["사고접수 경위","고객 직접 신고 (모바일앱)"],
+    ]},
+    {id:"desc",title:"3. 사고 경위",icon:"📝",editable:true,
+      text:caseData?.description||dateStr+" 경, 자사 고객이 서울 강남구 역삼동 소재 OO빌딩 지하주차장에서 차량을 빼내던 중 속력을 내다 노면 미끄러짐으로 인해 주차되어 있던 타사 고객 소유 제네시스 GV80 3.5T AWD 프레스티지 차량의 전면부를 충돌하였음.\n\n자사 고객 차량(현대 그랜저 캘리그래피 블랙잉크 3.5 AWD)의 우측 전면부와 타사 차량의 정면부가 접촉하였으며, 자사 고객의 100% 과실 사고로 판단됨.\n\n사고 당시 동승자 없었으며, 타사 차량에도 탑승자 없었음 (주정차 상태)."},
+    {id:"field",title:"4. 현장 조사 결과",icon:"🔍",rows:[
+      ["현장조사일",dateStr],["조사 참여자","AI 손해사정 Agent (자동 분석)"],
+      ["자사 차량 상태","우측 전면부 경미~중간 파손 (범퍼, 헤드라이트, 펜더)"],
+      ["타사 차량 상태","전면부 심각 파손 (범퍼 ASSY, 본넷, 헤드라이트, 그릴, 라디에이터)"],
+      ["증거자료 확보","사고 현장 사진 — AI 파손 감지 분석 완료"],
+      ["관련기관 조사","해당 없음 (경미 물적 사고, 인적 피해 없음)"],
+    ]},
+    {id:"damage",title:"5. 손해 발생 내용",icon:"💰",subSections:[
+      {subtitle:"자사 차량 (현대 그랜저 캘리그래피 블랙잉크 3.5 AWD)",items:[
+        ["차량가액","약 ₩52,000,000 (2025년 6월 출고, 약 9개월)"],
+        ["수리비","₩1,830,000 (판금 도장 수리)"],["렌트비","₩550,000~770,000 (그랜저 동급, 5~7일)"],
+        ["자사 소계","₩2,380,000~2,600,000"],
+      ]},
+      {subtitle:"타사 차량 (제네시스 GV80 3.5T AWD 프레스티지)",items:[
+        ["차량가액","약 ₩84,000,000 (2025년 12월 출고, 약 3개월 신차)"],
+        ["타사 청구","₩10,000,000 (수리비 + 렌트 포함)"],
+        ["AI 적정 견적","₩6,380,000 (수리비) + ₩980,000 (렌트) = ₩7,360,000"],
+        ["과다 청구 추정","₩2,640,000 (렌트 등급 부적정 + 수리비 과다)"],
+      ]},
+      {subtitle:"종합 손해 규모",items:[
+        ["인적 손해","없음 (쌍방 무상해)"],
+        ["자사 보험사 총 예상 지출","₩9,190,000~₩9,850,000 (AI 적정 기준)"],
+        ["타사 청구 수용 시","₩11,830,000"],
+        ["절감 가능액","▼ ₩2,000,000~4,240,000"],
+      ]},
+    ]},
+    {id:"coverage",title:"6. 보험 적용 검토",icon:"🛡️",rows:[
+      ["담보 적용","자동차보험 대물배상 + 자차보험 적용"],
+      ["면책 가능성","없음 (일반 과실 사고)"],
+      ["보상 가능성","보상 가능 — 자사 고객 100% 과실, 전액 보상 대상"],
+      ["주요 쟁점","타사 수리비 적정성 검증 / 렌트 등급 정정 / 신차 감가 대비"],
+    ]},
+    {id:"plan",title:"7. 향후 조사 계획",icon:"📅",rows:[
+      ["추가 조사","타사 수리비 세부 항목 검증 (부품별 단가 대조)"],
+      ["렌트 협상","벤츠 E-Class → GV80 동급으로 등급 정정 협의"],
+      ["감가 대비","신차(3개월) 감가 청구 가능성 사전 분석 완료 — 선제 대응"],
+      ["자사 차량","제휴 서비스센터 입고 안내 및 수리 일정 조율"],
+      ["예상 종결","협의 3~5일 + 수리 7~14일 = 약 2~3주 내 종결 목표"],
+    ]},
+    {id:"remark",title:"8. 특이사항",icon:"⚠️",editable:true,
+      text:"• 타사 차량이 출고 3개월 신차(GV80 3.5T AWD, ₩84,000,000)로 감가 청구 가능성 높음\n  → 대법원 2017다251234 판례 기반 사전 분석 완료\n  → 차량가액의 10~15% (₩8,400,000~12,600,000) 추가 청구 가능\n\n• 타사 보험사가 공식 서비스센터 이용 주장 중\n  → 사고 수리는 제조사 보증과 별개 (자동차관리법 제57조)\n  → 순정부품 조건 제휴 정비망 제안으로 15~20% 절감 가능\n\n• 타사 렌트 요구: 벤츠 E-Class (GV80 동급 아님)\n  → 대법원 '동종·동급 원칙' 적용하여 정정 필요\n\n• 자사 고객 심리 상태: 비용에 대한 불안감 큼\n  → 자기부담금(₩20~50만원) 외 부담 없음을 명확히 안내 필요\n\n• 보험 사기 의심 정황: 없음\n• 언론 보도 가능성: 없음"},
+    {id:"attach",title:"9. 첨부자료",icon:"📎",rows:[
+      ["사고 현장 사진","AI 파손 감지 분석 완료 (6개 부위 식별)"],
+      ["AI 견적 분석 리포트","타사 견적 검증 완료 (첨부)"],
+      ["자사 차량 견적","AI 산정 완료 (₩1,830,000)"],
+      ["보험사 총 지출 시뮬레이션","4개 시나리오 비교 분석 (첨부)"],
+      ["진단서","해당 없음 (인적 피해 없음)"],
+      ["CCTV","주차장 CCTV 확보 요청 중"],
+    ]},
+  ]);
+  const updateText=(id,val)=>setSections(prev=>prev.map(s=>s.id===id?{...s,text:val}:s));
+  const updateRow=(id,ri,ci,val)=>setSections(prev=>prev.map(s=>{
+    if(s.id!==id)return s;
+    const nr=[...s.rows];nr[ri]=[...nr[ri]];nr[ri][ci]=val;return{...s,rows:nr};
+  }));
+  const doSend=()=>{setSendPhase(1);setTimeout(()=>setSendPhase(2),2000);};
+  const reportRef=useRef(null);
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(6px)",zIndex:250,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s"}} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:22,width:780,maxWidth:"95vw",height:"88vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(0,0,0,.2)"}}>
+        {/* Header */}
+        <div style={{padding:"18px 26px 14px",borderBottom:"1px solid #f1f5f9",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:38,height:38,borderRadius:11,background:"linear-gradient(135deg,#0891b2,#06b6d4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:19,color:"#fff"}}>📋</div>
+            <div>
+              <div style={{fontSize:17,fontWeight:800,color:"#0f172a"}}>손해사정 일보(一報)</div>
+              <div style={{fontSize:10,color:"#94a3b8"}}>AI 자동 생성 · {dateStr} · Case 2 주차장 충돌 사고</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:6,alignItems:"center"}}>
+            {/* Mode toggle */}
+            <div style={{display:"flex",background:"#f1f5f9",borderRadius:8,padding:2}}>
+              {[{l:"열람",m:"view"},{l:"수정",m:"edit"}].map(t=>
+                <button key={t.m} onClick={()=>setMode(t.m)} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:11,fontWeight:mode===t.m?700:500,background:mode===t.m?"#fff":"transparent",color:mode===t.m?"#0891b2":"#94a3b8",cursor:"pointer",boxShadow:mode===t.m?"0 1px 3px rgba(0,0,0,.06)":"none"}}>{t.l}</button>
+              )}
+            </div>
+            <button onClick={()=>{setMode("view");setSendPhase(0);setTimeout(()=>setMode("send"),50);}} style={{padding:"5px 14px",borderRadius:8,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📤 센터장 전송</button>
+            <button onClick={onClose} style={{width:30,height:30,borderRadius:8,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"#94a3b8",fontSize:15}}>✕</button>
+          </div>
+        </div>
+        {/* Send mode */}
+        {mode==="send"?(
+          <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40}}>
+            {sendPhase===0&&<div style={{textAlign:"center",maxWidth:400,animation:"fadeIn .3s"}}>
+              <div style={{fontSize:40,marginBottom:16}}>📤</div>
+              <div style={{fontSize:16,fontWeight:700,marginBottom:20}}>일보 전송</div>
+              <div style={{background:"#f8fafc",borderRadius:12,padding:"16px 20px",border:"1px solid #e2e8f0",marginBottom:20,textAlign:"left"}}>
+                <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginBottom:6}}>수신자</div>
+                <input value={recipient} onChange={e=>setRecipient(e.target.value)} style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid #e2e8f0",fontSize:13,fontWeight:600,outline:"none",boxSizing:"border-box"}}/>
+                <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginTop:12,marginBottom:6}}>전송 내용</div>
+                <div style={{fontSize:12,color:"#475569",lineHeight:1.6}}>
+                  <div>• 손해사정 일보(一報) — Case 2 주차장 충돌 사고</div>
+                  <div>• AI 견적 분석 리포트 (타사/자사 차량)</div>
+                  <div>• 보험사 총 지출 시뮬레이션 4개 시나리오</div>
+                  <div>• AI 파손 감지 다이어그램</div>
+                  <div style={{marginTop:6,fontSize:11,color:"#94a3b8"}}>총 A4 약 3페이지 분량</div>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                <button onClick={()=>setMode("view")} style={{padding:"10px 24px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:13,fontWeight:600,cursor:"pointer"}}>취소</button>
+                <button onClick={doSend} style={{padding:"10px 28px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>📤 전송하기</button>
+              </div>
+            </div>}
+            {sendPhase===1&&<div style={{textAlign:"center",animation:"fadeIn .3s"}}>
+              <Sp/><div style={{marginTop:16,fontSize:14,fontWeight:600,color:"#0891b2"}}>전송 중...</div>
+              <div style={{fontSize:12,color:"#94a3b8",marginTop:6}}>{recipient}에게 일보를 전송하고 있습니다</div>
+            </div>}
+            {sendPhase===2&&<div style={{textAlign:"center",animation:"fadeIn .4s"}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"#dcfce7",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:28}}>✅</div>
+              <div style={{fontSize:17,fontWeight:800,color:"#059669"}}>전송 완료</div>
+              <div style={{fontSize:13,color:"#64748b",marginTop:6}}>{recipient}에게 일보가 전송되었습니다</div>
+              <div style={{fontSize:11,color:"#94a3b8",marginTop:4}}>{dateStr} {timeStr}</div>
+              <button onClick={()=>{setMode("view");setSendPhase(0);}} style={{marginTop:20,padding:"9px 24px",borderRadius:9,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:12,fontWeight:600,cursor:"pointer"}}>일보로 돌아가기</button>
+            </div>}
+          </div>
+        ):(
+          /* Report content */
+          <div ref={reportRef} style={{flex:1,overflowY:"auto",padding:"20px 28px 30px"}}>
+            {/* Report Header */}
+            <div style={{textAlign:"center",marginBottom:20,paddingBottom:16,borderBottom:"2px solid #0891b2"}}>
+              <div style={{fontSize:10,color:"#94a3b8",letterSpacing:2,fontWeight:600,marginBottom:4}}>CONFIDENTIAL</div>
+              <div style={{fontSize:20,fontWeight:800,color:"#0f172a"}}>손해사정 일보(一報)</div>
+              <div style={{fontSize:12,color:"#64748b",marginTop:4}}>AI 자동 생성 · {dateStr} · 작성자: AI 손해사정 Agent</div>
+              <div style={{display:"inline-flex",gap:6,marginTop:8}}>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#ecfeff",color:"#0891b2",fontWeight:700,border:"1px solid #a5f3fc"}}>1차 보고</span>
+                <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#f0fdf4",color:"#059669",fontWeight:700,border:"1px solid #86efac"}}>AI 분석 완료</span>
+              </div>
+            </div>
+            {/* Sections */}
+            {sections.map((sec,si)=>(
+              <div key={sec.id} style={{marginBottom:16}}>
+                <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:8,padding:"8px 12px",background:"linear-gradient(135deg,#f8fafc,#f1f5f9)",borderRadius:10,border:"1px solid #e2e8f0"}}>
+                  <span style={{fontSize:15}}>{sec.icon}</span>
+                  <span style={{fontSize:13.5,fontWeight:700,color:"#0f172a"}}>{sec.title}</span>
+                </div>
+                {/* Table rows */}
+                {sec.rows&&<div style={{border:"1px solid #e2e8f0",borderRadius:10,overflow:"hidden"}}>
+                  {sec.rows.map((r,ri)=>(
+                    <div key={ri} style={{display:"flex",borderBottom:ri<sec.rows.length-1?"1px solid #f1f5f9":"none"}}>
+                      <div style={{width:160,flexShrink:0,padding:"8px 14px",background:"#f8fafc",fontSize:11.5,fontWeight:600,color:"#475569",borderRight:"1px solid #f1f5f9"}}>{mode==="edit"?<input value={r[0]} onChange={e=>updateRow(sec.id,ri,0,e.target.value)} style={{width:"100%",border:"none",background:"transparent",fontSize:11.5,fontWeight:600,color:"#475569",outline:"none"}}/>:r[0]}</div>
+                      <div style={{flex:1,padding:"8px 14px",fontSize:11.5,color:"#0f172a"}}>{mode==="edit"?<input value={r[1]} onChange={e=>updateRow(sec.id,ri,1,e.target.value)} style={{width:"100%",border:"none",background:"transparent",fontSize:11.5,color:"#0f172a",outline:"none"}}/>:r[1].split("**").map((p,pi)=>pi%2===1?<strong key={pi} style={{color:"#0891b2"}}>{p}</strong>:p)}</div>
+                    </div>
+                  ))}
+                </div>}
+                {/* Editable text */}
+                {sec.editable&&(mode==="edit"?
+                  <textarea value={sec.text} onChange={e=>updateText(sec.id,e.target.value)} style={{width:"100%",minHeight:120,padding:14,borderRadius:10,border:"1px solid #e2e8f0",fontSize:12,lineHeight:1.75,color:"#334155",resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>:
+                  <div style={{padding:"12px 16px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fafbfc",fontSize:12,lineHeight:1.75,color:"#334155",whiteSpace:"pre-wrap"}}>{sec.text}</div>
+                )}
+                {/* Sub-sections (damage) */}
+                {sec.subSections&&sec.subSections.map((sub,ssi)=>(
+                  <div key={ssi} style={{marginBottom:10}}>
+                    <div style={{fontSize:11.5,fontWeight:700,color:"#475569",padding:"6px 12px",background:"#f8fafc",borderRadius:"8px 8px 0 0",border:"1px solid #e2e8f0",borderBottom:"none"}}>{sub.subtitle}</div>
+                    <div style={{border:"1px solid #e2e8f0",borderRadius:"0 0 8px 8px",overflow:"hidden"}}>
+                      {sub.items.map((r,ri)=>(
+                        <div key={ri} style={{display:"flex",borderBottom:ri<sub.items.length-1?"1px solid #f1f5f9":"none"}}>
+                          <div style={{width:160,flexShrink:0,padding:"7px 14px",background:"#fafbfc",fontSize:11,fontWeight:600,color:"#64748b",borderRight:"1px solid #f1f5f9"}}>{r[0]}</div>
+                          <div style={{flex:1,padding:"7px 14px",fontSize:11,color:r[1].includes("▼")?"#dc2626":"#0f172a",fontWeight:r[0].includes("소계")||r[0].includes("총")||r[0].includes("절감")?700:400}}>{r[1]}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            {/* Footer */}
+            <div style={{marginTop:20,paddingTop:16,borderTop:"2px solid #e2e8f0",textAlign:"center"}}>
+              <div style={{fontSize:10,color:"#94a3b8",lineHeight:1.6}}>
+                본 일보는 AI 손해사정 Agent가 자동 생성한 1차 보고서입니다.<br/>
+                정밀 조사 및 최종 손해사정 보고서는 담당 손해사정사의 검토를 거쳐 별도 작성됩니다.<br/>
+                <strong>kt ds AX 사업개발팀 · AI 손해사정 Agent v1.0</strong>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 function GV80DamageDiagram(){
   const[hoveredPart,setHoveredPart]=useState(null);
   const[animPhase,setAnimPhase]=useState(0);
@@ -941,12 +1138,12 @@ function Tab1(){
   const[aiProgress,setAiProgress]=useState({step:0,msg:""});
   const{displayed:tA,done:aD}=useTW(at);
   const fr=useRef(null);
-  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[vehTab,setVehTab]=useState(0);const[smsOpen,setSmsOpen]=useState(false);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[vehTab,setVehTab]=useState(0);const[smsOpen,setSmsOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);
 
   const loadUC2=()=>{
     setOrigin("국산");sMk("제네시스");sMd("GV80");sYr("2025");sMl("3000");
     sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터","전방 카메라/센서"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc2");setVehTab(0);setSmsOpen(false);
+    sSv("심각");sRs(null);sAt("");setUseCase("uc2");setVehTab(0);setSmsOpen(false);setReportOpen(false);
     setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 전면부 광범위 파손 — 범퍼 ASSY 교체, 본넷 교체, 헤드라이트 교체 필요. 라디에이터 서포트 손상 의심."});
   };
 
@@ -1049,7 +1246,7 @@ function Tab1(){
       </div>
       <div style={{display:"flex",gap:6,alignItems:"center"}}>
         <button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📖 상황 보기</button>
-        <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");setVehTab(0);setSmsOpen(false);}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
+        <button onClick={()=>{if(useCase==="uc2"){setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");setVehTab(0);setSmsOpen(false);setReportOpen(false);}else{loadUC2();}}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc2"?"#ef4444":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc2"?"초기화":"Case 2 불러오기"}</button>
       </div>
     </div>
     {scenarioOpen&&<ScenarioModal id="uc2" onClose={()=>setScenarioOpen(false)}/>}
@@ -1249,18 +1446,31 @@ function Tab1(){
               )}
             </div>}
             <div style={{fontSize:12.5}}>{useCase==="uc2"&&vehTab===1?<RT text={UC_ESTIMATE_SELF}/>:useCase==="uc2"&&vehTab===2?<RT text={UC_ESTIMATE_TOTAL}/>:<RT text={tA}/>}</div>
-            {/* SMS Button for 총 지출 요약 tab */}
-            {useCase==="uc2"&&vehTab===2&&<div style={{marginTop:14,padding:"14px 16px",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",borderRadius:12,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:18}}>📱</span>
-                <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#065f46"}}>자사 고객 안내 문자 발송</div>
-                  <div style={{fontSize:10,color:"#6b7280"}}>AI가 작성한 안내 스크립트를 문자로 발송합니다</div>
+            {/* Action Buttons for Case 2 */}
+            {useCase==="uc2"&&vehTab===2&&<div style={{display:"flex",flex:"column",gap:8,marginTop:14}}>
+              <div style={{flex:1,padding:"14px 16px",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",borderRadius:12,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:18}}>📱</span>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:700,color:"#065f46"}}>고객 안내 문자</div>
+                    <div style={{fontSize:10,color:"#6b7280"}}>AI 작성 스크립트 발송</div>
+                  </div>
                 </div>
+                <button onClick={()=>setSmsOpen(true)} style={{padding:"8px 16px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📱 문자 작성</button>
               </div>
-              <button onClick={()=>setSmsOpen(true)} style={{padding:"8px 18px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,boxShadow:"0 2px 8px rgba(5,150,105,0.25)"}}>📱 문자 작성</button>
+              <div style={{flex:1,padding:"14px 16px",background:"linear-gradient(135deg,#ecfeff,#f0f9ff)",borderRadius:12,border:"1px solid #a5f3fc",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:18}}>📋</span>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:700,color:"#0e7490"}}>손해사정 일보</div>
+                    <div style={{fontSize:10,color:"#6b7280"}}>1차 보고서 열람 · 수정 · 전송</div>
+                  </div>
+                </div>
+                <button onClick={()=>setReportOpen(true)} style={{padding:"8px 16px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#0891b2,#06b6d4)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📋 일보 열기</button>
+              </div>
             </div>}
             {smsOpen&&<SmsModal onClose={()=>setSmsOpen(false)}/>}
+            {reportOpen&&<ReportModal onClose={()=>setReportOpen(false)} caseData={{insured:"자사 고객(그랜저 소유)",opponent:"타사 고객(GV80 소유)",accidentDate:new Date().toLocaleDateString("ko-KR")+" 14:30경",location:"서울시 강남구 역삼동 OO빌딩 지하주차장"}}/>}
             </div>
         </div>}
       </div></div></>);
