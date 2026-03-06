@@ -336,7 +336,7 @@ export default function App() {
         </div>
         <h1 style={{ fontSize: 48, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.2, letterSpacing: -1.5, fontFamily: "'Space Grotesk','Pretendard',sans-serif" }}>
           Build Fast,<br />
-          <span style={{ background: `linear-gradient(135deg,${t.accent},${theme==="pro"?"#818cf8":"#06b6d4"})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Validate Faster.</span>
+          <span style={{ background: theme==="light"?"linear-gradient(135deg,#059669,#0891b2)":theme==="pro"?"linear-gradient(135deg,#60a5fa,#a78bfa)":"linear-gradient(135deg,#34d399,#22d3ee)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Validate Faster.</span>
         </h1>
         <p style={{ fontSize: 15, color: t.sub, lineHeight: 1.8, maxWidth: 520 }}>
           AX 사업개발팀이 만든 MVP를 직접 체험해보세요.<br />
