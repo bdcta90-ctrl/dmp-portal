@@ -2782,7 +2782,6 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   useEffect(()=>{
     if(activeCaseProp==="uc1")loadUC1();else if(activeCaseProp==="uc2")loadUC2();else if(activeCaseProp==="uc3")loadUC3();else clearAll();
   },[activeCaseProp]);
-  };
 
   const CUST_PREFS=[
     {id:"cash",label:"💰 현금 수령 선호",desc:"미수선 처리로 최대 보상금 확보",short:"현금선호"},
