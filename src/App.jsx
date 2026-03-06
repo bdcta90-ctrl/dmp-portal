@@ -2,6 +2,7 @@ import { useState } from "react";
 import ClaimsAgentMVP from "./ClaimsAgent.jsx";
 import SecurityDashboard from "./SecurityDashboard.jsx";
 import AIFirewall from "./AIFirewall.jsx";
+import ClaimsAgentNew from "./ClaimsAgentNew.jsx";
 
 const THEMES = {
   dark: {
@@ -108,6 +109,20 @@ const MVPS = [
     gradient: "linear-gradient(135deg,rgba(59,130,246,0.08),rgba(29,78,216,0.06))",
     border: "rgba(59,130,246,0.2)",
   },
+  {
+    id: "claimsNew",
+    category: "AI",
+    catColor: "#f97316",
+    icon: "🚗",
+    iconBg: "linear-gradient(135deg,#f97316,#ea580c)",
+    title: "AI 자동차 손해사정 (New)",
+    desc: "견적 산정 · 과실비율 분석 · 처리방법 제안까지 AI가 의사결정을 지원하는 자동차 손해사정 포탈 (신규 개발 버전)",
+    tags: ["AI Agent", "손해사정", "New"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(249,115,22,0.08),rgba(234,88,12,0.06))",
+    border: "rgba(249,115,22,0.2)",
+  },
 ];
 
 export default function App() {
@@ -129,6 +144,7 @@ export default function App() {
   if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
   if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
+  if (page === "claimsNew") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
 
   const handleRequest = () => {
     if (!reqForm.name.trim() || !reqForm.team.trim() || !reqForm.email.trim() || !reqForm.title.trim() || !reqForm.desc.trim()) return;
@@ -365,7 +381,7 @@ export default function App() {
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall";
+            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall" || mvp.id === "claimsNew";
             return (
               <div
                 key={mvp.id}
