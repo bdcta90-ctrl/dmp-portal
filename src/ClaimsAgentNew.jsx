@@ -1561,7 +1561,7 @@ const TA={width:"100%",padding:"9px 13px",borderRadius:10,fontSize:12.5,backgrou
 const BT={width:"100%",padding:"12px 0",borderRadius:10,border:"none",cursor:"pointer",color:"#fff",fontSize:13.5,fontWeight:700,letterSpacing:.4,transition:"all .3s"};
 
 // ═══ TAB 1: 견적 산정 (확장) ═══
-function Tab1({activeCase}){
+function Tab1({activeCase,setActiveCase,flow,onNext}){
   const[origin,setOrigin]=useState("전체");
   const[mk,sMk]=useState("");const[md,sMd]=useState("");const[yr,sYr]=useState("");const[ml,sMl]=useState("");
   const[sp,sSp]=useState([]);const[sv,sSv]=useState("중간");const[openCat,setOpenCat]=useState(null);
@@ -1686,16 +1686,10 @@ function Tab1({activeCase}){
   };
 
   return(<>
-    {/* Active Case Indicator */}
-    {useCase&&<div style={{background:"linear-gradient(135deg,#eff6ff,#dbeafe)",borderRadius:10,padding:"8px 14px",marginBottom:10,border:"1px solid #93c5fd",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:13}}>📋</span>
-        <div style={{fontSize:11,fontWeight:700,color:"#1e40af"}}>견적 산정 — {useCase==="uc1"?"Case 1 교차로 충돌":useCase==="uc2"?"Case 2 주차장 GV80":useCase==="uc3"?"Case 3 차선변경":"Use Case"}</div>
-      </div>
-      <button onClick={()=>setScenarioOpen(true)} style={{padding:"4px 10px",borderRadius:7,border:"1px solid #bfdbfe",background:"#fff",color:"#3b82f6",fontSize:10,fontWeight:600,cursor:"pointer"}}>📖 상황 보기</button>
-    </div>}
+    {/* Case Bar */}
+    <CaseBar activeCase={useCase} setActiveCase={setActiveCase} agentName="견적 산정" agentColor="#0891b2" currentStep={0} completed={flow} scenarioOpen={scenarioOpen} setScenarioOpen={setScenarioOpen}/>
     {scenarioOpen&&<ScenarioModal id={useCase} onClose={()=>setScenarioOpen(false)}/>}
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:useCase?"calc(100% - 48px)":"100%"}}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:useCase?"calc(100% - 54px)":"calc(100% - 54px)"}}>
       {/* Photo Preview Modal */}
       {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
         <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"85vw",maxHeight:"85vh",display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
@@ -1918,11 +1912,19 @@ function Tab1({activeCase}){
             {reportOpen&&<ReportModal onClose={()=>setReportOpen(false)} caseData={{insured:"자사 고객(그랜저 소유)",opponent:"타사 고객(GV80 소유)",accidentDate:new Date().toLocaleDateString("ko-KR")+" 14:30경",location:"서울시 강남구 역삼동 OO빌딩 지하주차장"}}/>}
             </div>
         </div>}
+        {/* 다음 Agent 확인 */}
+        {useCase&&rs&&<div style={{padding:"12px 14px",background:"linear-gradient(135deg,#eff6ff,#f0f9ff)",borderRadius:12,border:"1px solid #93c5fd",display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:14}}>✅</span>
+            <div><div style={{fontSize:12,fontWeight:700,color:"#1e40af"}}>견적 산정 완료</div><div style={{fontSize:10,color:"#64748b"}}>다음 단계: 대인 피해 산정</div></div>
+          </div>
+          <button onClick={onNext} style={{padding:"8px 20px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#dc2626,#f43f5e)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>다음 Agent 확인 →</button>
+        </div>}
       </div></div></>);
 }
 
 // ═══ TAB: 대인 피해 산정 ═══
-function TabInjury({activeCase:activeCaseProp}){
+function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   const[input,setInput]=useState("");
   const[result,setResult]=useState(null);
   const[loading,setLoading]=useState(false);
@@ -2165,13 +2167,21 @@ function TabInjury({activeCase:activeCaseProp}){
   };
 
   const sevC={critical:"#dc2626",high:"#f97316",medium:"#f59e0b",low:"#22c55e"};
+  const[scenarioOpen,setScenarioOpen]=useState(false);
 
   return(<>
-    {useCase&&<div style={{background:"linear-gradient(135deg,#fef2f2,#fce7f3)",borderRadius:10,padding:"8px 14px",marginBottom:10,border:"1px solid #fca5a5",display:"flex",alignItems:"center",gap:8}}>
-      <span style={{fontSize:13}}>🏥</span>
-      <div style={{fontSize:11,fontWeight:700,color:"#991b1b"}}>대인 피해 — {useCase==="uc1"?"Case 1 대인 5명 (타사3+자사2)":useCase==="uc2"?"Case 2 대인 접수 없음 (무상해)":useCase==="uc3"?"Case 3 대인 2명 (타사1+자사1)":"Use Case"}</div>
+    {/* Case Bar */}
+    <CaseBar activeCase={useCase} setActiveCase={setActiveCase} agentName="대인 피해" agentColor="#dc2626" currentStep={1} completed={flow} scenarioOpen={scenarioOpen} setScenarioOpen={setScenarioOpen}/>
+    {scenarioOpen&&<ScenarioModal id={useCase} onClose={()=>setScenarioOpen(false)}/>}
+    {/* 이어하기 - 이전 Agent 완료 시 */}
+    {useCase&&flow[0]&&!result&&!loading&&<div style={{padding:"10px 14px",background:"linear-gradient(135deg,#fef2f2,#fff1f2)",borderRadius:10,border:"1px solid #fca5a5",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,animation:"fadeIn .3s"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:14}}>🔗</span>
+        <div><div style={{fontSize:11,fontWeight:700,color:"#991b1b"}}>견적 산정 완료 → 대인 피해 분석 연계</div><div style={{fontSize:10,color:"#dc2626"}}>이전 단계 정보를 기반으로 대인 접수 정보가 자동 입력됩니다</div></div>
+      </div>
+      <button onClick={analyze} style={{padding:"7px 16px",borderRadius:8,border:"none",background:"linear-gradient(135deg,#dc2626,#f43f5e)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>🔄 이어하기 — 분석 실행</button>
     </div>}
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1.2fr",gap:16,height:useCase?"calc(100% - 48px)":"100%"}}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1.2fr",gap:16,height:"calc(100% - "+(useCase&&flow[0]&&!result&&!loading?"108":"54")+"px)"}}>
       {/* Left: Input */}
       <div style={{overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
         <div style={CD}>
@@ -2283,6 +2293,14 @@ function TabInjury({activeCase:activeCaseProp}){
           </div>
           {msgModal&&<InjurySmsModal onClose={()=>setMsgModal(false)}/>}
           {reportOpen&&<InjuryReportModal onClose={()=>setReportOpen(false)}/>}
+          {/* 다음 Agent 확인 */}
+          {useCase&&aiText&&<div style={{padding:"12px 14px",background:"linear-gradient(135deg,#fef2f2,#fff1f2)",borderRadius:12,border:"1px solid #fca5a5",display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:14}}>✅</span>
+              <div><div style={{fontSize:12,fontWeight:700,color:"#991b1b"}}>대인 피해 분석 완료</div><div style={{fontSize:10,color:"#64748b"}}>다음 단계: 과실 산정</div></div>
+            </div>
+            <button onClick={onNext} style={{padding:"8px 20px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#7c3aed,#a855f7)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>다음 Agent 확인 →</button>
+          </div>}
         </div>}
       </div>
     </div>
@@ -2290,7 +2308,7 @@ function TabInjury({activeCase:activeCaseProp}){
 }
 
 // ═══ TAB 2: 과실 (확장) ═══
-function Tab2({activeCase:activeCaseProp}){
+function Tab2({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   const[at,sAt]=useState("");const[rt,sRt]=useState("");const[wt,sWt]=useState("");const[sg,sSg]=useState("");
   const[mD,sMd]=useState("");const[oD,sOd]=useState("");
   const[dc,sDc]=useState(false);const[pr,sPr]=useState(false);const[cctv,sCctv]=useState(false);const[wit,sWit]=useState(false);
@@ -2448,16 +2466,18 @@ function Tab2({activeCase:activeCaseProp}){
   ];
 
   return(<>
-    {/* Active Case Indicator */}
-    {useCase&&<div style={{background:"linear-gradient(135deg,#f5f3ff,#ede9fe)",borderRadius:10,padding:"8px 14px",marginBottom:10,border:"1px solid #c4b5fd",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:13}}>⚖️</span>
-        <div style={{fontSize:11,fontWeight:700,color:"#5b21b6"}}>과실 산정 — {useCase==="uc1"?"Case 1 교차로 직진vs직진":useCase==="uc2"?"Case 2 주차장 (100:0 자사과실)":useCase==="uc3"?"Case 3 차선변경 과실분쟁":"Use Case"}</div>
-      </div>
-      <button onClick={()=>setScenarioOpen(true)} style={{padding:"4px 10px",borderRadius:7,border:"1px solid #c4b5fd",background:"#fff",color:"#7c3aed",fontSize:10,fontWeight:600,cursor:"pointer"}}>📖 상황 보기</button>
-    </div>}
+    {/* Case Bar */}
+    <CaseBar activeCase={useCase} setActiveCase={setActiveCase} agentName="과실 산정" agentColor="#7c3aed" currentStep={2} completed={flow} scenarioOpen={scenarioOpen} setScenarioOpen={setScenarioOpen}/>
     {scenarioOpen&&<ScenarioModal id={useCase} onClose={()=>setScenarioOpen(false)}/>}
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:useCase?"calc(100% - 48px)":"100%"}}>
+    {/* 이어하기 */}
+    {useCase&&flow[1]&&!rs&&!ld&&<div style={{padding:"10px 14px",background:"linear-gradient(135deg,#f5f3ff,#ede9fe)",borderRadius:10,border:"1px solid #c4b5fd",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,animation:"fadeIn .3s"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:14}}>🔗</span>
+        <div><div style={{fontSize:11,fontWeight:700,color:"#5b21b6"}}>대인 피해 완료 → 과실 산정 연계</div><div style={{fontSize:10,color:"#7c3aed"}}>사고 정보가 자동 입력되었습니다. 분석을 실행하세요.</div></div>
+      </div>
+      <button onClick={calc} disabled={!at} style={{padding:"7px 16px",borderRadius:8,border:"none",background:at?"linear-gradient(135deg,#7c3aed,#a855f7)":"#e2e8f0",color:at?"#fff":"#94a3b8",fontSize:11,fontWeight:700,cursor:at?"pointer":"not-allowed"}}>🔄 이어하기 — 분석 실행</button>
+    </div>}
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"calc(100% - "+(useCase&&flow[1]&&!rs&&!ld?"108":"54")+"px)"}}>
       {/* Photo Preview Modal */}
       {pvIdx!==null&&ph[pvIdx]&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>sPvIdx(null)}>
         <div onClick={e=>e.stopPropagation()} style={{position:"relative",maxWidth:"85vw",maxHeight:"85vh",display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
@@ -2645,11 +2665,19 @@ function Tab2({activeCase:activeCaseProp}){
             </div>}
             {reportOpen&&<FaultReportModal onClose={()=>setReportOpen(false)}/>}
             </div></div>}
+        {/* 다음 Agent 확인 */}
+        {useCase&&rs&&<div style={{padding:"12px 14px",background:"linear-gradient(135deg,#f5f3ff,#ede9fe)",borderRadius:12,border:"1px solid #c4b5fd",display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:14}}>✅</span>
+            <div><div style={{fontSize:12,fontWeight:700,color:"#5b21b6"}}>과실 산정 완료</div><div style={{fontSize:10,color:"#64748b"}}>다음 단계: 처리 방법 제안</div></div>
+          </div>
+          <button onClick={onNext} style={{padding:"8px 20px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>다음 Agent 확인 →</button>
+        </div>}
       </div></div></>);
 }
 
 // ═══ TAB 3: 처리 방법 (확장) ═══
-function Tab3({activeCase:activeCaseProp}){
+function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   const[stage,setStage]=useState("idle");
   const[selCase,setSelCase]=useState(null);const[modal,setModal]=useState(false);const[csQ,setCsQ]=useState("");
   const[input,setInput]=useState("");
@@ -3037,16 +3065,17 @@ function Tab3({activeCase:activeCaseProp}){
   const CI=[IC.cs,IC.wr,IC.sh],CC=["#0891b2","#7c3aed","#2563eb"],CB=["#ecfeff","#f5f3ff","#eff6ff"],CR=["#a5f3fc","#c4b5fd","#bfdbfe"];
 
   return(<>
-    {/* Active Case Indicator */}
-    {useCase&&<div style={{background:"linear-gradient(135deg,#ecfdf5,#d1fae5)",borderRadius:10,padding:"8px 14px",marginBottom:10,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:13}}>🚗</span>
-        <div style={{fontSize:11,fontWeight:700,color:"#065f46"}}>처리 방법 — {useCase==="uc1"?"Case 1 교차로 종합처리":useCase==="uc2"?"Case 2 주차장 비용처리":useCase==="uc3"?"Case 3 차선변경 협상":"Use Case"}</div>
-      </div>
-      <button onClick={()=>setScenarioOpen(true)} style={{padding:"4px 10px",borderRadius:7,border:"1px solid #86efac",background:"#fff",color:"#059669",fontSize:10,fontWeight:600,cursor:"pointer"}}>📖 상황 보기</button>
-    </div>}
+    {/* Case Bar */}
+    <CaseBar activeCase={useCase} setActiveCase={setActiveCase} agentName="처리 방법" agentColor="#059669" currentStep={3} completed={flow} scenarioOpen={scenarioOpen} setScenarioOpen={setScenarioOpen}/>
     {scenarioOpen&&<ScenarioModal id={useCase} onClose={()=>setScenarioOpen(false)}/>}
-    <div style={{display:"flex",flexDirection:"column",height:useCase?"calc(100% - 48px)":"100%"}}>
+    {/* 이어하기 */}
+    {useCase&&flow[2]&&stage==="idle"&&<div style={{padding:"10px 14px",background:"linear-gradient(135deg,#ecfdf5,#d1fae5)",borderRadius:10,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,animation:"fadeIn .3s"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <span style={{fontSize:14}}>🔗</span>
+        <div><div style={{fontSize:11,fontWeight:700,color:"#065f46"}}>견적+대인+과실 완료 → 처리 방법 종합 연계</div><div style={{fontSize:10,color:"#059669"}}>이전 3단계 분석 결과가 반영된 종합 접수 내용이 입력되었습니다</div></div>
+      </div>
+    </div>}
+    <div style={{display:"flex",flexDirection:"column",height:"calc(100% - "+(useCase&&flow[2]&&stage==="idle"?"108":"54")+"px)"}}>
       {modal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.2)",backdropFilter:"blur(3px)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setModal(false)}>
         <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:18,padding:24,width:580,maxHeight:"68vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 16px 48px rgba(0,0,0,.1)"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
@@ -3574,18 +3603,50 @@ function TabKPI(){
   </div>);
 }
 
+// ═══ Shared Case Bar Component ═══
+const CASES_INFO=[
+  {id:"uc1",label:"Case 1",desc:"교차로 골목길 충돌 — 그랜저 vs BMW 7시리즈",color:"#059669",icon:"🚗"},
+  {id:"uc2",label:"Case 2",desc:"주차장 신차 충돌 — GV80 3.5T AWD (3개월)",color:"#3b82f6",icon:"🅿️"},
+  {id:"uc3",label:"Case 3",desc:"차선변경 과실 분쟁 — 9:1 vs 10:0",color:"#7c3aed",icon:"🔀"},
+];
+function CaseBar({activeCase,setActiveCase,agentName,agentColor,currentStep,completed,onNext,scenarioOpen,setScenarioOpen}){
+  const STEPS=["견적 산정","대인 피해","과실 산정","처리 방법"];
+  return(
+    <div style={{marginBottom:10,display:"flex",flexDirection:"column",gap:6}}>
+      {/* Case Buttons */}
+      <div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:"#fff",borderRadius:10,border:"1px solid #e2e8f0"}}>
+        <span style={{fontSize:10,color:"#94a3b8",fontWeight:600,flexShrink:0}}>{agentName}:</span>
+        {CASES_INFO.map(c=>(
+          <button key={c.id} onClick={()=>setActiveCase(activeCase===c.id?null:c.id)} style={{padding:"5px 12px",borderRadius:7,border:activeCase===c.id?`2px solid ${c.color}`:"1px solid #e2e8f0",background:activeCase===c.id?c.color+"10":"#fff",color:activeCase===c.id?c.color:"#94a3b8",fontSize:10.5,fontWeight:activeCase===c.id?700:500,cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",gap:4}}>
+            <span>{c.icon}</span>{c.label}
+          </button>
+        ))}
+        {activeCase&&<>
+          <button onClick={()=>setScenarioOpen(true)} style={{marginLeft:4,padding:"4px 10px",borderRadius:7,border:`1px solid ${agentColor}40`,background:agentColor+"08",color:agentColor,fontSize:10,fontWeight:600,cursor:"pointer"}}>📖 상황 보기</button>
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:3}}>
+            {STEPS.map((s,i)=>(
+              <span key={i} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:currentStep===i?agentColor+"15":completed[i]?"#dcfce7":"#f1f5f9",color:currentStep===i?agentColor:completed[i]?"#16a34a":"#cbd5e1",fontWeight:currentStep===i?700:400,border:currentStep===i?`1px solid ${agentColor}30`:completed[i]?"1px solid #86efac":"1px solid transparent"}}>
+                {completed[i]?"✓ ":""}{i+1}.{s}
+              </span>
+            ))}
+          </div>
+        </>}
+      </div>
+      {/* 이어하기 + 다음Agent 버튼 — completed에 따라 표시 */}
+    </div>
+  );
+}
+
 // ═══ MAIN ═══
 export default function ClaimsAgentNew({ onBack }){
   const[tab,setTab]=useState(0);
-  const[activeCase,setActiveCase]=useState(null);// null,"uc1","uc2","uc3"
-  const CASES_INFO=[
-    {id:"uc1",label:"Case 1",desc:"교차로 골목길 충돌 — 그랜저 vs BMW 7시리즈",color:"#059669",icon:"🚗"},
-    {id:"uc2",label:"Case 2",desc:"주차장 신차 충돌 — GV80 3.5T AWD (3개월)",color:"#3b82f6",icon:"🅿️"},
-    {id:"uc3",label:"Case 3",desc:"차선변경 과실 분쟁 — 9:1 vs 10:0",color:"#7c3aed",icon:"🔀"},
-  ];
+  const[activeCase,setActiveCase]=useState(null);
+  const[flow,setFlow]=useState([false,false,false,false]);// 각 Agent 완료 상태
+  const markDone=(idx)=>setFlow(prev=>{const n=[...prev];n[idx]=true;return n;});
+  const goNext=(fromIdx)=>{markDone(fromIdx);setTab(fromIdx+1);};
   const tabs=[{l:"견적 산정",e:"Estimate",i:IC.est,c:"#0891b2"},{l:"대인 피해",e:"Injury",i:IC.flt,c:"#dc2626"},{l:"과실 산정",e:"Fault",i:IC.flt,c:"#7c3aed"},{l:"처리 방법",e:"Method",i:IC.mth,c:"#059669"},{l:"KPI 관리",e:"KPI",i:IC.est,c:"#f59e0b"}];
-  const nextTab=()=>{if(tab<3)setTab(tab+1);};
-  const FLOW_LABELS=["① 견적 산정","② 대인 피해","③ 과실 산정","④ 처리 방법","⑤ KPI"];
+  // Reset flow when case changes
+  useEffect(()=>{setFlow([false,false,false,false]);},[activeCase]);
   return(
     <div style={{width:"100%",height:"100vh",fontFamily:"'Noto Sans KR',-apple-system,sans-serif",background:"linear-gradient(155deg,#f8fafc,#f0f9ff 40%,#faf5ff 70%,#f8fafc)",color:"#0f172a",display:"flex",flexDirection:"column",overflow:"hidden"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
@@ -3599,37 +3660,15 @@ export default function ClaimsAgentNew({ onBack }){
             <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX</div></div></div>
         <div style={{display:"flex",alignItems:"center",gap:5,color:"#94a3b8",fontSize:11}}><div style={{width:6,height:6,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 5px #4ade80"}}/>Active</div></div>
 
-      {/* Global Case Selector Bar */}
-      <div style={{padding:"8px 26px",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.7)",display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:10,color:"#94a3b8",fontWeight:600,flexShrink:0}}>Use Case:</span>
-        {CASES_INFO.map(c=>(
-          <button key={c.id} onClick={()=>setActiveCase(activeCase===c.id?null:c.id)} style={{padding:"4px 12px",borderRadius:7,border:activeCase===c.id?`2px solid ${c.color}`:"1px solid #e2e8f0",background:activeCase===c.id?c.color+"10":"#fff",color:activeCase===c.id?c.color:"#94a3b8",fontSize:10,fontWeight:activeCase===c.id?700:500,cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",gap:4}}>
-            <span>{c.icon}</span>{c.label}
-          </button>
-        ))}
-        {activeCase&&<>
-          <div style={{width:1,height:20,background:"#e2e8f0",margin:"0 4px"}}/>
-          <span style={{fontSize:10,color:"#64748b",maxWidth:300,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{CASES_INFO.find(c=>c.id===activeCase)?.desc}</span>
-        </>}
-        {activeCase&&tab<4&&<div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
-          {/* Flow indicator */}
-          <div style={{display:"flex",gap:2}}>
-            {FLOW_LABELS.slice(0,4).map((fl,i)=>(
-              <span key={i} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:tab===i?tabs[i].c+"15":"#f1f5f9",color:tab===i?tabs[i].c:"#cbd5e1",fontWeight:tab===i?700:400,border:tab===i?`1px solid ${tabs[i].c}30`:"1px solid transparent"}}>{fl}</span>
-            ))}
-          </div>
-          {tab<3&&<button onClick={nextTab} style={{padding:"4px 12px",borderRadius:7,border:"none",background:"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:10,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:3}}>다음 단계 →</button>}
-        </div>}
-      </div>
-
       <div style={{display:"flex",gap:2,padding:"8px 26px",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.55)"}}>
-        {tabs.map((t,i)=><button key={i} onClick={()=>setTab(i)} style={{display:"flex",alignItems:"center",gap:5,padding:"7px 16px",borderRadius:9,border:"none",cursor:"pointer",background:tab===i?`${t.c}0D`:"transparent",color:tab===i?t.c:"#94a3b8",fontSize:12.5,fontWeight:tab===i?700:500,transition:"all .15s",borderBottom:tab===i?`2px solid ${t.c}`:"2px solid transparent"}}>
+        {tabs.map((t,i)=><button key={i} onClick={()=>setTab(i)} style={{display:"flex",alignItems:"center",gap:5,padding:"7px 16px",borderRadius:9,border:"none",cursor:"pointer",background:tab===i?`${t.c}0D`:flow[i]?`${t.c}08`:"transparent",color:tab===i?t.c:flow[i]?t.c+"99":"#94a3b8",fontSize:12.5,fontWeight:tab===i?700:500,transition:"all .15s",borderBottom:tab===i?`2px solid ${t.c}`:"2px solid transparent",position:"relative"}}>
+          {flow[i]&&tab!==i&&<span style={{position:"absolute",top:2,right:4,fontSize:7,color:"#16a34a"}}>✓</span>}
           {t.i}<span>{t.l}</span><span style={{fontSize:9.5,opacity:.5,marginLeft:2}}>{t.e}</span></button>)}</div>
       <div style={{flex:1,padding:"14px 26px",overflow:"hidden",minHeight:0}}>
-        <div style={{height:"100%",display:tab===0?"block":"none"}}><Tab1 activeCase={activeCase}/></div>
-        <div style={{height:"100%",display:tab===1?"block":"none"}}><TabInjury activeCase={activeCase}/></div>
-        <div style={{height:"100%",display:tab===2?"block":"none"}}><Tab2 activeCase={activeCase}/></div>
-        <div style={{height:"100%",display:tab===3?"flex":"none",flexDirection:"column"}}><Tab3 activeCase={activeCase}/></div>
+        <div style={{height:"100%",display:tab===0?"block":"none"}}><Tab1 activeCase={activeCase} setActiveCase={setActiveCase} flow={flow} onNext={()=>goNext(0)}/></div>
+        <div style={{height:"100%",display:tab===1?"block":"none"}}><TabInjury activeCase={activeCase} setActiveCase={setActiveCase} flow={flow} onNext={()=>goNext(1)}/></div>
+        <div style={{height:"100%",display:tab===2?"block":"none"}}><Tab2 activeCase={activeCase} setActiveCase={setActiveCase} flow={flow} onNext={()=>goNext(2)}/></div>
+        <div style={{height:"100%",display:tab===3?"flex":"none",flexDirection:"column"}}><Tab3 activeCase={activeCase} setActiveCase={setActiveCase} flow={flow} onNext={()=>goNext(3)}/></div>
         <div style={{height:"100%",display:tab===4?"flex":"none",flexDirection:"column"}}><TabKPI/></div></div>
     </div>);
 }
