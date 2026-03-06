@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ClaimsAgentMVP from "./ClaimsAgent.jsx";
 import SecurityDashboard from "./SecurityDashboard.jsx";
+import AIFirewall from "./AIFirewall.jsx";
 
 const THEMES = {
   dark: {
@@ -93,6 +94,20 @@ const MVPS = [
     gradient: "linear-gradient(135deg,rgba(244,63,94,0.08),rgba(251,146,60,0.06))",
     border: "rgba(244,63,94,0.2)",
   },
+  {
+    id: "firewall",
+    category: "SECURITY",
+    catColor: "#3b82f6",
+    icon: "🛡️",
+    iconBg: "linear-gradient(135deg,#3b82f6,#1d4ed8)",
+    title: "AI 방화벽",
+    desc: "기업 내 AI 도구 오남용 방지 · 외부 위협(패킷/이메일) 차단 · 내부 자산 보호를 위한 AI 기반 통합 보안 방화벽",
+    tags: ["AI보안", "방화벽", "위협탐지"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(59,130,246,0.08),rgba(29,78,216,0.06))",
+    border: "rgba(59,130,246,0.2)",
+  },
 ];
 
 export default function App() {
@@ -113,6 +128,7 @@ export default function App() {
 
   if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
+  if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
 
   const handleRequest = () => {
     if (!reqForm.name.trim() || !reqForm.team.trim() || !reqForm.email.trim() || !reqForm.title.trim() || !reqForm.desc.trim()) return;
@@ -347,9 +363,9 @@ export default function App() {
       {/* MVP SHOWCASE */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 40px" }}>
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "claims" || mvp.id === "security";
+            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall";
             return (
               <div
                 key={mvp.id}
