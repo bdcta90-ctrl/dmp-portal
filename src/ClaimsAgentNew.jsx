@@ -3609,30 +3609,40 @@ const CASES_INFO=[
   {id:"uc2",label:"Case 2",desc:"주차장 신차 충돌 — GV80 3.5T AWD (3개월)",color:"#3b82f6",icon:"🅿️"},
   {id:"uc3",label:"Case 3",desc:"차선변경 과실 분쟁 — 9:1 vs 10:0",color:"#7c3aed",icon:"🔀"},
 ];
-function CaseBar({activeCase,setActiveCase,agentName,agentColor,currentStep,completed,onNext,scenarioOpen,setScenarioOpen}){
+function CaseBar({activeCase,setActiveCase,agentName,agentColor,currentStep,completed,scenarioOpen,setScenarioOpen}){
   const STEPS=["견적 산정","대인 피해","과실 산정","처리 방법"];
+  const[selCase,setSelCase]=useState(activeCase||"");
+  useEffect(()=>{setSelCase(activeCase||"");},[activeCase]);
   return(
-    <div style={{marginBottom:10,display:"flex",flexDirection:"column",gap:6}}>
-      {/* Case Buttons */}
-      <div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:"#fff",borderRadius:10,border:"1px solid #e2e8f0"}}>
-        <span style={{fontSize:10,color:"#94a3b8",fontWeight:600,flexShrink:0}}>{agentName}:</span>
-        {CASES_INFO.map(c=>(
-          <button key={c.id} onClick={()=>setActiveCase(activeCase===c.id?null:c.id)} style={{padding:"5px 12px",borderRadius:7,border:activeCase===c.id?`2px solid ${c.color}`:"1px solid #e2e8f0",background:activeCase===c.id?c.color+"10":"#fff",color:activeCase===c.id?c.color:"#94a3b8",fontSize:10.5,fontWeight:activeCase===c.id?700:500,cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",gap:4}}>
-            <span>{c.icon}</span>{c.label}
-          </button>
-        ))}
-        {activeCase&&<>
-          <button onClick={()=>setScenarioOpen(true)} style={{marginLeft:4,padding:"4px 10px",borderRadius:7,border:`1px solid ${agentColor}40`,background:agentColor+"08",color:agentColor,fontSize:10,fontWeight:600,cursor:"pointer"}}>📖 상황 보기</button>
-          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:3}}>
-            {STEPS.map((s,i)=>(
-              <span key={i} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:currentStep===i?agentColor+"15":completed[i]?"#dcfce7":"#f1f5f9",color:currentStep===i?agentColor:completed[i]?"#16a34a":"#cbd5e1",fontWeight:currentStep===i?700:400,border:currentStep===i?`1px solid ${agentColor}30`:completed[i]?"1px solid #86efac":"1px solid transparent"}}>
-                {completed[i]?"✓ ":""}{i+1}.{s}
-              </span>
-            ))}
-          </div>
-        </>}
+    <div style={{marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 14px",background:"#fff",borderRadius:12,border:`1px solid ${activeCase?agentColor+"30":"#e2e8f0"}`,boxShadow:activeCase?`0 2px 8px ${agentColor}10`:"none"}}>
+        {/* Agent Label */}
+        <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:agentColor}}/>
+          <span style={{fontSize:11,fontWeight:700,color:agentColor}}>{agentName}</span>
+        </div>
+        <div style={{width:1,height:22,background:"#e2e8f0"}}/>
+        {/* Case Dropdown */}
+        <select value={selCase} onChange={e=>setSelCase(e.target.value)} style={{flex:1,maxWidth:420,padding:"6px 12px",borderRadius:8,border:"1px solid #e2e8f0",background:"#f8fafc",color:"#0f172a",fontSize:11,fontWeight:600,cursor:"pointer",outline:"none",appearance:"auto"}}>
+          <option value="">Use Case를 선택하세요</option>
+          {CASES_INFO.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}: {c.desc}</option>)}
+        </select>
+        {/* 불러오기 / 초기화 */}
+        {activeCase===selCase&&activeCase?
+          <button onClick={()=>setActiveCase(null)} style={{padding:"6px 14px",borderRadius:8,border:"none",background:"#ef4444",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>초기화</button>:
+          <button onClick={()=>{if(selCase)setActiveCase(selCase);}} disabled={!selCase} style={{padding:"6px 14px",borderRadius:8,border:"none",background:selCase?`linear-gradient(135deg,${agentColor},${agentColor}cc)`:"#e2e8f0",color:selCase?"#fff":"#94a3b8",fontSize:11,fontWeight:700,cursor:selCase?"pointer":"not-allowed",whiteSpace:"nowrap",flexShrink:0}}>불러오기</button>
+        }
+        {/* 상황 보기 */}
+        {activeCase&&<button onClick={()=>setScenarioOpen(true)} style={{padding:"6px 12px",borderRadius:8,border:`1px solid ${agentColor}30`,background:agentColor+"08",color:agentColor,fontSize:10,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>📖 상황 보기</button>}
+        {/* Flow Progress */}
+        {activeCase&&<div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:3,flexShrink:0}}>
+          {STEPS.map((s,i)=>(
+            <span key={i} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:currentStep===i?agentColor+"15":completed[i]?"#dcfce7":"#f1f5f9",color:currentStep===i?agentColor:completed[i]?"#16a34a":"#cbd5e1",fontWeight:currentStep===i?700:400,border:currentStep===i?`1px solid ${agentColor}30`:completed[i]?"1px solid #86efac":"1px solid transparent",whiteSpace:"nowrap"}}>
+              {completed[i]?"✓ ":""}{i+1}.{s}
+            </span>
+          ))}
+        </div>}
       </div>
-      {/* 이어하기 + 다음Agent 버튼 — completed에 따라 표시 */}
     </div>
   );
 }
