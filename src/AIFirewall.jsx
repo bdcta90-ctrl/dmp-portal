@@ -38,15 +38,56 @@ const ACTIONS_TAKEN = ["차단","경고 발송","격리","로그 기록","관리
 const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 const randInt = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 
+const NAMES = ["김현수","이지민","박서연","최민준","정소영","조태우","한예진","윤동훈","서수빈","강재현","임채원","신유진","배준서","송하은","류민재"];
+const POSITIONS = ["사원","대리","과장","차장","부장","팀장","매니저","연구원","선임연구원"];
+const DETECTION_METHODS = {
+  malicious_email:["YARA 룰 매칭(악성 시그니처 탐지)","샌드박스 분석(첨부파일 동적 실행 검사)","이메일 헤더 SPF/DKIM 검증 실패"],
+  phishing:["URL 평판 분석(피싱 도메인 DB 매칭)","머신러닝 기반 페이지 구조 분석","SSL 인증서 이상 탐지(자체서명/만료)"],
+  data_exfil:["DLP 정책 위반(민감정보 패턴 탐지)","비정상 데이터 전송량 감지(평소 대비 300% 초과)","비인가 외부 전송 목적지 탐지"],
+  malware_packet:["IDS/IPS 시그니처 매칭","네트워크 패킷 딥 인스펙션(비정상 페이로드)","C&C 서버 통신 패턴 탐지"],
+  ddos:["트래픽 볼륨 이상 탐지(임계치 초과)","SYN Flood 패턴 감지","봇넷 IP 블랙리스트 매칭"],
+  unauthorized_api:["API 키 미인증/만료 감지","비인가 엔드포인트 접근 시도","Rate Limit 초과(분당 500회 이상)"],
+  prompt_injection:["프롬프트 패턴 분석(시스템 프롬프트 우회 시도)","입력 토큰 이상 탐지(인코딩 우회)","역할 변경 명령어 감지"],
+  model_extraction:["반복적 추론 요청 패턴 감지(모델 복제 시도)","응답 데이터 대량 수집 탐지","비정상 API 호출 패턴(파라미터 순차 변경)"],
+  sensitive_upload:["PII 탐지(주민등록번호/카드번호 패턴)","기밀 문서 분류 태그 탐지","내부 전용 파일 확장자 외부 전송 감지"],
+  shadow_ai:["DNS 쿼리 분석(비인가 AI 도메인)","TLS 핑거프린트 기반 서비스 식별","프록시 우회 접속 시도 탐지"],
+};
+const THREAT_IMPACTS = {
+  malicious_email:["랜섬웨어 감염으로 전사 시스템 마비 위험","내부 계정 탈취 → 2차 피해 확산","기밀 데이터 암호화 및 금전 요구"],
+  phishing:["임직원 계정 정보 유출","내부 시스템 무단 접근 권한 획득","거래처 사칭 금전 피해 발생 가능"],
+  data_exfil:["고객 개인정보 유출 → 개인정보보호법 위반","영업 기밀 유출 → 경쟁사 유출 위험","규제 당국 과징금 및 기업 신뢰도 하락"],
+  malware_packet:["내부 네트워크 감염 확산","백도어 설치 → 지속적 정보 유출","시스템 성능 저하 및 서비스 장애"],
+  ddos:["서비스 가용성 저하/중단","고객 서비스 장애 → 매출 손실","공격 중 다른 보안 위협 은폐 가능"],
+  unauthorized_api:["내부 데이터 무단 접근/추출","API 남용으로 서비스 성능 저하","권한 상승 공격의 전조 가능"],
+  prompt_injection:["AI 시스템 오작동 유도","내부 정책/데이터 유출","AI 의사결정 조작 위험"],
+  model_extraction:["AI 모델 지적재산 탈취","경쟁사에 모델 복제 위험","학습 데이터 역추론 가능"],
+  sensitive_upload:["기업 기밀 외부 AI 서버에 저장","개인정보 제3자 제공 위반","학습 데이터로 활용되어 영구 유출"],
+  shadow_ai:["보안 정책 우회로 통제 불가","민감 데이터가 비인가 AI에 노출","컴플라이언스 위반 리스크"],
+};
+const RESPONSE_GUIDES = {
+  malicious_email:["이메일 격리 및 첨부파일 삭제","발신 IP/도메인 블랙리스트 등록","수신자에게 열람 금지 경고 발송","보안팀 악성코드 분석 의뢰"],
+  phishing:["피싱 URL 즉시 차단","해당 계정 비밀번호 강제 변경","전사 피싱 경고 공지 발송","유사 도메인 모니터링 등록"],
+  data_exfil:["전송 즉시 차단 및 세션 종료","해당 사용자 계정 일시 정지","유출 데이터 범위 파악 및 로그 확보","CISO 긴급 보고 및 사고대응팀 소집"],
+  malware_packet:["패킷 차단 및 출발지 IP 블랙리스트","감염 의심 단말 네트워크 격리","안티바이러스 긴급 스캔 실행","네트워크 포렌식 분석"],
+  ddos:["트래픽 필터링 및 Rate Limiting 강화","CDN/방화벽 DDoS 방어 모드 활성화","ISP 연계 상위 트래픽 차단 요청","서비스 가용성 모니터링 강화"],
+  unauthorized_api:["API 키 즉시 폐기/재발급","해당 IP/계정 접근 차단","API 접근 로그 전수 조사","인증 체계 점검 및 강화"],
+  prompt_injection:["해당 세션 즉시 종료","입력 필터링 규칙 업데이트","AI 시스템 출력 로그 검토","프롬프트 가드레일 강화"],
+  model_extraction:["해당 계정/IP 즉시 차단","API Rate Limit 긴급 하향","추론 요청 패턴 정밀 분석","모델 접근 권한 재검토"],
+  sensitive_upload:["업로드 즉시 차단","해당 파일의 민감정보 범위 파악","사용자에게 정책 위반 경고","DLP 정책 규칙 보강"],
+  shadow_ai:["비인가 AI 도메인 DNS 차단","사용자에게 경고 및 교육 안내","허용된 AI 도구 목록 안내","반복 위반 시 HR 연계 조치"],
+};
+
 function generateThreatEvent() {
   const threat = pick(THREAT_TYPES);
   const dept = pick(DEPARTMENTS);
   const src = `${randInt(10,220)}.${randInt(1,254)}.${randInt(1,254)}.${randInt(1,254)}`;
   const action = threat.severity === "critical" ? pick(["차단","세션 종료","IP 차단"]) : pick(ACTIONS_TAKEN);
+  const userName = pick(NAMES);
   return {
     id: "FW-"+Date.now()+"-"+randInt(100,999),
     timestamp: new Date(),
     threat, dept, sourceIP: src, action,
+    userName, position: pick(POSITIONS), empId: "EMP-"+randInt(10000,99999),
     destination: pick(["내부 DB","파일서버","이메일 서버","API 게이트웨이","클라우드 스토리지"]),
     payload: threat.type === "malicious_email" ? "악성 첨부파일 감지 ("+pick(["invoice.exe","report.zip.js","update.bat"])+")":
              threat.type === "phishing" ? "위조 로그인 페이지 링크 탐지":
@@ -54,6 +95,9 @@ function generateThreatEvent() {
              threat.type === "sensitive_upload" ? pick(["고객DB.csv","계약서_기밀.pdf","소스코드.zip"])+" 업로드 시도":
              threat.type === "shadow_ai" ? pick(AI_TOOLS.filter(t=>t.status==="blocked")).name+" 비인가 접속 시도":
              "비정상 트래픽 패턴 감지",
+    detectionMethod: pick(DETECTION_METHODS[threat.type]||["규칙 기반 탐지"]),
+    impacts: THREAT_IMPACTS[threat.type]||["보안 위협 발생 가능"],
+    responses: RESPONSE_GUIDES[threat.type]||["보안팀 확인 필요"],
     isNew: true,
     riskScore: threat.severity==="critical"?randInt(85,100):threat.severity==="high"?randInt(60,84):randInt(30,59),
   };
@@ -63,11 +107,12 @@ function generateAIUsageEvent(tools) {
   const tool = pick(tools);
   const dept = pick(DEPARTMENTS);
   const blocked = tool.status === "blocked";
+  const userName = pick(NAMES);
   return {
     id: "AI-"+Date.now()+"-"+randInt(100,999),
     timestamp: new Date(),
-    tool: tool.name, toolIcon: tool.icon, category: tool.category,
-    dept, user: pick(["김","이","박","최","정","조","한","윤","서","강"])+pick(["현수","지민","서연","민준","소영","태우","예진","동훈","수빈","재현"]),
+    tool: tool.name, toolIcon: tool.icon, category: tool.category, toolRisk: tool.risk,
+    dept, user: userName, position: pick(POSITIONS), empId: "EMP-"+randInt(10000,99999),
     action: blocked ? "차단" : tool.status==="monitoring" ? pick(["허용(모니터링)","경고"]) : "허용",
     dataVolume: blocked ? "—" : randInt(1,500)+"KB",
     query: blocked ? "접근 차단됨" :
@@ -75,6 +120,9 @@ function generateAIUsageEvent(tools) {
       tool.category==="코드생성" ? pick(["함수 자동완성","버그 수정 제안","리팩토링","테스트 코드 생성"]):
       pick(["문서 교정","이미지 편집","번역","검색"]),
     riskFlag: blocked ? "정책 위반" : tool.risk==="high" ? "주의 필요" : null,
+    detectionMethod: blocked ? "AI 보안 정책 — "+tool.name+" 차단 규칙 매칭" : tool.status==="monitoring" ? "모니터링 대상 AI 도구 사용 감지" : "허용 정책에 의한 정상 접근",
+    impacts: blocked ? ["비인가 AI에 사내 데이터 노출 위험","AI 학습 데이터로 활용 시 영구 유출","컴플라이언스 위반 리스크"] : tool.risk==="high" ? ["민감 데이터 외부 전송 가능성","AI 서비스 약관에 따른 데이터 활용 위험"] : [],
+    responses: blocked ? ["접근 차단 완료","사용자에게 정책 위반 경고 발송","허용된 AI 도구 목록 안내","반복 위반 시 부서장 통보"] : tool.risk==="high" ? ["데이터 전송 내용 모니터링","민감정보 포함 여부 DLP 검사"] : [],
     isNew: true,
   };
 }
@@ -124,6 +172,9 @@ export default function AIFirewall({onBack}){
   const[totalAllowed,setTotalAllowed]=useState(randInt(3500,5800));
   const[totalThreats,setTotalThreats]=useState(randInt(180,420));
   const[policyModal,setPolicyModal]=useState(null);
+  const[eventDetail,setEventDetail]=useState(null);
+  const[newPolicyModal,setNewPolicyModal]=useState(false);
+  const[newPolicy,setNewPolicy]=useState({name:"",vendor:"",category:"생성형AI",risk:"medium",status:"blocked",icon:"🔧"});
 
   const addEvents=useCallback(()=>{
     const te=generateThreatEvent();
@@ -159,6 +210,12 @@ export default function AIFirewall({onBack}){
   const toggleToolStatus=(name,newStatus)=>{
     setTools(prev=>prev.map(t=>t.name===name?{...t,status:newStatus}:t));
     setPolicyModal(null);
+  };
+  const addNewTool=()=>{
+    if(!newPolicy.name.trim()||!newPolicy.vendor.trim())return;
+    setTools(prev=>[...prev,{...newPolicy,dailyAttempts:0}]);
+    setNewPolicy({name:"",vendor:"",category:"생성형AI",risk:"medium",status:"blocked",icon:"🔧"});
+    setNewPolicyModal(false);
   };
 
   return(
@@ -196,6 +253,126 @@ export default function AIFirewall({onBack}){
                 {s==="blocked"?"🚫 차단":s==="allowed"?"✅ 허용":"👁️ 모니터링"}
               </button>
             ))}
+          </div>
+        </div>
+      </div>}
+
+      {/* Event Detail Modal */}
+      {eventDetail&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setEventDetail(null)}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#111827",borderRadius:20,width:640,maxWidth:"92vw",maxHeight:"85vh",overflow:"hidden",display:"flex",flexDirection:"column",border:"1px solid rgba(255,255,255,.08)",boxShadow:"0 32px 80px rgba(0,0,0,.5)",animation:"fadeIn .3s"}}>
+          {/* Header */}
+          <div style={{padding:"20px 24px 14px",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <div style={{width:40,height:40,borderRadius:12,background:eventDetail.kind==="threat"?"rgba(255,45,85,.12)":"rgba(59,130,246,.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{eventDetail.kind==="threat"?eventDetail.threat.icon:eventDetail.toolIcon}</div>
+              <div>
+                <div style={{fontSize:16,fontWeight:800}}>{eventDetail.kind==="threat"?eventDetail.threat.label:eventDetail.tool+" — "+eventDetail.action}</div>
+                <div style={{fontSize:11,color:"#64748b"}}>{eventDetail.id} · {eventDetail.timestamp.toLocaleString("ko-KR")}</div>
+              </div>
+            </div>
+            <button onClick={()=>setEventDetail(null)} style={{width:32,height:32,borderRadius:8,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",cursor:"pointer",color:"#94a3b8",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          </div>
+          {/* Body */}
+          <div style={{flex:1,overflowY:"auto",padding:"18px 24px 24px",display:"flex",flexDirection:"column",gap:14}}>
+            {/* Risk Score + Status */}
+            <div style={{display:"flex",gap:8}}>
+              {eventDetail.riskScore&&<span style={{padding:"4px 12px",borderRadius:8,fontSize:11,fontWeight:700,background:(eventDetail.riskScore>=85?"rgba(255,45,85,.12)":eventDetail.riskScore>=60?"rgba(255,149,0,.12)":"rgba(255,204,0,.12)"),color:eventDetail.riskScore>=85?"#ff2d55":eventDetail.riskScore>=60?"#ff9500":"#ffcc00",border:`1px solid ${eventDetail.riskScore>=85?"rgba(255,45,85,.2)":eventDetail.riskScore>=60?"rgba(255,149,0,.2)":"rgba(255,204,0,.2)"}`}}>위험도: {eventDetail.riskScore}점</span>}
+              <span style={{padding:"4px 12px",borderRadius:8,fontSize:11,fontWeight:700,background:eventDetail.action.includes("차단")?"rgba(255,45,85,.12)":eventDetail.action.includes("허용")?"rgba(48,209,88,.12)":"rgba(255,149,0,.12)",color:eventDetail.action.includes("차단")?"#ff2d55":eventDetail.action.includes("허용")?"#30d158":"#ff9500"}}>{eventDetail.action}</span>
+              {eventDetail.kind==="threat"&&<span style={{padding:"4px 12px",borderRadius:8,fontSize:11,fontWeight:700,background:"rgba(255,255,255,.04)",color:"#94a3b8"}}>{eventDetail.threat.severity}</span>}
+            </div>
+            {/* 발생자 정보 */}
+            <div style={{background:"rgba(255,255,255,.03)",borderRadius:14,padding:"14px 16px",border:"1px solid rgba(255,255,255,.06)"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#60a5fa",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>👤 이벤트 발생자 정보</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {[["이름",eventDetail.userName||eventDetail.user||"—"],["직급",eventDetail.position||"—"],["부서",eventDetail.dept],["사번",eventDetail.empId||"—"],["출발지 IP",eventDetail.sourceIP||"내부 네트워크"],["대상",eventDetail.destination||eventDetail.tool||"—"]].map(([k,v],i)=>(
+                  <div key={i} style={{display:"flex",gap:8,fontSize:11.5}}>
+                    <span style={{color:"#64748b",minWidth:70,fontWeight:600}}>{k}</span>
+                    <span style={{color:"#e2e8f0",fontWeight:500,fontFamily:k.includes("IP")||k==="사번"?"'DM Mono',monospace":"inherit"}}>{v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* 탐지 근거 */}
+            <div style={{background:"rgba(59,130,246,.04)",borderRadius:14,padding:"14px 16px",border:"1px solid rgba(59,130,246,.12)"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#60a5fa",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>🔍 탐지 근거</div>
+              <div style={{fontSize:12,color:"#e2e8f0",lineHeight:1.7,marginBottom:8}}>{eventDetail.detectionMethod}</div>
+              {eventDetail.payload&&<div style={{fontSize:11,color:"#94a3b8",padding:"8px 12px",borderRadius:8,background:"rgba(0,0,0,.2)",fontFamily:"'DM Mono',monospace"}}>페이로드: {eventDetail.payload}</div>}
+            </div>
+            {/* 대응 방법 */}
+            {eventDetail.responses&&eventDetail.responses.length>0&&<div style={{background:"rgba(48,209,88,.04)",borderRadius:14,padding:"14px 16px",border:"1px solid rgba(48,209,88,.12)"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#30d158",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>🛡️ 대응 조치 가이드</div>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {eventDetail.responses.map((r,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,fontSize:11.5,color:"#e2e8f0",lineHeight:1.6}}>
+                    <span style={{color:"#30d158",fontWeight:700,fontSize:10,marginTop:2,flexShrink:0}}>Step {i+1}</span>
+                    <span>{r}</span>
+                  </div>
+                ))}
+              </div>
+            </div>}
+            {/* 위협 영향 */}
+            {eventDetail.impacts&&eventDetail.impacts.length>0&&<div style={{background:"rgba(255,45,85,.04)",borderRadius:14,padding:"14px 16px",border:"1px solid rgba(255,45,85,.12)"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#ff2d55",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>⚠️ 야기되는 위협</div>
+              <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                {eventDetail.impacts.map((imp,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,fontSize:11.5,color:"#fca5a5"}}>
+                    <span style={{width:5,height:5,borderRadius:"50%",background:"#ff2d55",flexShrink:0}}/>
+                    <span>{imp}</span>
+                  </div>
+                ))}
+              </div>
+            </div>}
+          </div>
+        </div>
+      </div>}
+
+      {/* New Policy Modal */}
+      {newPolicyModal&&<div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setNewPolicyModal(false)}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#111827",borderRadius:18,padding:28,width:480,border:"1px solid rgba(255,255,255,.08)",animation:"fadeIn .3s"}}>
+          <div style={{fontSize:18,fontWeight:800,marginBottom:4}}>📋 새 AI 보안 정책 추가</div>
+          <div style={{fontSize:11,color:"#64748b",marginBottom:20}}>새로운 AI 도구에 대한 보안 정책을 등록합니다.</div>
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>
+            <div style={{display:"grid",gridTemplateColumns:"48px 1fr",gap:12,alignItems:"end"}}>
+              <div>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600,marginBottom:4}}>아이콘</div>
+                <input value={newPolicy.icon} onChange={e=>setNewPolicy({...newPolicy,icon:e.target.value})} style={{width:"100%",padding:"10px 0",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:20,textAlign:"center",outline:"none",boxSizing:"border-box"}}/>
+              </div>
+              <div>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600,marginBottom:4}}>도구 이름 *</div>
+                <input value={newPolicy.name} onChange={e=>setNewPolicy({...newPolicy,name:e.target.value})} placeholder="예: Sora, Grok" style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+              </div>
+            </div>
+            <div>
+              <div style={{fontSize:10,color:"#64748b",fontWeight:600,marginBottom:4}}>개발사/벤더 *</div>
+              <input value={newPolicy.vendor} onChange={e=>setNewPolicy({...newPolicy,vendor:e.target.value})} placeholder="예: OpenAI, xAI" style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              <div>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600,marginBottom:4}}>카테고리</div>
+                <select value={newPolicy.category} onChange={e=>setNewPolicy({...newPolicy,category:e.target.value})} style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:12,cursor:"pointer",outline:"none"}}>
+                  {["생성형AI","코드생성","이미지생성","영상생성","음악생성","문서작성","번역","검색AI","기타"].map(c=><option key={c} value={c} style={{background:"#1a2540"}}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600,marginBottom:4}}>위험도</div>
+                <select value={newPolicy.risk} onChange={e=>setNewPolicy({...newPolicy,risk:e.target.value})} style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:12,cursor:"pointer",outline:"none"}}>
+                  {[{v:"high",l:"🔴 높음"},{v:"medium",l:"🟡 중간"},{v:"low",l:"🟢 낮음"}].map(r=><option key={r.v} value={r.v} style={{background:"#1a2540"}}>{r.l}</option>)}
+                </select>
+              </div>
+            </div>
+            <div>
+              <div style={{fontSize:10,color:"#64748b",fontWeight:600,marginBottom:6}}>초기 정책</div>
+              <div style={{display:"flex",gap:8}}>
+                {["blocked","monitoring","allowed"].map(s=>(
+                  <button key={s} onClick={()=>setNewPolicy({...newPolicy,status:s})} style={{flex:1,padding:"10px 0",borderRadius:10,border:newPolicy.status===s?"2px solid":`1px solid rgba(255,255,255,.1)`,borderColor:newPolicy.status===s?(s==="blocked"?"#ff2d55":s==="allowed"?"#30d158":"#ffcc00"):"rgba(255,255,255,.1)",background:newPolicy.status===s?(s==="blocked"?"rgba(255,45,85,.1)":s==="allowed"?"rgba(48,209,88,.1)":"rgba(255,204,0,.1)"):"rgba(255,255,255,.03)",color:s==="blocked"?"#ff2d55":s==="allowed"?"#30d158":"#ffcc00",fontSize:12,fontWeight:700,cursor:"pointer"}}>
+                    {s==="blocked"?"🚫 차단":s==="allowed"?"✅ 허용":"👁️ 모니터링"}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:10,marginTop:20,justifyContent:"flex-end"}}>
+            <button onClick={()=>setNewPolicyModal(false)} style={{padding:"10px 20px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",background:"transparent",color:"#94a3b8",fontSize:12,fontWeight:600,cursor:"pointer"}}>취소</button>
+            <button onClick={addNewTool} disabled={!newPolicy.name.trim()||!newPolicy.vendor.trim()} style={{padding:"10px 24px",borderRadius:10,border:"none",background:newPolicy.name.trim()&&newPolicy.vendor.trim()?"linear-gradient(135deg,#3b82f6,#1d4ed8)":"rgba(255,255,255,.04)",color:newPolicy.name.trim()&&newPolicy.vendor.trim()?"#fff":"#475569",fontSize:12,fontWeight:700,cursor:newPolicy.name.trim()&&newPolicy.vendor.trim()?"pointer":"not-allowed"}}>정책 등록</button>
           </div>
         </div>
       </div>}
@@ -275,7 +452,9 @@ export default function AIFirewall({onBack}){
               </div>
               <div style={{maxHeight:340,overflowY:"auto",display:"flex",flexDirection:"column",gap:6}}>
                 {[...threats.slice(0,5).map(t=>({...t,kind:"threat"})),...aiEvents.slice(0,5).map(a=>({...a,kind:"ai"}))].sort((a,b)=>b.timestamp-a.timestamp).slice(0,10).map(ev=>(
-                  <div key={ev.id} style={{padding:"10px 12px",borderRadius:10,background:ev.kind==="threat"?"rgba(255,45,85,.04)":"rgba(59,130,246,.04)",border:`1px solid ${ev.kind==="threat"?"rgba(255,45,85,.1)":"rgba(59,130,246,.1)"}`,display:"flex",alignItems:"center",gap:10,animation:"fadeIn .3s"}}>
+                  <div key={ev.id} onClick={()=>setEventDetail(ev)} style={{padding:"10px 12px",borderRadius:10,background:ev.kind==="threat"?"rgba(255,45,85,.04)":"rgba(59,130,246,.04)",border:`1px solid ${ev.kind==="threat"?"rgba(255,45,85,.1)":"rgba(59,130,246,.1)"}`,display:"flex",alignItems:"center",gap:10,animation:"fadeIn .3s",cursor:"pointer",transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.borderColor=ev.kind==="threat"?"rgba(255,45,85,.3)":"rgba(59,130,246,.3)"}
+                    onMouseLeave={e=>e.currentTarget.style.borderColor=ev.kind==="threat"?"rgba(255,45,85,.1)":"rgba(59,130,246,.1)"}>
                     <span style={{fontSize:16}}>{ev.kind==="threat"?ev.threat.icon:ev.toolIcon}</span>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontSize:11.5,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{ev.kind==="threat"?ev.threat.label:ev.tool+" — "+ev.query}</div>
@@ -343,7 +522,9 @@ export default function AIFirewall({onBack}){
               <div style={{fontSize:13,fontWeight:700,marginBottom:12,display:"flex",alignItems:"center",gap:6}}>🤖 AI 도구 사용 로그 <span style={{fontSize:10,color:"#60a5fa",background:"rgba(59,130,246,.1)",padding:"2px 7px",borderRadius:10}}>{aiEvents.length}건</span></div>
               <div style={{maxHeight:"calc(100vh - 200px)",overflowY:"auto",display:"flex",flexDirection:"column",gap:6}}>
                 {aiEvents.slice(0,30).map(ev=>(
-                  <div key={ev.id} style={{padding:"12px 14px",borderRadius:11,background:ev.action==="차단"?"rgba(255,45,85,.04)":ev.riskFlag?"rgba(255,204,0,.04)":"rgba(255,255,255,.02)",border:`1px solid ${ev.action==="차단"?"rgba(255,45,85,.1)":ev.riskFlag?"rgba(255,204,0,.08)":"rgba(255,255,255,.04)"}`,animation:"fadeIn .3s"}}>
+                  <div key={ev.id} onClick={()=>setEventDetail({...ev,kind:"ai"})} style={{padding:"12px 14px",borderRadius:11,background:ev.action==="차단"?"rgba(255,45,85,.04)":ev.riskFlag?"rgba(255,204,0,.04)":"rgba(255,255,255,.02)",border:`1px solid ${ev.action==="차단"?"rgba(255,45,85,.1)":ev.riskFlag?"rgba(255,204,0,.08)":"rgba(255,255,255,.04)"}`,animation:"fadeIn .3s",cursor:"pointer",transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.borderColor=ev.action==="차단"?"rgba(255,45,85,.25)":"rgba(59,130,246,.2)"}
+                    onMouseLeave={e=>e.currentTarget.style.borderColor=ev.action==="차단"?"rgba(255,45,85,.1)":ev.riskFlag?"rgba(255,204,0,.08)":"rgba(255,255,255,.04)"}>
                     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
                       <span style={{fontSize:16}}>{ev.toolIcon}</span>
                       <div style={{flex:1}}>
@@ -427,12 +608,16 @@ export default function AIFirewall({onBack}){
                     </div>
                   </div>
                   {expandedThreat===ev.id&&<div style={{marginTop:10,paddingTop:10,borderTop:"1px solid rgba(255,255,255,.06)",animation:"fadeIn .3s"}}>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:11}}>
-                      <div><span style={{color:"#64748b"}}>페이로드:</span> <span style={{color:"#e2e8f0"}}>{ev.payload}</span></div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:11,marginBottom:10}}>
+                      <div><span style={{color:"#64748b"}}>발생자:</span> <span style={{color:"#e2e8f0",fontWeight:600}}>{ev.userName} ({ev.position})</span></div>
+                      <div><span style={{color:"#64748b"}}>사번:</span> <span style={{color:"#e2e8f0",fontFamily:"'DM Mono',monospace"}}>{ev.empId}</span></div>
                       <div><span style={{color:"#64748b"}}>출발지:</span> <span style={{color:"#e2e8f0",fontFamily:"'DM Mono',monospace"}}>{ev.sourceIP}</span></div>
                       <div><span style={{color:"#64748b"}}>목적지:</span> <span style={{color:"#e2e8f0"}}>{ev.destination}</span></div>
-                      <div><span style={{color:"#64748b"}}>조치:</span> <span style={{color:ev.action.includes("차단")?"#ff2d55":"#ff9500",fontWeight:600}}>{ev.action}</span></div>
                     </div>
+                    <div style={{fontSize:10,color:"#60a5fa",marginBottom:4,fontWeight:600}}>🔍 탐지 근거</div>
+                    <div style={{fontSize:11,color:"#94a3b8",marginBottom:8,padding:"6px 10px",borderRadius:6,background:"rgba(0,0,0,.2)"}}>{ev.detectionMethod}</div>
+                    <div style={{fontSize:10,color:"#64748b",marginBottom:3}}>페이로드: <span style={{color:"#e2e8f0"}}>{ev.payload}</span></div>
+                    <button onClick={(e)=>{e.stopPropagation();setEventDetail({...ev,kind:"threat"});}} style={{marginTop:8,width:"100%",padding:"8px 0",borderRadius:8,border:"1px solid rgba(59,130,246,.2)",background:"rgba(59,130,246,.06)",color:"#60a5fa",fontSize:11,fontWeight:700,cursor:"pointer"}}>📋 상세 분석 보기 (대응 가이드 · 위협 영향)</button>
                   </div>}
                 </div>
               ))}
@@ -474,8 +659,13 @@ export default function AIFirewall({onBack}){
         {/* ═══ POLICY TAB ═══ */}
         {activeTab==="policy"&&<div style={{animation:"fadeIn .4s"}}>
           <div style={{...panelStyle,marginBottom:16}}>
-            <div style={{fontSize:14,fontWeight:700,marginBottom:4}}>📋 AI 보안 정책 관리</div>
-            <div style={{fontSize:11,color:"#64748b",marginBottom:16}}>기업 내 AI 도구 사용 정책을 관리하고, 위험도 기반 자동 분류 및 접근 제어를 수행합니다.</div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:700,marginBottom:4}}>📋 AI 보안 정책 관리</div>
+                <div style={{fontSize:11,color:"#64748b"}}>기업 내 AI 도구 사용 정책을 관리하고, 위험도 기반 자동 분류 및 접근 제어를 수행합니다.</div>
+              </div>
+              <button onClick={()=>setNewPolicyModal(true)} style={{padding:"8px 18px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#3b82f6,#1d4ed8)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5,boxShadow:"0 2px 8px rgba(59,130,246,.3)"}}>+ 새 정책 추가</button>
+            </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
               {tools.map(tool=>(
                 <div key={tool.name} onClick={()=>setPolicyModal(tool)} style={{padding:"14px 16px",borderRadius:12,background:tool.status==="blocked"?"rgba(255,45,85,.04)":tool.status==="allowed"?"rgba(48,209,88,.04)":"rgba(255,204,0,.04)",border:`1px solid ${tool.status==="blocked"?"rgba(255,45,85,.12)":tool.status==="allowed"?"rgba(48,209,88,.12)":"rgba(255,204,0,.12)"}`,cursor:"pointer",transition:"all .2s"}}
