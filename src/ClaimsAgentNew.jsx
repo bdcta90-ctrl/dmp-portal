@@ -1909,6 +1909,323 @@ function Tab1(){
       </div></div></>);
 }
 
+// ═══ TAB: 대인 피해 산정 ═══
+function TabInjury(){
+  const[input,setInput]=useState("");
+  const[result,setResult]=useState(null);
+  const[loading,setLoading]=useState(false);
+  const[aiText,setAiText]=useState("");
+  const{displayed:tA,done:aD}=useTW(aiText);
+  const[msgModal,setMsgModal]=useState(false);
+  const[reportOpen,setReportOpen]=useState(false);
+  const[useCase,setUseCase]=useState(null);
+  const[prog,setProg]=useState({step:0,msg:"",pct:0});
+
+  const UC_INPUT=`[대인 접수 정보 — Case 1 교차로 골목길 충돌]
+■ 사고 유형: 교차로 골목길 충돌 (자사 그랜저 vs 타사 BMW 7시리즈)
+■ 과실 비율: AI 적정 50:50 (협의 중)
+
+[타사 대인 접수 — 3명]
+1. 타사 운전자 (BMW 7시리즈)
+   - 상해: 경추 염좌 (목 통증 호소)
+   - 진단: 2주 진단, 통원 치료 예정
+   - 치료비 청구: ₩1,200,000
+   - 위자료 청구: ₩3,000,000
+   - 휴업손해: 없음
+   - 합의금 요구: ₩5,000,000
+
+2. 타사 동승자 1 (뒷좌석 좌측)
+   - 상해: 요추 염좌 (허리 통증)
+   - 진단: 1주 진단
+   - 치료비 청구: ₩800,000
+   - 위자료 청구: ₩2,000,000
+   - 합의금 요구: ₩3,500,000
+
+3. 타사 동승자 2 (뒷좌석 우측)
+   - 상해: 경미한 타박 (경추 불편 호소)
+   - 진단: 3일 진단
+   - 치료비 청구: ₩300,000
+   - 위자료 청구: ₩1,500,000
+   - 합의금 요구: ₩2,000,000
+
+[자사 대인 접수 — 2명]
+1. 자사 운전자 (그랜저)
+   - 상해: 경추 염좌
+   - 진단: 1주 진단
+   - 치료비: ₩600,000
+   - 합의금 요구: 미정 (접수 고민 중)
+
+2. 자사 동승자 1 (조수석)
+   - 상해: 우측 어깨 타박
+   - 진단: 5일 진단
+   - 치료비: ₩400,000
+   - 합의금 요구: 미정`;
+
+  const UC_RESULT = {
+    totalClaimants: 5,
+    opponents: [
+      {name:"타사 운전자",injury:"경추 염좌(2주)",grade:"14급",treatCost:1200000,claimed:5000000,aiProper:[2800000,3500000],reason:"2주 진단 경추 염좌, 통원 치료 → 자동차보험 대인 14급 기준 적용. 치료비 ₩1.2M은 적정. 위자료 ₩3M은 과다 — 14급 위자료 기준 ₩1.5~2.0M"},
+      {name:"타사 동승자 1",injury:"요추 염좌(1주)",grade:"14급",treatCost:800000,claimed:3500000,aiProper:[1800000,2500000],reason:"1주 진단 요추 염좌 → 14급. 치료비 ₩0.8M 적정. 위자료 ₩2M은 1주 진단 대비 과다 — 기준 ₩0.8~1.2M"},
+      {name:"타사 동승자 2",injury:"경미 타박(3일)",grade:"등급외",treatCost:300000,claimed:2000000,aiProper:[800000,1200000],reason:"3일 진단 경미 타박 → 등급외. 합의금 ₩2M은 과다 — 경미 사고 기준 ₩0.5~0.8M. 추가 진단 없으면 보존치료 종결"},
+    ],
+    ours: [
+      {name:"자사 운전자",injury:"경추 염좌(1주)",grade:"14급",treatCost:600000,aiProper:[1500000,2200000],reason:"1주 진단 경추 염좌 → 14급. 타사 과실분(50%) 상계 시 실수령 ₩750,000~1,100,000"},
+      {name:"자사 동승자 1",injury:"어깨 타박(5일)",grade:"등급외",treatCost:400000,aiProper:[800000,1200000],reason:"5일 진단 경미 타박 → 등급외. 타사 과실분(50%) 상계 시 실수령 ₩400,000~600,000"},
+    ],
+    totalClaimed: 10500000,
+    aiTotalProper: [7700000,10600000],
+    savingRange: [0,2800000],
+    faultRatio: "50:50",
+    ourBurden: [3850000,5300000],
+  };
+
+  const UC_AI_TEXT=`## 🏥 AI 대인 피해 종합 분석 리포트
+
+### 📊 대인 접수 현황 요약
+
+| 구분 | 인원 | 총 청구액 | AI 적정 합의금 | **절감 가능액** |
+|------|------|----------|-------------|--------------|
+| 타사 접수자 | 3명 | ₩10,500,000 | **₩5,400,000~7,200,000** | **▼ ₩3,300,000~5,100,000** |
+| 자사 접수자 | 2명 | 미정 | **₩2,300,000~3,400,000** | — (수령 가능) |
+| **합계** | **5명** | | | |
+
+---
+
+### ⚖️ 타사 대인 상세 분석
+
+**1. 타사 운전자 — 경추 염좌 (2주 진단)**
+- 장해등급: **14급** (자동차보험 대인배상 기준)
+- 치료비 ₩1,200,000 → **적정** (통원 치료 2주 기준)
+- 위자료 청구 ₩3,000,000 → **과다** (14급 기준 ₩1,500,000~2,000,000)
+- 💡 **AI 적정 합의금: ₩2,800,000~3,500,000** (청구 대비 ▼ ₩1,500,000~2,200,000)
+
+**2. 타사 동승자 1 — 요추 염좌 (1주 진단)**
+- 장해등급: **14급**
+- 치료비 ₩800,000 → **적정**
+- 위자료 청구 ₩2,000,000 → **과다** (1주 진단 기준 ₩800,000~1,200,000)
+- 💡 **AI 적정 합의금: ₩1,800,000~2,500,000** (▼ ₩1,000,000~1,700,000)
+
+**3. 타사 동승자 2 — 경미 타박 (3일 진단)**
+- 장해등급: **등급 외** (3일 진단 경미)
+- 합의금 청구 ₩2,000,000 → **과다** (경미 사고 기준 ₩500,000~800,000)
+- 💡 **AI 적정 합의금: ₩800,000~1,200,000** (▼ ₩800,000~1,200,000)
+- ⚠️ 추가 진단서 없이 과다 청구 시 → **보존치료 종결 제안**
+
+---
+
+### 🔄 자사 대인 접수 실익 분석
+
+> **AI 판단: 자사 2명 모두 접수 권고 — 타사 과실 50% 상계로 실수령 가능**
+
+| 접수자 | 예상 합의금 | 과실 상계(50%) | **실수령액** |
+|--------|-----------|-------------|------------|
+| 자사 운전자 | ₩1,500,000~2,200,000 | 50% 적용 | **₩750,000~1,100,000** |
+| 자사 동승자 | ₩800,000~1,200,000 | 50% 적용 | **₩400,000~600,000** |
+| **합계** | | | **₩1,150,000~1,700,000** |
+
+---
+
+### 💰 보험사 비용 시뮬레이션
+
+| 시나리오 | 타사 대인 부담 | 자사 대인 수령 | **순 부담** |
+|---------|-------------|-------------|-----------|
+| 타사 청구 수용 | ₩5,250,000 | -₩1,150,000 | **₩4,100,000** |
+| **AI 적정 합의** | **₩2,700,000~3,600,000** | -₩1,150,000 | **₩1,550,000~2,450,000** |
+| 최소 합의 | ₩1,925,000 | -₩1,700,000 | **₩225,000** |
+
+### 🤝 협상 전략
+
+**[1안] 개별 합의 — 접수자별 맞춤 대응 (AI 권고)**
+- 타사 운전자: ₩3,200,000 (14급 중앙값)
+- 타사 동승자1: ₩2,200,000 (14급 하위)
+- 타사 동승자2: ₩1,000,000 (등급외 상위)
+- 자사 2명: 전액 접수 → ₩1,150,000~1,700,000 수령
+- **자사 순 부담: 약 ₩4,700,000**
+
+**[2안] 일괄 합의 패키지**
+- 타사 3명 일괄 ₩6,000,000으로 제안 (1인 평균 ₩2,000,000)
+- 자사 2명 대인 취하 조건으로 총액 협상
+- **자사 순 부담: 약 ₩3,000,000**
+
+**[3안] 쌍방 대인 취하 제안**
+- 타사 "대인 쌍방 취하" 제안 → 대인 비용 ₩0
+- ⚠️ 타사 거부 가능성 높음 (타사 청구액이 큼)`;
+
+  const loadUC=()=>{setInput(UC_INPUT);setUseCase("uc");setResult(null);setAiText("");};
+
+  const analyze=async()=>{if(!input.trim())return;setLoading(true);setResult(null);setAiText("");
+    const steps=[{msg:"📋 대인 접수 내용 파싱 중...",delay:500},{msg:"🏥 상해 등급 판정 중...",delay:700},{msg:"💰 적정 합의금 산정 중...",delay:600},{msg:"⚖️ 과실 상계 시뮬레이션...",delay:500},{msg:"🤖 AI 종합 분석 리포트 생성 중...",delay:600}];
+    for(let i=0;i<steps.length;i++){setProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*85)});await new Promise(r=>setTimeout(r,steps[i].delay));}
+    setProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
+    if(useCase==="uc"){setResult(UC_RESULT);setAiText(UC_AI_TEXT);}
+    else{setResult({totalClaimants:3,opponents:[{name:"상대방",injury:"경추 염좌",grade:"14급",treatCost:800000,claimed:3000000,aiProper:[1800000,2500000],reason:"14급 기준 적용"}],ours:[],totalClaimed:3000000,aiTotalProper:[1800000,2500000],faultRatio:"협의중",ourBurden:[1800000,2500000]});
+      const a=await callAI("대인 피해 분석 전문 AI. 상해등급, 적정합의금, 과실상계, 협상전략을 분석해주세요.",input);setAiText(a);}
+    await new Promise(r=>setTimeout(r,300));setLoading(false);setProg({step:0,msg:"",pct:0});
+  };
+
+  // Injury Report Modal
+  const InjuryReportModal=({onClose})=>{
+    const now=new Date();const ds=now.toLocaleDateString("ko-KR");
+    const[mode,setMode]=useState("view");const[sp,setSp]=useState(0);const[rcpt,setRcpt]=useState("김영수 센터장");
+    const doSend=()=>{setSp(1);setTimeout(()=>setSp(2),2000);};
+    return(
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(6px)",zIndex:250,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s"}} onClick={onClose}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:22,width:750,maxWidth:"95vw",height:"85vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 32px 80px rgba(0,0,0,.2)"}}>
+          <div style={{padding:"18px 26px 14px",borderBottom:"1px solid #f1f5f9",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <div style={{width:38,height:38,borderRadius:11,background:"linear-gradient(135deg,#dc2626,#f43f5e)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:19,color:"#fff"}}>🏥</div>
+              <div><div style={{fontSize:17,fontWeight:800}}>대인 피해 산정 일보(一報)</div><div style={{fontSize:10,color:"#94a3b8"}}>AI 자동 생성 · {ds} · 대인 접수 5명 분석</div></div>
+            </div>
+            <div style={{display:"flex",gap:6}}>
+              <div style={{display:"flex",background:"#f1f5f9",borderRadius:8,padding:2}}>
+                {[{l:"열람",m:"view"},{l:"수정",m:"edit"}].map(t=><button key={t.m} onClick={()=>setMode(t.m)} style={{padding:"5px 12px",borderRadius:6,border:"none",fontSize:11,fontWeight:mode===t.m?700:500,background:mode===t.m?"#fff":"transparent",color:mode===t.m?"#dc2626":"#94a3b8",cursor:"pointer"}}>{t.l}</button>)}
+              </div>
+              <button onClick={()=>{setMode("send");setSp(0);}} style={{padding:"5px 14px",borderRadius:8,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📤 전송</button>
+              <button onClick={onClose} style={{width:30,height:30,borderRadius:8,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",color:"#94a3b8",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+            </div>
+          </div>
+          {mode==="send"?(
+            <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:40}}>
+              {sp===0&&<div style={{textAlign:"center",maxWidth:380,animation:"fadeIn .3s"}}>
+                <div style={{fontSize:40,marginBottom:16}}>📤</div><div style={{fontSize:16,fontWeight:700,marginBottom:16}}>대인 일보 전송</div>
+                <div style={{background:"#f8fafc",borderRadius:12,padding:"14px 18px",border:"1px solid #e2e8f0",marginBottom:18,textAlign:"left"}}>
+                  <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,marginBottom:4}}>수신자</div>
+                  <input value={rcpt} onChange={e=>setRcpt(e.target.value)} style={{width:"100%",padding:"9px 14px",borderRadius:8,border:"1px solid #e2e8f0",fontSize:13,fontWeight:600,outline:"none",boxSizing:"border-box"}}/>
+                </div>
+                <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+                  <button onClick={()=>setMode("view")} style={{padding:"10px 24px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:13,cursor:"pointer"}}>취소</button>
+                  <button onClick={doSend} style={{padding:"10px 28px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>📤 전송</button>
+                </div>
+              </div>}
+              {sp===1&&<div style={{textAlign:"center"}}><Sp/><div style={{marginTop:16,color:"#dc2626",fontWeight:600}}>전송 중...</div></div>}
+              {sp===2&&<div style={{textAlign:"center",animation:"fadeIn .4s"}}><div style={{fontSize:48,marginBottom:12}}>✅</div><div style={{fontSize:17,fontWeight:800,color:"#059669"}}>전송 완료</div><div style={{fontSize:13,color:"#64748b",marginTop:6}}>{rcpt}에게 전송됨</div><button onClick={()=>{setMode("view");setSp(0);}} style={{marginTop:20,padding:"9px 24px",borderRadius:9,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:12,cursor:"pointer"}}>돌아가기</button></div>}
+            </div>
+          ):(
+            <div style={{flex:1,overflowY:"auto",padding:"18px 26px 28px"}}>
+              <div style={{textAlign:"center",marginBottom:18,paddingBottom:14,borderBottom:"2px solid #dc2626"}}>
+                <div style={{fontSize:10,color:"#94a3b8",letterSpacing:2,fontWeight:600}}>CONFIDENTIAL</div>
+                <div style={{fontSize:20,fontWeight:800,marginTop:4}}>대인 피해 산정 일보(一報)</div>
+                <div style={{fontSize:12,color:"#64748b",marginTop:4}}>AI 자동 생성 · {ds}</div>
+                <div style={{display:"inline-flex",gap:6,marginTop:8}}>
+                  <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#fef2f2",color:"#dc2626",fontWeight:700,border:"1px solid #fca5a5"}}>대인 5명</span>
+                  <span style={{fontSize:9,padding:"3px 10px",borderRadius:6,background:"#f0fdf4",color:"#059669",fontWeight:700,border:"1px solid #86efac"}}>AI 분석 완료</span>
+                </div>
+              </div>
+              {result&&<div style={{fontSize:12.5,lineHeight:1.8,color:"#334155"}}><RT text={aiText||tA}/></div>}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // SMS Modal
+  const InjurySmsModal=({onClose})=>{
+    const defMsg=`[kt ds 보험 대인 안내]\n\n안녕하세요, 고객님.\n접수하신 사고건의 대인 배상 처리 현황을 안내드립니다.\n\n■ 대인 접수 현황: 총 5명 (타사 3명 + 자사 2명)\n■ 현재 상태: AI 분석 완료, 적정 합의금 산정됨\n■ 예상 처리 기간: 2~4주\n\n■ 고객님 대인 접수 안내\n- 고객님과 동승자분의 대인 접수를 권고드립니다.\n- 과실 상계 적용 시 합의금 수령이 가능합니다.\n\n상세 내용은 담당 손해사정사가 안내드리겠습니다.\n감사합니다.`;
+    const[msg,setMsg]=useState(defMsg);const[phase,setPhase]=useState("edit");
+    return(
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",backdropFilter:"blur(5px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn .2s"}} onClick={onClose}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:20,width:500,maxWidth:"92vw",maxHeight:"80vh",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:"0 24px 64px rgba(0,0,0,.15)"}}>
+          <div style={{padding:"18px 24px 12px",borderBottom:"1px solid #f1f5f9",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:20}}>📱</span><div><div style={{fontSize:15,fontWeight:800}}>고객 안내 문자</div><div style={{fontSize:10,color:"#94a3b8"}}>대인 접수 안내</div></div></div>
+            <button onClick={onClose} style={{width:28,height:28,borderRadius:8,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",color:"#94a3b8",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          </div>
+          <div style={{padding:"14px 24px",flex:1,overflowY:"auto"}}>
+            {phase==="edit"?<textarea value={msg} onChange={e=>setMsg(e.target.value)} style={{width:"100%",minHeight:250,padding:14,borderRadius:12,border:"1px solid #e2e8f0",fontSize:12,lineHeight:1.7,color:"#0f172a",resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>:
+            phase==="preview"?<div style={{padding:14,borderRadius:12,border:"2px solid #059669",background:"#f0fdf4",fontSize:12.5,lineHeight:1.75,whiteSpace:"pre-wrap"}}>{msg}</div>:
+            <div style={{textAlign:"center",padding:40}}><div style={{fontSize:48}}>✅</div><div style={{fontSize:16,fontWeight:700,color:"#059669",marginTop:8}}>발송 완료</div></div>}
+          </div>
+          <div style={{padding:"10px 24px 18px",borderTop:"1px solid #f1f5f9",display:"flex",gap:8,justifyContent:"flex-end"}}>
+            {phase==="preview"&&<button onClick={()=>setPhase("edit")} style={{padding:"9px 18px",borderRadius:10,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:12,cursor:"pointer"}}>← 수정</button>}
+            {phase==="edit"&&<button onClick={()=>setPhase("preview")} style={{padding:"9px 18px",borderRadius:10,border:"none",background:"#0891b2",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>미리보기</button>}
+            {phase==="preview"&&<button onClick={()=>setPhase("done")} style={{padding:"9px 18px",borderRadius:10,border:"none",background:"#059669",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>📱 발송</button>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const sevC={critical:"#dc2626",high:"#f97316",medium:"#f59e0b",low:"#22c55e"};
+
+  return(<>
+    <div style={{background:useCase==="uc"?"linear-gradient(135deg,#fef2f2,#fce7f3)":"#f8fafc",borderRadius:12,padding:"10px 14px",marginBottom:12,border:useCase==="uc"?"2px solid #dc2626":"1px dashed #cbd5e1",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:15}}>🏥</span><div><div style={{fontSize:11,fontWeight:700,color:useCase==="uc"?"#991b1b":"#64748b"}}>Use Case 데모</div><div style={{fontSize:9.5,color:"#94a3b8"}}>Case 1: 교차로 충돌 — 대인 5명 (타사3+자사2) 합의금 분석</div></div></div>
+      <button onClick={()=>{if(useCase==="uc"){setUseCase(null);setInput("");setResult(null);setAiText("");}else loadUC();}} style={{padding:"6px 14px",borderRadius:8,border:"none",background:useCase==="uc"?"#ef4444":"linear-gradient(135deg,#dc2626,#f43f5e)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>{useCase==="uc"?"초기화":"Case 불러오기"}</button>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,height:"calc(100% - 58px)"}}>
+      {/* Left: Input */}
+      <div style={{overflowY:"auto",display:"flex",flexDirection:"column",gap:12}}>
+        <div style={CD}>
+          <h3 style={ST}>대인 접수 내용</h3>
+          <textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="대인 접수 정보를 입력하세요...&#10;&#10;예: 접수자 정보, 상해 내용, 진단서, 치료비, 위자료 등" rows={12} style={{width:"100%",padding:12,borderRadius:10,border:"1px solid #e2e8f0",fontSize:12,lineHeight:1.7,resize:"vertical",outline:"none",fontFamily:"'Pretendard',sans-serif",boxSizing:"border-box"}}/>
+          <button onClick={analyze} disabled={loading||!input.trim()} style={{...BT,marginTop:10,background:loading||!input.trim()?"#e2e8f0":"#dc2626",opacity:!input.trim()?.4:1}}>
+            {loading?<Sp/>:"대인 분석 실행"}
+          </button>
+        </div>
+        {loading&&prog.step>0&&<div style={{...CD,border:"1px solid #fca5a5",background:"#fef2f2"}}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+            <div style={{width:16,height:16,border:"2.5px solid #fecaca",borderTop:"2.5px solid #dc2626",borderRadius:"50%",animation:"spin .7s linear infinite"}}/>
+            <span style={{fontSize:12,fontWeight:700,color:"#dc2626"}}>AI 대인 분석 진행 중</span>
+          </div>
+          <div style={{height:4,borderRadius:3,background:"#fecaca",overflow:"hidden",marginBottom:6}}>
+            <div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#dc2626,#f43f5e)",width:prog.pct+"%",transition:"width .4s"}}/>
+          </div>
+          <div style={{fontSize:11,color:"#991b1b"}}>{prog.msg}</div>
+        </div>}
+      </div>
+      {/* Right: Results */}
+      <div style={{overflowY:"auto"}}>
+        {!result&&!loading&&<Em text="대인 접수 내용 입력 후 분석을 실행하세요"/>}
+        {result&&<div style={{animation:"fadeIn .4s",display:"flex",flexDirection:"column",gap:12}}>
+          {/* Summary Cards */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+            <MC label="총 접수자" value={result.totalClaimants+"명"} ac="#dc2626" big/>
+            <MC label="총 청구액" value={"₩"+((result.totalClaimed||0)/10000).toFixed(0)+"만"} ac="#f97316"/>
+            <MC label="AI 적정" value={"₩"+(((result.aiTotalProper||[0])[0]||0)/10000).toFixed(0)+"~"+(((result.aiTotalProper||[0,0])[1]||0)/10000).toFixed(0)+"만"} ac="#059669"/>
+          </div>
+          {/* Opponent table */}
+          {result.opponents&&result.opponents.length>0&&<div style={CD}>
+            <h4 style={{fontSize:12,fontWeight:700,color:"#dc2626",margin:"0 0 8px"}}>타사 대인 접수 ({result.opponents.length}명)</h4>
+            <div style={{border:"1px solid #e2e8f0",borderRadius:10,overflow:"hidden"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:10.5}}>
+                <thead><tr style={{background:"#f8fafc",borderBottom:"1px solid #e2e8f0"}}>
+                  <th style={{padding:"7px 10px",textAlign:"left",fontWeight:600,color:"#64748b"}}>접수자</th>
+                  <th style={{padding:"7px 10px",textAlign:"left",fontWeight:600,color:"#64748b"}}>상해</th>
+                  <th style={{padding:"7px 10px",textAlign:"center",fontWeight:600,color:"#64748b"}}>등급</th>
+                  <th style={{padding:"7px 10px",textAlign:"right",fontWeight:600,color:"#64748b"}}>청구액</th>
+                  <th style={{padding:"7px 10px",textAlign:"right",fontWeight:600,color:"#64748b"}}>AI 적정</th>
+                </tr></thead>
+                <tbody>{result.opponents.map((p,i)=><tr key={i} style={{borderBottom:"1px solid #f1f5f9"}}>
+                  <td style={{padding:"7px 10px",fontWeight:600}}>{p.name}</td>
+                  <td style={{padding:"7px 10px",color:"#64748b"}}>{p.injury}</td>
+                  <td style={{padding:"7px 10px",textAlign:"center"}}><span style={{padding:"1px 6px",borderRadius:4,fontSize:9,fontWeight:700,background:p.grade==="14급"?"#fef3c7":"#f1f5f9",color:p.grade==="14급"?"#d97706":"#94a3b8"}}>{p.grade}</span></td>
+                  <td style={{padding:"7px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace"}}>₩{(p.claimed/10000).toFixed(0)}만</td>
+                  <td style={{padding:"7px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#059669",fontWeight:700}}>₩{(p.aiProper[0]/10000).toFixed(0)}~{(p.aiProper[1]/10000).toFixed(0)}만</td>
+                </tr>)}</tbody>
+              </table>
+            </div>
+          </div>}
+          {/* AI Analysis */}
+          <div style={{...CD,border:"1px solid #fca5a5"}}>
+            <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
+              <div style={{width:22,height:22,borderRadius:"50%",background:"#dc2626",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
+              <span style={{fontSize:13,fontWeight:700}}>AI 대인 분석</span>{!aD&&aiText&&<Sp s/>}
+            </div>
+            <div style={{fontSize:12.5}}><RT text={tA}/></div>
+            {/* Action Buttons */}
+            {aiText&&<div style={{display:"flex",gap:8,marginTop:14}}>
+              <button onClick={()=>setMsgModal(true)} style={{flex:1,padding:"10px 0",borderRadius:10,border:"none",background:"linear-gradient(135deg,#059669,#10b981)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📱 고객 문자</button>
+              <button onClick={()=>setReportOpen(true)} style={{flex:1,padding:"10px 0",borderRadius:10,border:"none",background:"linear-gradient(135deg,#dc2626,#f43f5e)",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>📋 일보 열기</button>
+            </div>}
+          </div>
+          {msgModal&&<InjurySmsModal onClose={()=>setMsgModal(false)}/>}
+          {reportOpen&&<InjuryReportModal onClose={()=>setReportOpen(false)}/>}
+        </div>}
+      </div>
+    </div>
+  </>);
+}
+
 // ═══ TAB 2: 과실 (확장) ═══
 function Tab2(){
   const[at,sAt]=useState("");const[rt,sRt]=useState("");const[wt,sWt]=useState("");const[sg,sSg]=useState("");
@@ -2960,10 +3277,212 @@ function Tab3(){
     </div></>);
 }
 
+// ═══ TAB: KPI 관리 ═══
+function TabKPI(){
+  const[view,setView]=useState("dashboard");// dashboard, list, detail
+  const[selReport,setSelReport]=useState(null);
+  const now=new Date();const ds=now.toLocaleDateString("ko-KR");
+  const[reports]=useState([
+    {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M 검증. 렌트 등급 정정(벤츠E→GV80동급). 자사 그랜저 수리비 ₩1.83M.",aiSaving:2640000},
+    {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:5,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 거부 중. AI 판정 85:15. 쌍방 대인 5명. 판례 기반 반박 자료 생성 완료.",aiSaving:8500000},
+    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 골목길 충돌. BMW 7시리즈 수리비 ₩25M 과다청구. 렌트 부적정. 대인 5명 일괄합의 패키지 필요.",aiSaving:11750000},
+    {id:"RPT-004",date:"2025.03.03",type:"견적",case:"후미추돌 — 쏘나타 vs K5",adjuster:"정태우 사정사",status:"분석완료",cost:2800000,repairDays:7,faultRatio:"0:100(타사과실)",severity:"경미",claimants:1,priority:"보통",summary:"후미추돌 사고. 자사 쏘나타 리어범퍼+트렁크 파손. 수리비 적정. 타사 전액 배상.",aiSaving:0},
+    {id:"RPT-005",date:"2025.03.03",type:"대인",case:"Case 1 교차로 — 대인 5명",adjuster:"김민준 사정사",status:"진행중",cost:6400000,repairDays:0,faultRatio:"50:50",severity:"중간",claimants:5,priority:"높음",summary:"타사 3명(₩10.5M 청구→AI ₩5.4~7.2M) + 자사 2명(수령 ₩1.15~1.7M). 개별합의 또는 일괄패키지 진행.",aiSaving:3300000},
+    {id:"RPT-006",date:"2025.03.02",type:"과실",case:"신호위반 — 좌회전 충돌",adjuster:"한예진 사정사",status:"종결",cost:4200000,repairDays:10,faultRatio:"20:80(확정)",severity:"중간",claimants:2,priority:"낮음",summary:"신호위반 좌회전 충돌. 과실 20:80 확정. 대인 2명 합의 완료.",aiSaving:1200000},
+    {id:"RPT-007",date:"2025.03.01",type:"견적",case:"주차장 후진 — 벤츠 E300",adjuster:"이현수 사정사",status:"종결",cost:3500000,repairDays:10,faultRatio:"80:20",severity:"경미",claimants:0,priority:"보통",summary:"주차장 후진 접촉. 벤츠 E300 리어범퍼 수리. 비용 적정.",aiSaving:450000},
+  ]);
+
+  const typeColors={견적:"#0891b2",과실:"#7c3aed",처리:"#059669",대인:"#dc2626"};
+  const statusColors={분석완료:"#3b82f6",협의중:"#f59e0b",진행중:"#8b5cf6",종결:"#10b981"};
+  const priorityColors={긴급:"#dc2626",높음:"#f97316",보통:"#3b82f6",낮음:"#94a3b8"};
+
+  const totalSaving=reports.reduce((s,r)=>s+r.aiSaving,0);
+  const avgDays=Math.round(reports.filter(r=>r.repairDays>0).reduce((s,r)=>s+r.repairDays,0)/reports.filter(r=>r.repairDays>0).length);
+  const activeCount=reports.filter(r=>r.status!=="종결").length;
+
+  return(<div style={{display:"flex",flexDirection:"column",height:"100%"}}>
+    {/* Sub-tabs */}
+    <div style={{display:"flex",gap:0,background:"#f1f5f9",borderRadius:10,padding:3,marginBottom:14,flexShrink:0}}>
+      {[{id:"dashboard",l:"📊 대시보드"},{id:"list",l:"📋 일보 목록"}].map(t=>(
+        <button key={t.id} onClick={()=>{setView(t.id);setSelReport(null);}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",fontSize:12,fontWeight:view===t.id?700:500,background:view===t.id?"#fff":"transparent",color:view===t.id?"#0f172a":"#94a3b8",cursor:"pointer",boxShadow:view===t.id?"0 1px 3px rgba(0,0,0,.06)":"none"}}>{t.l}</button>
+      ))}
+    </div>
+
+    {/* Dashboard View */}
+    {view==="dashboard"&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
+      {/* KPI Cards */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:16}}>
+        {[
+          {label:"총 일보 건수",value:reports.length+"건",sub:"이번 주",color:"#3b82f6",icon:"📋"},
+          {label:"진행 중",value:activeCount+"건",sub:"미종결 사안",color:"#f59e0b",icon:"⏳"},
+          {label:"AI 절감 총액",value:"₩"+(totalSaving/10000).toFixed(0)+"만",sub:"전체 누적",color:"#059669",icon:"💰"},
+          {label:"평균 처리 기간",value:avgDays+"일",sub:"수리 기준",color:"#8b5cf6",icon:"📅"},
+        ].map((k,i)=>(
+          <div key={i} style={{background:"#fff",borderRadius:12,padding:"14px 16px",border:"1px solid #e2e8f0"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+              <span style={{fontSize:10,color:"#94a3b8",fontWeight:600}}>{k.label}</span>
+              <span style={{fontSize:14}}>{k.icon}</span>
+            </div>
+            <div style={{fontSize:22,fontWeight:800,color:k.color,fontFamily:"'DM Mono',monospace"}}>{k.value}</div>
+            <div style={{fontSize:9,color:"#cbd5e1",marginTop:2}}>{k.sub}</div>
+          </div>
+        ))}
+      </div>
+      {/* Agent별 분포 */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:16}}>
+        <div style={{background:"#fff",borderRadius:14,padding:18,border:"1px solid #e2e8f0"}}>
+          <div style={{fontSize:12,fontWeight:700,marginBottom:12}}>📊 Agent별 일보 현황</div>
+          {["견적","과실","처리","대인"].map(type=>{
+            const cnt=reports.filter(r=>r.type===type).length;
+            const pct=Math.round((cnt/reports.length)*100);
+            return(
+              <div key={type} style={{marginBottom:8}}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:3}}>
+                  <span style={{fontWeight:600,color:typeColors[type]}}>{type} 산정</span>
+                  <span style={{color:"#64748b"}}>{cnt}건 ({pct}%)</span>
+                </div>
+                <div style={{height:6,borderRadius:3,background:"#f1f5f9",overflow:"hidden"}}>
+                  <div style={{height:"100%",borderRadius:3,background:typeColors[type],width:pct+"%",transition:"width .5s"}}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{background:"#fff",borderRadius:14,padding:18,border:"1px solid #e2e8f0"}}>
+          <div style={{fontSize:12,fontWeight:700,marginBottom:12}}>👤 담당 사정사별 현황</div>
+          {[...new Set(reports.map(r=>r.adjuster))].map(adj=>{
+            const rs=reports.filter(r=>r.adjuster===adj);
+            const active=rs.filter(r=>r.status!=="종결").length;
+            const saving=rs.reduce((s,r)=>s+r.aiSaving,0);
+            return(
+              <div key={adj} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:8,marginBottom:4,background:active>0?"#fefce8":"#f8fafc",border:"1px solid "+(active>0?"#fef08a":"#f1f5f9")}}>
+                <div style={{width:28,height:28,borderRadius:8,background:"#e2e8f0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12}}>👤</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:11.5,fontWeight:600}}>{adj}</div>
+                  <div style={{fontSize:9,color:"#94a3b8"}}>{rs.length}건 (진행 {active}건)</div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{fontSize:11,fontWeight:700,color:"#059669",fontFamily:"'DM Mono',monospace"}}>₩{(saving/10000).toFixed(0)}만</div>
+                  <div style={{fontSize:8,color:"#94a3b8"}}>AI 절감</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {/* Priority Overview */}
+      <div style={{background:"#fff",borderRadius:14,padding:18,border:"1px solid #e2e8f0"}}>
+        <div style={{fontSize:12,fontWeight:700,marginBottom:12}}>🚨 우선순위별 현황</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+          {["긴급","높음","보통","낮음"].map(p=>{
+            const cnt=reports.filter(r=>r.priority===p).length;
+            return(
+              <div key={p} style={{textAlign:"center",padding:"12px 0",borderRadius:10,background:priorityColors[p]+"08",border:`1px solid ${priorityColors[p]}20`}}>
+                <div style={{fontSize:20,fontWeight:800,color:priorityColors[p],fontFamily:"'DM Mono',monospace"}}>{cnt}</div>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600}}>{p}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>}
+
+    {/* List View */}
+    {view==="list"&&!selReport&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+        <div style={{fontSize:13,fontWeight:700}}>📋 일보 목록 ({reports.length}건)</div>
+      </div>
+      {/* Table */}
+      <div style={{border:"1px solid #e2e8f0",borderRadius:12,overflow:"hidden"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+          <thead><tr style={{background:"#f8fafc",borderBottom:"2px solid #e2e8f0"}}>
+            {["ID","일자","유형","사건명","담당자","상태","예상비용","기간","우선순위",""].map((h,i)=>(
+              <th key={i} style={{padding:"9px 10px",textAlign:"left",fontWeight:600,color:"#64748b",fontSize:10,whiteSpace:"nowrap"}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>{reports.map(r=>(
+            <tr key={r.id} onClick={()=>setSelReport(r)} style={{borderBottom:"1px solid #f1f5f9",cursor:"pointer",transition:"background .15s"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <td style={{padding:"8px 10px",fontFamily:"'DM Mono',monospace",color:"#64748b",fontSize:10}}>{r.id}</td>
+              <td style={{padding:"8px 10px",fontSize:10,color:"#94a3b8"}}>{r.date}</td>
+              <td style={{padding:"8px 10px"}}><span style={{padding:"2px 7px",borderRadius:5,fontSize:9,fontWeight:700,color:typeColors[r.type],background:typeColors[r.type]+"12"}}>{r.type}</span></td>
+              <td style={{padding:"8px 10px",fontWeight:600,maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.case}</td>
+              <td style={{padding:"8px 10px",color:"#475569",fontSize:10}}>{r.adjuster}</td>
+              <td style={{padding:"8px 10px"}}><span style={{padding:"2px 7px",borderRadius:5,fontSize:9,fontWeight:700,color:statusColors[r.status],background:statusColors[r.status]+"12"}}>{r.status}</span></td>
+              <td style={{padding:"8px 10px",fontFamily:"'DM Mono',monospace",fontWeight:600}}>₩{(r.cost/10000).toFixed(0)}만</td>
+              <td style={{padding:"8px 10px",color:"#64748b"}}>{r.repairDays>0?r.repairDays+"일":"—"}</td>
+              <td style={{padding:"8px 10px"}}><span style={{padding:"2px 7px",borderRadius:5,fontSize:9,fontWeight:700,color:priorityColors[r.priority],background:priorityColors[r.priority]+"12"}}>{r.priority}</span></td>
+              <td style={{padding:"8px 10px",color:"#3b82f6",fontSize:10}}>→</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+    </div>}
+
+    {/* Detail View */}
+    {view==="list"&&selReport&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
+      <button onClick={()=>setSelReport(null)} style={{padding:"6px 14px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",marginBottom:12}}>← 목록으로</button>
+      <div style={{background:"#fff",borderRadius:16,padding:24,border:"1px solid #e2e8f0"}}>
+        {/* Header */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <span style={{padding:"6px 12px",borderRadius:8,fontSize:11,fontWeight:700,color:typeColors[selReport.type],background:typeColors[selReport.type]+"12",border:`1px solid ${typeColors[selReport.type]}30`}}>{selReport.type} Agent</span>
+            <div>
+              <div style={{fontSize:16,fontWeight:800}}>{selReport.case}</div>
+              <div style={{fontSize:11,color:"#94a3b8"}}>{selReport.id} · {selReport.date}</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:6}}>
+            <span style={{padding:"4px 10px",borderRadius:6,fontSize:10,fontWeight:700,color:statusColors[selReport.status],background:statusColors[selReport.status]+"12"}}>{selReport.status}</span>
+            <span style={{padding:"4px 10px",borderRadius:6,fontSize:10,fontWeight:700,color:priorityColors[selReport.priority],background:priorityColors[selReport.priority]+"12"}}>{selReport.priority}</span>
+          </div>
+        </div>
+        {/* Info Grid */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:18}}>
+          {[
+            {label:"예상 비용",value:"₩"+(selReport.cost/10000).toFixed(0)+"만",color:"#0891b2"},
+            {label:"AI 절감액",value:"₩"+(selReport.aiSaving/10000).toFixed(0)+"만",color:"#059669"},
+            {label:"예상 기간",value:selReport.repairDays>0?selReport.repairDays+"일":"—",color:"#8b5cf6"},
+            {label:"과실 비율",value:selReport.faultRatio,color:"#7c3aed"},
+            {label:"대인 접수",value:selReport.claimants>0?selReport.claimants+"명":"없음",color:selReport.claimants>0?"#dc2626":"#94a3b8"},
+            {label:"심각도",value:selReport.severity,color:selReport.severity==="심각"?"#dc2626":selReport.severity==="중간"?"#f59e0b":"#22c55e"},
+          ].map((item,i)=>(
+            <div key={i} style={{background:"#f8fafc",borderRadius:10,padding:"10px 14px",border:"1px solid #f1f5f9"}}>
+              <div style={{fontSize:9,color:"#94a3b8",fontWeight:600,marginBottom:2}}>{item.label}</div>
+              <div style={{fontSize:14,fontWeight:700,color:item.color,fontFamily:"'DM Mono',monospace"}}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+        {/* Adjuster */}
+        <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:"#f0f9ff",borderRadius:10,border:"1px solid #bae6fd",marginBottom:18}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"#0891b2",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:14}}>👤</div>
+          <div>
+            <div style={{fontSize:13,fontWeight:700}}>{selReport.adjuster}</div>
+            <div style={{fontSize:10,color:"#64748b"}}>담당 손해사정사</div>
+          </div>
+        </div>
+        {/* Summary */}
+        <div style={{background:"#fafbfc",borderRadius:12,padding:"16px 18px",border:"1px solid #e2e8f0"}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#0f172a",marginBottom:8}}>📝 AI 분석 요약</div>
+          <div style={{fontSize:12.5,color:"#475569",lineHeight:1.8}}>{selReport.summary}</div>
+        </div>
+        {selReport.aiSaving>0&&<div style={{marginTop:14,padding:"12px 16px",background:"linear-gradient(135deg,#ecfdf5,#d1fae5)",borderRadius:10,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:18}}>💰</span>
+            <div><div style={{fontSize:12,fontWeight:700,color:"#065f46"}}>AI 절감 효과</div><div style={{fontSize:10,color:"#6b7280"}}>기존 대비 절감된 금액</div></div>
+          </div>
+          <div style={{fontSize:20,fontWeight:800,color:"#059669",fontFamily:"'DM Mono',monospace"}}>₩{(selReport.aiSaving/10000).toFixed(0)}만</div>
+        </div>}
+      </div>
+    </div>}
+  </div>);
+}
+
 // ═══ MAIN ═══
 export default function ClaimsAgentNew({ onBack }){
   const[tab,setTab]=useState(0);
-  const tabs=[{l:"견적 산정",e:"Estimate",i:IC.est,c:"#0891b2"},{l:"과실 산정",e:"Fault",i:IC.flt,c:"#7c3aed"},{l:"처리 방법 제안",e:"Method",i:IC.mth,c:"#059669"}];
+  const tabs=[{l:"견적 산정",e:"Estimate",i:IC.est,c:"#0891b2"},{l:"대인 피해",e:"Injury",i:IC.flt,c:"#dc2626"},{l:"과실 산정",e:"Fault",i:IC.flt,c:"#7c3aed"},{l:"처리 방법",e:"Method",i:IC.mth,c:"#059669"},{l:"KPI 관리",e:"KPI",i:IC.est,c:"#f59e0b"}];
   return(
     <div style={{width:"100%",height:"100vh",fontFamily:"'Noto Sans KR',-apple-system,sans-serif",background:"linear-gradient(155deg,#f8fafc,#f0f9ff 40%,#faf5ff 70%,#f8fafc)",color:"#0f172a",display:"flex",flexDirection:"column",overflow:"hidden"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
@@ -2981,7 +3500,9 @@ export default function ClaimsAgentNew({ onBack }){
           {t.i}<span>{t.l}</span><span style={{fontSize:9.5,opacity:.5,marginLeft:2}}>{t.e}</span></button>)}</div>
       <div style={{flex:1,padding:"14px 26px",overflow:"hidden",minHeight:0}}>
         <div style={{height:"100%",display:tab===0?"block":"none"}}><Tab1/></div>
-        <div style={{height:"100%",display:tab===1?"block":"none"}}><Tab2/></div>
-        <div style={{height:"100%",display:tab===2?"flex":"none",flexDirection:"column"}}><Tab3/></div></div>
+        <div style={{height:"100%",display:tab===1?"block":"none"}}><TabInjury/></div>
+        <div style={{height:"100%",display:tab===2?"block":"none"}}><Tab2/></div>
+        <div style={{height:"100%",display:tab===3?"flex":"none",flexDirection:"column"}}><Tab3/></div>
+        <div style={{height:"100%",display:tab===4?"flex":"none",flexDirection:"column"}}><TabKPI/></div></div>
     </div>);
 }
