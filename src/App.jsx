@@ -76,7 +76,7 @@ const MVPS = [
     desc: "주식 포트폴리오 · 부동산/자동차 · 지출/연말정산 · AI진단 · 글로벌 시세까지 통합 관리하는 자산 관리 프로그램",
     tags: ["자산관리", "포트폴리오", "AI진단"],
     date: "2025.02",
-    status: "Live",
+    status: "준비중",
     gradient: "linear-gradient(135deg,rgba(99,102,241,0.08),rgba(139,92,246,0.06))",
     border: "rgba(99,102,241,0.2)",
   },
@@ -363,7 +363,7 @@ export default function App() {
       {/* MVP SHOWCASE */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 40px" }}>
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
             const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall";
             return (
@@ -373,6 +373,7 @@ export default function App() {
                 style={{
                   background: mvp.gradient, borderRadius: 18, padding: "24px 22px", border: `1px solid ${mvp.border}`,
                   cursor: isClickable ? "pointer" : "default", transition: "all .3s", position: "relative", overflow: "hidden",
+                  opacity: mvp.status==="준비중" ? 0.55 : 1,
                   animation: `fadeInUp ${.4 + idx * .15}s ease`,
                 }}
                 onMouseEnter={e => { if (isClickable) { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = `0 16px 40px rgba(0,0,0,.3)`; e.currentTarget.style.borderColor = mvp.catColor + "60"; }}}
@@ -381,8 +382,8 @@ export default function App() {
                 {/* Category + Status */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <span style={{ padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, letterSpacing: 1, border: `1px solid ${mvp.catColor}40`, color: mvp.catColor, background: mvp.catColor + "10" }}>{mvp.category}</span>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#10b981", fontWeight: 600 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981", animation: "pulse 2s infinite" }} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: mvp.status==="Live"?"#10b981":"#94a3b8", fontWeight: 600 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: mvp.status==="Live"?"#10b981":"#94a3b8", boxShadow: mvp.status==="Live"?"0 0 8px #10b981":"none", animation: mvp.status==="Live"?"pulse 2s infinite":"none" }} />
                     {mvp.status}
                   </div>
                 </div>
