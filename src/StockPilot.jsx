@@ -334,7 +334,29 @@ return<div key={i} style={{flex:1,height:h,borderRadius:1,background:v>=prev?`${
 </div>);}
 
 // Main
-export default function StockPilot({onBack}){const[tab,setTab]=useState(0);const[stocks,setStocks]=useState(DEFAULT_STOCKS);const[seed,setSeed]=useState(50000000);const[cash,setCash]=useState(8500000);const[withdrawals,setWithdrawals]=useState(5000000);const[events,setEvents]=useState(DEFAULT_EVENTS);const[realEstate,setRealEstate]=useState(DEFAULT_RE);const[cars,setCars]=useState(DEFAULT_CARS);const[memos,setMemos]=useState([]);const[goal,setGoal]=useState(DEFAULT_GOAL);const[expenses,setExpenses]=useState(DEFAULT_EXPENSES);const[loaded,setLoaded]=useState(false);
+export default function StockPilot({onBack}){const[unlocked,setUnlocked]=useState(false);const[pw,setPw]=useState("");const[pwError,setPwError]=useState(false);const[pwShake,setPwShake]=useState(false);
+const tryUnlock=()=>{if(pw==="0613"){setUnlocked(true);setPwError(false);}else{setPwError(true);setPwShake(true);setTimeout(()=>setPwShake(false),500);setPw("");}};
+if(!unlocked)return(
+<div style={{width:"100%",height:"100vh",background:"linear-gradient(135deg,#0B1121,#0F172A 40%,#131C2E)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Pretendard','Noto Sans KR',-apple-system,sans-serif"}}>
+<style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
+<div style={{textAlign:"center",animation:"fadeIn .5s"}}>
+{onBack&&<button onClick={onBack} style={{position:"absolute",top:24,left:24,padding:"8px 16px",borderRadius:10,background:"rgba(0,229,160,0.08)",border:"1px solid rgba(0,229,160,0.2)",color:"#00E5A0",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>← DMP</button>}
+<div style={{width:64,height:64,borderRadius:16,background:"linear-gradient(135deg,#00E5A0,#00B8D4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,fontWeight:900,color:"#0F172A",margin:"0 auto 20px",boxShadow:"0 8px 32px rgba(0,229,160,0.3)"}}>₩</div>
+<div style={{fontSize:24,fontWeight:800,color:"#F8FAFC",marginBottom:6}}>StockPilot</div>
+<div style={{fontSize:12,color:"#64748B",marginBottom:32}}>Total Asset Management · 비밀번호를 입력하세요</div>
+<div style={{animation:pwShake?"shake .4s":"none"}}>
+<div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16}}>
+{[0,1,2,3].map(i=><div key={i} style={{width:14,height:14,borderRadius:"50%",background:pw.length>i?"#00E5A0":"rgba(100,116,139,0.3)",border:pw.length>i?"2px solid #00E5A0":"2px solid rgba(100,116,139,0.2)",transition:"all .15s",boxShadow:pw.length>i?"0 0 8px rgba(0,229,160,0.4)":"none"}}/>)}
+</div>
+<input value={pw} onChange={e=>{const v=e.target.value.replace(/[^0-9]/g,"").slice(0,4);setPw(v);setPwError(false);if(v.length===4){if(v==="0613"){setTimeout(()=>setUnlocked(true),200);}else{setPwError(true);setPwShake(true);setTimeout(()=>{setPwShake(false);setPw("");},500);}}}} onKeyDown={e=>e.key==="Enter"&&tryUnlock()} type="password" inputMode="numeric" maxLength={4} placeholder="••••" autoFocus style={{width:200,padding:"14px 20px",borderRadius:14,background:"rgba(30,41,59,0.6)",border:pwError?"2px solid #FF6B6B":"2px solid rgba(0,229,160,0.2)",color:"#F8FAFC",fontSize:24,fontWeight:700,textAlign:"center",letterSpacing:12,outline:"none",fontFamily:"monospace",transition:"border .2s"}}/>
+</div>
+{pwError&&<div style={{marginTop:12,fontSize:12,color:"#FF6B6B",animation:"fadeIn .3s"}}>비밀번호가 일치하지 않습니다</div>}
+<div style={{marginTop:24,fontSize:11,color:"#334155"}}>🔒 개인 자산 정보 보호를 위해 잠금되어 있습니다</div>
+</div></div>);
+const[tab,setTab]=useState(0);const[stocks,setStocks]=useState(DEFAULT_STOCKS);const[seed,setSeed]=useState(50000000);const[cash,setCash]=useState(8500000);const[withdrawals,setWithdrawals]=useState(5000000);const[events,setEvents]=useState(DEFAULT_EVENTS);const[realEstate,setRealEstate]=useState(DEFAULT_RE);const[cars,setCars]=useState(DEFAULT_CARS);const[memos,setMemos]=useState([]);const[goal,setGoal]=useState(DEFAULT_GOAL);const[expenses,setExpenses]=useState(DEFAULT_EXPENSES);const[loaded,setLoaded]=useState(false);
 useEffect(()=>{(()=>{const d=loadD();if(d){d.stocks&&setStocks(d.stocks);d.seed&&setSeed(d.seed);d.cash!==undefined&&setCash(d.cash);d.withdrawals!==undefined&&setWithdrawals(d.withdrawals);d.events&&setEvents(d.events);d.realEstate&&setRealEstate(d.realEstate);d.cars&&setCars(d.cars);d.memos&&setMemos(d.memos);d.goal&&setGoal(d.goal);d.expenses&&setExpenses(prev=>{const e={...prev,...d.expenses};if(!e.cards&&d.expenses.mandatoryCards){e.cards=[{id:1,name:"신용카드",type:"credit",mandatory:false,monthlyMin:0},{id:2,name:"체크카드",type:"debit",mandatory:false,monthlyMin:0},{id:3,name:"계좌이체",type:"transfer",mandatory:false,monthlyMin:0},{id:4,name:"현금",type:"cash",mandatory:false,monthlyMin:0},...d.expenses.mandatoryCards.map((mc,i)=>({id:100+i,name:mc.name.replace(/\s/g,""),type:"credit",mandatory:true,monthlyMin:mc.monthlyMin||300000}))];}return e;});}setLoaded(true);})();},[]);
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>saveD({stocks,seed,cash,withdrawals,events,realEstate,cars,memos,goal,expenses}),500);return()=>clearTimeout(t);},[stocks,seed,cash,withdrawals,events,realEstate,cars,memos,goal,expenses,loaded]);
 const gt=stocks.reduce((s,st)=>s+st.currentPrice*st.quantity,0)+cash+realEstate.reduce((s,r)=>s+r.currentValue-r.loanBalance,0)+cars.reduce((s,c)=>s+c.currentValue-c.loanBalance,0);
