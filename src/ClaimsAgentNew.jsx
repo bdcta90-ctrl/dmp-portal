@@ -2130,7 +2130,18 @@ function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
     for(let i=0;i<steps.length;i++){setProg({step:i+1,total:steps.length,msg:steps[i].msg,pct:Math.round(((i+1)/steps.length)*85)});await new Promise(r=>setTimeout(r,steps[i].delay));}
     setProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
     if(useCase==="uc1"){setResult(UC_RESULT);setAiText(UC_AI_TEXT);}
-    else{setResult({totalClaimants:3,opponents:[{name:"상대방",injury:"경추 염좌",grade:"14급",treatCost:800000,claimed:3000000,aiProper:[1800000,2500000],reason:"14급 기준 적용"}],ours:[],totalClaimed:3000000,aiTotalProper:[1800000,2500000],faultRatio:"협의중",ourBurden:[1800000,2500000]});
+    else if(useCase==="uc2"){
+      setResult({totalClaimants:0,opponents:[],ours:[],totalClaimed:0,aiTotalProper:[0,0],faultRatio:"100:0(자사)",ourBurden:[0,0],noInjury:true});
+      setAiText("## 🏥 AI 대인 피해 분석 — Case 2 주차장 충돌\n\n### 대인 접수 대상 없음\n\n> **이 사고는 물적 손해만 발생하였으며, 대인 배상 대상이 없습니다.**\n\n---\n\n### 📋 판단 근거\n\n| 항목 | 내용 |\n|------|------|\n| 타사 차량 상태 | **무인 주차 상태** (탑승자 없음) |\n| 자사 운전자 | 상해 없음 (본인 진술) |\n| 동승자 | 없음 |\n| 대인 접수 | **해당 없음** |\n\n---\n\n### 💡 AI 권고\n\n- 타사 차량이 무인 주차 상태였으므로 **대인 배상 청구 가능성 0%**\n- 자사 운전자가 향후 경미한 통증을 호소할 경우, **자사 상해보험**으로 별도 처리\n- 이 건은 **물적 손해(견적 산정)와 과실 산정(100:0)만 진행** 하면 됩니다\n\n✅ **대인 피해 산정 단계: 해당 없음 → 다음 단계(과실 산정)로 진행하세요**");
+    }
+    else if(useCase==="uc3"){
+      setResult({totalClaimants:2,
+        opponents:[{name:"타사 운전자(직진차량)",injury:"경추 염좌(2주)",grade:"14급",treatCost:1200000,claimed:4000000,aiProper:[2800000,3500000],reason:"2주 진단 경추 염좌 → 14급. 치료비 ₩1.2M 적정. 위자료 ₩2.5M은 과다(기준 ₩1.5~2M). 과실 15% 상계 시 자사 부담 ₩2,380,000~2,975,000"}],
+        ours:[{name:"자사 운전자(차선변경)",injury:"경추 불편(1주)",grade:"등급외",treatCost:500000,aiProper:[800000,1200000],reason:"1주 진단 경미 → 등급외. 타사 과실 15% 상계 시 실수령 ₩120,000~180,000. 실익 크지 않으나 협상 카드로 활용 가능"}],
+        totalClaimed:4000000,aiTotalProper:[3600000,4700000],faultRatio:"85:15",ourBurden:[2380000,2975000]});
+      setAiText("## 🏥 AI 대인 피해 분석 — Case 3 차선변경 충돌\n\n### 📊 대인 접수 현황\n\n| 구분 | 인원 | 청구액 | AI 적정 | 과실 상계 후 |\n|------|------|-------|--------|------------|\n| 타사 (직진차량) | 1명 | ₩4,000,000 | ₩2,800,000~3,500,000 | 자사 부담 85%: **₩2,380,000~2,975,000** |\n| 자사 (차선변경) | 1명 | 미정 | ₩800,000~1,200,000 | 타사 부담 15%: **수령 ₩120,000~180,000** |\n\n---\n\n### ⚖️ 타사 대인 상세\n\n**타사 운전자 — 경추 염좌 (2주 진단)**\n- 장해등급: **14급**\n- 치료비 ₩1,200,000 → **적정**\n- 위자료 ₩2,500,000 → **과다** (14급 기준 ₩1,500,000~2,000,000)\n- 💡 AI 적정 합의금: **₩2,800,000~3,500,000**\n- 과실 85% 적용 → 자사 부담: **₩2,380,000~2,975,000**\n\n---\n\n### 🔄 자사 대인 실익 분석\n\n**자사 운전자 — 경추 불편 (1주 진단)**\n- 장해등급: **등급외**\n- AI 적정: ₩800,000~1,200,000\n- 타사 과실 15% 상계 → **실수령 ₩120,000~180,000**\n- ⚠️ 실익이 크지 않음 → 타사 대인 취하 협상 카드로 활용 권장\n\n---\n\n### 🤝 협상 전략\n\n**[1안] 개별 합의 (AI 권고)**\n- 타사 운전자: ₩3,000,000 (14급 중앙값)\n- 자사 운전자: 접수 보류 (협상 카드 보유)\n- 자사 부담: **₩2,550,000**\n\n**[2안] 쌍방 대인 취하**\n- 양측 대인 접수 모두 취하 합의\n- 자사 부담: **₩0**\n- ⚠️ 타사 거부 가능성 (타사 청구액이 큼)");
+    }
+    else{setResult({totalClaimants:0,opponents:[],ours:[],totalClaimed:0,aiTotalProper:[0,0],faultRatio:"미정",ourBurden:[0,0]});
       const a=await callAI("대인 피해 분석 전문 AI. 상해등급, 적정합의금, 과실상계, 협상전략을 분석해주세요.",input);setAiText(a);}
     await new Promise(r=>setTimeout(r,300));setLoading(false);setProg({step:0,msg:"",pct:0});
   };
@@ -2257,12 +2268,22 @@ function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
       <div style={{overflowY:"auto"}}>
         {!result&&!loading&&<Em text="대인 접수 내용 입력 후 분석을 실행하세요"/>}
         {result&&<div style={{animation:"fadeIn .4s",display:"flex",flexDirection:"column",gap:12}}>
-          {/* Summary Cards */}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+          {/* 대인 없음 표시 (UC2 등) */}
+          {result.noInjury&&<div style={{...CD,border:"2px solid #86efac",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",textAlign:"center",padding:"28px 20px"}}>
+            <div style={{fontSize:36,marginBottom:8}}>✅</div>
+            <div style={{fontSize:16,fontWeight:800,color:"#065f46",marginBottom:6}}>대인 접수 대상 없음</div>
+            <div style={{fontSize:12,color:"#6b7280",lineHeight:1.6}}>이 사고는 물적 손해만 발생하였으며, 대인 배상 대상이 없습니다.</div>
+            <div style={{marginTop:12,display:"inline-flex",gap:8}}>
+              <span style={{fontSize:10,padding:"4px 10px",borderRadius:6,background:"#dcfce7",color:"#16a34a",fontWeight:600}}>타사 차량: 무인 주차</span>
+              <span style={{fontSize:10,padding:"4px 10px",borderRadius:6,background:"#dbeafe",color:"#2563eb",fontWeight:600}}>자사 운전자: 상해 없음</span>
+            </div>
+          </div>}
+          {/* Summary Cards — 대인 있는 경우만 */}
+          {!result.noInjury&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
             <MC label="총 접수자" value={result.totalClaimants+"명"} ac="#dc2626" big/>
             <MC label="총 청구액" value={"₩"+((result.totalClaimed||0)/10000).toFixed(0)+"만"} ac="#f97316"/>
             <MC label="AI 적정" value={"₩"+(((result.aiTotalProper||[0])[0]||0)/10000).toFixed(0)+"~"+(((result.aiTotalProper||[0,0])[1]||0)/10000).toFixed(0)+"만"} ac="#059669"/>
-          </div>
+          </div>}
 
           {/* ═══ 타사 대인 섹션 ═══ */}
           {result.opponents&&result.opponents.length>0&&<div style={{...CD,border:"2px solid #fca5a5",background:"#fef2f2"}}>
@@ -2501,8 +2522,17 @@ function Tab2({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
       factors.push({label:"B차 급가속 주장",val:"0% (증거 부재로 미반영)",impact:"중립"});
       factors.push({label:"최종 산정",val:"A 85% : B 15%",impact:"주의"});
     }
+    // UC2: 주차된 차량 충돌 → 100:0 강제
+    if(useCase==="uc2"){b=100;factors.length=0;
+      factors.push({label:"기본 과실 (기준표)",val:"A 100% : B 0% (주정차 차량 충돌)",impact:"불리"});
+      factors.push({label:"타사 차량 상태",val:"무인 주차 상태 (탑승자 없음)",impact:"확정"});
+      factors.push({label:"CCTV 증거",val:"주차장 CCTV 확보 → 자사 단독 과실 확인",impact:"확정"});
+      factors.push({label:"과실 보정 없음",val:"주정차 차량은 과실 0% (판례 확립)",impact:"확정"});
+      factors.push({label:"최종 산정",val:"A 100% : B 0%",impact:"불리"});
+    }
     sRs({mf:b,of:100-b,cf,evCount,fileCount,phCount:ph.length,factors,stmtAdj});
-    const a=useCase==="uc3"?UC_FAULT_RESPONSE:await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
+    const UC2_FAULT_RESPONSE="## ⚖️ AI 과실 분석 — Case 2 주차장 충돌\n\n### 과실 판정: A(자사) 100% : B(타사) 0%\n\n---\n\n### 📋 판단 근거\n\n| 항목 | 내용 |\n|------|------|\n| 사고 유형 | 주차장 내 주정차 차량 충돌 |\n| 타사 차량 상태 | **무인 주차 상태** (시동 OFF, 탑승자 없음) |\n| 과실 기준 | 주정차 차량은 과실 **0%** (판례 확립) |\n| 근거 판례 | 대법원 2015다12345: 적법 주차 차량 충돌 시 주차 차량 과실 0% |\n\n---\n\n### ⚠️ 주의사항\n\n- 타사 차량이 **적법한 주차 구역에 주차**되어 있었으므로 과실 분쟁 여지 없음\n- 자사 고객이 주차장에서 빠져나오다 미끄러져 충돌 → **단독 과실**\n- 주차장 CCTV 확보 시 과실 입증 명확\n\n### 💡 AI 권고\n\n- 과실 분쟁 불필요 → **100:0 확정 처리**\n- 견적 산정(수리비 검증)과 처리 방법 제안에 집중\n- 타사 신차(3개월) 감가 청구 가능성 대비 필요";
+    const a=useCase==="uc3"?UC_FAULT_RESPONSE:useCase==="uc2"?UC2_FAULT_RESPONSE:await callAI("당신은 과실 산정 전문 AI입니다. 판단근거,판례,협상차선안을 제시하세요.",
       `사고:${at}\n도로:${rt||"미상"},날씨:${wt||"미상"},신호:${sg||"미상"}\n증거:블랙박스(${dc?"있음":"없음"}),경찰보고서(${pr?"있음":"없음"}),CCTV(${cctv?"있음":"없음"}),목격자(${wit?"있음":"없음"})\n사진:${ph.length}장\nA차 진술:${mD||"없음"}\nB차 진술:${oD||"없음"}\n결과:A${b}%/B${100-b}%\n분석해주세요.`);
     setAiProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료!",pct:100});
     await new Promise(r=>setTimeout(r,400));
@@ -3673,7 +3703,7 @@ export default function ClaimsAgentNew({ onBack }){
           <button onClick={onBack} style={{padding:"6px 14px",borderRadius:8,background:"rgba(8,145,178,0.08)",border:"1px solid rgba(8,145,178,0.2)",color:"#0891b2",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5,fontFamily:"inherit"}}>← DMP</button>
           <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#0891b2,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",boxShadow:"0 3px 8px rgba(8,145,178,.2)"}}>{IC.car}</div>
           <div><div style={{fontSize:15,fontWeight:800,letterSpacing:-.3}}><span style={{color:"#0891b2"}}>AI</span> 손해사정 Portal <span style={{fontSize:11,color:"#fff",fontWeight:800,background:"linear-gradient(135deg,#f97316,#ea580c)",padding:"2px 10px",borderRadius:6,boxShadow:"0 2px 6px rgba(249,115,22,.3)"}}>New v2</span></div>
-            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.1-dmg</span></div></div></div>
+            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.2-fix</span></div></div></div>
         <div style={{display:"flex",alignItems:"center",gap:5,color:"#94a3b8",fontSize:11}}><div style={{width:6,height:6,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 5px #4ade80"}}/>Active</div></div>
 
       <div style={{display:"flex",gap:2,padding:"8px 26px",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.55)"}}>
