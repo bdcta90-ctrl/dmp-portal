@@ -1428,122 +1428,116 @@ function ProcessReportModal({onClose}){
     </div>
   );
 }
-function GV80DamageDiagram(){
-  const[hoveredPart,setHoveredPart]=useState(null);
-  const[animPhase,setAnimPhase]=useState(0);
+// ═══ Generic Damage Diagram ═══
+const DAMAGE_CONFIGS = {
+  uc1_a: { vehicle:"현대 그랜저", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩5,000,000",
+    parts:[
+      {id:"fenderL",label:"좌 프론트 펜더",severity:"판금 교체",cost:"₩850,000",x:55,y:155,w:55,h:50,phase:1,color:"#dc2626"},
+      {id:"doorL",label:"좌 프론트 도어",severity:"판금 도장",cost:"₩1,200,000",x:55,y:105,w:55,h:50,phase:2,color:"#dc2626"},
+      {id:"bumperF",label:"프론트 범퍼(좌측)",severity:"교체 필요",cost:"₩680,000",x:60,y:215,w:140,h:50,phase:3,color:"#f97316"},
+      {id:"headL",label:"좌 헤드라이트",severity:"교체 필요",cost:"₩720,000",x:58,y:158,w:50,h:45,phase:4,color:"#dc2626"},
+      {id:"grillL",label:"프론트 그릴(좌측)",severity:"교체",cost:"₩350,000",x:120,y:198,w:80,h:18,phase:5,color:"#f59e0b"},
+      {id:"paint",label:"도장 (3면)",severity:"전체 도장",cost:"₩1,200,000",x:55,y:85,w:55,h:20,phase:6,color:"#8b5cf6"},
+    ]},
+  uc1_b: { vehicle:"BMW 7시리즈", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩25,000,000 (청구)",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼 ASSY",severity:"교체 필요",cost:"₩3,500,000",x:60,y:215,w:280,h:55,phase:1,color:"#dc2626"},
+      {id:"hood",label:"본넷(후드)",severity:"교체 필요",cost:"₩2,800,000",x:90,y:100,w:220,h:105,phase:2,color:"#dc2626"},
+      {id:"fenderR",label:"우 프론트 펜더",severity:"판금 교체",cost:"₩2,200,000",x:290,y:155,w:55,h:50,phase:3,color:"#f97316"},
+      {id:"headR",label:"우 헤드라이트",severity:"교체 필요",cost:"₩3,200,000",x:292,y:158,w:50,h:45,phase:4,color:"#dc2626"},
+      {id:"grill",label:"프론트 그릴",severity:"교체",cost:"₩1,800,000",x:142,y:198,w:116,h:18,phase:5,color:"#f59e0b"},
+      {id:"rad",label:"라디에이터+에어컨",severity:"교체 의심",cost:"₩2,500,000",x:120,y:170,w:160,h:25,phase:6,color:"#f97316"},
+    ]},
+  uc2_a: { vehicle:"현대 그랜저 캘리그래피", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩1,830,000",
+    parts:[
+      {id:"bumperR",label:"프론트 범퍼(우측)",severity:"판금 도장",cost:"₩380,000",x:260,y:215,w:80,h:50,phase:1,color:"#f97316"},
+      {id:"headR",label:"우 헤드라이트",severity:"크랙 점검",cost:"₩420,000",x:292,y:158,w:50,h:45,phase:2,color:"#f59e0b"},
+      {id:"fenderR",label:"우 프론트 펜더",severity:"판금 도장",cost:"₩350,000",x:290,y:135,w:55,h:25,phase:3,color:"#f97316"},
+      {id:"fog",label:"우 안개등/DRL",severity:"점검",cost:"₩80,000",x:295,y:235,w:20,h:20,phase:4,color:"#f59e0b"},
+      {id:"labor",label:"공임 (탈거/조립)",severity:"—",cost:"₩280,000",x:200,y:82,w:30,h:16,phase:5,color:"#8b5cf6"},
+      {id:"paint",label:"도장 (2면)",severity:"도장",cost:"₩320,000",x:290,y:110,w:55,h:25,phase:6,color:"#8b5cf6"},
+    ]},
+  uc2_b: { vehicle:"제네시스 GV80 3.5T AWD", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩6,380,000 (AI적정)",
+    parts:[
+      {id:"bumper",label:"프론트 범퍼 ASSY",severity:"교체 필요",cost:"₩1,350,000",x:60,y:215,w:280,h:55,phase:1,color:"#dc2626"},
+      {id:"hood",label:"본넷(후드)",severity:"교체 필요",cost:"₩980,000",x:90,y:100,w:220,h:105,phase:2,color:"#f97316"},
+      {id:"headL",label:"좌 헤드라이트(LED)",severity:"교체 필요",cost:"₩1,350,000",x:55,y:155,w:58,h:55,phase:3,color:"#dc2626"},
+      {id:"grill",label:"프론트 그릴",severity:"교체",cost:"₩350,000",x:140,y:195,w:120,h:22,phase:4,color:"#f59e0b"},
+      {id:"rad",label:"라디에이터 서포트",severity:"손상 의심",cost:"₩300,000",x:120,y:170,w:160,h:25,phase:5,color:"#f97316"},
+      {id:"cam",label:"전방 카메라/레이더",severity:"캘리브레이션",cost:"₩300,000",x:185,y:82,w:30,h:16,phase:6,color:"#8b5cf6"},
+    ]},
+  uc3_a: { vehicle:"A차 (차선변경)", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩1,200,000~1,800,000",
+    parts:[
+      {id:"bumperR",label:"리어 범퍼(우측)",severity:"판금 도장",cost:"₩450,000",x:260,y:215,w:80,h:50,phase:1,color:"#f97316"},
+      {id:"quarterR",label:"우 리어쿼터패널",severity:"판금 도장",cost:"₩550,000",x:290,y:155,w:55,h:55,phase:2,color:"#f97316"},
+      {id:"doorR",label:"우 리어 도어(하단)",severity:"경미 접촉",cost:"₩300,000",x:290,y:105,w:55,h:50,phase:3,color:"#f59e0b"},
+    ]},
+  uc3_b: { vehicle:"B차 (직진)", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩800,000~1,500,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼(좌측)",severity:"판금 도장",cost:"₩350,000",x:60,y:215,w:140,h:50,phase:1,color:"#f97316"},
+      {id:"fenderL",label:"좌 프론트 펜더",severity:"판금 도장",cost:"₩450,000",x:55,y:155,w:55,h:50,phase:2,color:"#f97316"},
+    ]},
+};
+
+function DamageDiagram({configKey}){
+  const cfg=DAMAGE_CONFIGS[configKey];
+  if(!cfg)return null;
+  const[hov,setHov]=useState(null);
+  const[anim,setAnim]=useState(0);
   useEffect(()=>{
-    const timers=[];
-    timers.push(setTimeout(()=>setAnimPhase(1),300));
-    timers.push(setTimeout(()=>setAnimPhase(2),800));
-    timers.push(setTimeout(()=>setAnimPhase(3),1300));
-    timers.push(setTimeout(()=>setAnimPhase(4),1800));
-    timers.push(setTimeout(()=>setAnimPhase(5),2200));
-    timers.push(setTimeout(()=>setAnimPhase(6),2600));
-    return()=>timers.forEach(clearTimeout);
-  },[]);
-  const parts=[
-    {id:"bumper",label:"프론트 범퍼 ASSY",severity:"교체 필요",cost:"₩1,350,000",x:60,y:215,w:280,h:55,rx:8,phase:1,color:"#dc2626",labelX:200,labelY:255,anchor:"middle"},
-    {id:"hood",label:"본넷(후드)",severity:"교체 필요",cost:"₩980,000",x:90,y:100,w:220,h:105,rx:14,phase:2,color:"#f97316",labelX:200,labelY:145,anchor:"middle"},
-    {id:"headlightL",label:"좌 헤드라이트(LED)",severity:"교체 필요",cost:"₩1,350,000",x:55,y:155,w:58,h:55,rx:6,phase:3,color:"#dc2626",labelX:20,labelY:150,anchor:"start"},
-    {id:"grill",label:"프론트 그릴",severity:"교체 필요",cost:"₩350,000",x:140,y:195,w:120,h:22,rx:4,phase:4,color:"#f59e0b",labelX:200,labelY:206,anchor:"middle"},
-    {id:"radiator",label:"라디에이터 서포트",severity:"손상 의심",cost:"₩300,000",x:120,y:170,w:160,h:25,rx:4,phase:5,color:"#f97316",labelX:370,labelY:180,anchor:"start"},
-    {id:"camera",label:"전방 카메라/레이더",severity:"캘리브레이션",cost:"₩300,000",x:185,y:82,w:30,h:16,rx:4,phase:6,color:"#8b5cf6",labelX:370,labelY:88,anchor:"start"},
-  ];
+    const t=[];
+    cfg.parts.forEach((p,i)=>t.push(setTimeout(()=>setAnim(i+1),300+i*400)));
+    return()=>t.forEach(clearTimeout);
+  },[configKey]);
   return(
-    <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",borderRadius:14,padding:"16px 14px 12px",border:"1px solid rgba(8,145,178,0.3)"}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-        <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <div style={{width:8,height:8,borderRadius:"50%",background:"#dc2626",animation:"pulse 1.5s infinite"}}/>
-          <span style={{fontSize:11,fontWeight:700,color:"#f1f5f9"}}>AI 파손 감지 결과</span>
-          <span style={{fontSize:9,padding:"2px 6px",borderRadius:5,background:"rgba(8,145,178,0.2)",color:"#22d3ee",fontWeight:700}}>GV80 3.5T AWD</span>
+    <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",borderRadius:12,padding:"12px 12px 10px",border:"1px solid rgba(59,130,246,0.2)"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:5}}>
+          <div style={{width:7,height:7,borderRadius:"50%",background:"#dc2626",animation:"pulse 1.5s infinite"}}/>
+          <span style={{fontSize:10,fontWeight:700,color:"#f1f5f9"}}>AI 파손 감지</span>
+          <span style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:cfg.badgeColor+"20",color:cfg.badgeColor=="#dc2626"?"#fca5a5":"#93c5fd",fontWeight:700,border:`1px solid ${cfg.badgeColor}30`}}>{cfg.badge}</span>
+          <span style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:"rgba(8,145,178,0.2)",color:"#22d3ee",fontWeight:700}}>{cfg.vehicle}</span>
         </div>
-        <span style={{fontSize:9,color:"#64748b",fontFamily:"'DM Mono',monospace"}}>감지 부위: 6개</span>
+        <span style={{fontSize:8,color:"#64748b"}}>{cfg.parts.length}개 부위</span>
       </div>
-      <svg viewBox="0 0 400 290" style={{width:"100%",height:"auto"}}>
+      <svg viewBox="0 0 400 280" style={{width:"100%",height:"auto"}}>
         <defs>
-          <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#475569"/><stop offset="100%" stopColor="#334155"/>
-          </linearGradient>
-          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id="glowRed"><feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#dc2626" floodOpacity="0.6"/></filter>
-          <filter id="glowOrange"><feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#f97316" floodOpacity="0.5"/></filter>
+          <linearGradient id={"bg"+configKey} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#475569"/><stop offset="100%" stopColor="#334155"/></linearGradient>
+          <filter id={"gl"+configKey}><feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#dc2626" floodOpacity="0.5"/></filter>
         </defs>
-        {/* Vehicle body outline */}
-        <rect x="55" y="70" width="290" height="210" rx="30" fill="url(#bodyGrad)" stroke="#64748b" strokeWidth="1.5"/>
-        {/* Windshield */}
-        <path d="M 110 72 Q 200 60 290 72 L 280 98 Q 200 92 120 98 Z" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
-        {/* Hood lines */}
-        <line x1="200" y1="98" x2="200" y2="195" stroke="#475569" strokeWidth="0.8" strokeDasharray="3,3"/>
-        <line x1="120" y1="130" x2="280" y2="130" stroke="#475569" strokeWidth="0.5" strokeDasharray="2,4"/>
-        {/* Headlights */}
-        <rect x="58" y="158" width="52" height="48" rx="8" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
-        <rect x="290" y="158" width="52" height="48" rx="8" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
-        {/* Grill */}
-        <rect x="142" y="198" width="116" height="18" rx="4" fill="#1e293b" stroke="#475569" strokeWidth="1"/>
-        {[0,1,2,3,4].map(i=><line key={i} x1={152+i*22} y1="200" x2={152+i*22} y2="214" stroke="#475569" strokeWidth="0.8"/>)}
-        {/* Bumper bottom */}
-        <rect x="65" y="220" width="270" height="45" rx="10" fill="#2d3748" stroke="#475569" strokeWidth="1"/>
-        {/* Fog lights */}
-        <circle cx="95" cy="242" r="12" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
-        <circle cx="305" cy="242" r="12" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
-        {/* Camera/sensor */}
-        <rect x="188" y="85" width="24" height="12" rx="3" fill="#334155" stroke="#475569" strokeWidth="0.8"/>
-        {/* Genesis logo */}
-        <circle cx="200" cy="150" r="14" fill="none" stroke="#64748b" strokeWidth="1"/>
-        <text x="200" y="154" textAnchor="middle" fontSize="10" fontWeight="700" fill="#64748b">G</text>
-        {/* License plate area */}
-        <rect x="165" y="248" width="70" height="16" rx="2" fill="#1e293b" stroke="#475569" strokeWidth="0.6"/>
-
-        {/* Damage overlays - animated */}
-        {parts.map(p=>animPhase>=p.phase&&(
-          <g key={p.id} style={{cursor:"pointer"}} onMouseEnter={()=>setHoveredPart(p.id)} onMouseLeave={()=>setHoveredPart(null)}>
-            <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={p.rx}
-              fill={p.color+"20"} stroke={p.color} strokeWidth={hoveredPart===p.id?2.5:1.5}
-              strokeDasharray={hoveredPart===p.id?"":"4,2"}
-              filter={hoveredPart===p.id?(p.color==="#dc2626"?"url(#glowRed)":"url(#glowOrange)"):""}
-              style={{animation:"fadeIn 0.5s ease-out"}}/>
-            {/* Scan line animation */}
-            {animPhase===p.phase&&<rect x={p.x} y={p.y} width={p.w} height="2" rx="1" fill={p.color} opacity="0.8">
-              <animate attributeName="y" from={p.y} to={p.y+p.h} dur="0.5s" fill="freeze"/>
-              <animate attributeName="opacity" from="0.8" to="0" dur="0.5s" fill="freeze"/>
-            </rect>}
+        <rect x="55" y="70" width="290" height="210" rx="28" fill={`url(#bg${configKey})`} stroke="#64748b" strokeWidth="1.2"/>
+        <path d="M 110 72 Q 200 60 290 72 L 280 96 Q 200 90 120 96 Z" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
+        <line x1="200" y1="96" x2="200" y2="195" stroke="#475569" strokeWidth="0.6" strokeDasharray="3,3"/>
+        <rect x="58" y="158" width="50" height="45" rx="7" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
+        <rect x="292" y="158" width="50" height="45" rx="7" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
+        <rect x="142" y="198" width="116" height="16" rx="3" fill="#1e293b" stroke="#475569" strokeWidth="0.8"/>
+        <rect x="65" y="220" width="270" height="42" rx="9" fill="#2d3748" stroke="#475569" strokeWidth="0.8"/>
+        <circle cx="95" cy="240" r="10" fill="#1e293b" stroke="#475569" strokeWidth="0.6"/>
+        <circle cx="305" cy="240" r="10" fill="#1e293b" stroke="#475569" strokeWidth="0.6"/>
+        <rect x="188" y="84" width="24" height="10" rx="3" fill="#334155" stroke="#475569" strokeWidth="0.6"/>
+        <circle cx="200" cy="148" r="12" fill="none" stroke="#64748b" strokeWidth="0.8"/>
+        {cfg.parts.map(p=>anim>=p.phase&&(
+          <g key={p.id} style={{cursor:"pointer"}} onMouseEnter={()=>setHov(p.id)} onMouseLeave={()=>setHov(null)}>
+            <rect x={p.x} y={p.y} width={p.w} height={p.h} rx={6} fill={p.color+"20"} stroke={p.color} strokeWidth={hov===p.id?2.2:1.2} strokeDasharray={hov===p.id?"":"3,2"} filter={hov===p.id?`url(#gl${configKey})`:""} style={{animation:"fadeIn 0.4s"}}/>
+            {hov===p.id&&<g style={{animation:"fadeIn 0.15s"}}>
+              <rect x={p.x+p.w/2-70} y={p.y-30} width={140} height={28} rx={5} fill="rgba(15,23,42,0.92)" stroke={p.color} strokeWidth="0.8"/>
+              <text x={p.x+p.w/2} y={p.y-17} textAnchor="middle" fontSize="8" fontWeight="700" fill={p.color}>{p.label}</text>
+              <text x={p.x+p.w/2} y={p.y-7} textAnchor="middle" fontSize="7" fill="#94a3b8">{p.severity} · {p.cost}</text>
+            </g>}
           </g>
         ))}
-
-        {/* Labels with leader lines */}
-        {parts.map(p=>animPhase>=p.phase&&hoveredPart===p.id&&(
-          <g key={p.id+"label"} style={{animation:"fadeIn 0.2s"}}>
-            <rect x={p.labelX-(p.anchor==="start"?0:75)} y={p.labelY-28} width={150} height={32} rx={6}
-              fill="rgba(15,23,42,0.92)" stroke={p.color} strokeWidth="1"/>
-            <text x={p.labelX-(p.anchor==="start"?-8:67)} y={p.labelY-14} fontSize="9" fontWeight="700" fill={p.color}>{p.label}</text>
-            <text x={p.labelX-(p.anchor==="start"?-8:67)} y={p.labelY-4} fontSize="8" fill="#94a3b8">{p.severity} · {p.cost}</text>
-          </g>
-        ))}
-
-        {/* Scanning overlay text */}
-        {animPhase<6&&<text x="200" y="20" textAnchor="middle" fontSize="10" fontWeight="600" fill="#22d3ee" opacity="0.8" style={{animation:"pulse 1s infinite"}}>
-          {animPhase<2?"🔍 전면부 스캔 중...":animPhase<4?"🧠 파손 영역 분석 중...":"📊 손상도 판정 중..."}
-        </text>}
-        {animPhase>=6&&<text x="200" y="20" textAnchor="middle" fontSize="10" fontWeight="700" fill="#4ade80">✅ 감지 완료 — 6개 부위 · 파손 부위에 마우스를 올려보세요</text>}
+        {anim>=cfg.parts.length?<text x="200" y="18" textAnchor="middle" fontSize="9" fontWeight="700" fill="#4ade80">✅ 감지 완료 — 마우스를 올려보세요</text>:
+          <text x="200" y="18" textAnchor="middle" fontSize="9" fontWeight="600" fill="#22d3ee" style={{animation:"pulse 1s infinite"}}>🔍 파손 영역 스캔 중...</text>}
       </svg>
-      {/* Bottom legend */}
-      <div style={{display:"flex",gap:10,justifyContent:"center",marginTop:6,flexWrap:"wrap"}}>
-        {[{c:"#dc2626",l:"심각 (교체)"},{c:"#f97316",l:"높음 (교체/수리)"},{c:"#f59e0b",l:"중간 (교체)"},{c:"#8b5cf6",l:"캘리브레이션"}].map(v=>
-          <div key={v.l} style={{display:"flex",alignItems:"center",gap:4}}>
-            <div style={{width:8,height:8,borderRadius:2,background:v.c}}/>
-            <span style={{fontSize:9,color:"#94a3b8"}}>{v.l}</span>
-          </div>
-        )}
+      <div style={{display:"flex",gap:8,justifyContent:"center",marginTop:4}}>
+        {[{c:"#dc2626",l:"심각"},{c:"#f97316",l:"높음"},{c:"#f59e0b",l:"중간"},{c:"#8b5cf6",l:"기타"}].map(v=>
+          <div key={v.l} style={{display:"flex",alignItems:"center",gap:3}}>
+            <div style={{width:6,height:6,borderRadius:2,background:v.c}}/><span style={{fontSize:8,color:"#94a3b8"}}>{v.l}</span>
+          </div>)}
       </div>
-      {/* Cost summary */}
-      <div style={{marginTop:8,background:"rgba(8,145,178,0.08)",borderRadius:8,padding:"8px 12px",border:"1px solid rgba(8,145,178,0.2)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <span style={{fontSize:10,color:"#94a3b8"}}>AI 감지 총 예상 수리비</span>
-        </div>
-        <div style={{display:"flex",alignItems:"baseline",gap:4}}>
-          <span style={{fontSize:15,fontWeight:800,color:"#22d3ee",fontFamily:"'DM Mono',monospace"}}>₩4,630,000</span>
-          <span style={{fontSize:9,color:"#64748b"}}>부품+공임 (도장 별도)</span>
-        </div>
+      <div style={{marginTop:6,background:"rgba(8,145,178,0.08)",borderRadius:7,padding:"6px 10px",border:"1px solid rgba(8,145,178,0.15)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:9,color:"#94a3b8"}}>AI 감지 총 예상</span>
+        <span style={{fontSize:13,fontWeight:800,color:"#22d3ee",fontFamily:"'DM Mono',monospace"}}>{cfg.totalCost}</span>
       </div>
     </div>
   );
@@ -1610,27 +1604,27 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
   const[aiProgress,setAiProgress]=useState({step:0,msg:""});
   const{displayed:tA,done:aD}=useTW(at);
   const fr=useRef(null);
-  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[vehTab,setVehTab]=useState(0);const[smsOpen,setSmsOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);
+  const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[vehTab,setVehTab]=useState(0);const[smsOpen,setSmsOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);const[dmgTab,setDmgTab]=useState(0);
 
   const loadUC2=()=>{
     setOrigin("국산");sMk("제네시스");sMd("GV80");sYr("2025");sMl("3000");
     sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터","전방 카메라/센서"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc2");setVehTab(0);setSmsOpen(false);setReportOpen(false);
+    sSv("심각");sRs(null);sAt("");setUseCase("uc2");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
     setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 전면부 광범위 파손 — 범퍼 ASSY 교체, 본넷 교체, 헤드라이트 교체 필요. 라디에이터 서포트 손상 의심."});
   };
   const loadUC1=()=>{
     setOrigin("외산");sMk("BMW");sMd("7시리즈");sYr("2023");sMl("25000");
     sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","좌 프론트 펜더","좌 프론트 도어","좌 헤드라이트","프론트 그릴"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc1");setVehTab(0);setSmsOpen(false);setReportOpen(false);
+    sSv("심각");sRs(null);sAt("");setUseCase("uc1");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
     setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","좌 프론트 펜더","좌 프론트 도어","좌 헤드라이트"],severity:"심각",confidence:"높음",memo:"AI 분석: 좌측 전면부 광범위 파손 — 교차로 측면 충돌 패턴. 범퍼+펜더+도어 판금 교체, 헤드라이트 교체 필요."});
   };
   const loadUC3=()=>{
     setOrigin("전체");sMk("");sMd("");sYr("");sMl("");
     sSp(["리어 범퍼(상)","우 리어쿼터패널","우 리어 도어"]);
-    sSv("중간");sRs(null);sAt("");setUseCase("uc3");setVehTab(0);setSmsOpen(false);setReportOpen(false);
+    sSv("중간");sRs(null);sAt("");setUseCase("uc3");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
     setAiDetected({parts:["리어 범퍼(상)","우 리어쿼터패널"],severity:"중간",confidence:"보통",memo:"AI 분석: 우측 후방부 접촉 파손 — 차선변경 중 충돌. 범퍼 판금, 쿼터패널 판금 도장."});
   };
-  const clearUC=()=>{setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");setVehTab(0);setSmsOpen(false);setReportOpen(false);};
+  const clearUC=()=>{setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);};
   useEffect(()=>{
     if(activeCase==="uc1")loadUC1();else if(activeCase==="uc2")loadUC2();else if(activeCase==="uc3")loadUC3();else clearUC();
   },[activeCase]);
@@ -1838,8 +1832,26 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
           </div>}
         </div>
 
-        {/* AI 파손 감지 다이어그램 - Case 2 전용 */}
-        {useCase==="uc2"&&<div style={CD}><GV80DamageDiagram/></div>}
+        {/* AI 파손 감지 다이어그램 — 탭으로 자사/타사 전환 */}
+        {useCase&&<div style={{...CD,padding:"14px 16px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:7,height:7,borderRadius:"50%",background:"#dc2626",animation:"pulse 1.5s infinite"}}/>
+              <span style={{fontSize:12,fontWeight:700}}>AI 파손 감지 다이어그램</span>
+            </div>
+            {/* 자사/타사 탭 */}
+            <div style={{display:"flex",background:"#f1f5f9",borderRadius:8,padding:2}}>
+              {[{l:"자사 A차",color:"#2563eb",key:"_a"},{l:"타사 B차",color:"#dc2626",key:"_b"}].map((t,i)=>{
+                const cfg=DAMAGE_CONFIGS[useCase+t.key];
+                return <button key={i} onClick={()=>setDmgTab(i)} style={{padding:"5px 14px",borderRadius:6,border:"none",cursor:"pointer",background:dmgTab===i?"#fff":"transparent",boxShadow:dmgTab===i?"0 1px 3px rgba(0,0,0,.08)":"none",color:dmgTab===i?t.color:"#94a3b8",fontSize:11,fontWeight:dmgTab===i?700:500,transition:"all .15s",display:"flex",alignItems:"center",gap:4}}>
+                  <div style={{width:6,height:6,borderRadius:"50%",background:dmgTab===i?t.color:"#cbd5e1"}}/>
+                  {t.l}{cfg?" · "+cfg.vehicle:""}
+                </button>;
+              })}
+            </div>
+          </div>
+          <DamageDiagram configKey={useCase+(dmgTab===0?"_a":"_b")}/>
+        </div>}
 
         {/* 파손 부위 - 카테고리 */}
         <div style={CD}>
@@ -3661,7 +3673,7 @@ export default function ClaimsAgentNew({ onBack }){
           <button onClick={onBack} style={{padding:"6px 14px",borderRadius:8,background:"rgba(8,145,178,0.08)",border:"1px solid rgba(8,145,178,0.2)",color:"#0891b2",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5,fontFamily:"inherit"}}>← DMP</button>
           <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#0891b2,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",boxShadow:"0 3px 8px rgba(8,145,178,.2)"}}>{IC.car}</div>
           <div><div style={{fontSize:15,fontWeight:800,letterSpacing:-.3}}><span style={{color:"#0891b2"}}>AI</span> 손해사정 Portal <span style={{fontSize:11,color:"#fff",fontWeight:800,background:"linear-gradient(135deg,#f97316,#ea580c)",padding:"2px 10px",borderRadius:6,boxShadow:"0 2px 6px rgba(249,115,22,.3)"}}>New v2</span></div>
-            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX</div></div></div>
+            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.1-dmg</span></div></div></div>
         <div style={{display:"flex",alignItems:"center",gap:5,color:"#94a3b8",fontSize:11}}><div style={{width:6,height:6,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 5px #4ade80"}}/>Active</div></div>
 
       <div style={{display:"flex",gap:2,padding:"8px 26px",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.55)"}}>
