@@ -3487,6 +3487,7 @@ function TabKPI(){
   const[selReport,setSelReport]=useState(null);
   const[filterMember,setFilterMember]=useState("전체");
   const[filterPriority,setFilterPriority]=useState(null);
+  const[filterStatus,setFilterStatus]=useState(null);
   const[savingDetail,setSavingDetail]=useState(false);
   const[memberDetail,setMemberDetail]=useState(null);
   const[liveCount,setLiveCount]=useState(0);
@@ -3521,22 +3522,22 @@ function TabKPI(){
   ];
 
   const[reports]=useState([
-    {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M.",originalClaim:10000000,aiResult:6380000,aiSaving:3620000,savingBasis:"타사 보험사 최초 청구액 ₩10,000,000 대비 AI 적정 견적 ₩6,380,000"},
-    {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:2,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 → AI 85:15 판정.",originalClaim:15800000,aiResult:7300000,aiSaving:8500000,savingBasis:"타사 100:0 주장 시 자사 전액부담 ₩15,800,000 대비 AI 85:15 판정 ₩7,300,000"},
-    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000"},
-    {id:"RPT-004",date:"2025.03.03",type:"견적",case:"후미추돌 — 쏘나타 vs K5",adjuster:"정태우 사정사",status:"종결",cost:2800000,repairDays:7,faultRatio:"0:100(타사과실)",severity:"경미",claimants:0,priority:"보통",summary:"후미추돌. 자사 쏘나타 리어범퍼 파손.",originalClaim:2800000,aiResult:2800000,aiSaving:0,savingBasis:"자사 인지 손해액 ₩2,800,000 — AI 검증 결과 적정"},
-    {id:"RPT-005",date:"2025.03.03",type:"대인",case:"Case 1 교차로 — 대인 5명",adjuster:"김민준 사정사",status:"진행중",cost:6400000,repairDays:0,faultRatio:"50:50",severity:"중간",claimants:5,priority:"높음",summary:"타사 3명 + 자사 2명. 개별합의 또는 일괄패키지.",originalClaim:10500000,aiResult:7200000,aiSaving:3300000,savingBasis:"타사 대인 3명 최초 청구 ₩10,500,000 대비 AI 적정 합의 ₩7,200,000"},
-    {id:"RPT-006",date:"2025.03.02",type:"과실",case:"신호위반 — 좌회전 충돌",adjuster:"한예진 사정사",status:"종결",cost:4200000,repairDays:10,faultRatio:"20:80(확정)",severity:"중간",claimants:2,priority:"낮음",summary:"신호위반 좌회전 충돌. 과실 20:80 확정.",originalClaim:5400000,aiResult:4200000,aiSaving:1200000,savingBasis:"자사 최초 인지 ₩5,400,000 대비 AI 과실 적용 후 ₩4,200,000"},
-    {id:"RPT-007",date:"2025.03.01",type:"견적",case:"주차장 후진 — 벤츠 E300",adjuster:"이현수 사정사",status:"종결",cost:3500000,repairDays:10,faultRatio:"80:20",severity:"경미",claimants:0,priority:"보통",summary:"주차장 후진 접촉. 벤츠 E300 리어범퍼.",originalClaim:3950000,aiResult:3500000,aiSaving:450000,savingBasis:"타사 최초 청구 ₩3,950,000 대비 AI 적정 ₩3,500,000"},
-    {id:"RPT-008",date:"2025.03.04",type:"견적",case:"고속도로 추돌 — 아반떼 vs 투싼",adjuster:"윤동훈 사정사",status:"분석완료",cost:4500000,repairDays:12,faultRatio:"10:90",severity:"중간",claimants:1,priority:"보통",summary:"고속도로 다차로 추돌.",originalClaim:5300000,aiResult:4500000,aiSaving:800000,savingBasis:"타사 최초 청구 ₩5,300,000 대비 AI 적정 ₩4,500,000"},
-    {id:"RPT-009",date:"2025.03.03",type:"처리",case:"이면도로 측면충돌 — K8 vs 말리부",adjuster:"서수빈 사정사",status:"진행중",cost:8200000,repairDays:18,faultRatio:"40:60",severity:"중간",claimants:2,priority:"높음",summary:"이면도로 측면충돌. 쌍방 과실.",originalClaim:10300000,aiResult:8200000,aiSaving:2100000,savingBasis:"자사 최초 인지 ₩10,300,000 대비 AI 최적 처리 ₩8,200,000"},
-    {id:"RPT-010",date:"2025.03.02",type:"과실",case:"유턴사고 — 쏘렌토 vs 셀토스",adjuster:"강재현 사정사",status:"종결",cost:3100000,repairDays:8,faultRatio:"70:30(확정)",severity:"경미",claimants:0,priority:"낮음",summary:"유턴 중 직진차량 접촉. 종결.",originalClaim:3750000,aiResult:3100000,aiSaving:650000,savingBasis:"자사 최초 인지 ₩3,750,000 대비 AI 적정 과실 ₩3,100,000"},
-    {id:"RPT-011",date:"2025.03.04",type:"대인",case:"횡단보도 보행자 — 카니발",adjuster:"조소영 사정사",status:"진행중",cost:12000000,repairDays:0,faultRatio:"60:40",severity:"심각",claimants:1,priority:"긴급",summary:"횡단보도 보행자 접촉. 합의금 산정 중.",originalClaim:15500000,aiResult:12000000,aiSaving:3500000,savingBasis:"피해자 최초 청구 ₩15,500,000 대비 AI 적정 합의 ₩12,000,000"},
-    {id:"RPT-012",date:"2025.03.01",type:"견적",case:"후진사고 — 팰리세이드",adjuster:"정태우 사정사",status:"종결",cost:1800000,repairDays:5,faultRatio:"100:0",severity:"경미",claimants:0,priority:"낮음",summary:"후진 시 기둥 접촉. 단독 과실.",originalClaim:1800000,aiResult:1800000,aiSaving:0,savingBasis:"자사 인지 ₩1,800,000 — 단독사고 절감 대상 아님"},
-    {id:"RPT-013",date:"2025.03.03",type:"처리",case:"끼어들기 — 제네시스 G80",adjuster:"박서연 사정사",status:"종결",cost:5600000,repairDays:14,faultRatio:"65:35(확정)",severity:"중간",claimants:1,priority:"보통",summary:"끼어들기 접촉. 종결.",originalClaim:7400000,aiResult:5600000,aiSaving:1800000,savingBasis:"타사 최초 청구 ₩7,400,000 대비 AI 종합 처리 ₩5,600,000"},
-    {id:"RPT-014",date:"2025.03.04",type:"견적",case:"중앙선침범 — 스타리아 vs K5",adjuster:"윤동훈 사정사",status:"협의중",cost:15000000,repairDays:25,faultRatio:"90:10",severity:"심각",claimants:3,priority:"긴급",summary:"커브구간 중앙선침범 정면충돌.",originalClaim:19200000,aiResult:15000000,aiSaving:4200000,savingBasis:"타사 최초 청구 ₩19,200,000 대비 AI 적정 견적 ₩15,000,000"},
-    {id:"RPT-015",date:"2025.03.02",type:"과실",case:"비접촉사고 — 오토바이 전도",adjuster:"한예진 사정사",status:"협의중",cost:2200000,repairDays:0,faultRatio:"30:70(AI판정)",severity:"중간",claimants:1,priority:"보통",summary:"차선변경 시 오토바이 회피 전도.",originalClaim:3100000,aiResult:2200000,aiSaving:900000,savingBasis:"피해자 최초 청구 ₩3,100,000 대비 AI 과실 적용 ₩2,200,000"},
-    {id:"RPT-016",date:"2025.03.01",type:"견적",case:"주차장 접촉 — BMW X5 vs 벤츠 GLC",adjuster:"강재현 사정사",status:"종결",cost:6800000,repairDays:12,faultRatio:"50:50",severity:"중간",claimants:0,priority:"보통",summary:"주차장 통로 쌍방 접촉. 외제차 검증.",originalClaim:8300000,aiResult:6800000,aiSaving:1500000,savingBasis:"타사 최초 청구 ₩8,300,000 대비 AI 적정 ₩6,800,000"},
+    {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M.",originalClaim:10000000,aiResult:6380000,aiSaving:3620000,savingBasis:"타사 보험사 최초 청구액 ₩10,000,000 대비 AI 적정 견적 ₩6,380,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:2,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 → AI 85:15 판정.",originalClaim:15800000,aiResult:7300000,aiSaving:8500000,savingBasis:"타사 100:0 주장 시 자사 전액부담 ₩15,800,000 대비 AI 85:15 판정 ₩7,300,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000",unrepaired:false,fraudDetected:true},
+    {id:"RPT-004",date:"2025.03.03",type:"견적",case:"후미추돌 — 쏘나타 vs K5",adjuster:"정태우 사정사",status:"종결",cost:2800000,repairDays:7,faultRatio:"0:100(타사과실)",severity:"경미",claimants:0,priority:"보통",summary:"후미추돌. 자사 쏘나타 리어범퍼 파손.",originalClaim:2800000,aiResult:2800000,aiSaving:0,savingBasis:"자사 인지 손해액 ₩2,800,000 — AI 검증 결과 적정",unrepaired:true,fraudDetected:false},
+    {id:"RPT-005",date:"2025.03.03",type:"대인",case:"Case 1 교차로 — 대인 5명",adjuster:"김민준 사정사",status:"진행중",cost:6400000,repairDays:0,faultRatio:"50:50",severity:"중간",claimants:5,priority:"높음",summary:"타사 3명 + 자사 2명. 개별합의 또는 일괄패키지.",originalClaim:10500000,aiResult:7200000,aiSaving:3300000,savingBasis:"타사 대인 3명 최초 청구 ₩10,500,000 대비 AI 적정 합의 ₩7,200,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-006",date:"2025.03.02",type:"과실",case:"신호위반 — 좌회전 충돌",adjuster:"한예진 사정사",status:"종결",cost:4200000,repairDays:10,faultRatio:"20:80(확정)",severity:"중간",claimants:2,priority:"낮음",summary:"신호위반 좌회전 충돌. 과실 20:80 확정.",originalClaim:5400000,aiResult:4200000,aiSaving:1200000,savingBasis:"자사 최초 인지 ₩5,400,000 대비 AI 과실 적용 후 ₩4,200,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-007",date:"2025.03.01",type:"견적",case:"주차장 후진 — 벤츠 E300",adjuster:"이현수 사정사",status:"종결",cost:3500000,repairDays:10,faultRatio:"80:20",severity:"경미",claimants:0,priority:"보통",summary:"주차장 후진 접촉. 벤츠 E300 리어범퍼.",originalClaim:3950000,aiResult:3500000,aiSaving:450000,savingBasis:"타사 최초 청구 ₩3,950,000 대비 AI 적정 ₩3,500,000",unrepaired:true,fraudDetected:false},
+    {id:"RPT-008",date:"2025.03.04",type:"견적",case:"고속도로 추돌 — 아반떼 vs 투싼",adjuster:"윤동훈 사정사",status:"분석완료",cost:4500000,repairDays:12,faultRatio:"10:90",severity:"중간",claimants:1,priority:"보통",summary:"고속도로 다차로 추돌.",originalClaim:5300000,aiResult:4500000,aiSaving:800000,savingBasis:"타사 최초 청구 ₩5,300,000 대비 AI 적정 ₩4,500,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-009",date:"2025.03.03",type:"처리",case:"이면도로 측면충돌 — K8 vs 말리부",adjuster:"서수빈 사정사",status:"진행중",cost:8200000,repairDays:18,faultRatio:"40:60",severity:"중간",claimants:2,priority:"높음",summary:"이면도로 측면충돌. 쌍방 과실.",originalClaim:10300000,aiResult:8200000,aiSaving:2100000,savingBasis:"자사 최초 인지 ₩10,300,000 대비 AI 최적 처리 ₩8,200,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-010",date:"2025.03.02",type:"과실",case:"유턴사고 — 쏘렌토 vs 셀토스",adjuster:"강재현 사정사",status:"종결",cost:3100000,repairDays:8,faultRatio:"70:30(확정)",severity:"경미",claimants:0,priority:"낮음",summary:"유턴 중 직진차량 접촉. 종결.",originalClaim:3750000,aiResult:3100000,aiSaving:650000,savingBasis:"자사 최초 인지 ₩3,750,000 대비 AI 적정 과실 ₩3,100,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-011",date:"2025.03.04",type:"대인",case:"횡단보도 보행자 — 카니발",adjuster:"조소영 사정사",status:"진행중",cost:12000000,repairDays:0,faultRatio:"60:40",severity:"심각",claimants:1,priority:"긴급",summary:"횡단보도 보행자 접촉. 합의금 산정 중.",originalClaim:15500000,aiResult:12000000,aiSaving:3500000,savingBasis:"피해자 최초 청구 ₩15,500,000 대비 AI 적정 합의 ₩12,000,000",unrepaired:false,fraudDetected:true},
+    {id:"RPT-012",date:"2025.03.01",type:"견적",case:"후진사고 — 팰리세이드",adjuster:"정태우 사정사",status:"종결",cost:1800000,repairDays:5,faultRatio:"100:0",severity:"경미",claimants:0,priority:"낮음",summary:"후진 시 기둥 접촉. 단독 과실.",originalClaim:1800000,aiResult:1800000,aiSaving:0,savingBasis:"자사 인지 ₩1,800,000 — 단독사고 절감 대상 아님",unrepaired:true,fraudDetected:false},
+    {id:"RPT-013",date:"2025.03.03",type:"처리",case:"끼어들기 — 제네시스 G80",adjuster:"박서연 사정사",status:"종결",cost:5600000,repairDays:14,faultRatio:"65:35(확정)",severity:"중간",claimants:1,priority:"보통",summary:"끼어들기 접촉. 종결.",originalClaim:7400000,aiResult:5600000,aiSaving:1800000,savingBasis:"타사 최초 청구 ₩7,400,000 대비 AI 종합 처리 ₩5,600,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-014",date:"2025.03.04",type:"견적",case:"중앙선침범 — 스타리아 vs K5",adjuster:"윤동훈 사정사",status:"협의중",cost:15000000,repairDays:25,faultRatio:"90:10",severity:"심각",claimants:3,priority:"긴급",summary:"커브구간 중앙선침범 정면충돌.",originalClaim:19200000,aiResult:15000000,aiSaving:4200000,savingBasis:"타사 최초 청구 ₩19,200,000 대비 AI 적정 견적 ₩15,000,000",unrepaired:false,fraudDetected:true},
+    {id:"RPT-015",date:"2025.03.02",type:"과실",case:"비접촉사고 — 오토바이 전도",adjuster:"한예진 사정사",status:"협의중",cost:2200000,repairDays:0,faultRatio:"30:70(AI판정)",severity:"중간",claimants:1,priority:"보통",summary:"차선변경 시 오토바이 회피 전도.",originalClaim:3100000,aiResult:2200000,aiSaving:900000,savingBasis:"피해자 최초 청구 ₩3,100,000 대비 AI 과실 적용 ₩2,200,000",unrepaired:false,fraudDetected:false},
+    {id:"RPT-016",date:"2025.03.01",type:"견적",case:"주차장 접촉 — BMW X5 vs 벤츠 GLC",adjuster:"강재현 사정사",status:"종결",cost:6800000,repairDays:12,faultRatio:"50:50",severity:"중간",claimants:0,priority:"보통",summary:"주차장 통로 쌍방 접촉. 외제차 검증.",originalClaim:8300000,aiResult:6800000,aiSaving:1500000,savingBasis:"타사 최초 청구 ₩8,300,000 대비 AI 적정 ₩6,800,000",unrepaired:true,fraudDetected:false},
   ]);
 
   const typeColors={견적:"#0891b2",과실:"#7c3aed",처리:"#059669",대인:"#dc2626"};
@@ -3552,7 +3553,10 @@ function TabKPI(){
 
   const filteredReports=reports.filter(r=>{
     if(filterMember!=="전체"&&r.adjuster!==filterMember)return false;
-    if(filterPriority&&r.priority!==filterPriority)return false;return true;});
+    if(filterPriority&&r.priority!==filterPriority)return false;
+    if(filterStatus==="active"&&r.status==="종결")return false;
+    if(filterStatus==="closed"&&r.status!=="종결")return false;
+    return true;});
 
   const renderTable=(list,showBack)=>(<div>
     {showBack&&<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
@@ -3580,7 +3584,7 @@ function TabKPI(){
   return(<div style={{display:"flex",flexDirection:"column",height:"100%"}}>
     <div style={{display:"flex",gap:0,background:"#f1f5f9",borderRadius:10,padding:3,marginBottom:12,flexShrink:0}}>
       {[{id:"dashboard",l:"📊 대시보드"},{id:"list",l:"📋 일보 목록"}].map(t=>(
-        <button key={t.id} onClick={()=>{setView(t.id);setSelReport(null);setFilterPriority(null);setSavingDetail(false);setMemberDetail(null);}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",fontSize:12,fontWeight:view===t.id?700:500,background:view===t.id?"#fff":"transparent",color:view===t.id?"#0f172a":"#94a3b8",cursor:"pointer",boxShadow:view===t.id?"0 1px 3px rgba(0,0,0,.06)":"none"}}>{t.l}</button>))}
+        <button key={t.id} onClick={()=>{setView(t.id);setSelReport(null);setFilterPriority(null);setSavingDetail(false);setMemberDetail(null);setFilterStatus(null);}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",fontSize:12,fontWeight:view===t.id?700:500,background:view===t.id?"#fff":"transparent",color:view===t.id?"#0f172a":"#94a3b8",cursor:"pointer",boxShadow:view===t.id?"0 1px 3px rgba(0,0,0,.06)":"none"}}>{t.l}</button>))}
     </div>
 
     {view==="dashboard"&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
@@ -3602,15 +3606,23 @@ function TabKPI(){
 
       {/* KPI Cards */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>
-        {[{label:"배당 건수",value:totalAssigned+"건",sub:"AI 분석 기준",color:"#3b82f6",icon:"📋"},
-          {label:"진행 중",value:activeCount+"건",sub:"미종결",color:"#f59e0b",icon:"⏳"},
-          {label:"종결",value:closedCount+"건",sub:"처리 완료",color:"#10b981",icon:"✅"},
-          {label:"종결률",value:closeRate+"%",sub:closedCount+"/"+totalAssigned,color:closeRate>=50?"#059669":"#dc2626",icon:"📈"},
-        ].map((k,i)=>(<div key={i} style={{background:"#fff",borderRadius:12,padding:"12px 14px",border:"1px solid #e2e8f0"}}>
+        {[{label:"배당 건수",value:totalAssigned+"건",sub:"AI 분석 기준",color:"#3b82f6",icon:"📋",fk:"all"},
+          {label:"진행 중",value:activeCount+"건",sub:"미종결",color:"#f59e0b",icon:"⏳",fk:"active"},
+          {label:"종결",value:closedCount+"건",sub:"처리 완료",color:"#10b981",icon:"✅",fk:"closed"},
+          {label:"종결률",value:closeRate+"%",sub:closedCount+"/"+totalAssigned,color:closeRate>=50?"#059669":"#dc2626",icon:"📈",fk:null},
+        ].map((k,i)=>(<div key={i} onClick={()=>{if(k.fk){setFilterStatus(filterStatus===k.fk?null:k.fk);}}} style={{background:filterStatus===k.fk?"#f0f9ff":"#fff",borderRadius:12,padding:"12px 14px",border:filterStatus===k.fk?`2px solid ${k.color}`:"1px solid #e2e8f0",cursor:k.fk?"pointer":"default",transition:"all .2s"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{fontSize:10,color:"#94a3b8",fontWeight:600}}>{k.label}</span><span style={{fontSize:13}}>{k.icon}</span></div>
           <div style={{fontSize:20,fontWeight:800,color:k.color,fontFamily:"'DM Mono',monospace"}}>{k.value}</div>
-          <div style={{fontSize:9,color:"#cbd5e1"}}>{k.sub}</div></div>))}
+          <div style={{fontSize:9,color:"#cbd5e1"}}>{k.fk?"클릭 시 목록 표시":k.sub}</div></div>))}
       </div>
+      {/* 카드 클릭 시 필터된 목록 */}
+      {filterStatus&&<div style={{background:"#fff",borderRadius:14,padding:16,border:"1px solid #e2e8f0",marginBottom:14,animation:"fadeIn .3s"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+          <button onClick={()=>setFilterStatus(null)} style={{padding:"4px 10px",borderRadius:7,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:10,fontWeight:600,cursor:"pointer"}}>✕ 닫기</button>
+          <span style={{fontSize:12,fontWeight:700,color:filterStatus==="all"?"#3b82f6":filterStatus==="active"?"#f59e0b":"#10b981"}}>{filterStatus==="all"?"전체 배당건":filterStatus==="active"?"진행 중":"종결"} ({(filterStatus==="all"?reports:filterStatus==="active"?reports.filter(r=>r.status!=="종결"):reports.filter(r=>r.status==="종결")).length}건)</span>
+        </div>
+        {renderTable(filterStatus==="all"?reports:filterStatus==="active"?reports.filter(r=>r.status!=="종결"):reports.filter(r=>r.status==="종결"),false)}
+      </div>}
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
         {/* Agent별 */}
@@ -3675,6 +3687,8 @@ function TabKPI(){
               </div>
               <div style={{display:"flex",justifyContent:"center",gap:1,flexWrap:"wrap"}}>
                 {m.strengths.map(s=><span key={s} style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#dcfce7",color:"#16a34a",fontWeight:600}}>💪{s}</span>)}
+                {rs.filter(r=>r.unrepaired).length>0&&<span style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#fefce8",color:"#ca8a04",fontWeight:600}}>🔧{rs.filter(r=>r.unrepaired).length}</span>}
+                {rs.filter(r=>r.fraudDetected).length>0&&<span style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#fef2f2",color:"#dc2626",fontWeight:600}}>🚨{rs.filter(r=>r.fraudDetected).length}</span>}
               </div>
             </div>);})}
         </div>
@@ -3704,6 +3718,17 @@ function TabKPI(){
             <div style={{display:"flex",gap:5}}>{["견적","과실","처리","대인"].map(type=>{const cnt=rs.filter(r=>r.type===type).length;const isS=m.strengths.includes(type);const isW=m.weaknesses.includes(type);
               return<div key={type} style={{flex:1,textAlign:"center",padding:"5px 0",borderRadius:6,background:isS?"#dcfce7":isW?"#fef2f2":"#f8fafc",border:`1px solid ${isS?"#86efac":isW?"#fecaca":"#e2e8f0"}`}}>
                 <div style={{fontSize:13,fontWeight:800,color:typeColors[type],fontFamily:"'DM Mono',monospace"}}>{cnt}</div><div style={{fontSize:7.5,color:"#64748b"}}>{type}</div></div>;})}</div>
+            {/* 미수선 + 보험사기 */}
+            <div style={{display:"flex",gap:8,marginTop:8}}>
+              <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"#fefce8",border:"1px solid #fef08a",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div><div style={{fontSize:9,fontWeight:600,color:"#a16207"}}>🔧 미수선 처리</div><div style={{fontSize:8,color:"#ca8a04"}}>현금 정산 건</div></div>
+                <div style={{fontSize:18,fontWeight:800,color:"#ca8a04",fontFamily:"'DM Mono',monospace"}}>{rs.filter(r=>r.unrepaired).length}</div>
+              </div>
+              <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"#fef2f2",border:"1px solid #fecaca",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div><div style={{fontSize:9,fontWeight:600,color:"#991b1b"}}>🚨 보험사기 적발</div><div style={{fontSize:8,color:"#dc2626"}}>AI 탐지 건</div></div>
+                <div style={{fontSize:18,fontWeight:800,color:"#dc2626",fontFamily:"'DM Mono',monospace"}}>{rs.filter(r=>r.fraudDetected).length}</div>
+              </div>
+            </div>
           </div>);})()}
       </div>
 
@@ -3803,7 +3828,7 @@ export default function ClaimsAgentNew({ onBack }){
           <button onClick={onBack} style={{padding:"6px 14px",borderRadius:8,background:"rgba(8,145,178,0.08)",border:"1px solid rgba(8,145,178,0.2)",color:"#0891b2",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5,fontFamily:"inherit"}}>← DMP</button>
           <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#0891b2,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",boxShadow:"0 3px 8px rgba(8,145,178,.2)"}}>{IC.car}</div>
           <div><div style={{fontSize:15,fontWeight:800,letterSpacing:-.3}}><span style={{color:"#0891b2"}}>AI</span> 손해사정 Portal <span style={{fontSize:11,color:"#fff",fontWeight:800,background:"linear-gradient(135deg,#f97316,#ea580c)",padding:"2px 10px",borderRadius:6,boxShadow:"0 2px 6px rgba(249,115,22,.3)"}}>New v2</span></div>
-            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.4-kpi2</span></div></div></div>
+            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.5-kpi3</span></div></div></div>
         <div style={{display:"flex",alignItems:"center",gap:5,color:"#94a3b8",fontSize:11}}><div style={{width:6,height:6,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 5px #4ade80"}}/>Active</div></div>
 
       <div style={{display:"flex",gap:2,padding:"8px 26px",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.55)"}}>
