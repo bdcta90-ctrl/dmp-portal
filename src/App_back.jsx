@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ClaimsAgentMVP from "./ClaimsAgent.jsx";
 import SecurityDashboard from "./SecurityDashboard.jsx";
+import AIFirewall from "./AIFirewall.jsx";
+import ClaimsAgentNew from "./ClaimsAgentNew.jsx";
 
 const THEMES = {
   dark: {
@@ -75,7 +77,7 @@ const MVPS = [
     desc: "주식 포트폴리오 · 부동산/자동차 · 지출/연말정산 · AI진단 · 글로벌 시세까지 통합 관리하는 자산 관리 프로그램",
     tags: ["자산관리", "포트폴리오", "AI진단"],
     date: "2025.02",
-    status: "Live",
+    status: "준비중",
     gradient: "linear-gradient(135deg,rgba(99,102,241,0.08),rgba(139,92,246,0.06))",
     border: "rgba(99,102,241,0.2)",
   },
@@ -92,6 +94,34 @@ const MVPS = [
     status: "Live",
     gradient: "linear-gradient(135deg,rgba(244,63,94,0.08),rgba(251,146,60,0.06))",
     border: "rgba(244,63,94,0.2)",
+  },
+  {
+    id: "firewall",
+    category: "SECURITY",
+    catColor: "#3b82f6",
+    icon: "🛡️",
+    iconBg: "linear-gradient(135deg,#3b82f6,#1d4ed8)",
+    title: "AI 방화벽",
+    desc: "기업 내 AI 도구 오남용 방지 · 외부 위협(패킷/이메일) 차단 · 내부 자산 보호를 위한 AI 기반 통합 보안 방화벽",
+    tags: ["AI보안", "방화벽", "위협탐지"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(59,130,246,0.08),rgba(29,78,216,0.06))",
+    border: "rgba(59,130,246,0.2)",
+  },
+  {
+    id: "claimsNew",
+    category: "AI",
+    catColor: "#f97316",
+    icon: "🚗",
+    iconBg: "linear-gradient(135deg,#f97316,#ea580c)",
+    title: "AI 자동차 손해사정 (New)",
+    desc: "견적 산정 · 과실비율 분석 · 처리방법 제안까지 AI가 의사결정을 지원하는 자동차 손해사정 포탈 (신규 개발 버전)",
+    tags: ["AI Agent", "손해사정", "New"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(249,115,22,0.08),rgba(234,88,12,0.06))",
+    border: "rgba(249,115,22,0.2)",
   },
 ];
 
@@ -113,6 +143,8 @@ export default function App() {
 
   if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
+  if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
+  if (page === "claimsNew") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
 
   const handleRequest = () => {
     if (!reqForm.name.trim() || !reqForm.team.trim() || !reqForm.email.trim() || !reqForm.title.trim() || !reqForm.desc.trim()) return;
@@ -349,7 +381,7 @@ export default function App() {
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "claims" || mvp.id === "security";
+            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall" || mvp.id === "claimsNew";
             return (
               <div
                 key={mvp.id}
@@ -357,6 +389,7 @@ export default function App() {
                 style={{
                   background: mvp.gradient, borderRadius: 18, padding: "24px 22px", border: `1px solid ${mvp.border}`,
                   cursor: isClickable ? "pointer" : "default", transition: "all .3s", position: "relative", overflow: "hidden",
+                  opacity: mvp.status==="준비중" ? 0.55 : 1,
                   animation: `fadeInUp ${.4 + idx * .15}s ease`,
                 }}
                 onMouseEnter={e => { if (isClickable) { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = `0 16px 40px rgba(0,0,0,.3)`; e.currentTarget.style.borderColor = mvp.catColor + "60"; }}}
@@ -365,8 +398,8 @@ export default function App() {
                 {/* Category + Status */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <span style={{ padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, letterSpacing: 1, border: `1px solid ${mvp.catColor}40`, color: mvp.catColor, background: mvp.catColor + "10" }}>{mvp.category}</span>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#10b981", fontWeight: 600 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981", animation: "pulse 2s infinite" }} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: mvp.status==="Live"?"#10b981":"#94a3b8", fontWeight: 600 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: mvp.status==="Live"?"#10b981":"#94a3b8", boxShadow: mvp.status==="Live"?"0 0 8px #10b981":"none", animation: mvp.status==="Live"?"pulse 2s infinite":"none" }} />
                     {mvp.status}
                   </div>
                 </div>
