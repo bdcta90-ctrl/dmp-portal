@@ -3521,7 +3521,7 @@ function TabKPI(){
     {name:"조소영 사정사",role:"사정사",emoji:"👤",strengths:["대인","처리"],weaknesses:["견적"]},
   ];
 
-  const[reports]=useState([
+  const[reports,setReports]=useState([
     {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M.",originalClaim:10000000,aiResult:6380000,aiSaving:3620000,savingBasis:"타사 보험사 최초 청구액 ₩10,000,000 대비 AI 적정 견적 ₩6,380,000",unrepaired:false,fraudDetected:false},
     {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:2,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 → AI 85:15 판정.",originalClaim:15800000,aiResult:7300000,aiSaving:8500000,savingBasis:"타사 100:0 주장 시 자사 전액부담 ₩15,800,000 대비 AI 85:15 판정 ₩7,300,000",unrepaired:false,fraudDetected:false},
     {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000",unrepaired:false,fraudDetected:true},
@@ -3539,6 +3539,81 @@ function TabKPI(){
     {id:"RPT-015",date:"2025.03.02",type:"과실",case:"비접촉사고 — 오토바이 전도",adjuster:"한예진 사정사",status:"협의중",cost:2200000,repairDays:0,faultRatio:"30:70(AI판정)",severity:"중간",claimants:1,priority:"보통",summary:"차선변경 시 오토바이 회피 전도.",originalClaim:3100000,aiResult:2200000,aiSaving:900000,savingBasis:"피해자 최초 청구 ₩3,100,000 대비 AI 과실 적용 ₩2,200,000",unrepaired:false,fraudDetected:false},
     {id:"RPT-016",date:"2025.03.01",type:"견적",case:"주차장 접촉 — BMW X5 vs 벤츠 GLC",adjuster:"강재현 사정사",status:"종결",cost:6800000,repairDays:12,faultRatio:"50:50",severity:"중간",claimants:0,priority:"보통",summary:"주차장 통로 쌍방 접촉. 외제차 검증.",originalClaim:8300000,aiResult:6800000,aiSaving:1500000,savingBasis:"타사 최초 청구 ₩8,300,000 대비 AI 적정 ₩6,800,000",unrepaired:true,fraudDetected:false},
   ]);
+
+  // 동적 배당건 생성기
+  const rptCounter=useRef(17);
+  const CASE_TEMPLATES=[
+    {type:"견적",cases:["후미추돌 — ","측면충돌 — ","교차로 — ","주차장 — ","추돌 — ","접촉 — "],vehicles:["아반떼 vs K3","쏘나타 vs K5","그랜저 vs 제네시스","투싼 vs 스포티지","팰리세이드 vs 카니발","벤츠 E vs BMW 5","아이오닉6 vs EV6","싼타페 vs 쏘렌토"]},
+    {type:"과실",cases:["과실분쟁 — ","신호위반 — ","차선변경 — ","유턴 — ","비접촉 — "],vehicles:["쏘나타","K5","그랜저","아반떼","투싼","싼타페","스타리아","BMW 3시리즈"]},
+    {type:"처리",cases:["종합처리 — ","합의 — ","협상 — "],vehicles:["그랜저 vs BMW","K8 vs 벤츠","투싼 vs RAV4","싼타페 vs CX-5"]},
+    {type:"대인",cases:["대인접수 — ","보행자 — ","다중대인 — "],vehicles:["경추염좌 1명","경추+요추 2명","보행자 1명","다중 3명"]},
+  ];
+  const generateReport=()=>{
+    const pk=["긴급","높음","보통","낮음"];const pw=[0.12,0.28,0.40,0.20];
+    const r=Math.random();let priority=pk[3];let cum=0;for(let i=0;i<pw.length;i++){cum+=pw[i];if(r<cum){priority=pk[i];break;}}
+    const tpl=CASE_TEMPLATES[Math.floor(Math.random()*CASE_TEMPLATES.length)];
+    const caseName=tpl.cases[Math.floor(Math.random()*tpl.cases.length)]+tpl.vehicles[Math.floor(Math.random()*tpl.vehicles.length)];
+    const adj=TEAM[1+Math.floor(Math.random()*(TEAM.length-1))].name;// 센터장 제외 랜덤
+    const statuses=["분석완료","협의중","진행중"];const status=statuses[Math.floor(Math.random()*statuses.length)];
+    const origClaim=Math.round((2000000+Math.random()*18000000)/100000)*100000;
+    const savingPct=Math.random()*0.35;const aiSaving=Math.round(origClaim*savingPct/10000)*10000;
+    const aiResult=origClaim-aiSaving;
+    const id="RPT-"+String(rptCounter.current++).padStart(3,"0");
+    const now=new Date();const ds=now.getFullYear()+"."+(now.getMonth()+1).toString().padStart(2,"0")+"."+now.getDate().toString().padStart(2,"0");
+    return{id,date:ds,type:tpl.type,case:caseName,adjuster:adj,status,cost:aiResult,
+      repairDays:tpl.type==="대인"?0:Math.round(3+Math.random()*25),
+      faultRatio:Math.round(Math.random()*100)+":"+(100-Math.round(Math.random()*100)),
+      severity:priority==="긴급"?"심각":priority==="낮음"?"경미":"중간",
+      claimants:tpl.type==="대인"?Math.ceil(Math.random()*5):Math.random()>0.6?Math.ceil(Math.random()*3):0,
+      priority,summary:caseName+" AI 분석 "+status+".",
+      originalClaim:origClaim,aiResult,aiSaving,
+      savingBasis:aiSaving>0?"최초 청구 ₩"+(origClaim/10000).toFixed(0)+"만 대비 AI 적정 ₩"+(aiResult/10000).toFixed(0)+"만":"적정 — 절감 없음",
+      unrepaired:Math.random()<0.15,fraudDetected:Math.random()<0.08,isNew:true};
+  };
+
+  // 1분마다 배치 동기화: liveCount에 맞춰 reports 수 조정
+  const[lastSync,setLastSync]=useState(Date.now());
+  const[newBadge,setNewBadge]=useState(0);
+  const initialBurst=useRef(false);
+  useEffect(()=>{
+    // 초기 진입 시 5초 후 첫 배치 (가시적 효과)
+    if(!initialBurst.current){
+      initialBurst.current=true;
+      setTimeout(()=>{
+        const batch=Math.ceil(Math.random()*4)+3;// 3~7건
+        const newRpts=[];for(let i=0;i<batch;i++)newRpts.push(generateReport());
+        setReports(prev=>[...newRpts,...prev]);
+        setNewBadge(batch);setTimeout(()=>setNewBadge(0),4000);
+        setLastSync(Date.now());
+      },5000);
+    }
+    const syncIv=setInterval(()=>{
+      const target=16+Math.round(liveCount*0.08);
+      setReports(prev=>{
+        if(prev.length>=target)return prev;
+        const batch=Math.min(target-prev.length,Math.ceil(Math.random()*5)+2);
+        const newRpts=[];for(let i=0;i<batch;i++)newRpts.push(generateReport());
+        setNewBadge(batch);setTimeout(()=>setNewBadge(0),4000);
+        return[...newRpts,...prev];
+      });
+      // 일부 기존 건 상태 변화 (진행→종결 등)
+      setReports(prev=>{
+        const cp=[...prev];
+        const actives=cp.filter(r=>r.status!=="종결");
+        if(actives.length>3&&Math.random()<0.4){
+          const pick=actives[Math.floor(Math.random()*actives.length)];
+          const idx=cp.findIndex(r=>r.id===pick.id);
+          if(idx>=0){
+            const ns=Math.random()<0.3?"종결":Math.random()<0.5?"협의중":"진행중";
+            cp[idx]={...cp[idx],status:ns};
+          }
+        }
+        return cp;
+      });
+      setLastSync(Date.now());
+    },60000);
+    return()=>clearInterval(syncIv);
+  },[liveCount]);
 
   const typeColors={견적:"#0891b2",과실:"#7c3aed",처리:"#059669",대인:"#dc2626"};
   const statusColors={분석완료:"#3b82f6",협의중:"#f59e0b",진행중:"#8b5cf6",종결:"#10b981"};
@@ -3567,7 +3642,7 @@ function TabKPI(){
       <thead><tr style={{background:"#f8fafc",borderBottom:"2px solid #e2e8f0"}}>
         {["ID","일자","유형","사건명","담당자","상태","최초청구","AI적정","절감","우선순위",""].map((h,i)=>(<th key={i} style={{padding:"7px 7px",textAlign:"left",fontWeight:600,color:"#64748b",fontSize:9,whiteSpace:"nowrap"}}>{h}</th>))}
       </tr></thead>
-      <tbody>{list.map(r=>(<tr key={r.id} onClick={()=>setSelReport(r)} style={{borderBottom:"1px solid #f1f5f9",cursor:"pointer",transition:"background .15s"}} onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+      <tbody>{list.map(r=>(<tr key={r.id} onClick={()=>setSelReport(r)} style={{borderBottom:"1px solid #f1f5f9",cursor:"pointer",transition:"background .15s",background:r.isNew?"#f0fdf4":"transparent",animation:r.isNew?"fadeIn .5s":"none"}} onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"} onMouseLeave={e=>e.currentTarget.style.background=r.isNew?"#f0fdf4":"transparent"}>
         <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",color:"#64748b",fontSize:9}}>{r.id}</td>
         <td style={{padding:"6px 7px",fontSize:9,color:"#94a3b8"}}>{r.date}</td>
         <td style={{padding:"6px 7px"}}><span style={{padding:"2px 5px",borderRadius:4,fontSize:8,fontWeight:700,color:typeColors[r.type],background:typeColors[r.type]+"12"}}>{r.type}</span></td>
@@ -3592,8 +3667,8 @@ function TabKPI(){
       <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",borderRadius:12,padding:"14px 18px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <div style={{width:8,height:8,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 8px #4ade80",animation:"pulse 1.5s infinite"}}/>
-          <div><div style={{fontSize:11,fontWeight:700,color:"#f1f5f9"}}>실시간 배당 유입 <span style={{fontSize:9,color:"#94a3b8"}}>{liveTime.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})} 기준</span></div>
-            <div style={{fontSize:9,color:"#64748b"}}>일 평균 150~200건 · 업무시간 09:00~18:00</div></div>
+          <div><div style={{fontSize:11,fontWeight:700,color:"#f1f5f9"}}>실시간 배당 유입 <span style={{fontSize:9,color:"#94a3b8"}}>{liveTime.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})} 기준</span>{newBadge>0&&<span style={{marginLeft:6,fontSize:9,padding:"2px 8px",borderRadius:10,background:"#4ade80",color:"#052e16",fontWeight:700,animation:"fadeIn .3s"}}>+{newBadge}건 배당</span>}</div>
+            <div style={{fontSize:9,color:"#64748b"}}>일 평균 150~200건 · 업무시간 09:00~18:00 · <span style={{color:"#60a5fa"}}>1분 주기 동기화</span> · AI분석 {totalAssigned}건 완료</div></div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:14}}>
           <div style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#4ade80",fontFamily:"'DM Mono',monospace"}}>{liveCount}</div><div style={{fontSize:8,color:"#64748b"}}>오늘 유입</div></div>
@@ -3604,6 +3679,15 @@ function TabKPI(){
         </div>
       </div>
 
+      {/* 동기화 상태 */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:"#3b82f6",animation:"pulse 2s infinite"}}/>
+          <span style={{fontSize:10,color:"#64748b"}}>마지막 동기화: {new Date(lastSync).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}</span>
+          <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:"#eff6ff",color:"#3b82f6",fontWeight:600}}>1분 주기</span>
+        </div>
+        <span style={{fontSize:10,color:"#94a3b8"}}>총 AI 분석 완료 <strong style={{color:"#0f172a"}}>{reports.length}건</strong></span>
+      </div>
       {/* KPI Cards */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>
         {[{label:"배당 건수",value:totalAssigned+"건",sub:"AI 분석 기준",color:"#3b82f6",icon:"📋",fk:"all"},
@@ -3828,7 +3912,7 @@ export default function ClaimsAgentNew({ onBack }){
           <button onClick={onBack} style={{padding:"6px 14px",borderRadius:8,background:"rgba(8,145,178,0.08)",border:"1px solid rgba(8,145,178,0.2)",color:"#0891b2",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5,fontFamily:"inherit"}}>← DMP</button>
           <div style={{width:32,height:32,borderRadius:8,background:"linear-gradient(135deg,#0891b2,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",boxShadow:"0 3px 8px rgba(8,145,178,.2)"}}>{IC.car}</div>
           <div><div style={{fontSize:15,fontWeight:800,letterSpacing:-.3}}><span style={{color:"#0891b2"}}>AI</span> 손해사정 Portal <span style={{fontSize:11,color:"#fff",fontWeight:800,background:"linear-gradient(135deg,#f97316,#ea580c)",padding:"2px 10px",borderRadius:6,boxShadow:"0 2px 6px rgba(249,115,22,.3)"}}>New v2</span></div>
-            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.5-kpi3</span></div></div></div>
+            <div style={{color:"#94a3b8",fontSize:9.5,letterSpacing:.4}}>Auto Claims Agent · kt ds AX · <span style={{color:"#f97316"}}>v2.6-live</span></div></div></div>
         <div style={{display:"flex",alignItems:"center",gap:5,color:"#94a3b8",fontSize:11}}><div style={{width:6,height:6,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 5px #4ade80"}}/>Active</div></div>
 
       <div style={{display:"flex",gap:2,padding:"8px 26px",borderBottom:"1px solid #e2e8f0",background:"rgba(255,255,255,.55)"}}>
