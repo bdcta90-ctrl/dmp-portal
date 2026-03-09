@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, CartesianGrid, Line } from "recharts";
+import * as XLSX from "xlsx";
 
 const COLORS = ["#00E5A0","#FF6B6B","#4ECDC4","#FFE66D","#A78BFA","#F97316","#38BDF8","#FB7185","#34D399","#FBBF24","#818CF8","#F472B6"];
 const SECTOR_OPTIONS = ["반도체","2차전지","바이오","금융","IT/소프트웨어","자동차","에너지","소비재","통신","부동산","방산/우주","AI/로봇","엔터","기타"];
@@ -365,6 +366,112 @@ export default function StockPilot({onBack}){const[tab,setTab]=useState(0);const
 useEffect(()=>{(()=>{const d=loadD();if(d){d.stocks&&setStocks(d.stocks);d.seed&&setSeed(d.seed);d.cash!==undefined&&setCash(d.cash);d.withdrawals!==undefined&&setWithdrawals(d.withdrawals);d.events&&setEvents(d.events);d.realEstate&&setRealEstate(d.realEstate);d.cars&&setCars(d.cars);d.memos&&setMemos(d.memos);d.goal&&setGoal(d.goal);d.expenses&&setExpenses(prev=>{const e={...prev,...d.expenses};if(!e.cards&&d.expenses.mandatoryCards){e.cards=[{id:1,name:"신용카드",type:"credit",mandatory:false,monthlyMin:0},{id:2,name:"체크카드",type:"debit",mandatory:false,monthlyMin:0},{id:3,name:"계좌이체",type:"transfer",mandatory:false,monthlyMin:0},{id:4,name:"현금",type:"cash",mandatory:false,monthlyMin:0},...d.expenses.mandatoryCards.map((mc,i)=>({id:100+i,name:mc.name.replace(/\s/g,""),type:"credit",mandatory:true,monthlyMin:mc.monthlyMin||300000}))];}return e;});}setLoaded(true);})();},[]);
 useEffect(()=>{if(!loaded)return;const t=setTimeout(()=>saveD({stocks,seed,cash,withdrawals,events,realEstate,cars,memos,goal,expenses}),500);return()=>clearTimeout(t);},[stocks,seed,cash,withdrawals,events,realEstate,cars,memos,goal,expenses,loaded]);
 const gt=stocks.reduce((s,st)=>s+st.currentPrice*st.quantity,0)+cash+realEstate.reduce((s,r)=>s+r.currentValue-r.loanBalance,0)+cars.reduce((s,c)=>s+c.currentValue-c.loanBalance,0);
+const xlRef=useRef(null);
+const[xlMsg,setXlMsg]=useState(null);
+const exportExcel=()=>{
+const wb=XLSX.utils.book_new();
+// 1) 포트폴리오
+const stockRows=stocks.map(s=>({종목명:s.name,섹터:s.sector,매입단가:s.avgPrice,현재가:s.currentPrice,수량:s.quantity,메모:s.memo||""}));
+const ws1=XLSX.utils.json_to_sheet(stockRows);ws1["!cols"]=[{wch:16},{wch:12},{wch:12},{wch:12},{wch:8},{wch:20}];
+XLSX.utils.book_append_sheet(wb,ws1,"포트폴리오");
+// 2) 설정
+const settingRows=[{항목:"시드머니",값:seed},{항목:"현금",값:cash},{항목:"인출금",값:withdrawals},{항목:"연소득",값:expenses.annualIncome},{항목:"목표금액",값:goal.targetAmount},{항목:"목표시점",값:goal.targetDate},{항목:"월투자가능",값:goal.monthlyInvestment},{항목:"목표메모",값:goal.memo}];
+const ws2=XLSX.utils.json_to_sheet(settingRows);ws2["!cols"]=[{wch:14},{wch:20}];
+XLSX.utils.book_append_sheet(wb,ws2,"설정");
+// 3) 부동산
+const reRows=realEstate.map(r=>({자산명:r.name,유형:r.type,매입가:r.purchasePrice,시세:r.currentValue,매입일:r.purchaseDate,대출잔액:r.loanBalance,월상환:r.monthlyPayment,주소:r.address,면적:r.area,메모:r.memo||""}));
+const ws3=XLSX.utils.json_to_sheet(reRows.length?reRows:[{자산명:"",유형:"아파트",매입가:0,시세:0,매입일:"",대출잔액:0,월상환:0,주소:"",면적:0,메모:""}]);ws3["!cols"]=[{wch:16},{wch:8},{wch:14},{wch:14},{wch:10},{wch:14},{wch:12},{wch:20},{wch:6},{wch:16}];
+XLSX.utils.book_append_sheet(wb,ws3,"부동산");
+// 4) 차량
+const carRows=cars.map(c=>({차량명:c.name,브랜드:c.brand,구매가:c.purchasePrice,시세:c.currentValue,구매일:c.purchaseDate,대출잔액:c.loanBalance,월상환:c.monthlyPayment,주행거리:c.mileage,메모:c.memo||""}));
+const ws4=XLSX.utils.json_to_sheet(carRows.length?carRows:[{차량명:"",브랜드:"",구매가:0,시세:0,구매일:"",대출잔액:0,월상환:0,주행거리:0,메모:""}]);ws4["!cols"]=[{wch:16},{wch:10},{wch:14},{wch:14},{wch:10},{wch:14},{wch:12},{wch:10},{wch:16}];
+XLSX.utils.book_append_sheet(wb,ws4,"차량");
+// 5) 카드
+const cardRows=(expenses.cards||[]).map(c=>({카드명:c.name,유형:c.type,필수여부:c.mandatory?"Y":"N",월최소실적:c.monthlyMin||0}));
+const ws5=XLSX.utils.json_to_sheet(cardRows.length?cardRows:[{카드명:"",유형:"credit",필수여부:"N",월최소실적:0}]);ws5["!cols"]=[{wch:16},{wch:10},{wch:8},{wch:12}];
+XLSX.utils.book_append_sheet(wb,ws5,"카드");
+// 6) 지출내역
+const entryRows=(expenses.entries||[]).map(e=>({일자:e.date,카테고리:e.category,금액:e.amount,카드:e.card||"",메모:e.desc||""}));
+const ws6=XLSX.utils.json_to_sheet(entryRows.length?entryRows:[{일자:"2025-03-01",카테고리:"식비",금액:0,카드:"",메모:""}]);ws6["!cols"]=[{wch:12},{wch:10},{wch:12},{wch:12},{wch:20}];
+XLSX.utils.book_append_sheet(wb,ws6,"지출내역");
+// 7) 인사이트
+const evtRows=events.map(e=>({연도:e.year,제목:e.title,설명:e.desc,유형:e.type}));
+const ws7=XLSX.utils.json_to_sheet(evtRows);ws7["!cols"]=[{wch:8},{wch:24},{wch:50},{wch:12}];
+XLSX.utils.book_append_sheet(wb,ws7,"인사이트");
+// 8) 메모
+const memoRows=memos.map(m=>({일자:m.date,내용:m.text}));
+const ws8=XLSX.utils.json_to_sheet(memoRows.length?memoRows:[{일자:"",내용:""}]);ws8["!cols"]=[{wch:12},{wch:50}];
+XLSX.utils.book_append_sheet(wb,ws8,"메모");
+const fn="StockPilot_"+new Date().toISOString().slice(0,10).replace(/-/g,"")+".xlsx";
+XLSX.writeFile(wb,fn);
+setXlMsg({type:"ok",text:`✅ ${fn} 다운로드 완료 (${Object.keys(wb.Sheets).length}시트)`});setTimeout(()=>setXlMsg(null),4000);
+};
+const importExcel=(e)=>{
+const file=e.target.files?.[0];if(!file)return;
+const reader=new FileReader();
+reader.onload=(evt)=>{
+try{
+const wb=XLSX.read(evt.target.result,{type:"array"});
+let imported=[];
+// 포트폴리오
+if(wb.SheetNames.includes("포트폴리오")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["포트폴리오"]);
+if(rows.length>0){const ns=rows.map((r,i)=>({id:i+1,name:r["종목명"]||"",sector:r["섹터"]||"기타",avgPrice:Number(r["매입단가"])||0,currentPrice:Number(r["현재가"])||0,quantity:Number(r["수량"])||0,memo:r["메모"]||""})).filter(s=>s.name);
+if(ns.length>0){setStocks(ns);imported.push("포트폴리오 "+ns.length+"종목");}}}
+// 설정
+if(wb.SheetNames.includes("설정")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["설정"]);
+const sm={};rows.forEach(r=>sm[r["항목"]]=r["값"]);
+if(sm["시드머니"])setSeed(Number(sm["시드머니"])||seed);
+if(sm["현금"]!==undefined)setCash(Number(sm["현금"])||0);
+if(sm["인출금"]!==undefined)setWithdrawals(Number(sm["인출금"])||0);
+if(sm["연소득"])setExpenses(prev=>({...prev,annualIncome:Number(sm["연소득"])||prev.annualIncome}));
+const ng={...goal};let gc=false;
+if(sm["목표금액"]){ng.targetAmount=Number(sm["목표금액"]);gc=true;}
+if(sm["목표시점"]){ng.targetDate=String(sm["목표시점"]);gc=true;}
+if(sm["월투자가능"]){ng.monthlyInvestment=Number(sm["월투자가능"]);gc=true;}
+if(sm["목표메모"]){ng.memo=String(sm["목표메모"]);gc=true;}
+if(gc)setGoal(ng);
+imported.push("설정");}
+// 부동산
+if(wb.SheetNames.includes("부동산")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["부동산"]);
+const nr=rows.map((r,i)=>({id:i+1,name:r["자산명"]||"",type:r["유형"]||"아파트",purchasePrice:Number(r["매입가"])||0,currentValue:Number(r["시세"])||0,purchaseDate:r["매입일"]||"",loanBalance:Number(r["대출잔액"])||0,monthlyPayment:Number(r["월상환"])||0,address:r["주소"]||"",area:Number(r["면적"])||0,memo:r["메모"]||""})).filter(r=>r.name);
+if(nr.length>0){setRealEstate(nr);imported.push("부동산 "+nr.length+"건");}}
+// 차량
+if(wb.SheetNames.includes("차량")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["차량"]);
+const nc=rows.map((r,i)=>({id:i+1,name:r["차량명"]||"",brand:r["브랜드"]||"",purchasePrice:Number(r["구매가"])||0,currentValue:Number(r["시세"])||0,purchaseDate:r["구매일"]||"",loanBalance:Number(r["대출잔액"])||0,monthlyPayment:Number(r["월상환"])||0,mileage:Number(r["주행거리"])||0,memo:r["메모"]||""})).filter(c=>c.name);
+if(nc.length>0){setCars(nc);imported.push("차량 "+nc.length+"대");}}
+// 카드
+if(wb.SheetNames.includes("카드")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["카드"]);
+const nk=rows.map((r,i)=>({id:i+1,name:r["카드명"]||"",type:r["유형"]||"credit",mandatory:r["필수여부"]==="Y",monthlyMin:Number(r["월최소실적"])||0})).filter(c=>c.name);
+if(nk.length>0)setExpenses(prev=>({...prev,cards:nk}));
+imported.push("카드 "+nk.length+"장");}
+// 지출내역
+if(wb.SheetNames.includes("지출내역")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["지출내역"]);
+const ne=rows.map((r,i)=>({id:Date.now()+i,date:r["일자"]||"",category:r["카테고리"]||"기타",amount:Number(r["금액"])||0,card:r["카드"]||"",desc:r["메모"]||""})).filter(e=>e.amount>0);
+if(ne.length>0)setExpenses(prev=>({...prev,entries:[...ne,...(prev.entries||[])]}));
+imported.push("지출 "+ne.length+"건");}
+// 인사이트
+if(wb.SheetNames.includes("인사이트")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["인사이트"]);
+const ne=rows.map(r=>({year:Number(r["연도"])||2025,title:r["제목"]||"",desc:r["설명"]||"",type:r["유형"]||"crisis"})).filter(e=>e.title);
+if(ne.length>0){setEvents(ne);imported.push("인사이트 "+ne.length+"건");}}
+// 메모
+if(wb.SheetNames.includes("메모")){
+const rows=XLSX.utils.sheet_to_json(wb.Sheets["메모"]);
+const nm=rows.map(r=>({id:Date.now()+Math.random(),date:r["일자"]||new Date().toISOString().slice(0,10),text:r["내용"]||""})).filter(m=>m.text);
+if(nm.length>0){setMemos(prev=>[...nm,...prev]);imported.push("메모 "+nm.length+"건");}}
+if(imported.length>0)setXlMsg({type:"ok",text:`✅ 업로드 완료: ${imported.join(", ")}`});
+else setXlMsg({type:"warn",text:"⚠ 인식 가능한 시트가 없습니다. 시트명을 확인하세요."});
+}catch(err){setXlMsg({type:"err",text:`❌ 파일 읽기 실패: ${err.message}`});}
+setTimeout(()=>setXlMsg(null),5000);
+};reader.readAsArrayBuffer(file);
+if(xlRef.current)xlRef.current.value="";
+};
 return(<div className="sp-root" style={{minHeight:"100vh",background:"linear-gradient(135deg,#0B1121,#0F172A 40%,#131C2E)",color:"#E2E8F0",fontFamily:"'Pretendard','Noto Sans KR',-apple-system,sans-serif",boxSizing:"border-box"}}><style>{`@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;overflow-x:hidden;}
@@ -446,7 +553,12 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 </div></div>}
 <div className="sp-wrap">
 <div style={{position:"sticky",top:0,zIndex:100,background:"linear-gradient(135deg,#0B1121,#0F172A)",borderBottom:"1px solid rgba(255,255,255,0.06)",padding:"10px 0 10px",marginBottom:16}}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:6}}><div style={{display:"flex",alignItems:"center",gap:10}}>{onBack&&<button onClick={onBack} style={{padding:"6px 14px",borderRadius:8,background:"rgba(0,229,160,0.08)",border:"1px solid rgba(0,229,160,0.2)",color:"#00E5A0",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>← DMP</button>}<div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#00E5A0,#00B8D4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#0F172A",boxShadow:"0 4px 16px rgba(0,229,160,0.25)"}}>₩</div><div><div style={{fontSize:18,fontWeight:800,color:"#F8FAFC"}}>StockPilot</div><div style={{fontSize:10,color:"#64748B"}}>Total Asset Management v3.0</div></div></div><div style={{display:"flex",alignItems:"center",gap:10}}><div style={{fontSize:12,color:"#475569",padding:"6px 12px",background:"rgba(30,41,59,0.5)",borderRadius:8}}>{stocks.length}종목 · 순자산 {fk(gt)}원</div></div></div>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:6}}><div style={{display:"flex",alignItems:"center",gap:10}}>{onBack&&<button onClick={onBack} style={{padding:"6px 14px",borderRadius:8,background:"rgba(0,229,160,0.08)",border:"1px solid rgba(0,229,160,0.2)",color:"#00E5A0",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>← DMP</button>}<div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#00E5A0,#00B8D4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#0F172A",boxShadow:"0 4px 16px rgba(0,229,160,0.25)"}}>₩</div><div><div style={{fontSize:18,fontWeight:800,color:"#F8FAFC"}}>StockPilot</div><div style={{fontSize:10,color:"#64748B"}}>Total Asset Management v3.0</div></div></div><div style={{display:"flex",alignItems:"center",gap:10}}><div style={{fontSize:12,color:"#475569",padding:"6px 12px",background:"rgba(30,41,59,0.5)",borderRadius:8}}>{stocks.length}종목 · 순자산 {fk(gt)}원</div>
+<input ref={xlRef} type="file" accept=".xlsx,.xls" onChange={importExcel} style={{display:"none"}}/>
+<button onClick={()=>xlRef.current?.click()} style={{padding:"6px 12px",borderRadius:8,background:"rgba(56,189,248,0.1)",border:"1px solid rgba(56,189,248,0.25)",color:"#38BDF8",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:4}}>📤 업로드</button>
+<button onClick={exportExcel} style={{padding:"6px 12px",borderRadius:8,background:"rgba(0,229,160,0.1)",border:"1px solid rgba(0,229,160,0.25)",color:"#00E5A0",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:4}}>📥 다운로드</button>
+</div></div>
+{xlMsg&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:10000,padding:"10px 24px",borderRadius:12,background:xlMsg.type==="ok"?"rgba(0,229,160,0.15)":xlMsg.type==="warn"?"rgba(255,230,109,0.15)":"rgba(255,107,107,0.15)",border:`1px solid ${xlMsg.type==="ok"?"rgba(0,229,160,0.3)":xlMsg.type==="warn"?"rgba(255,230,109,0.3)":"rgba(255,107,107,0.3)"}`,color:xlMsg.type==="ok"?"#00E5A0":xlMsg.type==="warn"?"#FFE66D":"#FF6B6B",fontSize:13,fontWeight:600,backdropFilter:"blur(12px)",boxShadow:"0 8px 32px rgba(0,0,0,.4)",animation:"fadeIn .3s"}}>{xlMsg.text}</div>}
 <Nav active={tab} setActive={setTab}/>
 </div>
 <MemoPad memos={memos} setMemos={setMemos}/>
