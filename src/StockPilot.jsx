@@ -191,24 +191,22 @@ return(<div style={{display:"flex",flexDirection:"column",gap:16}}><div style={{
 // Market
 const FINNHUB_KEY="d6nlgvhr01qse5qm5sb0d6nlgvhr01qse5qm5sbg";
 const MKT_SYMBOLS=[
-{key:"GLD",name:"금(Gold)",unit:"$/oz",icon:"🥇",color:"#FFE66D",cat:"원자재",tz:"America/New_York",open:18,close:17,openM:0,closeM:0,almost24:true,note:"GLD ETF 기준"},
-{key:"SLV",name:"은(Silver)",unit:"$/oz",icon:"🥈",color:"#C0C0C0",cat:"원자재",tz:"America/New_York",open:18,close:17,openM:0,closeM:0,almost24:true,note:"SLV ETF 기준"},
-{key:"USO",name:"WTI 유가",unit:"$/bbl",icon:"🛢️",color:"#F97316",cat:"원자재",tz:"America/New_York",open:18,close:17,openM:0,closeM:0,almost24:true,note:"USO ETF 기준"},
-{key:"SPY",name:"S&P 500",unit:"pt",icon:"🇺🇸",color:"#00E5A0",cat:"해외지수",tz:"America/New_York",open:9,close:16,openM:30,closeM:0,note:"SPY ETF 추종"},
-{key:"QQQ",name:"NASDAQ 100",unit:"pt",icon:"🇺🇸",color:"#38BDF8",cat:"해외지수",tz:"America/New_York",open:9,close:16,openM:30,closeM:0,note:"QQQ ETF 추종"},
-{key:"DIA",name:"다우존스",unit:"pt",icon:"🇺🇸",color:"#A78BFA",cat:"해외지수",tz:"America/New_York",open:9,close:16,openM:30,closeM:0,note:"DIA ETF 추종"},
-{key:"EWJ",name:"닛케이(일본)",unit:"pt",icon:"🇯🇵",color:"#FF6B6B",cat:"해외지수",tz:"Asia/Tokyo",open:9,close:15,openM:0,closeM:0,note:"EWJ ETF 기준"},
-{key:"EWY",name:"KOSPI(한국)",unit:"pt",icon:"🇰🇷",color:"#FF6B6B",cat:"국내지수",tz:"Asia/Seoul",open:9,close:15,openM:0,closeM:30,note:"EWY iShares 한국 ETF"},
-{key:"USDKRW",name:"환율(USD/KRW)",unit:"원",icon:"💱",color:"#34D399",cat:"환율",tz:"fx",open:0,close:0,src:"finnhub_fx"},
-{key:"KRW-BTC",name:"비트코인(BTC)",unit:"원",icon:"₿",color:"#F7931A",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-ETH",name:"이더리움(ETH)",unit:"원",icon:"⟠",color:"#627EEA",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-XRP",name:"리플(XRP)",unit:"원",icon:"✕",color:"#00AAE4",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-USDT",name:"테더(USDT)",unit:"원",icon:"₮",color:"#26A17B",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-SC",name:"시아(SC)",unit:"원",icon:"◆",color:"#20EE82",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-XEC",name:"이캐시(XEC)",unit:"원",icon:"ℯ",color:"#0074C2",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-SOL",name:"솔라나(SOL)",unit:"원",icon:"◎",color:"#9945FF",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-AMO",name:"아모(AMO)",unit:"원",icon:"Ⓐ",color:"#FF4D94",cat:"코인",tz:"crypto",src:"upbit"},
-{key:"KRW-GRND",name:"슈퍼워크(GRND)",unit:"원",icon:"👟",color:"#6EE7B7",cat:"코인",tz:"crypto",src:"upbit"},
+{key:"GLD",name:"금(Gold)",unit:"$/oz",icon:"🥇",color:"#FFE66D",cat:"원자재",src:"finnhub",tz:"America/New_York",open:18,close:17,openM:0,closeM:0,almost24:true},
+{key:"SLV",name:"은(Silver)",unit:"$/oz",icon:"🥈",color:"#C0C0C0",cat:"원자재",src:"finnhub",tz:"America/New_York",open:18,close:17,openM:0,closeM:0,almost24:true},
+{key:"USO",name:"WTI 유가",unit:"$/bbl",icon:"🛢️",color:"#F97316",cat:"원자재",src:"finnhub",tz:"America/New_York",open:18,close:17,openM:0,closeM:0,almost24:true},
+{key:"SPY",name:"S&P 500",unit:"pt",icon:"🇺🇸",color:"#00E5A0",cat:"해외지수",src:"finnhub",tz:"America/New_York",open:9,close:16,openM:30,closeM:0},
+{key:"QQQ",name:"NASDAQ 100",unit:"pt",icon:"🇺🇸",color:"#38BDF8",cat:"해외지수",src:"finnhub",tz:"America/New_York",open:9,close:16,openM:30,closeM:0},
+{key:"DIA",name:"다우존스",unit:"pt",icon:"🇺🇸",color:"#A78BFA",cat:"해외지수",src:"finnhub",tz:"America/New_York",open:9,close:16,openM:30,closeM:0},
+{key:"EWJ",name:"닛케이(일본)",unit:"pt",icon:"🇯🇵",color:"#FF6B6B",cat:"해외지수",src:"finnhub",tz:"Asia/Tokyo",open:9,close:15,openM:0,closeM:0},
+{key:"EWY",name:"KOSPI(한국)",unit:"pt",icon:"🇰🇷",color:"#FF6B6B",cat:"국내지수",src:"finnhub",tz:"Asia/Seoul",open:9,close:15,openM:0,closeM:30},
+{key:"USDKRW",name:"환율(USD/KRW)",unit:"원",icon:"💱",color:"#34D399",cat:"환율",src:"exchangerate",tz:"fx",open:0,close:0},
+{key:"bitcoin",name:"비트코인(BTC)",unit:"원",icon:"₿",color:"#F7931A",cat:"코인",src:"coingecko",tz:"crypto"},
+{key:"ethereum",name:"이더리움(ETH)",unit:"원",icon:"⟠",color:"#627EEA",cat:"코인",src:"coingecko",tz:"crypto"},
+{key:"ripple",name:"리플(XRP)",unit:"원",icon:"✕",color:"#00AAE4",cat:"코인",src:"coingecko",tz:"crypto"},
+{key:"tether",name:"테더(USDT)",unit:"원",icon:"₮",color:"#26A17B",cat:"코인",src:"coingecko",tz:"crypto"},
+{key:"solana",name:"솔라나(SOL)",unit:"원",icon:"◎",color:"#9945FF",cat:"코인",src:"coingecko",tz:"crypto"},
+{key:"siacoin",name:"시아코인(SC)",unit:"원",icon:"◆",color:"#20EE82",cat:"코인",src:"coingecko",tz:"crypto"},
+{key:"ecash",name:"이캐시(XEC)",unit:"원",icon:"ℯ",color:"#0074C2",cat:"코인",src:"coingecko",tz:"crypto"},
 ];
 function getMarketStatus(sym){
 const now=new Date();
@@ -217,14 +215,12 @@ if(sym.tz==="fx"){const d=now.getUTCDay();if(d===0||(d===6&&now.getUTCHours()>=2
 const tStr=now.toLocaleString("en-US",{timeZone:sym.tz,hour12:false,hour:"2-digit",minute:"2-digit",weekday:"short"});
 const parts=tStr.split(", ");const wd=parts[0];const[hh,mm]=(parts[1]||tStr).split(":").map(Number);
 if(["Sat","Sun"].includes(wd))return{status:"closed",label:"주말 휴장",color:"#64748B"};
-const nowMin=hh*60+mm;
-const openMin=sym.open*60+(sym.openM||0);
-const closeMin=sym.close*60+(sym.closeM||0);
+const nowMin=hh*60+mm;const openMin=sym.open*60+(sym.openM||0);const closeMin=sym.close*60+(sym.closeM||0);
 if(sym.almost24){const breakStart=sym.close*60;const breakEnd=sym.open*60;if(nowMin>=breakStart&&nowMin<breakEnd)return{status:"closed",label:`휴장 (${sym.open}:${String(sym.openM||0).padStart(2,"0")} 개장)`,color:"#64748B"};const toBreak=breakStart-nowMin;if(toBreak>0&&toBreak<=30)return{status:"closing",label:`${toBreak}분 후 휴장`,color:"#FFE66D"};return{status:"open",label:"거래중",color:"#00E5A0"};}
 if(nowMin>=openMin&&nowMin<closeMin){const toClose=closeMin-nowMin;if(toClose<=30)return{status:"closing",label:`${toClose}분 후 장마감`,color:"#FFE66D"};return{status:"open",label:"장중",color:"#00E5A0"};}
 if(nowMin<openMin){const toOpen=openMin-nowMin;if(toOpen<=60)return{status:"pre",label:`${toOpen}분 후 개장`,color:"#38BDF8"};return{status:"closed",label:`장전 (${sym.open}:${String(sym.openM||0).padStart(2,"0")} 개장)`,color:"#64748B"};}
 return{status:"closed",label:`장마감 (${sym.open}:${String(sym.openM||0).padStart(2,"0")} 개장)`,color:"#64748B"};}
-const MKT_CACHE_KEY="stockpilot-market";
+const MKT_CACHE_KEY="stockpilot-market-v2";
 function Market(){
 const[data,setData]=useState(()=>{try{const c=localStorage.getItem(MKT_CACHE_KEY);return c?JSON.parse(c):{};}catch{return{};}});
 const[loading,setLoading]=useState(false);
@@ -234,75 +230,76 @@ const[apiCalls,setApiCalls]=useState(0);
 const fetchAll=async()=>{
 setLoading(true);setError("");
 const results={};let ok=0,fail=0,calls=0;
-const finnhubSyms=MKT_SYMBOLS.filter(s=>s.src!=="upbit"&&s.src!=="finnhub_fx");
-const fxSyms=MKT_SYMBOLS.filter(s=>s.src==="finnhub_fx");
-const upbitSyms=MKT_SYMBOLS.filter(s=>s.src==="upbit");
 
-// Finnhub quote + candle
-const now=Math.floor(Date.now()/1000);
-const from=now-30*86400;// 30일 전
+// 1) Finnhub — 주식/원자재 (CORS OK, API키)
+const finnhubSyms=MKT_SYMBOLS.filter(s=>s.src==="finnhub");
+const now=Math.floor(Date.now()/1000);const from=now-30*86400;
 for(const sym of finnhubSyms){
 try{
 const[qr,cr]=await Promise.all([
 fetch(`https://finnhub.io/api/v1/quote?symbol=${sym.key}&token=${FINNHUB_KEY}`),
 fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${sym.key}&resolution=D&from=${from}&to=${now}&token=${FINNHUB_KEY}`)
-]);
-calls+=2;
+]);calls+=2;
 if(!qr.ok)throw new Error("quote "+qr.status);
 const q=await qr.json();
-if(!q||q.c===0||q.c===undefined)throw new Error("no quote data");
-const price=q.c;const change=q.d||0;const changePct=q.dp||0;const prevClose=q.pc||price;
+if(!q||q.c===0||q.c===undefined)throw new Error("no data");
 let history=[];
-if(cr.ok){
-const cd=await cr.json();
-if(cd&&cd.s==="ok"&&cd.c){
-history=cd.c.map((c,i)=>({date:new Date(cd.t[i]*1000).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"}),close:c}));}}
-results[sym.key]={price,change,changePct,prevClose,high:q.h,low:q.l,history};ok++;
+if(cr.ok){const cd=await cr.json();if(cd&&cd.s==="ok"&&cd.c){history=cd.c.map((c,i)=>({date:new Date(cd.t[i]*1000).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"}),close:c}));}}
+results[sym.key]={price:q.c,change:q.d||0,changePct:q.dp||0,prevClose:q.pc||q.c,high:q.h,low:q.l,history};ok++;
 }catch(e){fail++;results[sym.key]=data[sym.key]||{price:0,change:0,changePct:0,history:[],error:true};}}
 
-// Finnhub forex (USD/KRW)
+// 2) ExchangeRate API — 환율 USD/KRW (CORS OK, 무키, 무료)
+const fxSyms=MKT_SYMBOLS.filter(s=>s.src==="exchangerate");
 for(const sym of fxSyms){
 try{
-const r=await fetch(`https://finnhub.io/api/v1/forex/rates?base=USD&token=${FINNHUB_KEY}`);
-calls++;
+const r=await fetch("https://open.er-api.com/v6/latest/USD");calls++;
 if(!r.ok)throw new Error(r.status);
 const j=await r.json();
-const rate=j?.quote?.KRW;
-if(!rate)throw new Error("no KRW rate");
-const prev=data[sym.key]?.price||rate;
-const change=rate-prev;const changePct=prev>0?(change/prev*100):0;
-results[sym.key]={price:rate,change,changePct,prevClose:prev,history:data[sym.key]?.history||[]};ok++;
+const rate=j?.rates?.KRW;
+if(!rate)throw new Error("no KRW");
+const prev=data[sym.key]?.price||rate;const change=rate-prev;const changePct=prev>0?(change/prev*100):0;
+const oldHist=data[sym.key]?.history||[];
+const today=new Date().toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"});
+const hist=[...oldHist.filter(h=>h.date!==today),{date:today,close:rate}].slice(-20);
+results[sym.key]={price:rate,change,changePct,prevClose:prev,history:hist};ok++;
 }catch(e){fail++;results[sym.key]=data[sym.key]||{price:0,change:0,changePct:0,history:[],error:true};}}
 
-// Upbit crypto (keep existing)
-if(upbitSyms.length>0){
+// 3) CoinGecko — 코인 KRW 직접 (CORS OK, 무키, 무료)
+const cryptoSyms=MKT_SYMBOLS.filter(s=>s.src==="coingecko");
+if(cryptoSyms.length>0){
 try{
-const mkts=upbitSyms.map(s=>s.key).join(",");
-const r=await fetch(`https://api.upbit.com/v1/ticker?markets=${mkts}`);
-calls++;
+const ids=cryptoSyms.map(s=>s.key).join(",");
+const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=krw&include_24hr_change=true&include_24hr_vol=true`);calls++;
 if(!r.ok)throw new Error(r.status);
-const tickers=await r.json();
-const tickerMap={};tickers.forEach(t=>tickerMap[t.market]=t);
-for(const sym of upbitSyms){
-const t=tickerMap[sym.key];
-if(!t){fail++;results[sym.key]=data[sym.key]||{price:0,change:0,changePct:0,history:[],error:true};continue;}
-results[sym.key]={price:t.trade_price,change:t.signed_change_price,changePct:t.signed_change_rate*100,prevClose:t.prev_closing_price,high24:t.high_price,low24:t.low_price,volume24:t.acc_trade_volume_24h,history:[]};ok++;}
-for(const sym of upbitSyms){
+const j=await r.json();
+for(const sym of cryptoSyms){
+const cd=j[sym.key];
+if(!cd||!cd.krw){fail++;results[sym.key]=data[sym.key]||{price:0,change:0,changePct:0,history:[],error:true};continue;}
+const price=cd.krw;const changePct=cd.krw_24h_change||0;
+const prev=price/(1+changePct/100);const change=price-prev;
+const oldHist=data[sym.key]?.history||[];
+const today=new Date().toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"});
+const hist=[...oldHist.filter(h=>h.date!==today),{date:today,close:price}].slice(-20);
+results[sym.key]={price,change,changePct,prevClose:prev,history:hist,volume24:cd.krw_24h_vol};ok++;}
+}catch(e){cryptoSyms.forEach(sym=>{fail++;results[sym.key]=data[sym.key]||{price:0,change:0,changePct:0,history:[],error:true};});}}
+
+// CoinGecko 7일 차트 데이터 (별도 호출)
+for(const sym of cryptoSyms){
+if(results[sym.key]?.error)continue;
 try{
-const cr2=await fetch(`https://api.upbit.com/v1/candles/days?market=${sym.key}&count=20`);
-calls++;
-if(!cr2.ok)continue;
-const candles=await cr2.json();
-if(Array.isArray(candles)){
-const hist=candles.reverse().map(c=>({date:c.candle_date_time_kst?.slice(5,10).replace("-","/"),close:c.trade_price}));
-if(results[sym.key])results[sym.key].history=hist;}}catch{}}
-}catch(e){upbitSyms.forEach(sym=>{fail++;results[sym.key]=data[sym.key]||{price:0,change:0,changePct:0,history:[],error:true};});}}
+const r=await fetch(`https://api.coingecko.com/api/v3/coins/${sym.key}/market_chart?vs_currency=krw&days=20&interval=daily`);calls++;
+if(!r.ok)continue;
+const j=await r.json();
+if(j?.prices){
+const hist=j.prices.map(p=>({date:new Date(p[0]).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"}),close:p[1]}));
+if(results[sym.key])results[sym.key].history=hist;}
+}catch{}}
 
 const ts=Date.now();results._ts=ts;
 setData(results);setLastUpdate(ts);setApiCalls(calls);
 try{localStorage.setItem(MKT_CACHE_KEY,JSON.stringify(results));}catch{}
 setLoading(false);
-if(fail>0&&ok===0)setError("시세 조회 실패 — API 키 또는 네트워크를 확인하세요");
+if(fail>0&&ok===0)setError("시세 조회 실패 — 네트워크를 확인하세요");
 else if(fail>0)setError(`${ok}개 성공, ${fail}개 실패`);
 };
 const[countdown,setCountdown]=useState(30);
@@ -314,8 +311,10 @@ const fmtPrice=(v,sym)=>{if(!v)return"—";if(sym.unit==="원")return ff(Math.ro
 return(<div style={{display:"flex",flexDirection:"column",gap:16}}>
 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
 <div><h2 style={{margin:0,fontSize:22,fontWeight:800,color:"#F8FAFC"}}>📈 글로벌 시세</h2><p style={{margin:"4px 0 0",fontSize:12,color:"#64748B",display:"flex",alignItems:"center",gap:8}}>{lastUpdate?`${new Date(lastUpdate).toLocaleString("ko-KR")}`:"데이터 없음"}<span style={{display:"inline-flex",alignItems:"center",gap:4,fontSize:11,color:loading?"#FFE66D":"#00E5A0",fontWeight:600}}><span style={{width:6,height:6,borderRadius:"50%",background:loading?"#FFE66D":"#00E5A0",animation:"pulse 1.5s infinite"}}/>{loading?"조회 중":countdown+"초 후 갱신"}</span><span style={{fontSize:10,color:"#475569"}}>API {apiCalls}회</span></p></div>
-<div style={{display:"flex",gap:8,alignItems:"center"}}>
-<span style={{fontSize:10,padding:"3px 8px",borderRadius:6,background:"rgba(0,229,160,0.08)",border:"1px solid rgba(0,229,160,0.15)",color:"#00E5A0",fontWeight:600}}>Finnhub + Upbit</span>
+<div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
+<span style={{fontSize:9,padding:"3px 7px",borderRadius:5,background:"rgba(0,229,160,0.08)",border:"1px solid rgba(0,229,160,0.15)",color:"#00E5A0",fontWeight:600}}>Finnhub</span>
+<span style={{fontSize:9,padding:"3px 7px",borderRadius:5,background:"rgba(247,147,26,0.08)",border:"1px solid rgba(247,147,26,0.15)",color:"#F7931A",fontWeight:600}}>CoinGecko</span>
+<span style={{fontSize:9,padding:"3px 7px",borderRadius:5,background:"rgba(52,211,153,0.08)",border:"1px solid rgba(52,211,153,0.15)",color:"#34D399",fontWeight:600}}>ExchangeRate</span>
 <button onClick={()=>{fetchAll();cdRef.current=30;setCountdown(30);}} disabled={loading} style={{...BT(),opacity:loading?0.5:1}}>{loading?"⏳ 조회 중...":"🔄 새로고침"}</button>
 </div></div>
 {error&&<div style={{padding:"8px 14px",background:"rgba(255,107,107,0.1)",border:"1px solid rgba(255,107,107,0.2)",borderRadius:8,fontSize:12,color:"#FF6B6B"}}>{error}</div>}
@@ -339,7 +338,7 @@ return<Card key={sym.key} style={{overflow:"hidden"}}>
 <span style={{width:5,height:5,borderRadius:"50%",background:ms.color,boxShadow:ms.status==="open"?`0 0 6px ${ms.color}`:"none",animation:ms.status==="open"?"pulse 1.5s infinite":"none"}}/><span style={{fontSize:9,color:ms.color,fontWeight:600}}>{ms.label}</span></div>;})()}
 <div style={{fontSize:20,fontWeight:800,color:sym.color,fontFamily:"monospace",marginBottom:4}}>{d.price?fmtPrice(d.price,sym):"—"}</div>
 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
-<span style={{fontSize:12,fontWeight:700,fontFamily:"monospace",color:up?"#00E5A0":"#FF6B6B"}}>{up?"+":""}{d.change?Math.abs(d.change)<0.01?d.change.toFixed(6):d.change.toFixed(2):"0"}</span>
+<span style={{fontSize:12,fontWeight:700,fontFamily:"monospace",color:up?"#00E5A0":"#FF6B6B"}}>{up?"+":""}{d.change?Math.abs(d.change)<0.01?d.change.toFixed(6):d.change>=1000?ff(Math.round(d.change)):d.change.toFixed(2):"0"}</span>
 <span style={{fontSize:11,padding:"1px 6px",borderRadius:4,background:up?"rgba(0,229,160,0.12)":"rgba(255,107,107,0.12)",color:up?"#00E5A0":"#FF6B6B",fontWeight:600,fontFamily:"monospace"}}>{up?"+":""}{(d.changePct||0).toFixed(2)}%</span>
 </div>
 {sparkH.length>1&&<div style={{height:40,display:"flex",alignItems:"flex-end",gap:1}}>
@@ -348,18 +347,16 @@ return vals.slice(-20).map((v,i)=>{const h=Math.max(((v-mn)/rng)*36+4,2);const p
 return<div key={i} style={{flex:1,height:h,borderRadius:1,background:v>=prev?`${sym.color}`:up?"rgba(0,229,160,0.3)":"rgba(255,107,107,0.3)",transition:"height 0.3s"}}/>;});})()}
 </div>}
 {d.error&&<div style={{fontSize:10,color:"#FF6B6B",marginTop:4}}>⚠ 조회실패 (캐시)</div>}
-{d.high24&&<div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:9,color:"#64748B"}}><span>H {fmtPrice(d.high24,sym)}</span><span>L {fmtPrice(d.low24,sym)}</span></div>}
-{d.high&&!d.high24&&<div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:9,color:"#64748B"}}><span>H {fmtPrice(d.high,sym)}</span><span>L {fmtPrice(d.low,sym)}</span></div>}
-{sym.note&&<div style={{fontSize:8,color:"#475569",marginTop:3}}>{sym.note}</div>}
+{d.high&&<div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:9,color:"#64748B"}}><span>H {fmtPrice(d.high,sym)}</span><span>L {fmtPrice(d.low,sym)}</span></div>}
 </Card>})}</div></div>})}
 <Card style={{background:"rgba(255,255,255,0.02)"}}>
 <h3 style={{margin:"0 0 10px",fontSize:14,fontWeight:700,color:"#94A3B8"}}>💡 데이터 소스</h3>
 <div style={{fontSize:12,color:"#64748B",lineHeight:1.8}}>
-• 주식/원자재/환율 → <b style={{color:"#00E5A0"}}>Finnhub API</b> (실시간, API키 인증, CORS 무제한)<br/>
-• 코인 → <b style={{color:"#00E5A0"}}>업비트(Upbit) API</b> (KRW 원화가격, 실시간)<br/>
-• 해외지수는 ETF 추종 기준 (SPY→S&P500, QQQ→NASDAQ100, DIA→다우존스)<br/>
-• 모든 시세 <b style={{color:"#00E5A0"}}>30초마다 자동 갱신</b> · Vite 프록시 불필요<br/>
-• 무료 한도: 60회/분 (현재 {apiCalls}회/갱신)
+• 주식/원자재 → <b style={{color:"#00E5A0"}}>Finnhub API</b> (ETF 추종, 실시간, 30일 차트)<br/>
+• 코인 → <b style={{color:"#F7931A"}}>CoinGecko API</b> (KRW 원화 직접, 24h 변동률, 20일 차트)<br/>
+• 환율 → <b style={{color:"#34D399"}}>ExchangeRate API</b> (USD/KRW, 무료, CORS 지원)<br/>
+• 모든 시세 <b style={{color:"#00E5A0"}}>30초마다 자동 갱신</b> · 프록시 불필요<br/>
+• API 호출: Finnhub {MKT_SYMBOLS.filter(s=>s.src==="finnhub").length*2}회 + CoinGecko {MKT_SYMBOLS.filter(s=>s.src==="coingecko").length+1}회 + ExchangeRate 1회
 </div></Card>
 </div>);}
 
