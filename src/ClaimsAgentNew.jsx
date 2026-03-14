@@ -2802,20 +2802,22 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   const loadUC1=()=>{
     setInput(`[교차로 골목길 충돌 사고 — Case 1]
 사고유형: 교차로 직진 vs 직진 (골목길)
-자사 고객 (A): 현대 그랜저
+자사 고객 (A): 현대 그랜저 2023년식 / 25,138km
+  - 파손 부위: 프론트 범퍼, 좌측 펜더, 좌측 도어, 좌 헤드라이트 (심각)
   - 수리비: ₩5,000,000
   - 렌트: 그랜저 (동급)
   - 대인: 2명 (운전자 + 동승자 1명)
   - 과실 주장: A 30% : B 70%
-타사 고객 (B): BMW 7시리즈
+타사 고객 (B): BMW 7시리즈 2023년식 / 15,000km
+  - 파손 부위: 프론트 범퍼 ASSY, 우측 펜더, 우 헤드라이트, 그릴, 라디에이터 (심각)
   - 수리비: ₩25,000,000 (청구)
   - 렌트: BMW 7시리즈 요구
   - 대인: 3명 (운전자 + 동승자 2명)
   - 과실 주장: A 70% : B 30%
-[견적 산정 결과] AI 적정 수리비: BMW ₩17~20M (₩5~8M 과다청구)
+[견적 산정 결과] A차 ₩5,000,000 / B차 AI 적정 ₩17~20M (₩5~8M 과다청구)
 [대인 피해 결과] 타사3명 ₩5.4~7.2M / 자사2명 수령 ₩1.15~1.7M
 [과실 산정 결과] AI 적정: 50:50 (교차로 골목길 기준)
-핵심쟁점: 과실 분쟁 + BMW 수리비 + 렌트 등급 + 대인 5명`);
+핵심쟁점: 과실 분쟁 + BMW 수리비 과다청구 + 렌트 등급 정정 + 대인 5명`);
     setCustPref("insurance");setUseCase("uc1");setReportOpen(false);
     setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});
   };
@@ -2823,23 +2825,27 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
     setInput(`[주차장 신차 충돌 — Case 2]
 사고유형: 주차장 내 주정차 차량 충돌 (100% 자사 과실)
 자사 고객: 현대 그랜저 캘리그래피 블랙잉크 3.5 AWD (25년 6월 출고)
+  - 파손 부위: 프론트 범퍼(우측), 우 헤드라이트, 우 펜더 (중간)
   - 수리비: ₩1,830,000 (우측 전면부)
 타사 고객: 제네시스 GV80 3.5T AWD 프레스티지 (25년 12월 출고, 3개월 신차)
+  - 파손 부위: 프론트 범퍼 ASSY, 본넷, 좌 헤드라이트, 그릴, 라디에이터 (심각)
   - 타사 청구: ₩10,000,000
   - AI 적정: ₩6,380,000
 [견적 산정 결과] ₩3,620,000 절감 가능
 [대인 피해 결과] 대인 접수 없음 (쌍방 무상해)
 [과실 산정 결과] 100:0 (자사 100% 과실)
-핵심쟁점: 수리비 적정성 + 렌트 등급 + 신차 감가 대비`);
+핵심쟁점: 수리비 적정성 + 렌트 등급 정정 + 신차 감가 대비`);
     setCustPref("cost");setUseCase("uc2");setReportOpen(false);
     setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});
   };
   const loadUC3=()=>{
     setInput(`[차선변경 과실 분쟁 — Case 3]
 사고유형: 차선변경 중 직진차량 충돌
-자사 고객 (A): 차선변경 차량
+자사 고객 (A): 현대 그랜저 2022년식 / 35,000km — 차선변경 차량
+  - 파손 부위: 리어 범퍼, 우 리어쿼터패널, 우 리어 도어 (중간)
   - 과실 주장: A 90% : B 10% (양 보험사 협의안)
-타사 고객 (B): 직진 차량
+타사 고객 (B): BMW 5시리즈 2024년식 / 12,000km — 직진 차량
+  - 파손 부위: 프론트 범퍼, 좌 프론트 펜더 (중간)
   - 과실 주장: A 100% : B 0% (타사 고객 주장, 협의안 거부)
 [견적 산정 결과] A차 리어범퍼+쿼터패널 ₩1.2~1.8M / B차 프론트범퍼+펜더 ₩0.8~1.5M
 [대인 피해 결과] 타사1명 ₩4M 청구 → AI ₩2.8~3.5M / 자사1명 접수고민중
@@ -2879,17 +2885,17 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
     // 필수 항목 체크
     const txt=input.toLowerCase();
     const missing=[];
-    if(!txt.includes("차량")&&!txt.includes("차종")&&!txt.match(/[a-z]\d|아반떼|소나타|그랜저|k\d|gv/i))
+    if(!txt.includes("차량")&&!txt.includes("차종")&&!txt.includes("년식")&&!txt.match(/[a-z]\d|아반떼|소나타|쏘나타|그랜저|k\d|gv|bmw|벤츠|제네시스/i))
       missing.push({key:"vehicle",q:"차량 정보 (제조사, 모델명, 연식)가 누락되었습니다. 어떤 차량인가요?",hint:"예: 현대 아반떼 CN7 2022년식"});
-    if(!txt.includes("파손")&&!txt.includes("손상")&&!txt.includes("부위")&&!txt.includes("범퍼")&&!txt.includes("미러")&&!txt.includes("도어"))
+    if(!txt.includes("파손")&&!txt.includes("손상")&&!txt.includes("부위")&&!txt.includes("범퍼")&&!txt.includes("미러")&&!txt.includes("도어")&&!txt.includes("펜더")&&!txt.includes("헤드라이트")&&!txt.includes("본넷")&&!txt.includes("견적 산정 결과")&&!txt.includes("수리비"))
       missing.push({key:"damage",q:"파손 부위와 정도가 확인되지 않았습니다. 어떤 부위가 어느 정도 파손되었나요?",hint:"예: 프론트범퍼 교체, 좌측 펜더 판금도장"});
-    if(!txt.includes("수리비")&&!txt.includes("견적")&&!txt.match(/\d{2,},?\d{3}/))
+    if(!txt.includes("수리비")&&!txt.includes("견적")&&!txt.includes("₩")&&!txt.includes("만원")&&!txt.match(/\d{2,},?\d{3}/))
       missing.push({key:"cost",q:"예상 수리비(견적)가 확인되지 않았습니다. 산출된 견적이 있나요?",hint:"예: 약 280만원 / 아직 미산출"});
     if(!txt.includes("과실")&&!txt.match(/\d+\s*[:%]/))
       missing.push({key:"fault",q:"과실 비율이 확인되지 않았습니다. 과실 비율이 어떻게 되나요?",hint:"예: 상대 100%, 쌍방 50:50, 미산정"});
     if(!txt.includes("렌트")&&!txt.includes("대차"))
       missing.push({key:"rental",q:"대차(렌트) 사용 여부가 확인되지 않았습니다. 현재 대차를 사용 중인가요?",hint:"예: 대차 사용 중 (일 7만원) / 미사용"});
-    if(!txt.includes("보험")&&!txt.includes("자차")&&!txt.includes("삼자"))
+    if(!txt.includes("보험")&&!txt.includes("자차")&&!txt.includes("삼자")&&!txt.includes("보험사")&&!txt.includes("과실"))
       missing.push({key:"insurance",q:"보험 처리 유형이 확인되지 않았습니다. 어떤 보험으로 처리되나요?",hint:"예: 상대 삼자배책 / 자차보험 / 미정"});
     setIntakeProg({step:steps.length,total:steps.length,msg:"✅ 분석 완료",pct:100});
     await new Promise(r=>setTimeout(r,300));
