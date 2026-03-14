@@ -4644,19 +4644,19 @@ function TabData(){
             "처리":    [{db:"UC_PROCESS_*",icon:"📐",label:"처리방법 3안"},{db:"CUST_PREFS",icon:"🎯",label:"고객성향 6종"},{db:"claimProcess",icon:"📋",label:"지급프로세스 6단계"}],
           };
           const isDetail=graphMode==="detail";
-          const gH=isDetail?620:520;
-          // Detail 모드에서 노드 간격을 더 벌림
+          const gH=isDetail?950:520;
+          // Detail 모드에서 노드 간격을 대폭 벌림 (DB 태그 겹침 방지)
           const nodes=isDetail?[
-            {id:"피해자",  x:50, y:8,  w:56},
-            {id:"차량A",   x:22, y:17, w:60},
-            {id:"차량B",   x:78, y:17, w:60},
+            {id:"피해자",  x:50, y:5,  w:56},
+            {id:"차량A",   x:20, y:17, w:60},
+            {id:"차량B",   x:80, y:17, w:60},
             {id:"사고",    x:50, y:30, w:70},
-            {id:"파손A",   x:12, y:40, w:56},
-            {id:"파손B",   x:88, y:40, w:56},
-            {id:"과실",    x:22, y:54, w:56},
-            {id:"견적",    x:50, y:54, w:56},
-            {id:"보험",    x:50, y:70, w:64},
-            {id:"처리",    x:50, y:87, w:64},
+            {id:"파손A",   x:12, y:43, w:56},
+            {id:"파손B",   x:88, y:43, w:56},
+            {id:"과실",    x:20, y:57, w:56},
+            {id:"견적",    x:50, y:57, w:56},
+            {id:"보험",    x:50, y:73, w:64},
+            {id:"처리",    x:50, y:90, w:64},
           ]:[
             {id:"피해자",  x:50, y:10, w:56},
             {id:"차량A",   x:26, y:18, w:60},
