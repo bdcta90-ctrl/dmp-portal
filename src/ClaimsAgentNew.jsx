@@ -3865,9 +3865,10 @@ function TabKPI(){
       <div style={{background:"#fff",borderRadius:14,padding:16,border:"1px solid #e2e8f0",marginBottom:14}}>
         <div style={{fontSize:12,fontWeight:700,marginBottom:10}}>👥 팀원별 현황 · 역량 분석 <span style={{fontSize:9,color:"#94a3b8",fontWeight:400}}>클릭 시 상세</span></div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:7}}>
-          {TEAM.map(m=>{const rs=reports.filter(r=>r.adjuster===m.name);const closed=rs.filter(r=>r.status==="종결").length;const rate=rs.length>0?Math.round((closed/rs.length)*100):0;const isOpen=memberDetail===m.name;
-            return(<div key={m.name} onClick={()=>setMemberDetail(isOpen?null:m.name)} style={{padding:"9px 6px",borderRadius:10,background:isOpen?"#eff6ff":"#fff",border:isOpen?"2px solid #3b82f6":"1px solid #e2e8f0",cursor:"pointer",transition:"all .15s",textAlign:"center"}}
-              onMouseEnter={e=>{if(!isOpen)e.currentTarget.style.borderColor="#93c5fd";}} onMouseLeave={e=>{if(!isOpen)e.currentTarget.style.borderColor=isOpen?"#3b82f6":"#e2e8f0";}}>
+          {TEAM.map(m=>{const rs=reports.filter(r=>r.adjuster===m.name);const closed=rs.filter(r=>r.status==="종결").length;const rate=rs.length>0?Math.round((closed/rs.length)*100):0;const isOpen=memberDetail===m.name;const cmpCnt=rs.filter(r=>r.complaint&&r.status!=="종결").length;const hasCmp=cmpCnt>0;
+            return(<div key={m.name} onClick={()=>setMemberDetail(isOpen?null:m.name)} style={{padding:"9px 6px",borderRadius:10,background:isOpen?"#eff6ff":hasCmp?"#fff5f5":"#fff",border:isOpen?"2px solid #3b82f6":hasCmp?"2px solid #fca5a5":"1px solid #e2e8f0",cursor:"pointer",transition:"all .15s",textAlign:"center",position:"relative"}}
+              onMouseEnter={e=>{if(!isOpen)e.currentTarget.style.borderColor=hasCmp?"#f87171":"#93c5fd";}} onMouseLeave={e=>{if(!isOpen)e.currentTarget.style.borderColor=isOpen?"#3b82f6":hasCmp?"#fca5a5":"#e2e8f0";}}>
+              {hasCmp&&<div style={{position:"absolute",top:-4,left:-4,width:18,height:18,borderRadius:"50%",background:"#dc2626",color:"#fff",fontSize:8,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 6px rgba(220,38,38,.4)",animation:"pulse 2s infinite",zIndex:1}}>⚠️</div>}
               <div style={{fontSize:14,marginBottom:1}}>{m.emoji}</div>
               <div style={{fontSize:9.5,fontWeight:700}}>{m.name.replace(" 사정사","").replace(" 센터장","")}</div>
               <div style={{fontSize:7.5,color:"#94a3b8",marginBottom:2}}>{m.role}</div>
