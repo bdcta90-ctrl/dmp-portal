@@ -1467,13 +1467,13 @@ const DAMAGE_CONFIGS = {
       {id:"rad",label:"라디에이터 서포트",severity:"손상 의심",cost:"₩300,000",x:120,y:170,w:160,h:25,phase:5,color:"#f97316"},
       {id:"cam",label:"전방 카메라/레이더",severity:"캘리브레이션",cost:"₩300,000",x:185,y:82,w:30,h:16,phase:6,color:"#8b5cf6"},
     ]},
-  uc3_a: { vehicle:"A차 (차선변경)", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩1,200,000~1,800,000",
+  uc3_a: { vehicle:"현대 그랜저", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩1,200,000~1,800,000",
     parts:[
       {id:"bumperR",label:"리어 범퍼(우측)",severity:"판금 도장",cost:"₩450,000",x:260,y:215,w:80,h:50,phase:1,color:"#f97316"},
       {id:"quarterR",label:"우 리어쿼터패널",severity:"판금 도장",cost:"₩550,000",x:290,y:155,w:55,h:55,phase:2,color:"#f97316"},
       {id:"doorR",label:"우 리어 도어(하단)",severity:"경미 접촉",cost:"₩300,000",x:290,y:105,w:55,h:50,phase:3,color:"#f59e0b"},
     ]},
-  uc3_b: { vehicle:"B차 (직진)", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩800,000~1,500,000",
+  uc3_b: { vehicle:"BMW 5시리즈", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩800,000~1,500,000",
     parts:[
       {id:"bumperF",label:"프론트 범퍼(좌측)",severity:"판금 도장",cost:"₩350,000",x:60,y:215,w:140,h:50,phase:1,color:"#f97316"},
       {id:"fenderL",label:"좌 프론트 펜더",severity:"판금 도장",cost:"₩450,000",x:55,y:155,w:55,h:50,phase:2,color:"#f97316"},
@@ -1607,25 +1607,51 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
   const fr=useRef(null);
   const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[vehTab,setVehTab]=useState(0);const[smsOpen,setSmsOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);const[dmgTab,setDmgTab]=useState(0);
 
-  const loadUC2=()=>{
-    setOrigin("국산");sMk("제네시스");sMd("GV80");sYr("2025");sMl("3000");
-    sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터","전방 카메라/센서"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc2");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
-    setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 전면부 광범위 파손 — 범퍼 ASSY 교체, 본넷 교체, 헤드라이트 교체 필요. 라디에이터 서포트 손상 의심."});
+  // ═══ 케이스별 자사A차 / 타사B차 정보 ═══
+  const CASE_CARS={
+    uc1:{
+      a:{origin:"국산",mk:"현대",md:"그랜저",yr:"2023",ml:"25138",
+        sp:["프론트 범퍼(상)","좌 프론트 펜더","좌 프론트 도어","좌 헤드라이트"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","좌 프론트 펜더","좌 프론트 도어","좌 헤드라이트"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 좌측 전면부 파손 — 교차로 충돌 패턴. 범퍼 판금, 펜더+도어 판금 교체, 헤드라이트 교체 필요."}},
+      b:{origin:"외산",mk:"BMW",md:"7시리즈",yr:"2023",ml:"15000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","우 프론트 펜더","우 헤드라이트","프론트 그릴","라디에이터"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","우 프론트 펜더","우 헤드라이트","프론트 그릴","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 타사 B차 우측 전면부 광범위 파손 — 교차로 측면 충돌. 범퍼 ASSY+펜더 교체, 헤드라이트 교체, 그릴+라디에이터 교체 필요."}},
+    },
+    uc2:{
+      a:{origin:"국산",mk:"현대",md:"그랜저",yr:"2024",ml:"8500",
+        sp:["프론트 범퍼(상)","우 헤드라이트","우 프론트 펜더"],
+        sv:"중간",ai:{parts:["프론트 범퍼(상)","우 헤드라이트","우 프론트 펜더"],severity:"중간",confidence:"높음",memo:"AI 분석: 자사 A차 우측 전면부 경미~중간 파손 — 주차장 충돌. 범퍼 판금도장, 펜더 판금도장, 헤드라이트 크랙 점검."}},
+      b:{origin:"국산",mk:"제네시스",md:"GV80",yr:"2025",ml:"3000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터","전방 카메라/센서"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","좌 헤드라이트","라디에이터"],severity:"심각",confidence:"높음",memo:"AI 분석: 타사 B차 전면부 광범위 파손 — 범퍼 ASSY 교체, 본넷 교체, 헤드라이트 교체 필요. 라디에이터 서포트 손상 의심."}},
+    },
+    uc3:{
+      a:{origin:"국산",mk:"현대",md:"그랜저",yr:"2022",ml:"35000",
+        sp:["리어 범퍼(상)","우 리어쿼터패널","우 리어 도어"],
+        sv:"중간",ai:{parts:["리어 범퍼(상)","우 리어쿼터패널"],severity:"중간",confidence:"보통",memo:"AI 분석: 자사 A차 우측 후방부 접촉 파손 — 차선변경 중 충돌. 범퍼 판금, 쿼터패널 판금 도장."}},
+      b:{origin:"외산",mk:"BMW",md:"5시리즈",yr:"2024",ml:"12000",
+        sp:["프론트 범퍼(상)","좌 프론트 펜더"],
+        sv:"중간",ai:{parts:["프론트 범퍼(상)","좌 프론트 펜더"],severity:"중간",confidence:"보통",memo:"AI 분석: 타사 B차 좌측 전면부 경미 접촉 — 직진 중 측면 접촉. 범퍼 판금도장, 펜더 판금도장."}},
+    },
   };
-  const loadUC1=()=>{
-    setOrigin("외산");sMk("BMW");sMd("7시리즈");sYr("2023");sMl("25000");
-    sSp(["프론트 범퍼(상)","프론트 범퍼(하/립)","좌 프론트 펜더","좌 프론트 도어","좌 헤드라이트","프론트 그릴"]);
-    sSv("심각");sRs(null);sAt("");setUseCase("uc1");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
-    setAiDetected({parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","좌 프론트 펜더","좌 프론트 도어","좌 헤드라이트"],severity:"심각",confidence:"높음",memo:"AI 분석: 좌측 전면부 광범위 파손 — 교차로 측면 충돌 패턴. 범퍼+펜더+도어 판금 교체, 헤드라이트 교체 필요."});
+  const applyCarInfo=(uc,side)=>{
+    const car=CASE_CARS[uc]?.[side];
+    if(!car)return;
+    setOrigin(car.origin);sMk(car.mk);sMd(car.md);sYr(car.yr);sMl(car.ml);
+    sSp(car.sp);sSv(car.sv);sRs(null);sAt("");
+    setAiDetected(car.ai);
   };
-  const loadUC3=()=>{
-    setOrigin("전체");sMk("");sMd("");sYr("");sMl("");
-    sSp(["리어 범퍼(상)","우 리어쿼터패널","우 리어 도어"]);
-    sSv("중간");sRs(null);sAt("");setUseCase("uc3");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
-    setAiDetected({parts:["리어 범퍼(상)","우 리어쿼터패널"],severity:"중간",confidence:"보통",memo:"AI 분석: 우측 후방부 접촉 파손 — 차선변경 중 충돌. 범퍼 판금, 쿼터패널 판금 도장."});
-  };
+
+  const loadUC1=()=>{applyCarInfo("uc1","a");setUseCase("uc1");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);};
+  const loadUC2=()=>{applyCarInfo("uc2","b");setUseCase("uc2");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);};
+  const loadUC3=()=>{applyCarInfo("uc3","a");setUseCase("uc3");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);};
   const clearUC=()=>{setUseCase(null);sMk("");sMd("");sYr("");sMl("");sSp([]);sSv("중간");sRs(null);sAt("");setAiDetected(null);setOrigin("전체");setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);};
+  // dmgTab 전환 시 차량정보+파손부위+파손정도 연동
+  useEffect(()=>{
+    if(!useCase)return;
+    const side=dmgTab===0?"a":"b";
+    applyCarInfo(useCase,side);
+  },[dmgTab]);
   useEffect(()=>{
     if(activeCase==="uc1")loadUC1();else if(activeCase==="uc2")loadUC2();else if(activeCase==="uc3")loadUC3();else clearUC();
   },[activeCase]);
