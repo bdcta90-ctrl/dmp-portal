@@ -4365,6 +4365,7 @@ function TabData(){
   const[dataView,setDataView]=useState("explorer");// "explorer" or "map" or "ontology"
   const[expandedMap,setExpandedMap]=useState(null);
   const[graphMode,setGraphMode]=useState("default");// "default" or "detail"
+  const[expandedRule,setExpandedRule]=useState(null);
   const fileRef=useRef(null);
   const PER=100;
   const ds=DATASETS[DK[dk]];
@@ -4736,38 +4737,88 @@ function TabData(){
       </div>
 
       {/* ═══ 추론 규칙 R01~R15 (카테고리별 그룹) ═══ */}
-      <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
-        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:12}}>
-          <span style={{fontSize:14}}>⚙️</span>
-          <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 15개</span>
-          <span style={{fontSize:10,color:"#94a3b8"}}>— 우선순위: </span>
-          {[{p:0,l:"P0 최우선",c:"#dc2626"},{p:1,l:"P1 높음",c:"#d97706"},{p:2,l:"P2 보통",c:"#2563eb"},{p:3,l:"P3 참고",c:"#94a3b8"}].map(p=>(
-            <span key={p.p} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:p.c+"12",color:p.c,fontWeight:700,border:`1px solid ${p.c}20`}}>● {p.l}</span>))}
-        </div>
-        {["대인","견적","과실","보험","처리"].map(cat=>{
-          const catCol={대인:"#7c3aed",견적:"#0891b2",과실:"#6366f1",보험:"#b45309",처리:"#059669"}[cat];
-          const catRules=ONTOLOGY.rules.filter(r=>r.cat===cat);
-          return<div key={cat} style={{marginBottom:10}}>
-            <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:5}}>
-              <div style={{width:4,height:16,borderRadius:2,background:catCol}}/>
-              <span style={{fontSize:10.5,fontWeight:700,color:catCol}}>{cat} ({catRules.length}개)</span></div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,paddingLeft:9}}>
-              {catRules.map(rule=>{const priCol={0:"#dc2626",1:"#d97706",2:"#2563eb",3:"#94a3b8"}[rule.priority];
-                return<div key={rule.id} style={{padding:"8px 12px",borderRadius:10,background:"#fafbfc",border:`1.5px solid ${catCol}15`,display:"flex",alignItems:"center",gap:8,transition:"all .15s"}}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor=catCol;e.currentTarget.style.background=catCol+"06";e.currentTarget.style.transform="translateY(-1px)";}}
-                  onMouseLeave={e=>{e.currentTarget.style.borderColor=catCol+"15";e.currentTarget.style.background="#fafbfc";e.currentTarget.style.transform="none";}}>
-                  <div style={{minWidth:36,textAlign:"center"}}>
-                    <div style={{fontSize:11,fontWeight:800,color:catCol,fontFamily:"'DM Mono',monospace"}}>{rule.id}</div>
-                    <div style={{width:8,height:8,borderRadius:"50%",background:priCol,margin:"3px auto 0",boxShadow:`0 0 4px ${priCol}40`}}/>
-                  </div>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:10.5,fontWeight:700,color:"#0f172a"}}>{rule.name}</div>
-                    <div style={{fontSize:8.5,color:"#94a3b8"}}>우선순위 P{rule.priority} · IF→THEN 체인</div>
-                  </div>
-                </div>;})}
-            </div>
-          </div>;})}
-      </div>
+      {(()=>{
+        const RULE_DETAILS={
+          R01:{ifText:"상해등급이 12~14급(경상) AND 치료기간 > 28일(4주)",thenText:"진단서 제출 의무 발동 → 진단서 없으면 4주 초과 치료비 불인정",example:"Case 3: 12급 경추염좌 환자가 35일 치료 → R01 발동 → \"4주 초과, 진단서 제출하세요\"",clause:"보통약관 별표1, 경상환자 제도 (2023.1.1 시행)",related:["R12"],entities:["피해자","보험"]},
+          R02:{ifText:"수리비 ≥ 차량가액 × 80%",thenText:"전부손해 검토 필요 → 전부손해 확정 시 자기부담금 면제(R09 연쇄)",example:"20년식 아반떼 가액 ₩12M, 수리비 ₩10M(83%) → R02 발동 → 전부손해 검토",clause:"보통약관 제24조 (자기차량손해)",related:["R09"],entities:["견적","보험"]},
+          R03:{ifText:"품질인증부품 사용 = true AND 경미손상 아님",thenText:"OEM 부품 공시가격의 25%를 피보험자에게 인센티브 지급",example:"Case 2: GV80 범퍼를 품질인증부품으로 교체 → 부품가 ₩638만 × 25% = ₩159만 환급",clause:"2025.08.16 개정 약관 (품질인증부품 활성화)",related:[],entities:["견적"]},
+          R04:{ifText:"사고유형이 존재하면 (교차로/차선변경/후미추돌/좌회전/유턴 등)",thenText:"손해보험협회 과실비율 인정기준에 따라 기본 과실 자동 산정",example:"Case 1: \"교차로 골목길 충돌\" → R04 발동 → 기본 50:50 산정",clause:"별표3 과실상계, accident.knia.or.kr",related:["R13"],entities:["사고","과실"]},
+          R05:{ifText:"음주운전 = true",thenText:"자기차량손해 면책(미보상) + 대인Ⅱ·대물 보험금의 10~20% 사고부담금",example:"음주 사고 → R05 발동 → 자차 수리비 전액 본인부담 + 상대방 보상의 10~20% 추가 부담",clause:"보통약관 제11조 (사고부담금)",related:["R06"],entities:["보험"]},
+          R06:{ifText:"무면허운전 = true",thenText:"자기차량손해 면책 + 대인Ⅱ·대물 20% 사고부담금",example:"무면허 사고 → R06 발동 → R05와 유사하나 부담금률 고정 20%",clause:"보통약관 제11조",related:["R05"],entities:["보험"]},
+          R07:{ifText:"요구 렌트등급 > 차량 동종동급",thenText:"렌트 부적정 판정 + 동종동급으로 정정 시 절감액 산출",example:"Case 1: BMW 7시리즈 렌트 요구(일₩37.5만) → 5시리즈 동급(일₩22.5만) → 일 ₩15만 절감",clause:"대법원 '동종·동급' 원칙, 별표2 대차료 기준",related:[],entities:["보험","처리"]},
+          R08:{ifText:"12대 중과실 사고 = true",thenText:"종합보험 가입 시에도 형사처벌 면제 불가 → 리스크 경고",example:"신호위반 사고 → R08 발동 → \"12대 중과실 해당, 형사처벌 가능\" 경고",clause:"교통사고처리특례법 제3조 제2항",related:["R04"],entities:["과실"]},
+          R09:{ifText:"자기차량손해 = true AND 손해액 > 0",thenText:"손해액 × 20% → 최소 ₩20만 ~ 최대 ₩50만 자기부담금 산출 (전부손해 시 면제)",example:"Case 1: 손해액 ₩5,000,000 × 20% = ₩1,000,000 → 최대 캡 ₩500,000 적용",clause:"보통약관 제24조",related:["R02"],entities:["보험"]},
+          R10:{ifText:"차량이 외산(수입차) = true",thenText:"부품가격 배수 ×1.6 적용 (슈퍼카는 ×3.0)",example:"Case 1: BMW 7시리즈(외산) → R10 발동 → 국산 부품가 대비 ×1.6 자동 반영",clause:"업계 관행 (OEM 부품 단가 차이)",related:["R03"],entities:["견적"]},
+          R11:{ifText:"차량 출고 후 ≤ 6개월 AND 파손 정도 = 심각",thenText:"신차 감가 청구 가능성 경고 + 차량가액의 10~15% 추가 청구 대비",example:"Case 2: GV80 출고 3개월 + 전면 심각 파손 → 가액₩8,400만 × 10~15% = ₩840~1,260만 대비",clause:"대법원 판례 (감가상각)",related:[],entities:["처리"]},
+          R12:{ifText:"상해등급 1~14급 존재",thenText:"해당 등급의 대인배상Ⅰ 책임보험금 한도 자동 조회 + 경상/중상 구분",example:"Case 1: 경추염좌 12급 → R12 발동 → 대인Ⅰ 한도 ₩15,000,000, 경상환자 해당",clause:"자배법 시행령 별표1 (2016.4.1 이후)",related:["R01","R14"],entities:["피해자","보험"]},
+          R13:{ifText:"자사 과실 > 0 AND 타사 과실 > 0 AND 타사 총비용 > 0",thenText:"타사 손해액 × 자사 과실비율 = 자사 실부담 자동 계산",example:"Case 1: 타사 ₩25,000,000 × 자사 50% = 자사 부담 ₩12,500,000",clause:"별표3 과실상계",related:["R04"],entities:["과실","보험"]},
+          R14:{ifText:"동승자 유형이 존재 AND 유형 ≠ 업무",thenText:"동승자 유형별 감액률 적용 (무단 100%, 음주동승 40%, 요청 30%, 호의 20%)",example:"음주운전 차량에 알면서 동승 → R14 발동 → 대인 보상 40% 감액",clause:"별표5 동승자 유형별 감액비율표",related:["R12"],entities:["피해자"]},
+          R15:{ifText:"보험금 청구 서류 접수 = true",thenText:"10일 이내 지급 여부 결정 의무 → 지연 시 보험계약대출이율 가산",example:"합의 완료 후 서류 접수 → R15 발동 → \"10일 이내 지급 결정\" 타임라인 시작",clause:"보통약관 제35조",related:[],entities:["처리"]},
+        };
+        return <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+            <span style={{fontSize:14}}>⚙️</span>
+            <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 15개</span>
+            <span style={{fontSize:10,color:"#94a3b8"}}>— 클릭하면 IF→THEN 조건과 적용 예시를 볼 수 있습니다</span>
+          </div>
+          <div style={{display:"flex",gap:4,marginBottom:12}}>
+            {[{p:0,l:"P0 최우선",c:"#dc2626"},{p:1,l:"P1 높음",c:"#d97706"},{p:2,l:"P2 보통",c:"#2563eb"},{p:3,l:"P3 참고",c:"#94a3b8"}].map(p=>(
+              <span key={p.p} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:p.c+"12",color:p.c,fontWeight:700,border:`1px solid ${p.c}20`}}>● {p.l}</span>))}
+          </div>
+          {["대인","견적","과실","보험","처리"].map(cat=>{
+            const catCol={대인:"#7c3aed",견적:"#0891b2",과실:"#6366f1",보험:"#b45309",처리:"#059669"}[cat];
+            const catRules=ONTOLOGY.rules.filter(r=>r.cat===cat);
+            return<div key={cat} style={{marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:5}}>
+                <div style={{width:4,height:16,borderRadius:2,background:catCol}}/>
+                <span style={{fontSize:10.5,fontWeight:700,color:catCol}}>{cat} ({catRules.length}개)</span></div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,paddingLeft:9}}>
+                {catRules.map(rule=>{const priCol={0:"#dc2626",1:"#d97706",2:"#2563eb",3:"#94a3b8"}[rule.priority];const isOpen=expandedRule===rule.id;const det=RULE_DETAILS[rule.id];
+                  return<div key={rule.id}>
+                    <div onClick={()=>setExpandedRule(isOpen?null:rule.id)} style={{padding:"8px 12px",borderRadius:isOpen?"10px 10px 0 0":10,background:isOpen?catCol+"06":"#fafbfc",border:`1.5px solid ${isOpen?catCol:catCol+"15"}`,display:"flex",alignItems:"center",gap:8,cursor:"pointer",transition:"all .15s"}}
+                      onMouseEnter={e=>{if(!isOpen){e.currentTarget.style.borderColor=catCol;e.currentTarget.style.background=catCol+"06";}}}
+                      onMouseLeave={e=>{if(!isOpen){e.currentTarget.style.borderColor=catCol+"15";e.currentTarget.style.background="#fafbfc";}}}>
+                      <div style={{minWidth:36,textAlign:"center"}}>
+                        <div style={{fontSize:11,fontWeight:800,color:catCol,fontFamily:"'DM Mono',monospace"}}>{rule.id}</div>
+                        <div style={{width:8,height:8,borderRadius:"50%",background:priCol,margin:"3px auto 0",boxShadow:`0 0 4px ${priCol}40`}}/>
+                      </div>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:10.5,fontWeight:700,color:"#0f172a"}}>{rule.name}</div>
+                        <div style={{fontSize:8.5,color:"#94a3b8"}}>P{rule.priority} · {rule.cat} · 클릭하여 상세 보기</div>
+                      </div>
+                      <span style={{fontSize:10,color:catCol,transform:isOpen?"rotate(180deg)":"none",transition:"transform .2s"}}>▼</span>
+                    </div>
+                    {/* ═══ 펼침 상세 패널 ═══ */}
+                    {isOpen&&det&&<div style={{padding:"12px 14px",background:"#fff",border:`1.5px solid ${catCol}`,borderTop:"none",borderRadius:"0 0 10px 10px",animation:"fadeIn .2s"}}>
+                      {/* IF → THEN */}
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 24px 1fr",gap:6,marginBottom:10}}>
+                        <div style={{padding:"8px 10px",borderRadius:8,background:"#fef3c7",border:"1px solid #fde68a"}}>
+                          <div style={{fontSize:8.5,fontWeight:700,color:"#92400e",marginBottom:3}}>IF (조건)</div>
+                          <div style={{fontSize:9.5,color:"#78350f",lineHeight:1.6}}>{det.ifText}</div>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:catCol}}>→</div>
+                        <div style={{padding:"8px 10px",borderRadius:8,background:catCol+"08",border:`1px solid ${catCol}20`}}>
+                          <div style={{fontSize:8.5,fontWeight:700,color:catCol,marginBottom:3}}>THEN (결과)</div>
+                          <div style={{fontSize:9.5,color:"#334155",lineHeight:1.6}}>{det.thenText}</div>
+                        </div>
+                      </div>
+                      {/* 적용 예시 */}
+                      <div style={{padding:"8px 10px",borderRadius:8,background:"#f0fdf4",border:"1px solid #bbf7d0",marginBottom:8}}>
+                        <div style={{fontSize:8.5,fontWeight:700,color:"#059669",marginBottom:3}}>💡 적용 예시</div>
+                        <div style={{fontSize:9.5,color:"#334155",lineHeight:1.6}}>{det.example}</div>
+                      </div>
+                      {/* 하단: 약관 근거 + 연관 규칙 + 관련 엔티티 */}
+                      <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
+                        <span style={{fontSize:8,padding:"3px 8px",borderRadius:5,background:"#f1f5f9",border:"1px solid #e2e8f0",color:"#475569",fontWeight:600}}>📌 {det.clause}</span>
+                        {det.related.length>0&&det.related.map(r=><span key={r} style={{fontSize:8,padding:"3px 8px",borderRadius:5,background:catCol+"08",border:`1px solid ${catCol}20`,color:catCol,fontWeight:700,cursor:"pointer"}} onClick={e=>{e.stopPropagation();setExpandedRule(r);}}>🔗 {r}</span>)}
+                        {det.entities.map(eid=>{const ent=ONTOLOGY.entities[eid];return ent?<span key={eid} style={{fontSize:8,padding:"3px 8px",borderRadius:5,background:ent.color+"08",border:`1px solid ${ent.color}20`,color:ent.color,fontWeight:600}}>{ent.icon} {eid}</span>:null;})}
+                      </div>
+                    </div>}
+                  </div>;})}
+              </div>
+            </div>;})}
+        </div>;
+      })()}
 
       {/* ═══ RAG vs 온톨로지 — 일반 비교 ═══ */}
       <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
