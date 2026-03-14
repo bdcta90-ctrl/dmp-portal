@@ -4520,10 +4520,10 @@ function TabData(){
     {/* ═══ 뷰 전환 토글 ═══ */}
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
       <div style={{display:"flex",background:"#f1f5f9",borderRadius:10,padding:3}}>
-        {[{id:"explorer",l:"📊 DB 탐색기"},{id:"map",l:"🗺️ 데이터 구조 맵"}].map(v=>(
+        {[{id:"explorer",l:"📊 DB 탐색기"},{id:"map",l:"🗺️ 데이터 구조 맵"},{id:"ontology",l:"🧠 온톨로지 센터"}].map(v=>(
           <button key={v.id} onClick={()=>setDataView(v.id)} style={{padding:"7px 16px",borderRadius:8,border:"none",fontSize:12,fontWeight:dataView===v.id?700:500,background:dataView===v.id?"#fff":"transparent",color:dataView===v.id?"#0f172a":"#94a3b8",cursor:"pointer",boxShadow:dataView===v.id?"0 1px 3px rgba(0,0,0,.06)":"none",transition:"all .15s"}}>{v.l}</button>))}
       </div>
-      {dataView==="map"&&<button onClick={downloadDataMap} style={{padding:"6px 14px",borderRadius:8,border:"1.5px solid #6366f140",background:"#6366f108",color:"#6366f1",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📥 데이터맵 다운로드 (xlsx)</button>}
+      {(dataView==="map"||dataView==="ontology")&&<button onClick={downloadDataMap} style={{padding:"6px 14px",borderRadius:8,border:"1.5px solid #6366f140",background:"#6366f108",color:"#6366f1",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4}}>📥 데이터맵 다운로드 (xlsx)</button>}
     </div>
     {/* ═══ 데이터 구조 맵 뷰 ═══ */}
     {dataView==="map"&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
@@ -4584,155 +4584,6 @@ function TabData(){
               </div>);})}
           </div>
         </div>))}
-      {/* ═══ 온톨로지 추론 엔진 (재설계) ═══ */}
-      <div style={{marginBottom:16}}>
-        {/* 헤더 */}
-        <div style={{padding:"16px 20px",borderRadius:"14px 14px 0 0",background:"#fff",border:"1px solid #e2e8f0",borderBottom:"2px solid #6366f1",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <div style={{width:40,height:40,borderRadius:12,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:"#fff"}}>🧠</div>
-            <div><div style={{fontSize:15,fontWeight:800,color:"#0f172a"}}>온톨로지 추론 엔진</div>
-              <div style={{fontSize:10.5,color:"#64748b"}}>15개 추론 규칙 · 10개 엔티티 · 12개 관계 — IF-THEN 체인 기반 자동 판단</div></div>
-          </div>
-          <div style={{display:"flex",gap:6}}>
-            {[{v:"10",l:"엔티티",c:"#2563eb"},{v:"12",l:"관계",c:"#7c3aed"},{v:"15",l:"규칙",c:"#059669"}].map((s,i)=>(
-              <div key={i} style={{textAlign:"center",padding:"4px 10px",borderRadius:8,background:s.c+"08",border:`1px solid ${s.c}20`}}>
-                <div style={{fontSize:14,fontWeight:800,color:s.c}}>{s.v}</div>
-                <div style={{fontSize:8,color:"#94a3b8"}}>{s.l}</div></div>))}
-          </div>
-        </div>
-        {/* 지식 그래프 */}
-        <div style={{padding:"16px 20px",background:"#fafbfc",border:"1px solid #e2e8f0",borderTop:"none"}}>
-          <div style={{fontSize:11,fontWeight:700,color:"#475569",marginBottom:10}}>📊 지식 그래프 (Knowledge Graph)</div>
-          <div style={{position:"relative",height:240,background:"#fff",borderRadius:12,border:"1px solid #e2e8f0",overflow:"hidden"}}>
-            {/* 배경 그리드 */}
-            <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"30px 30px",opacity:.4}}/>
-            {/* 관계선 + 라벨 */}
-            <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
-              <defs><marker id="ah" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0 0, 6 2, 0 4" fill="#94a3b8"/></marker></defs>
-              {[{x1:50,y1:38,x2:22,y2:18,l:"involves"},{x1:50,y1:38,x2:78,y2:18,l:"involves"},{x1:50,y1:38,x2:50,y2:8,l:"causes"},
-                {x1:50,y1:38,x2:30,y2:68,l:"determines"},{x1:22,y1:18,x2:10,y2:50,l:"has_damage"},{x1:78,y1:18,x2:90,y2:50,l:"has_damage"},
-                {x1:10,y1:50,x2:70,y2:68,l:"calculates"},{x1:90,y1:50,x2:70,y2:68,l:"calculates"},
-                {x1:50,y1:8,x2:50,y2:82,l:"triggers"},{x1:30,y1:68,x2:50,y2:82,l:"applies"},
-                {x1:70,y1:68,x2:50,y2:82,l:"validates"},{x1:50,y1:82,x2:50,y2:96,l:"produces"}
-              ].map((l,i)=><g key={i}>
-                <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke="#cbd5e1" strokeWidth="1.5" markerEnd="url(#ah)"/>
-                <text x={(l.x1+l.x2)/2+"%"} y={(l.y1+l.y2)/2+"%"} fill="#94a3b8" fontSize="7" textAnchor="middle" dy="-3">{l.l}</text>
-              </g>)}
-            </svg>
-            {/* 엔티티 노드 */}
-            {[{id:"사고",x:50,y:38},{id:"차량A",x:22,y:18},{id:"차량B",x:78,y:18},{id:"파손A",x:10,y:50},{id:"파손B",x:90,y:50},
-              {id:"피해자",x:50,y:8},{id:"과실",x:30,y:68},{id:"견적",x:70,y:68},{id:"보험",x:50,y:82},{id:"처리",x:50,y:96}
-            ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
-              return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:2}}>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
-                  <div style={{width:38,height:38,borderRadius:10,background:"#fff",border:`2px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:"0 2px 8px rgba(0,0,0,.08)"}}>{ent.icon}</div>
-                  <div style={{background:"#fff",padding:"1px 6px",borderRadius:4,border:`1px solid ${ent.color}30`,boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>
-                    <span style={{fontSize:8,fontWeight:700,color:ent.color}}>{n.id}</span></div>
-                </div></div>;})}
-          </div>
-        </div>
-        {/* 추론 규칙 R01~R15 */}
-        <div style={{padding:"14px 20px",background:"#fff",border:"1px solid #e2e8f0",borderTop:"none"}}>
-          <div style={{fontSize:11,fontWeight:700,color:"#475569",marginBottom:8}}>⚙️ 추론 규칙 15개 (IF → THEN 체인)</div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
-            {ONTOLOGY.rules.map(rule=>{const catCol={대인:"#7c3aed",견적:"#0891b2",과실:"#6366f1",보험:"#b45309",처리:"#059669"}[rule.cat]||"#64748b";
-              const priCol={0:"#dc2626",1:"#d97706",2:"#2563eb",3:"#94a3b8"}[rule.priority];
-              return<div key={rule.id} style={{padding:"7px 10px",borderRadius:9,background:"#fafbfc",border:`1.5px solid ${catCol}20`,display:"flex",alignItems:"center",gap:7,transition:"all .15s"}}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor=catCol;e.currentTarget.style.background=catCol+"08";}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor=catCol+"20";e.currentTarget.style.background="#fafbfc";}}>
-                <div style={{minWidth:30,textAlign:"center"}}>
-                  <div style={{fontSize:10,fontWeight:800,color:catCol}}>{rule.id}</div>
-                  <div style={{width:6,height:6,borderRadius:"50%",background:priCol,margin:"2px auto 0"}}/>
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{fontSize:9.5,fontWeight:700,color:"#0f172a"}}>{rule.name}</div>
-                  <div style={{fontSize:8,color:"#94a3b8"}}>{rule.cat} · P{rule.priority}</div>
-                </div>
-              </div>;})}
-          </div>
-        </div>
-        {/* Case 1/2/3별 RAG vs 온톨로지 비교 */}
-        <div style={{padding:"16px 20px",background:"#f8fafc",border:"1px solid #e2e8f0",borderTop:"none",borderRadius:"0 0 14px 14px"}}>
-          <div style={{fontSize:12,fontWeight:800,color:"#0f172a",marginBottom:12}}>🔬 RAG vs 온톨로지 — Case별 비교</div>
-          {/* 일반 비교 */}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-            <div style={{padding:"12px 14px",borderRadius:10,background:"#fff",border:"1px solid #fecaca"}}>
-              <div style={{fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:6}}>📚 기존 RAG</div>
-              <div style={{fontSize:10,color:"#64748b",lineHeight:1.7}}>PDF에서 키워드 검색 → 텍스트 조각 반환<br/>
-                "14급이 뭐야?" → 해당 문단만 반환<br/>
-                <b style={{color:"#dc2626"}}>한계:</b> 여러 조건이 결합된 판단 불가<br/>
-                약관 A 페이지 + B 페이지 + C 페이지 연결 못함</div>
-            </div>
-            <div style={{padding:"12px 14px",borderRadius:10,background:"#fff",border:"1px solid #86efac"}}>
-              <div style={{fontSize:11,fontWeight:700,color:"#059669",marginBottom:6}}>🧠 온톨로지 추론</div>
-              <div style={{fontSize:10,color:"#64748b",lineHeight:1.7}}>엔티티 관계 + IF-THEN 규칙 → 추론 체인 작동<br/>
-                "14급 + 4주초과 + 과실50%?" → R01→R12→R13 체인<br/>
-                <b style={{color:"#059669"}}>강점:</b> 조건 조합별 자동 판단 도출<br/>
-                약관 전체를 구조화하여 관계 기반 추론 가능</div>
-            </div>
-          </div>
-          {/* Case별 상세 비교 */}
-          {[{case_:"Case 1: 교차로 충돌 (그랜저 vs BMW 7시리즈)",color:"#dc2626",
-              rag:[
-                "\"교차로 과실비율\" 검색 → 약관 50:50 문단 반환 (끝)",
-                "\"BMW 수리비 적정\" → 관련 문단 없음 (PDF에 개별 차종 수리비 없음)",
-                "\"렌트 동종동급\" → 약관 문구만 반환, 7시리즈→5시리즈 정정은 판단 불가",
-                "\"대인 5명 일괄합의\" → 일괄합의 개념 자체가 PDF에 없음",
-              ],
-              onto:[
-                {rule:"R04",text:"사고유형 [교차로 골목길] → 자동으로 기본 과실 50:50 산정"},
-                {rule:"R10",text:"BMW(외산) → ×1.6 배수 자동 적용 → 수리비 적정성 검증 근거"},
-                {rule:"R07",text:"7시리즈 렌트 요구 > 동급 → 자동 부적정 판정 + 절감액 산출"},
-                {rule:"R12+R13",text:"상해12급 + 과실50% → 대인Ⅰ 한도₩15M + 상계₩12.5M 자동 계산"},
-                {rule:"R09",text:"자기부담금 ₩5M × 20% → ₩500,000 자동 산출 (최대 캡)"},
-              ]},
-            {case_:"Case 2: 주차장 신차 충돌 (그랜저 vs GV80 3개월)",color:"#f59e0b",
-              rag:[
-                "\"100% 과실 자기부담금\" → 약관 조항은 반환하지만 실제 계산은 못함",
-                "\"신차 감가\" → 판례 정보 PDF에 없으면 답변 불가",
-                "\"품질인증부품 인센티브\" → 2025.08.16 개정 내용을 찾더라도 OEM 25% 적용 계산은 불가",
-              ],
-              onto:[
-                {rule:"R11",text:"출고 3개월(0.25년) + 심각 파손 → 신차감가 자동 경고 + ₩8.4M~12.6M 청구 대비"},
-                {rule:"R03",text:"품질인증부품 적용 시 → OEM 25% 인센티브 = ₩1,595,000 자동 산출"},
-                {rule:"R09",text:"₩1,830,000 × 20% = ₩366,000 → 최소₩200,000 적용 → 자기부담금 자동 산출"},
-              ]},
-            {case_:"Case 3: 차선변경 과실 분쟁 (A차 vs B차)",color:"#7c3aed",
-              rag:[
-                "\"차선변경 과실\" → 70:30 문구만 반환, 급차선변경 시 80~90% 조정은 판단 불가",
-                "\"경상환자 진단서\" → 4주 규정은 찾을 수 있지만, 해당 건이 경상환자인지는 판단 불가",
-                "\"타사 10:0 주장 반박\" → 판례 기반 반박 논리 구성 불가",
-              ],
-              onto:[
-                {rule:"R04",text:"차선변경 충돌 → 기본 70:30 산정 + 급변경 시 80~90% 자동 조정"},
-                {rule:"R01",text:"상해12급 + 치료21일(4주 미만) → 진단서 의무 해당 없음 자동 판정"},
-                {rule:"R13",text:"과실 85:15 → 타사 손해₩5M × 85% = ₩4,250,000 자사 부담 자동 계산"},
-                {rule:"R12",text:"12급 → 대인Ⅰ 한도 ₩15,000,000 자동 조회 + 경상환자 구분"},
-              ]},
-          ].map((cs,ci)=>(
-            <div key={ci} style={{marginBottom:12,borderRadius:11,overflow:"hidden",border:`1.5px solid ${cs.color}25`}}>
-              <div style={{padding:"8px 14px",background:cs.color+"08",borderBottom:`1px solid ${cs.color}15`,display:"flex",alignItems:"center",gap:6}}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:cs.color}}/>
-                <span style={{fontSize:11.5,fontWeight:700,color:cs.color}}>{cs.case_}</span></div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",minHeight:0}}>
-                {/* RAG */}
-                <div style={{padding:"10px 14px",borderRight:`1px solid ${cs.color}15`,background:"#fff"}}>
-                  <div style={{fontSize:9,fontWeight:700,color:"#dc2626",marginBottom:6}}>📚 RAG가 할 수 있는 것</div>
-                  {cs.rag.map((r,ri)=><div key={ri} style={{display:"flex",gap:5,marginBottom:4,alignItems:"flex-start"}}>
-                    <span style={{color:"#dc2626",fontSize:8,marginTop:2,flexShrink:0}}>✗</span>
-                    <span style={{fontSize:9,color:"#64748b",lineHeight:1.5}}>{r}</span></div>)}
-                </div>
-                {/* 온톨로지 */}
-                <div style={{padding:"10px 14px",background:"#f0fdf4"}}>
-                  <div style={{fontSize:9,fontWeight:700,color:"#059669",marginBottom:6}}>🧠 온톨로지가 추가로 할 수 있는 것</div>
-                  {cs.onto.map((o,oi)=><div key={oi} style={{display:"flex",gap:5,marginBottom:4,alignItems:"flex-start"}}>
-                    <span style={{fontSize:8,padding:"1px 4px",borderRadius:3,background:"#059669",color:"#fff",fontWeight:700,flexShrink:0,marginTop:1}}>{o.rule}</span>
-                    <span style={{fontSize:9,color:"#334155",lineHeight:1.5}}>{o.text}</span></div>)}
-                </div>
-              </div>
-            </div>))}
-        </div>
-      </div>
       {/* 하단 요약 */}
       <div style={{padding:"14px 18px",borderRadius:12,background:"#f8fafc",border:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.6}}>
@@ -4740,6 +4591,175 @@ function TabData(){
           <strong style={{color:"#0f172a"}}>약관 출처:</strong> 삼성화재 개인용 자동차보험약관 (2025.08.16) + 현대해상 Hicar 업무용 약관 (2026.08.16)
         </div>
         <button onClick={downloadDataMap} style={{padding:"8px 16px",borderRadius:8,background:"#6366f1",color:"#fff",border:"none",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,flexShrink:0}}>📥 전체 데이터맵 다운로드</button>
+      </div>
+    </div>}
+    {/* ═══ 온톨로지 센터 탭 ═══ */}
+    {dataView==="ontology"&&<div style={{flex:1,overflowY:"auto",animation:"fadeIn .3s"}}>
+      {/* 헤더 */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px",background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",marginBottom:14}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:48,height:48,borderRadius:14,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,color:"#fff",boxShadow:"0 4px 12px rgba(99,102,241,.3)"}}>🧠</div>
+          <div><div style={{fontSize:17,fontWeight:800,color:"#0f172a"}}>온톨로지 추론 센터</div>
+            <div style={{fontSize:11,color:"#64748b"}}>엔티티 관계 기반 IF-THEN 추론 체인 · 사고 데이터 입력 시 15개 규칙 자동 평가</div></div>
+        </div>
+        <div style={{display:"flex",gap:8}}>
+          {[{v:"10",l:"엔티티",c:"#2563eb"},{v:"12",l:"관계",c:"#7c3aed"},{v:"15",l:"규칙",c:"#059669"},{v:"3",l:"Case",c:"#f59e0b"}].map((s,i)=>(
+            <div key={i} style={{textAlign:"center",padding:"6px 14px",borderRadius:10,background:s.c+"08",border:`1.5px solid ${s.c}20`}}>
+              <div style={{fontSize:18,fontWeight:800,color:s.c,fontFamily:"'DM Mono',monospace"}}>{s.v}</div>
+              <div style={{fontSize:8.5,color:"#94a3b8",fontWeight:600}}>{s.l}</div></div>))}
+        </div>
+      </div>
+
+      {/* ═══ 확대 지식 그래프 ═══ */}
+      <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",marginBottom:14,overflow:"hidden"}}>
+        <div style={{padding:"12px 20px",borderBottom:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{width:7,height:7,borderRadius:"50%",background:"#6366f1"}}/>
+            <span style={{fontSize:12.5,fontWeight:700,color:"#0f172a"}}>지식 그래프 (Knowledge Graph)</span></div>
+          <div style={{display:"flex",gap:4}}>
+            {[{c:"#2563eb",l:"object"},{c:"#dc2626",l:"event"},{c:"#7c3aed",l:"ratio"},{c:"#059669",l:"money"},{c:"#b45309",l:"contract"}].map((t,i)=>(
+              <span key={i} style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:t.c+"10",color:t.c,fontWeight:600,border:`1px solid ${t.c}20`}}>{t.l}</span>))}
+          </div>
+        </div>
+        <div style={{position:"relative",height:380,background:"#fafbfc",overflow:"hidden"}}>
+          {/* 도트 그리드 배경 */}
+          <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"24px 24px",opacity:.5}}/>
+          {/* ═══ 관계선 (SVG) + 라벨 ═══ */}
+          <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
+            <defs>
+              <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/></marker>
+              <marker id="arrowB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+              <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker>
+              <marker id="arrowP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7c3aed"/></marker>
+              <marker id="arrowT" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0891b2"/></marker>
+              <marker id="arrowE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#059669"/></marker>
+            </defs>
+            {/* 관계선 데이터: from→to, 라벨, 색상 */}
+            {[
+              {x1:50,y1:32,x2:24,y2:16, l:"involves (자사)", c:"#2563eb", m:"arrowB"},
+              {x1:50,y1:32,x2:76,y2:16, l:"involves (타사)", c:"#dc2626", m:"arrowR"},
+              {x1:50,y1:32,x2:50,y2:7,  l:"causes (피해발생)", c:"#7c3aed", m:"arrowP"},
+              {x1:50,y1:32,x2:24,y2:55, l:"determines (과실결정)", c:"#6366f1", m:"arrowP"},
+              {x1:24,y1:16,x2:10,y2:40, l:"has_damage", c:"#0891b2", m:"arrowT"},
+              {x1:76,y1:16,x2:90,y2:40, l:"has_damage", c:"#f97316", m:"arrowG"},
+              {x1:10,y1:40,x2:40,y2:55, l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
+              {x1:90,y1:40,x2:60,y2:55, l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
+              {x1:50,y1:7,x2:50,y2:72,  l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
+              {x1:24,y1:55,x2:40,y2:72, l:"applies (과실상계)", c:"#6366f1", m:"arrowP"},
+              {x1:50,y1:55,x2:50,y2:72, l:"validates (적정성검증)", c:"#059669", m:"arrowE"},
+              {x1:50,y1:72,x2:50,y2:92, l:"produces (처리안도출)", c:"#059669", m:"arrowE"},
+            ].map((l,i)=><g key={i}>
+              <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke={l.c} strokeWidth="1.5" strokeOpacity=".5" markerEnd={`url(#${l.m})`}/>
+              <rect x={((l.x1+l.x2)/2-0.1)+"%"} y={((l.y1+l.y2)/2-1.5)+"%"} width={Math.max(l.l.length*3.5,40)} height="14" rx="4" fill="#fff" stroke={l.c} strokeWidth=".5" strokeOpacity=".4" transform={`translate(-${Math.max(l.l.length*1.7,20)},0)`}/>
+              <text x={((l.x1+l.x2)/2)+"%"} y={((l.y1+l.y2)/2+0.8)+"%"} fill={l.c} fontSize="7.5" fontWeight="600" textAnchor="middle">{l.l}</text>
+            </g>)}
+          </svg>
+          {/* ═══ 엔티티 노드 (확대) ═══ */}
+          {[
+            {id:"사고",    x:50, y:32, w:70},
+            {id:"차량A",   x:24, y:16, w:60},
+            {id:"차량B",   x:76, y:16, w:60},
+            {id:"파손A",   x:10, y:40, w:56},
+            {id:"파손B",   x:90, y:40, w:56},
+            {id:"피해자",  x:50, y:7,  w:56},
+            {id:"과실",    x:24, y:55, w:56},
+            {id:"견적",    x:50, y:55, w:56},
+            {id:"보험",    x:50, y:72, w:64},
+            {id:"처리",    x:50, y:92, w:64},
+          ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
+            return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:3}}>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
+                <div style={{width:46,height:46,borderRadius:12,background:"#fff",border:`2.5px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 12px ${ent.color}18`}}>{ent.icon}</div>
+                <div style={{background:"#fff",padding:"3px 10px",borderRadius:6,border:`1.5px solid ${ent.color}`,boxShadow:`0 2px 6px ${ent.color}10`}}>
+                  <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
+                  <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
+                </div>
+              </div></div>;})}
+        </div>
+      </div>
+
+      {/* ═══ 추론 규칙 R01~R15 (카테고리별 그룹) ═══ */}
+      <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:12}}>
+          <span style={{fontSize:14}}>⚙️</span>
+          <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 15개</span>
+          <span style={{fontSize:10,color:"#94a3b8"}}>— 우선순위: </span>
+          {[{p:0,l:"P0 최우선",c:"#dc2626"},{p:1,l:"P1 높음",c:"#d97706"},{p:2,l:"P2 보통",c:"#2563eb"},{p:3,l:"P3 참고",c:"#94a3b8"}].map(p=>(
+            <span key={p.p} style={{fontSize:8,padding:"2px 6px",borderRadius:4,background:p.c+"12",color:p.c,fontWeight:700,border:`1px solid ${p.c}20`}}>● {p.l}</span>))}
+        </div>
+        {["대인","견적","과실","보험","처리"].map(cat=>{
+          const catCol={대인:"#7c3aed",견적:"#0891b2",과실:"#6366f1",보험:"#b45309",처리:"#059669"}[cat];
+          const catRules=ONTOLOGY.rules.filter(r=>r.cat===cat);
+          return<div key={cat} style={{marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:5}}>
+              <div style={{width:4,height:16,borderRadius:2,background:catCol}}/>
+              <span style={{fontSize:10.5,fontWeight:700,color:catCol}}>{cat} ({catRules.length}개)</span></div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,paddingLeft:9}}>
+              {catRules.map(rule=>{const priCol={0:"#dc2626",1:"#d97706",2:"#2563eb",3:"#94a3b8"}[rule.priority];
+                return<div key={rule.id} style={{padding:"8px 12px",borderRadius:10,background:"#fafbfc",border:`1.5px solid ${catCol}15`,display:"flex",alignItems:"center",gap:8,transition:"all .15s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=catCol;e.currentTarget.style.background=catCol+"06";e.currentTarget.style.transform="translateY(-1px)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor=catCol+"15";e.currentTarget.style.background="#fafbfc";e.currentTarget.style.transform="none";}}>
+                  <div style={{minWidth:36,textAlign:"center"}}>
+                    <div style={{fontSize:11,fontWeight:800,color:catCol,fontFamily:"'DM Mono',monospace"}}>{rule.id}</div>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:priCol,margin:"3px auto 0",boxShadow:`0 0 4px ${priCol}40`}}/>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:10.5,fontWeight:700,color:"#0f172a"}}>{rule.name}</div>
+                    <div style={{fontSize:8.5,color:"#94a3b8"}}>우선순위 P{rule.priority} · IF→THEN 체인</div>
+                  </div>
+                </div>;})}
+            </div>
+          </div>;})}
+      </div>
+
+      {/* ═══ RAG vs 온톨로지 — 일반 비교 ═══ */}
+      <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
+        <div style={{fontSize:13,fontWeight:800,color:"#0f172a",marginBottom:12}}>🔬 RAG vs 온톨로지 추론</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+          <div style={{padding:"14px 16px",borderRadius:12,background:"#fef2f2",border:"1.5px solid #fecaca"}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#dc2626",marginBottom:8}}>📚 기존 RAG 방식</div>
+            <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.8}}>PDF에서 키워드 검색 → 텍스트 조각 반환<br/>
+              "14급이 뭐야?" → 해당 문단만 반환<br/>
+              <b style={{color:"#dc2626"}}>한계:</b> 여러 조건이 결합된 판단 불가<br/>
+              약관 A 페이지 + B 페이지 + C 페이지를 연결하지 못함</div>
+          </div>
+          <div style={{padding:"14px 16px",borderRadius:12,background:"#f0fdf4",border:"1.5px solid #86efac"}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#059669",marginBottom:8}}>🧠 온톨로지 추론</div>
+            <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.8}}>엔티티 관계 + IF-THEN 규칙 → 추론 체인 작동<br/>
+              "14급 + 4주초과 + 과실50%?" → R01→R12→R13 체인<br/>
+              <b style={{color:"#059669"}}>강점:</b> 조건 조합별 자동 판단 도출<br/>
+              약관 전체를 구조화하여 관계 기반 추론 가능</div>
+          </div>
+        </div>
+        {/* ═══ Case별 상세 비교 ═══ */}
+        <div style={{fontSize:12,fontWeight:800,color:"#475569",marginBottom:10}}>📋 Case별 비교 — RAG의 한계 vs 온톨로지의 추론</div>
+        {[{case_:"Case 1: 교차로 충돌 (그랜저 vs BMW 7시리즈)",color:"#dc2626",
+            rag:["\"교차로 과실비율\" 검색 → 약관 50:50 문단 반환 (끝)","\"BMW 수리비 적정\" → 관련 문단 없음 (PDF에 개별 차종 수리비 없음)","\"렌트 동종동급\" → 약관 문구만 반환, 7시리즈→5시리즈 정정은 판단 불가","\"대인 5명 일괄합의\" → 일괄합의 개념 자체가 PDF에 없음"],
+            onto:[{rule:"R04",text:"사고유형 [교차로 골목길] → 자동으로 기본 과실 50:50 산정"},{rule:"R10",text:"BMW(외산) → ×1.6 배수 자동 적용 → 수리비 적정성 검증"},{rule:"R07",text:"7시리즈 렌트 요구 > 동급 → 자동 부적정 판정 + 절감액 산출"},{rule:"R12+R13",text:"상해12급 + 과실50% → 대인Ⅰ 한도₩15M + 상계₩12.5M 자동"},{rule:"R09",text:"자기부담금 ₩5M × 20% → ₩500,000 자동 (최대 캡)"}]},
+          {case_:"Case 2: 주차장 신차 충돌 (그랜저 vs GV80 3개월)",color:"#f59e0b",
+            rag:["\"100% 과실 자기부담금\" → 약관 조항은 반환하지만 실제 계산은 못함","\"신차 감가\" → 판례 정보가 PDF에 없으면 답변 불가","\"품질인증부품 인센티브\" → 2025 개정 내용을 찾더라도 OEM 25% 계산은 불가"],
+            onto:[{rule:"R11",text:"출고 3개월 + 심각 파손 → 신차감가 경고 + ₩8.4M~12.6M 대비"},{rule:"R03",text:"품질인증부품 → OEM 25% 인센티브 = ₩1,595,000 자동 산출"},{rule:"R09",text:"₩1,830,000 × 20% → 최소₩200,000 자기부담금 자동 산출"}]},
+          {case_:"Case 3: 차선변경 과실 분쟁 (A차 vs B차)",color:"#7c3aed",
+            rag:["\"차선변경 과실\" → 70:30 문구만, 급변경 시 80~90% 조정은 판단 불가","\"경상환자 진단서\" → 4주 규정은 찾으나, 해당 건의 경상환자 여부 판단 불가","\"타사 10:0 주장 반박\" → 판례 기반 반박 논리 구성 불가"],
+            onto:[{rule:"R04",text:"차선변경 충돌 → 70:30 산정 + 급변경 시 80~90% 자동 조정"},{rule:"R01",text:"상해12급 + 21일(4주 미만) → 진단서 의무 해당 없음 자동 판정"},{rule:"R13",text:"과실 85:15 → 타사 손해₩5M × 85% = ₩4,250,000 자동"},{rule:"R12",text:"12급 → 대인Ⅰ 한도 ₩15,000,000 자동 + 경상환자 구분"}]}
+        ].map((cs,ci)=>(
+          <div key={ci} style={{marginBottom:10,borderRadius:12,overflow:"hidden",border:`1.5px solid ${cs.color}20`}}>
+            <div style={{padding:"9px 16px",background:cs.color+"06",borderBottom:`1px solid ${cs.color}15`,display:"flex",alignItems:"center",gap:8}}>
+              <div style={{width:10,height:10,borderRadius:"50%",background:cs.color}}/>
+              <span style={{fontSize:12,fontWeight:700,color:cs.color}}>{cs.case_}</span></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr"}}>
+              <div style={{padding:"12px 16px",borderRight:`1px solid ${cs.color}10`,background:"#fff"}}>
+                <div style={{fontSize:10,fontWeight:700,color:"#dc2626",marginBottom:8}}>📚 RAG의 한계</div>
+                {cs.rag.map((r,ri)=><div key={ri} style={{display:"flex",gap:6,marginBottom:5,alignItems:"flex-start"}}>
+                  <span style={{color:"#dc2626",fontSize:9,marginTop:1,flexShrink:0}}>✗</span>
+                  <span style={{fontSize:9.5,color:"#64748b",lineHeight:1.6}}>{r}</span></div>)}</div>
+              <div style={{padding:"12px 16px",background:"#f0fdf408"}}>
+                <div style={{fontSize:10,fontWeight:700,color:"#059669",marginBottom:8}}>🧠 온톨로지 추론으로 가능</div>
+                {cs.onto.map((o,oi)=><div key={oi} style={{display:"flex",gap:6,marginBottom:5,alignItems:"flex-start"}}>
+                  <span style={{fontSize:8.5,padding:"2px 5px",borderRadius:4,background:"#059669",color:"#fff",fontWeight:700,flexShrink:0,marginTop:1,fontFamily:"'DM Mono',monospace"}}>{o.rule}</span>
+                  <span style={{fontSize:9.5,color:"#334155",lineHeight:1.6}}>{o.text}</span></div>)}</div>
+            </div>
+          </div>))}
       </div>
     </div>}
     {/* ═══ DB 탐색기 뷰 ═══ */}
