@@ -483,6 +483,140 @@ const UC_SCENARIOS = {
 const ROAD_TYPES=["편도1차로","편도2차로","편도3차로이상","고속도로","골목길/이면도로","교차로","회전교차로","주차장내"];
 const WEATHER_TYPES=["맑음","흐림","비","눈","안개","야간"];
 const SIGNAL_STATES=["녹색신호","황색신호","적색신호","비보호좌회전","점멸","신호없음"];
+// ═══ 온톨로지 기반 추론 엔진 (Ontology Inference Engine) ═══
+// 엔티티 정의: 노드(개체)와 엣지(관계)로 구성된 지식 그래프
+const ONTOLOGY = {
+  // ── 엔티티 정의 ──
+  entities: {
+    사고:     {id:"사고",     type:"event",   icon:"💥", color:"#dc2626", desc:"교통사고 건", fields:["유형","일시","장소","날씨","신호"]},
+    차량A:    {id:"차량A",    type:"object",  icon:"🚗", color:"#2563eb", desc:"자사 고객 차량", fields:["제조사","모델","년식","주행거리","국산/외산"]},
+    차량B:    {id:"차량B",    type:"object",  icon:"🚙", color:"#dc2626", desc:"타사 고객 차량", fields:["제조사","모델","년식","주행거리","국산/외산"]},
+    파손A:    {id:"파손A",    type:"state",   icon:"🔧", color:"#0891b2", desc:"A차 파손 상태", fields:["부위","정도","부위수"]},
+    파손B:    {id:"파손B",    type:"state",   icon:"🔩", color:"#f97316", desc:"B차 파손 상태", fields:["부위","정도","부위수"]},
+    피해자:   {id:"피해자",   type:"person",  icon:"🤕", color:"#7c3aed", desc:"인적 피해자", fields:["인원수","상해등급","치료기간"]},
+    과실:     {id:"과실",     type:"ratio",   icon:"⚖️", color:"#6366f1", desc:"과실 비율", fields:["A비율","B비율","산정근거"]},
+    견적:     {id:"견적",     type:"money",   icon:"💰", color:"#059669", desc:"수리비 견적", fields:["A수리비","B수리비","B청구액"]},
+    보험:     {id:"보험",     type:"contract",icon:"🛡️", color:"#b45309", desc:"보험 적용", fields:["보장종목","자기부담금","렌트"]},
+    처리:     {id:"처리",     type:"action",  icon:"📋", color:"#059669", desc:"최종 처리", fields:["처리방안","총비용","절감액"]},
+  },
+  // ── 관계 정의 (엣지) ──
+  edges: [
+    {from:"사고",to:"차량A",  rel:"involves",  label:"자사 차량 관여"},
+    {from:"사고",to:"차량B",  rel:"involves",  label:"타사 차량 관여"},
+    {from:"사고",to:"피해자", rel:"causes",    label:"인적 피해 발생"},
+    {from:"사고",to:"과실",   rel:"determines",label:"과실 비율 결정"},
+    {from:"차량A",to:"파손A", rel:"has_damage",label:"파손 발생"},
+    {from:"차량B",to:"파손B", rel:"has_damage",label:"파손 발생"},
+    {from:"파손A",to:"견적",  rel:"calculates",label:"A차 견적 산출"},
+    {from:"파손B",to:"견적",  rel:"calculates",label:"B차 견적 산출"},
+    {from:"피해자",to:"보험", rel:"triggers",  label:"보험 적용 판단"},
+    {from:"과실",to:"보험",   rel:"applies",   label:"과실 상계 적용"},
+    {from:"견적",to:"보험",   rel:"validates", label:"견적 적정성 검증"},
+    {from:"보험",to:"처리",   rel:"produces",  label:"최종 처리안 도출"},
+  ],
+  // ── 추론 규칙 (IF-THEN 체인) ──
+  rules: [
+    {id:"R01",name:"경상환자 진단서 의무",cat:"대인",priority:1,
+      condition:(ctx)=>ctx.injuryGrade>=12&&ctx.injuryGrade<=14&&ctx.treatDays>28,
+      then:(ctx)=>({flag:"진단서_필수",msg:`상해 ${ctx.injuryGrade}급 경상환자 — 4주(28일) 초과 치료 시 진단서 제출 의무 (2023.1.1 시행)`,clause:"보통약관 별표1, 경상환자 제도",severity:"warning"})},
+    {id:"R02",name:"전부손해 판정",cat:"견적",priority:1,
+      condition:(ctx)=>ctx.repairCost>=ctx.vehicleValue*0.8,
+      then:(ctx)=>({flag:"전부손해_의심",msg:`수리비(₩${ctx.repairCost?.toLocaleString()})가 차량가액(₩${ctx.vehicleValue?.toLocaleString()})의 ${Math.round(ctx.repairCost/ctx.vehicleValue*100)}% → 전부손해 검토 필요. 전부손해 시 자기부담금 면제.`,clause:"보통약관 제24조",severity:"critical"})},
+    {id:"R03",name:"품질인증부품 인센티브",cat:"견적",priority:2,
+      condition:(ctx)=>ctx.certifiedParts===true&&!ctx.minorDamage,
+      then:(ctx)=>({flag:"OEM_25%_인센티브",msg:`품질인증부품 수리 시 OEM 공시가격의 25% 피보험자 지급. 예상 인센티브: ₩${Math.round((ctx.partsCost||0)*0.25).toLocaleString()}`,clause:"2025.08.16 개정 약관",severity:"positive"})},
+    {id:"R04",name:"과실비율 자동 산정",cat:"과실",priority:1,
+      condition:(ctx)=>!!ctx.accidentType,
+      then:(ctx)=>{const map={"교차로":"50:50","차선변경":"70:30(변경차)","후미추돌":"0:100(후방차)","좌회전":"70:30(좌회전차)","유턴":"70:30(유턴차)","주차장":"상황별","골목길":"50:50"};
+        const key=Object.keys(map).find(k=>ctx.accidentType.includes(k));
+        return{flag:"기본과실_산정",msg:`사고유형 [${ctx.accidentType}] → 기본 과실: ${key?map[key]:"개별 판단 필요"}. 손해보험협회 과실비율 인정기준 적용.`,clause:"별표3 과실상계",severity:"info"};}},
+    {id:"R05",name:"음주운전 면책",cat:"보험",priority:0,
+      condition:(ctx)=>ctx.dui===true,
+      then:()=>({flag:"음주_면책",msg:"음주운전 사고 → 자기차량손해 면책(미보상), 대인Ⅱ·대물 보험금의 10~20% 사고부담금 부과.",clause:"보통약관 제11조",severity:"critical"})},
+    {id:"R06",name:"무면허 면책",cat:"보험",priority:0,
+      condition:(ctx)=>ctx.unlicensed===true,
+      then:()=>({flag:"무면허_면책",msg:"무면허운전 → 자기차량손해 면책, 대인Ⅱ·대물 20% 사고부담금.",clause:"보통약관 제11조",severity:"critical"})},
+    {id:"R07",name:"렌트 동종동급 검증",cat:"처리",priority:2,
+      condition:(ctx)=>ctx.rentalRequested&&ctx.rentalGrade>ctx.vehicleGrade,
+      then:(ctx)=>({flag:"렌트_부적정",msg:`타사 요구 렌트등급(${ctx.rentalRequested})이 동종동급 원칙에 부적합. 적정등급으로 정정 시 일 ₩${((ctx.rentalDaily||0)-(ctx.properRentalDaily||0)).toLocaleString()} 절감.`,clause:"대법원 동종동급 원칙, 별표2",severity:"warning"})},
+    {id:"R08",name:"12대 중과실 확인",cat:"과실",priority:0,
+      condition:(ctx)=>ctx.majorFault===true,
+      then:(ctx)=>({flag:"12대_중과실",msg:`12대 중과실 사고 해당 [${ctx.majorFaultType||"미상"}] → 종합보험 가입 시에도 형사처벌 면제 불가. 교통사고처리특례법 제3조 제2항.`,clause:"교통사고처리특례법",severity:"critical"})},
+    {id:"R09",name:"자기부담금 산출",cat:"보험",priority:2,
+      condition:(ctx)=>ctx.selfDamage===true&&ctx.damageAmount>0,
+      then:(ctx)=>{const pct20=Math.round(ctx.damageAmount*0.2);const actual=ctx.totalLoss?0:Math.min(500000,Math.max(200000,pct20));
+        return{flag:"자기부담금_산출",msg:`손해액 ₩${ctx.damageAmount.toLocaleString()} × 20% = ₩${pct20.toLocaleString()} → 실제 부담: ₩${actual.toLocaleString()}${ctx.totalLoss?" (전부손해 면제)":pct20<200000?" (최소 20만원)":pct20>500000?" (최대 50만원)":""}`,clause:"보통약관 제24조",severity:"info"};}},
+    {id:"R10",name:"수입차 가격 보정",cat:"견적",priority:3,
+      condition:(ctx)=>ctx.isImport===true,
+      then:(ctx)=>{const m=ctx.isSupercar?3.0:1.6;return{flag:"수입차_배수",msg:`외산 차량 부품가격 배수 ×${m} 적용${ctx.isSupercar?" (슈퍼카)":""}. OEM 부품 단가 국산 대비 ${m}배 반영.`,clause:"업계 관행",severity:"info"};}},
+    {id:"R11",name:"신차 감가 청구 대비",cat:"처리",priority:2,
+      condition:(ctx)=>ctx.vehicleAge!==undefined&&ctx.vehicleAge<=0.5&&ctx.severity==="심각",
+      then:(ctx)=>({flag:"신차감가_대비",msg:`출고 ${Math.round(ctx.vehicleAge*12)}개월 신차 + 심각 파손 → 감가 청구 가능성 높음. 차량가액의 10~15% (₩${Math.round((ctx.vehicleValue||0)*0.1).toLocaleString()}~${Math.round((ctx.vehicleValue||0)*0.15).toLocaleString()}) 추가 청구 대비.`,clause:"대법원 판례",severity:"warning"})},
+    {id:"R12",name:"대인배상 한도 확인",cat:"대인",priority:1,
+      condition:(ctx)=>ctx.injuryGrade>=1&&ctx.injuryGrade<=14,
+      then:(ctx)=>{const limits=[0,200000000,176000000,152000000,128000000,75000000,50000000,40000000,30000000,25000000,20000000,20000000,15000000,15000000,12000000];
+        const lim=limits[ctx.injuryGrade]||0;
+        return{flag:"대인Ⅰ_한도",msg:`상해 ${ctx.injuryGrade}급 → 대인배상Ⅰ 한도: ₩${lim.toLocaleString()}. ${ctx.injuryGrade<=5?"중상해 — 합의금 산정 신중":""}${ctx.injuryGrade>=12?"경상환자 — 과실비례 치료비 부담 적용":""}`,clause:"자배법 시행령 별표1",severity:ctx.injuryGrade<=3?"critical":ctx.injuryGrade<=8?"warning":"info"};}},
+    {id:"R13",name:"과실 상계 계산",cat:"과실",priority:2,
+      condition:(ctx)=>ctx.faultA>0&&ctx.faultB>0&&ctx.totalCostB>0,
+      then:(ctx)=>{const burden=Math.round(ctx.totalCostB*ctx.faultA/100);return{flag:"과실상계_결과",msg:`자사 과실 ${ctx.faultA}% 적용 → 타사 손해(₩${ctx.totalCostB.toLocaleString()}) × ${ctx.faultA}% = 자사 부담 ₩${burden.toLocaleString()}`,clause:"별표3 과실상계",severity:"info"};}},
+    {id:"R14",name:"동승자 감액 적용",cat:"대인",priority:3,
+      condition:(ctx)=>ctx.passengerType&&ctx.passengerType!=="업무",
+      then:(ctx)=>{const rates={"무단":100,"음주동승":40,"요청":30,"호의":20,"업무":0};const rate=rates[ctx.passengerType]||0;
+        return{flag:"동승자_감액",msg:`동승 유형 [${ctx.passengerType}] → ${rate}% 감액 적용.${rate===100?" 전액 감액(보상 없음)":""}`,clause:"별표5 동승자 감액비율표",severity:rate>=40?"warning":"info"};}},
+    {id:"R15",name:"보험금 지급 기한",cat:"처리",priority:3,
+      condition:(ctx)=>ctx.claimFiled===true,
+      then:()=>({flag:"지급_기한",msg:"서류 접수 후 10일 이내 지급 여부 결정 의무. 정당 사유 없이 지연 시 보험계약대출이율 가산.",clause:"보통약관 제35조",severity:"info"})},
+  ],
+};
+
+// ── 추론 엔진: 컨텍스트를 받아 모든 규칙을 평가하고 적용된 결과를 반환 ──
+function runOntologyInference(context){
+  const results=[];
+  const chain=[];// 추론 체인 (어떤 규칙이 어떤 순서로 발동했는지)
+  // 우선순위 순으로 정렬 (0=최우선)
+  const sorted=[...ONTOLOGY.rules].sort((a,b)=>a.priority-b.priority);
+  for(const rule of sorted){
+    try{
+      if(rule.condition(context)){
+        const result=rule.then(context);
+        results.push({...result,ruleId:rule.id,ruleName:rule.name,cat:rule.cat});
+        chain.push({step:chain.length+1,rule:rule.id,name:rule.name,flag:result.flag,severity:result.severity});
+      }
+    }catch(e){/* skip rules that can't evaluate with given context */}
+  }
+  return{results,chain,context,rulesEvaluated:sorted.length,rulesFired:results.length,timestamp:new Date().toISOString()};
+}
+
+// ── Use Case별 컨텍스트 생성 (기존 데이터에서 자동 매핑) ──
+function buildContextFromCase(useCase,extraData={}){
+  const base={
+    uc1:{accidentType:"교차로 골목길 충돌",vehicleA:"현대 그랜저",vehicleB:"BMW 7시리즈",
+      isImport:true,isSupercar:false,severity:"심각",faultA:50,faultB:50,
+      repairCostA:5000000,repairCostB:25000000,totalCostB:25000000,
+      vehicleValue:85000000,vehicleAge:2,injuryGrade:12,treatDays:14,
+      claimants:5,rentalRequested:"BMW 7시리즈",rentalGrade:6,vehicleGrade:5,
+      rentalDaily:375000,properRentalDaily:225000,selfDamage:true,damageAmount:5000000,
+      totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:15000000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc2:{accidentType:"주차장 충돌",vehicleA:"현대 그랜저 캘리그래피",vehicleB:"제네시스 GV80",
+      isImport:false,isSupercar:false,severity:"심각",faultA:100,faultB:0,
+      repairCostA:1830000,repairCostB:6380000,totalCostB:10000000,
+      vehicleValue:84000000,vehicleAge:0.25,injuryGrade:0,treatDays:0,
+      claimants:0,selfDamage:true,damageAmount:1830000,
+      totalLoss:false,certifiedParts:true,minorDamage:false,partsCost:6380000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc3:{accidentType:"차선변경 충돌",vehicleA:"현대 그랜저",vehicleB:"BMW 5시리즈",
+      isImport:true,isSupercar:false,severity:"중간",faultA:85,faultB:15,
+      repairCostA:1500000,repairCostB:1200000,totalCostB:5000000,
+      vehicleValue:45000000,vehicleAge:3,injuryGrade:12,treatDays:21,
+      claimants:2,selfDamage:true,damageAmount:1500000,
+      totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:1200000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+  };
+  return{...(base[useCase]||{}), ...extraData};
+}
+
 // ═══ 자동차보험 약관 참조 데이터 (삼성화재 2025.08.16 + 현대해상 2026.08.16 기준) ═══
 const INSURANCE_REF = {
   meta: { sources: ["삼성화재 개인용 자동차보험약관 (2025.08.16 개정)","현대해상 Hicar 업무용자동차보험약관 (2026.08.16 개정)"], updated: "2025.08.16" },
@@ -1735,6 +1869,7 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
   const[mk,sMk]=useState("");const[md,sMd]=useState("");const[yr,sYr]=useState("");const[ml,sMl]=useState("");
   const[sp,sSp]=useState([]);const[sv,sSv]=useState("중간");const[openCat,setOpenCat]=useState(null);
   const[rs,sRs]=useState(null);const[ld,sLd]=useState(false);const[at,sAt]=useState("");
+  const[ontoResult,setOntoResult]=useState(null);const[ontoOpen,setOntoOpen]=useState(false);
   const[ph,sPh]=useState([]);const[pvIdx,sPvIdx]=useState(null);
   const[aiDetecting,setAiDetecting]=useState(false);const[aiDetected,setAiDetected]=useState(null);
   const[aiProgress,setAiProgress]=useState({step:0,msg:""});
@@ -1869,13 +2004,19 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
   const isSuper=["페라리","람보르기니","벤틀리","롤스로이스","맥라렌","애스턴마틴","부가티","마세라티","포르쉐","로터스"].includes(mk);
   const catColors={"전면부":"#0891b2","후면부":"#7c3aed","좌측면":"#2563eb","우측면":"#059669","상부":"#d97706","하부/구조":"#dc2626","휠/서스펜션":"#6366f1","기타/ADAS":"#0d9488"};
 
-  const calc=async()=>{if(!mk||!md||!sp.length)return;sLd(true);sRs(null);sAt("");
+  const calc=async()=>{if(!mk||!md||!sp.length)return;sLd(true);sRs(null);sAt("");setOntoResult(null);
     const impM=isSuper?3.0:isImport?1.6:1.0;
     const m=sM[sv]*impM*(yr&&2025-+yr>5?.85:1);
     const bd=sp.map(p=>{const base=PP[p]||{p:[120000,280000],l:[80000,200000]};const pc=Math.round(R(base.p[0],base.p[1])*m);const lc=Math.round(R(base.l[0],base.l[1])*m);return{pt:p,pc,lc,t:pc+lc};});
     const tp=bd.reduce((s,b)=>s+b.pc,0),tl=bd.reduce((s,b)=>s+b.lc,0),pt=Math.round(sp.length*R(60000,160000)*m);
     sRs({bd,tp,tl,pt,gt:tp+tl+pt,vh:`${mk} ${md} ${yr||""}`});
-    const a=useCase==="uc2"?UC_ESTIMATE_RESPONSE:await callAI("당신은 자동차 손해사정 전문 AI입니다. 견적 분석을 간결하게 해주세요.\n[참조 기준] 삼성화재·현대해상 약관(2025.08.16 개정), 자배법 시행령 별표1 상해등급, 품질인증부품 OEM 25% 인센티브, 대차 동종동급 원칙 적용.",
+    // ═══ 온톨로지 추론 실행 ═══
+    const ontoCtx=useCase?buildContextFromCase(useCase,{repairCostA:tp+tl+pt,partsCost:tp,severity:sv,isImport,isSupercar:isSuper})
+      :{accidentType:"일반",isImport,isSupercar:isSuper,severity:sv,repairCostA:tp+tl+pt,partsCost:tp,damageAmount:tp+tl+pt,selfDamage:true,totalLoss:false,certifiedParts:false,minorDamage:false,vehicleValue:yr?Math.round(40000000*(1-Math.min((2025-(+yr||2023))*0.08,0.6))):40000000,dui:false,unlicensed:false,claimFiled:true};
+    const ontoRes=runOntologyInference(ontoCtx);
+    setOntoResult(ontoRes);
+    const ontoSummary=ontoRes.results.map(r=>`[${r.flag}] ${r.msg}`).join("\n");
+    const a=useCase==="uc2"?UC_ESTIMATE_RESPONSE:await callAI("당신은 자동차 손해사정 전문 AI입니다. 견적 분석을 간결하게 해주세요.\n[참조 기준] 삼성화재·현대해상 약관(2025.08.16 개정), 자배법 시행령 별표1 상해등급, 품질인증부품 OEM 25% 인센티브, 대차 동종동급 원칙 적용.\n[온톨로지 추론 결과]\n"+ontoSummary,
       `차량:${mk} ${md} ${yr||"미상"}년식 (${isImport?"외산":"국산"}${isSuper?" 슈퍼카":""})\n파손:${sp.join(",")}(${sv})\n사진:${ph.length}장\n견적:부품${F(tp)},공임${F(tl)},도장${F(pt)},합계${F(tp+tl+pt)}\n\n견적 적정성, 수리vs교환, 미수선처리, ADAS캘리브레이션, 부품수급 등을 분석해주세요.`);
     sAt(a);sLd(false);
   };
@@ -2098,6 +2239,38 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
               )}
             </div>}
             <div style={{fontSize:12.5}}>{useCase==="uc2"&&vehTab===1?<RT text={UC_ESTIMATE_SELF}/>:useCase==="uc2"&&vehTab===2?<RT text={UC_ESTIMATE_TOTAL}/>:<RT text={tA}/>}</div>
+            {/* ═══ 온톨로지 추론 체인 ═══ */}
+            {ontoResult&&ontoResult.rulesFired>0&&<div style={{marginTop:12}}>
+              <button onClick={()=>setOntoOpen(!ontoOpen)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",borderRadius:10,background:"linear-gradient(135deg,#1e1b4b,#312e81)",color:"#c7d2fe",border:"none",cursor:"pointer",width:"100%",fontSize:11,fontWeight:700}}>
+                <span style={{fontSize:13}}>🧠</span>
+                <span>온톨로지 추론 체인</span>
+                <span style={{marginLeft:4,padding:"2px 8px",borderRadius:6,background:"#4f46e510",color:"#a5b4fc",fontSize:9,fontWeight:700}}>{ontoResult.rulesFired}개 규칙 발동 / {ontoResult.rulesEvaluated}개 평가</span>
+                <span style={{marginLeft:"auto",transform:ontoOpen?"rotate(180deg)":"none",transition:"transform .2s",fontSize:10}}>▼</span>
+              </button>
+              {ontoOpen&&<div style={{padding:"10px 12px",background:"#0f172a",borderRadius:"0 0 12px 12px",border:"1px solid #1e293b",animation:"fadeIn .2s"}}>
+                {/* 추론 체인 시각화 */}
+                {ontoResult.results.map((r,i)=>{const sCol={critical:"#f87171",warning:"#fbbf24",positive:"#4ade80",info:"#60a5fa"}[r.severity]||"#94a3b8";
+                  return<div key={i} style={{display:"flex",gap:8,padding:"7px 0",borderBottom:i<ontoResult.results.length-1?"1px solid #1e293b":"none"}}>
+                    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:20}}>
+                      <div style={{width:8,height:8,borderRadius:"50%",background:sCol,boxShadow:`0 0 6px ${sCol}`}}/>
+                      {i<ontoResult.results.length-1&&<div style={{width:1,flex:1,background:"#334155"}}/>}
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:2}}>
+                        <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:sCol+"20",color:sCol,fontWeight:700}}>{r.ruleId}</span>
+                        <span style={{fontSize:9.5,fontWeight:700,color:"#e2e8f0"}}>{r.flag}</span>
+                        <span style={{fontSize:8,color:"#64748b",marginLeft:"auto"}}>{r.cat}</span>
+                      </div>
+                      <div style={{fontSize:10,color:"#94a3b8",lineHeight:1.5}}>{r.msg}</div>
+                      <div style={{fontSize:8,color:"#475569",marginTop:2}}>📌 {r.clause}</div>
+                    </div>
+                  </div>;})}
+                <div style={{marginTop:6,padding:"5px 8px",borderRadius:6,background:"#1e293b",fontSize:8.5,color:"#64748b",display:"flex",justifyContent:"space-between"}}>
+                  <span>🧠 {ontoResult.rulesFired}개 규칙 발동 · {ontoResult.chain.filter(c=>c.severity==="critical").length}개 위험 · {ontoResult.chain.filter(c=>c.severity==="warning").length}개 주의</span>
+                  <span>{ontoResult.timestamp.split("T")[1]?.split(".")[0]}</span>
+                </div>
+              </div>}
+            </div>}
             {/* Action Buttons for Case 2 */}
             {useCase==="uc2"&&vehTab===2&&<div style={{display:"flex",flex:"column",gap:8,marginTop:14}}>
               <div style={{flex:1,padding:"14px 16px",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",borderRadius:12,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -4389,6 +4562,58 @@ function TabData(){
               </div>);})}
           </div>
         </div>))}
+      {/* ═══ 온톨로지 지식 그래프 ═══ */}
+      <div style={{marginBottom:16,padding:"18px 20px",borderRadius:14,background:"linear-gradient(135deg,#0f172a,#1e1b4b)",border:"1px solid #312e81"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:20}}>🧠</span>
+            <div><div style={{fontSize:14,fontWeight:800,color:"#e0e7ff"}}>온톨로지 추론 엔진</div>
+              <div style={{fontSize:10,color:"#6366f1"}}>15개 규칙 · 10개 엔티티 · 12개 관계 — 사고 데이터 입력 시 자동 추론 체인 작동</div></div>
+          </div>
+          <div style={{padding:"4px 12px",borderRadius:8,background:"#4f46e520",border:"1px solid #6366f140",fontSize:10,fontWeight:700,color:"#a5b4fc"}}>vs RAG: 관계 추론 가능</div>
+        </div>
+        {/* 엔티티 노드 그래프 */}
+        <div style={{position:"relative",height:220,marginBottom:12}}>
+          {/* 노드 배치 */}
+          {[{id:"사고",x:50,y:45},{id:"차량A",x:18,y:20},{id:"차량B",x:82,y:20},{id:"파손A",x:8,y:55},{id:"파손B",x:92,y:55},
+            {id:"피해자",x:50,y:10},{id:"과실",x:25,y:80},{id:"견적",x:75,y:80},{id:"보험",x:50,y:90},{id:"처리",x:50,y:100}
+          ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
+            return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:2}}>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                <div style={{width:36,height:36,borderRadius:10,background:ent.color+"20",border:`2px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:`0 0 12px ${ent.color}30`}}>{ent.icon}</div>
+                <span style={{fontSize:8,fontWeight:700,color:ent.color,textShadow:"0 0 8px rgba(0,0,0,.8)"}}>{n.id}</span>
+              </div></div>;})}
+          {/* 관계선 (SVG) */}
+          <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
+            {[{x1:50,y1:45,x2:18,y2:20},{x1:50,y1:45,x2:82,y2:20},{x1:50,y1:45,x2:50,y2:10},{x1:50,y1:45,x2:25,y2:80},
+              {x1:18,y1:20,x2:8,y2:55},{x1:82,y1:20,x2:92,y2:55},{x1:8,y1:55,x2:75,y2:80},{x1:92,y1:55,x2:75,y2:80},
+              {x1:50,y1:10,x2:50,y2:90},{x1:25,y1:80,x2:50,y2:90},{x1:75,y1:80,x2:50,y2:90},{x1:50,y1:90,x2:50,y2:100}
+            ].map((l,i)=><line key={i} x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke="#4f46e540" strokeWidth="1.5" strokeDasharray="4,4"/>)}
+          </svg>
+        </div>
+        {/* 추론 규칙 목록 */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
+          {ONTOLOGY.rules.slice(0,15).map(rule=>{const sCol={0:"#f87171",1:"#fbbf24",2:"#60a5fa",3:"#94a3b8"}[rule.priority]||"#94a3b8";
+            return<div key={rule.id} style={{padding:"7px 10px",borderRadius:8,background:"#1e293b",border:"1px solid #334155",display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:6,height:6,borderRadius:"50%",background:sCol,flexShrink:0}}/>
+              <div>
+                <div style={{fontSize:9,fontWeight:700,color:"#e2e8f0"}}>{rule.id}: {rule.name}</div>
+                <div style={{fontSize:7.5,color:"#64748b"}}>{rule.cat} · 우선순위 {rule.priority}</div>
+              </div>
+            </div>;})}
+        </div>
+        {/* RAG vs 온톨로지 비교 */}
+        <div style={{marginTop:14,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          <div style={{padding:"10px 14px",borderRadius:10,background:"#1e293b",border:"1px solid #334155"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"#94a3b8",marginBottom:6}}>📚 기존 RAG 방식</div>
+            <div style={{fontSize:9.5,color:"#64748b",lineHeight:1.6}}>"14급이 뭐야?" → PDF에서 해당 문단 검색 → 텍스트 조각 반환. <b style={{color:"#f87171"}}>관계 추론 불가</b> — 여러 조건이 결합된 판단을 내릴 수 없음.</div>
+          </div>
+          <div style={{padding:"10px 14px",borderRadius:10,background:"#312e8130",border:"1px solid #6366f140"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"#a5b4fc",marginBottom:6}}>🧠 온톨로지 추론</div>
+            <div style={{fontSize:9.5,color:"#c7d2fe",lineHeight:1.6}}>"14급 + 4주초과 + 과실50%일 때?" → R01(진단서) + R12(대인한도) + R13(상계) 체인 발동. <b style={{color:"#4ade80"}}>자동 추론</b> — 조건 조합별 판단 도출.</div>
+          </div>
+        </div>
+      </div>
       {/* 하단 요약 */}
       <div style={{padding:"14px 18px",borderRadius:12,background:"#f8fafc",border:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.6}}>
