@@ -4621,7 +4621,7 @@ function TabData(){
               <span key={i} style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:t.c+"10",color:t.c,fontWeight:600,border:`1px solid ${t.c}20`}}>{t.l}</span>))}
           </div>
         </div>
-        <div style={{position:"relative",height:380,background:"#fafbfc",overflow:"hidden"}}>
+        <div style={{position:"relative",height:520,background:"#fafbfc",padding:"20px 10px"}}>
           {/* 도트 그리드 배경 */}
           <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"24px 24px",opacity:.5}}/>
           {/* ═══ 관계선 (SVG) + 라벨 ═══ */}
@@ -4634,20 +4634,19 @@ function TabData(){
               <marker id="arrowT" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0891b2"/></marker>
               <marker id="arrowE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#059669"/></marker>
             </defs>
-            {/* 관계선 데이터: from→to, 라벨, 색상 */}
             {[
-              {x1:50,y1:32,x2:24,y2:16, l:"involves (자사)", c:"#2563eb", m:"arrowB"},
-              {x1:50,y1:32,x2:76,y2:16, l:"involves (타사)", c:"#dc2626", m:"arrowR"},
-              {x1:50,y1:32,x2:50,y2:7,  l:"causes (피해발생)", c:"#7c3aed", m:"arrowP"},
-              {x1:50,y1:32,x2:24,y2:55, l:"determines (과실결정)", c:"#6366f1", m:"arrowP"},
-              {x1:24,y1:16,x2:10,y2:40, l:"has_damage", c:"#0891b2", m:"arrowT"},
-              {x1:76,y1:16,x2:90,y2:40, l:"has_damage", c:"#f97316", m:"arrowG"},
-              {x1:10,y1:40,x2:40,y2:55, l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
-              {x1:90,y1:40,x2:60,y2:55, l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
-              {x1:50,y1:7,x2:50,y2:72,  l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
-              {x1:24,y1:55,x2:40,y2:72, l:"applies (과실상계)", c:"#6366f1", m:"arrowP"},
-              {x1:50,y1:55,x2:50,y2:72, l:"validates (적정성검증)", c:"#059669", m:"arrowE"},
-              {x1:50,y1:72,x2:50,y2:92, l:"produces (처리안도출)", c:"#059669", m:"arrowE"},
+              {x1:50,y1:33,x2:26,y2:18, l:"involves (자사)", c:"#2563eb", m:"arrowB"},
+              {x1:50,y1:33,x2:74,y2:18, l:"involves (타사)", c:"#dc2626", m:"arrowR"},
+              {x1:50,y1:33,x2:50,y2:10, l:"causes (피해발생)", c:"#7c3aed", m:"arrowP"},
+              {x1:50,y1:33,x2:26,y2:52, l:"determines (과실결정)", c:"#6366f1", m:"arrowP"},
+              {x1:26,y1:18,x2:14,y2:38, l:"has_damage", c:"#0891b2", m:"arrowT"},
+              {x1:74,y1:18,x2:86,y2:38, l:"has_damage", c:"#f97316", m:"arrowG"},
+              {x1:14,y1:38,x2:42,y2:52, l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
+              {x1:86,y1:38,x2:58,y2:52, l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
+              {x1:50,y1:10,x2:50,y2:68, l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
+              {x1:26,y1:52,x2:42,y2:68, l:"applies (과실상계)", c:"#6366f1", m:"arrowP"},
+              {x1:50,y1:52,x2:50,y2:68, l:"validates (적정성검증)", c:"#059669", m:"arrowE"},
+              {x1:50,y1:68,x2:50,y2:85, l:"produces (처리안도출)", c:"#059669", m:"arrowE"},
             ].map((l,i)=><g key={i}>
               <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke={l.c} strokeWidth="1.5" strokeOpacity=".5" markerEnd={`url(#${l.m})`}/>
               <rect x={((l.x1+l.x2)/2-0.1)+"%"} y={((l.y1+l.y2)/2-1.5)+"%"} width={Math.max(l.l.length*3.5,40)} height="14" rx="4" fill="#fff" stroke={l.c} strokeWidth=".5" strokeOpacity=".4" transform={`translate(-${Math.max(l.l.length*1.7,20)},0)`}/>
@@ -4656,16 +4655,16 @@ function TabData(){
           </svg>
           {/* ═══ 엔티티 노드 (확대) ═══ */}
           {[
-            {id:"사고",    x:50, y:32, w:70},
-            {id:"차량A",   x:24, y:16, w:60},
-            {id:"차량B",   x:76, y:16, w:60},
-            {id:"파손A",   x:10, y:40, w:56},
-            {id:"파손B",   x:90, y:40, w:56},
-            {id:"피해자",  x:50, y:7,  w:56},
-            {id:"과실",    x:24, y:55, w:56},
-            {id:"견적",    x:50, y:55, w:56},
-            {id:"보험",    x:50, y:72, w:64},
-            {id:"처리",    x:50, y:92, w:64},
+            {id:"피해자",  x:50, y:10, w:56},
+            {id:"차량A",   x:26, y:18, w:60},
+            {id:"차량B",   x:74, y:18, w:60},
+            {id:"사고",    x:50, y:33, w:70},
+            {id:"파손A",   x:14, y:38, w:56},
+            {id:"파손B",   x:86, y:38, w:56},
+            {id:"과실",    x:26, y:52, w:56},
+            {id:"견적",    x:50, y:52, w:56},
+            {id:"보험",    x:50, y:68, w:64},
+            {id:"처리",    x:50, y:85, w:64},
           ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
             return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:3}}>
               <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
