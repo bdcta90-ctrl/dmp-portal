@@ -3105,6 +3105,7 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   const[intakeQs,setIntakeQs]=useState([]);const[intakeAs,setIntakeAs]=useState({});
   const[intakeProg,setIntakeProg]=useState({step:0,msg:"",pct:0});
   const[useCase,setUseCase]=useState(null);const[scenarioOpen,setScenarioOpen]=useState(false);const[reportOpen,setReportOpen]=useState(false);
+  const[ontoResult3,setOntoResult3]=useState(null);const[ontoOpen3,setOntoOpen3]=useState(false);
 
   const clearAll=()=>{setUseCase(null);setInput("");setCustPref("");setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});setReportOpen(false);};
   const loadUC1=()=>{
@@ -3212,11 +3213,16 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   };
 
   // 최종 분석
-  const runAnalysis=async()=>{setStage("loading");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");
+  const runAnalysis=async()=>{setStage("loading");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setOntoResult3(null);
     // 보충 정보 합산
     let fullInput=input;
     Object.entries(intakeAs).forEach(([k,v])=>{if(v&&v.trim())fullInput+=`\n${k}: ${v}`;});
     if(custPref)fullInput+=`\n고객성향: ${CUST_PREFS.find(p=>p.id===custPref)?.short||custPref}`;
+    // ═══ 온톨로지 추론 실행 ═══
+    const ontoCtx=useCase?buildContextFromCase(useCase):{accidentType:"일반",isImport:false,severity:"중간",faultA:50,faultB:50,selfDamage:true,damageAmount:2000000,totalLoss:false,certifiedParts:false,minorDamage:false,vehicleValue:40000000,dui:false,unlicensed:false,claimFiled:true,totalCostB:5000000};
+    const ontoRes=runOntologyInference(ontoCtx);
+    setOntoResult3(ontoRes);
+    const ontoSummary=ontoRes.results.map(r=>`[${r.flag}] ${r.msg}`).join("\n");
     const steps=[
       {msg:"📋 접수 내용 종합 분석 중...",delay:600},
       {msg:"🔍 차량·파손·비용 데이터 매칭 중...",delay:700},
@@ -3232,7 +3238,7 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
     let sO;try{sO=JSON.parse(sR.replace(/```json|```/g,"").trim())}catch{sO={업무영역:"자동차 손해사정",핵심쟁점:"수리 방법 결정",차량:"확인 필요",추정비용:"산정 중",긴급도:"보통",주의사항:""}}
     setSummary(sO);
     setIntakeProg({step:steps.length,total:steps.length,msg:"📊 리포트 작성 중...",pct:92});
-    const nR=useCase==="uc1"?UC_PROCESS_AI_ANALYSIS:await callAI("손해사정 전문 AI. 사고건을 보고서 형태로 분석해주세요.\n[참조] 자배법 상해등급 1~14급, 위자료(사망 65세미만 8천만/이상 5천만), 자기부담금(손해액 20%, 최소20만~최대50만), 렌트 동종동급 원칙, 품질인증부품 OEM 25% 인센티브, 경상환자(12~14급) 4주 초과 진단서 의무, 12대 중과실사고 구분 적용.",`정리:\n${fullInput}`);setSumText(nR);
+    const nR=useCase==="uc1"?UC_PROCESS_AI_ANALYSIS:await callAI("손해사정 전문 AI. 사고건을 보고서 형태로 분석해주세요.\n[참조] 자배법 상해등급 1~14급, 위자료, 자기부담금, 렌트 동종동급 원칙, 품질인증부품 OEM 25%, 경상환자 4주 기준, 12대 중과실.\n[온톨로지 추론 결과]\n"+ontoSummary,`정리:\n${fullInput}`);setSumText(nR);
     // 비용 산출
     const costMatch=fullInput.match(/(\d{1,3}[,.]?\d{3}[,.]?\d{0,3})/);
     const c=costMatch?parseInt(costMatch[1].replace(/[,.]/g,"")):selCase?.cost||2000000;
@@ -3646,6 +3652,22 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
           <div style={{background:"#fff",borderRadius:10,padding:"12px 14px",border:"1px solid #e2e8f0",fontSize:12.5,color:"#475569",lineHeight:1.7,maxHeight:400,overflowY:"auto"}}>
             {sD?<RT text={tS}/>:(tS?<RT text={tS}/>:<span style={{color:"#94a3b8"}}>분석 중...</span>)}</div>
           {summary.주의사항&&<div style={{marginTop:7,padding:"6px 11px",borderRadius:7,background:"#fef3c7",border:"1px solid #fde68a",fontSize:11.5,color:"#92400e"}}>⚠️ {summary.주의사항}</div>}
+          {/* 온톨로지 추론 체인 */}
+          {ontoResult3&&ontoResult3.rulesFired>0&&<div style={{marginTop:8}}>
+            <button onClick={()=>setOntoOpen3(!ontoOpen3)} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 12px",borderRadius:9,background:"#f8fafc",border:"1px solid #e2e8f0",cursor:"pointer",width:"100%",fontSize:10.5,fontWeight:600,color:"#475569"}}>
+              🧠 온톨로지 추론 결과 <span style={{padding:"2px 7px",borderRadius:5,background:"#6366f112",color:"#6366f1",fontSize:9,fontWeight:700,marginLeft:4}}>{ontoResult3.rulesFired}개 규칙 발동</span>
+              <span style={{marginLeft:"auto",transform:ontoOpen3?"rotate(180deg)":"none",transition:"transform .2s",fontSize:9}}>▼</span></button>
+            {ontoOpen3&&<div style={{padding:"8px 10px",borderRadius:"0 0 10px 10px",background:"#fafbfc",border:"1px solid #e2e8f0",borderTop:"none",animation:"fadeIn .2s"}}>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                {ontoResult3.results.map((r,i)=>{const sCol={critical:"#dc2626",warning:"#d97706",positive:"#059669",info:"#2563eb"}[r.severity]||"#64748b";
+                  return<div key={i} style={{flex:"1 1 calc(50% - 4px)",minWidth:200,padding:"6px 9px",borderRadius:8,background:"#fff",border:`1px solid ${sCol}25`,display:"flex",gap:6,alignItems:"flex-start"}}>
+                    <div style={{width:6,height:6,borderRadius:"50%",background:sCol,marginTop:4,flexShrink:0}}/>
+                    <div><div style={{fontSize:9.5,fontWeight:700,color:sCol}}>{r.ruleId} {r.flag}</div>
+                      <div style={{fontSize:9,color:"#64748b",lineHeight:1.4}}>{r.msg.substring(0,80)}{r.msg.length>80?"...":""}</div></div>
+                  </div>;})}
+              </div>
+            </div>}
+          </div>}
         </div>
 
         {proposals&&<div style={{animation:"fadeIn .5s"}}>
@@ -4562,56 +4584,153 @@ function TabData(){
               </div>);})}
           </div>
         </div>))}
-      {/* ═══ 온톨로지 지식 그래프 ═══ */}
-      <div style={{marginBottom:16,padding:"18px 20px",borderRadius:14,background:"linear-gradient(135deg,#0f172a,#1e1b4b)",border:"1px solid #312e81"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:20}}>🧠</span>
-            <div><div style={{fontSize:14,fontWeight:800,color:"#e0e7ff"}}>온톨로지 추론 엔진</div>
-              <div style={{fontSize:10,color:"#6366f1"}}>15개 규칙 · 10개 엔티티 · 12개 관계 — 사고 데이터 입력 시 자동 추론 체인 작동</div></div>
+      {/* ═══ 온톨로지 추론 엔진 (재설계) ═══ */}
+      <div style={{marginBottom:16}}>
+        {/* 헤더 */}
+        <div style={{padding:"16px 20px",borderRadius:"14px 14px 0 0",background:"#fff",border:"1px solid #e2e8f0",borderBottom:"2px solid #6366f1",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:40,height:40,borderRadius:12,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:"#fff"}}>🧠</div>
+            <div><div style={{fontSize:15,fontWeight:800,color:"#0f172a"}}>온톨로지 추론 엔진</div>
+              <div style={{fontSize:10.5,color:"#64748b"}}>15개 추론 규칙 · 10개 엔티티 · 12개 관계 — IF-THEN 체인 기반 자동 판단</div></div>
           </div>
-          <div style={{padding:"4px 12px",borderRadius:8,background:"#4f46e520",border:"1px solid #6366f140",fontSize:10,fontWeight:700,color:"#a5b4fc"}}>vs RAG: 관계 추론 가능</div>
+          <div style={{display:"flex",gap:6}}>
+            {[{v:"10",l:"엔티티",c:"#2563eb"},{v:"12",l:"관계",c:"#7c3aed"},{v:"15",l:"규칙",c:"#059669"}].map((s,i)=>(
+              <div key={i} style={{textAlign:"center",padding:"4px 10px",borderRadius:8,background:s.c+"08",border:`1px solid ${s.c}20`}}>
+                <div style={{fontSize:14,fontWeight:800,color:s.c}}>{s.v}</div>
+                <div style={{fontSize:8,color:"#94a3b8"}}>{s.l}</div></div>))}
+          </div>
         </div>
-        {/* 엔티티 노드 그래프 */}
-        <div style={{position:"relative",height:220,marginBottom:12}}>
-          {/* 노드 배치 */}
-          {[{id:"사고",x:50,y:45},{id:"차량A",x:18,y:20},{id:"차량B",x:82,y:20},{id:"파손A",x:8,y:55},{id:"파손B",x:92,y:55},
-            {id:"피해자",x:50,y:10},{id:"과실",x:25,y:80},{id:"견적",x:75,y:80},{id:"보험",x:50,y:90},{id:"처리",x:50,y:100}
-          ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
-            return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:2}}>
-              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                <div style={{width:36,height:36,borderRadius:10,background:ent.color+"20",border:`2px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:`0 0 12px ${ent.color}30`}}>{ent.icon}</div>
-                <span style={{fontSize:8,fontWeight:700,color:ent.color,textShadow:"0 0 8px rgba(0,0,0,.8)"}}>{n.id}</span>
-              </div></div>;})}
-          {/* 관계선 (SVG) */}
-          <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
-            {[{x1:50,y1:45,x2:18,y2:20},{x1:50,y1:45,x2:82,y2:20},{x1:50,y1:45,x2:50,y2:10},{x1:50,y1:45,x2:25,y2:80},
-              {x1:18,y1:20,x2:8,y2:55},{x1:82,y1:20,x2:92,y2:55},{x1:8,y1:55,x2:75,y2:80},{x1:92,y1:55,x2:75,y2:80},
-              {x1:50,y1:10,x2:50,y2:90},{x1:25,y1:80,x2:50,y2:90},{x1:75,y1:80,x2:50,y2:90},{x1:50,y1:90,x2:50,y2:100}
-            ].map((l,i)=><line key={i} x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke="#4f46e540" strokeWidth="1.5" strokeDasharray="4,4"/>)}
-          </svg>
+        {/* 지식 그래프 */}
+        <div style={{padding:"16px 20px",background:"#fafbfc",border:"1px solid #e2e8f0",borderTop:"none"}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#475569",marginBottom:10}}>📊 지식 그래프 (Knowledge Graph)</div>
+          <div style={{position:"relative",height:240,background:"#fff",borderRadius:12,border:"1px solid #e2e8f0",overflow:"hidden"}}>
+            {/* 배경 그리드 */}
+            <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"30px 30px",opacity:.4}}/>
+            {/* 관계선 + 라벨 */}
+            <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
+              <defs><marker id="ah" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0 0, 6 2, 0 4" fill="#94a3b8"/></marker></defs>
+              {[{x1:50,y1:38,x2:22,y2:18,l:"involves"},{x1:50,y1:38,x2:78,y2:18,l:"involves"},{x1:50,y1:38,x2:50,y2:8,l:"causes"},
+                {x1:50,y1:38,x2:30,y2:68,l:"determines"},{x1:22,y1:18,x2:10,y2:50,l:"has_damage"},{x1:78,y1:18,x2:90,y2:50,l:"has_damage"},
+                {x1:10,y1:50,x2:70,y2:68,l:"calculates"},{x1:90,y1:50,x2:70,y2:68,l:"calculates"},
+                {x1:50,y1:8,x2:50,y2:82,l:"triggers"},{x1:30,y1:68,x2:50,y2:82,l:"applies"},
+                {x1:70,y1:68,x2:50,y2:82,l:"validates"},{x1:50,y1:82,x2:50,y2:96,l:"produces"}
+              ].map((l,i)=><g key={i}>
+                <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke="#cbd5e1" strokeWidth="1.5" markerEnd="url(#ah)"/>
+                <text x={(l.x1+l.x2)/2+"%"} y={(l.y1+l.y2)/2+"%"} fill="#94a3b8" fontSize="7" textAnchor="middle" dy="-3">{l.l}</text>
+              </g>)}
+            </svg>
+            {/* 엔티티 노드 */}
+            {[{id:"사고",x:50,y:38},{id:"차량A",x:22,y:18},{id:"차량B",x:78,y:18},{id:"파손A",x:10,y:50},{id:"파손B",x:90,y:50},
+              {id:"피해자",x:50,y:8},{id:"과실",x:30,y:68},{id:"견적",x:70,y:68},{id:"보험",x:50,y:82},{id:"처리",x:50,y:96}
+            ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
+              return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:2}}>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+                  <div style={{width:38,height:38,borderRadius:10,background:"#fff",border:`2px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,boxShadow:"0 2px 8px rgba(0,0,0,.08)"}}>{ent.icon}</div>
+                  <div style={{background:"#fff",padding:"1px 6px",borderRadius:4,border:`1px solid ${ent.color}30`,boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>
+                    <span style={{fontSize:8,fontWeight:700,color:ent.color}}>{n.id}</span></div>
+                </div></div>;})}
+          </div>
         </div>
-        {/* 추론 규칙 목록 */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
-          {ONTOLOGY.rules.slice(0,15).map(rule=>{const sCol={0:"#f87171",1:"#fbbf24",2:"#60a5fa",3:"#94a3b8"}[rule.priority]||"#94a3b8";
-            return<div key={rule.id} style={{padding:"7px 10px",borderRadius:8,background:"#1e293b",border:"1px solid #334155",display:"flex",alignItems:"center",gap:6}}>
-              <div style={{width:6,height:6,borderRadius:"50%",background:sCol,flexShrink:0}}/>
-              <div>
-                <div style={{fontSize:9,fontWeight:700,color:"#e2e8f0"}}>{rule.id}: {rule.name}</div>
-                <div style={{fontSize:7.5,color:"#64748b"}}>{rule.cat} · 우선순위 {rule.priority}</div>
+        {/* 추론 규칙 R01~R15 */}
+        <div style={{padding:"14px 20px",background:"#fff",border:"1px solid #e2e8f0",borderTop:"none"}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#475569",marginBottom:8}}>⚙️ 추론 규칙 15개 (IF → THEN 체인)</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
+            {ONTOLOGY.rules.map(rule=>{const catCol={대인:"#7c3aed",견적:"#0891b2",과실:"#6366f1",보험:"#b45309",처리:"#059669"}[rule.cat]||"#64748b";
+              const priCol={0:"#dc2626",1:"#d97706",2:"#2563eb",3:"#94a3b8"}[rule.priority];
+              return<div key={rule.id} style={{padding:"7px 10px",borderRadius:9,background:"#fafbfc",border:`1.5px solid ${catCol}20`,display:"flex",alignItems:"center",gap:7,transition:"all .15s"}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=catCol;e.currentTarget.style.background=catCol+"08";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=catCol+"20";e.currentTarget.style.background="#fafbfc";}}>
+                <div style={{minWidth:30,textAlign:"center"}}>
+                  <div style={{fontSize:10,fontWeight:800,color:catCol}}>{rule.id}</div>
+                  <div style={{width:6,height:6,borderRadius:"50%",background:priCol,margin:"2px auto 0"}}/>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:9.5,fontWeight:700,color:"#0f172a"}}>{rule.name}</div>
+                  <div style={{fontSize:8,color:"#94a3b8"}}>{rule.cat} · P{rule.priority}</div>
+                </div>
+              </div>;})}
+          </div>
+        </div>
+        {/* Case 1/2/3별 RAG vs 온톨로지 비교 */}
+        <div style={{padding:"16px 20px",background:"#f8fafc",border:"1px solid #e2e8f0",borderTop:"none",borderRadius:"0 0 14px 14px"}}>
+          <div style={{fontSize:12,fontWeight:800,color:"#0f172a",marginBottom:12}}>🔬 RAG vs 온톨로지 — Case별 비교</div>
+          {/* 일반 비교 */}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+            <div style={{padding:"12px 14px",borderRadius:10,background:"#fff",border:"1px solid #fecaca"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:6}}>📚 기존 RAG</div>
+              <div style={{fontSize:10,color:"#64748b",lineHeight:1.7}}>PDF에서 키워드 검색 → 텍스트 조각 반환<br/>
+                "14급이 뭐야?" → 해당 문단만 반환<br/>
+                <b style={{color:"#dc2626"}}>한계:</b> 여러 조건이 결합된 판단 불가<br/>
+                약관 A 페이지 + B 페이지 + C 페이지 연결 못함</div>
+            </div>
+            <div style={{padding:"12px 14px",borderRadius:10,background:"#fff",border:"1px solid #86efac"}}>
+              <div style={{fontSize:11,fontWeight:700,color:"#059669",marginBottom:6}}>🧠 온톨로지 추론</div>
+              <div style={{fontSize:10,color:"#64748b",lineHeight:1.7}}>엔티티 관계 + IF-THEN 규칙 → 추론 체인 작동<br/>
+                "14급 + 4주초과 + 과실50%?" → R01→R12→R13 체인<br/>
+                <b style={{color:"#059669"}}>강점:</b> 조건 조합별 자동 판단 도출<br/>
+                약관 전체를 구조화하여 관계 기반 추론 가능</div>
+            </div>
+          </div>
+          {/* Case별 상세 비교 */}
+          {[{case_:"Case 1: 교차로 충돌 (그랜저 vs BMW 7시리즈)",color:"#dc2626",
+              rag:[
+                "\"교차로 과실비율\" 검색 → 약관 50:50 문단 반환 (끝)",
+                "\"BMW 수리비 적정\" → 관련 문단 없음 (PDF에 개별 차종 수리비 없음)",
+                "\"렌트 동종동급\" → 약관 문구만 반환, 7시리즈→5시리즈 정정은 판단 불가",
+                "\"대인 5명 일괄합의\" → 일괄합의 개념 자체가 PDF에 없음",
+              ],
+              onto:[
+                {rule:"R04",text:"사고유형 [교차로 골목길] → 자동으로 기본 과실 50:50 산정"},
+                {rule:"R10",text:"BMW(외산) → ×1.6 배수 자동 적용 → 수리비 적정성 검증 근거"},
+                {rule:"R07",text:"7시리즈 렌트 요구 > 동급 → 자동 부적정 판정 + 절감액 산출"},
+                {rule:"R12+R13",text:"상해12급 + 과실50% → 대인Ⅰ 한도₩15M + 상계₩12.5M 자동 계산"},
+                {rule:"R09",text:"자기부담금 ₩5M × 20% → ₩500,000 자동 산출 (최대 캡)"},
+              ]},
+            {case_:"Case 2: 주차장 신차 충돌 (그랜저 vs GV80 3개월)",color:"#f59e0b",
+              rag:[
+                "\"100% 과실 자기부담금\" → 약관 조항은 반환하지만 실제 계산은 못함",
+                "\"신차 감가\" → 판례 정보 PDF에 없으면 답변 불가",
+                "\"품질인증부품 인센티브\" → 2025.08.16 개정 내용을 찾더라도 OEM 25% 적용 계산은 불가",
+              ],
+              onto:[
+                {rule:"R11",text:"출고 3개월(0.25년) + 심각 파손 → 신차감가 자동 경고 + ₩8.4M~12.6M 청구 대비"},
+                {rule:"R03",text:"품질인증부품 적용 시 → OEM 25% 인센티브 = ₩1,595,000 자동 산출"},
+                {rule:"R09",text:"₩1,830,000 × 20% = ₩366,000 → 최소₩200,000 적용 → 자기부담금 자동 산출"},
+              ]},
+            {case_:"Case 3: 차선변경 과실 분쟁 (A차 vs B차)",color:"#7c3aed",
+              rag:[
+                "\"차선변경 과실\" → 70:30 문구만 반환, 급차선변경 시 80~90% 조정은 판단 불가",
+                "\"경상환자 진단서\" → 4주 규정은 찾을 수 있지만, 해당 건이 경상환자인지는 판단 불가",
+                "\"타사 10:0 주장 반박\" → 판례 기반 반박 논리 구성 불가",
+              ],
+              onto:[
+                {rule:"R04",text:"차선변경 충돌 → 기본 70:30 산정 + 급변경 시 80~90% 자동 조정"},
+                {rule:"R01",text:"상해12급 + 치료21일(4주 미만) → 진단서 의무 해당 없음 자동 판정"},
+                {rule:"R13",text:"과실 85:15 → 타사 손해₩5M × 85% = ₩4,250,000 자사 부담 자동 계산"},
+                {rule:"R12",text:"12급 → 대인Ⅰ 한도 ₩15,000,000 자동 조회 + 경상환자 구분"},
+              ]},
+          ].map((cs,ci)=>(
+            <div key={ci} style={{marginBottom:12,borderRadius:11,overflow:"hidden",border:`1.5px solid ${cs.color}25`}}>
+              <div style={{padding:"8px 14px",background:cs.color+"08",borderBottom:`1px solid ${cs.color}15`,display:"flex",alignItems:"center",gap:6}}>
+                <div style={{width:8,height:8,borderRadius:"50%",background:cs.color}}/>
+                <span style={{fontSize:11.5,fontWeight:700,color:cs.color}}>{cs.case_}</span></div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",minHeight:0}}>
+                {/* RAG */}
+                <div style={{padding:"10px 14px",borderRight:`1px solid ${cs.color}15`,background:"#fff"}}>
+                  <div style={{fontSize:9,fontWeight:700,color:"#dc2626",marginBottom:6}}>📚 RAG가 할 수 있는 것</div>
+                  {cs.rag.map((r,ri)=><div key={ri} style={{display:"flex",gap:5,marginBottom:4,alignItems:"flex-start"}}>
+                    <span style={{color:"#dc2626",fontSize:8,marginTop:2,flexShrink:0}}>✗</span>
+                    <span style={{fontSize:9,color:"#64748b",lineHeight:1.5}}>{r}</span></div>)}
+                </div>
+                {/* 온톨로지 */}
+                <div style={{padding:"10px 14px",background:"#f0fdf4"}}>
+                  <div style={{fontSize:9,fontWeight:700,color:"#059669",marginBottom:6}}>🧠 온톨로지가 추가로 할 수 있는 것</div>
+                  {cs.onto.map((o,oi)=><div key={oi} style={{display:"flex",gap:5,marginBottom:4,alignItems:"flex-start"}}>
+                    <span style={{fontSize:8,padding:"1px 4px",borderRadius:3,background:"#059669",color:"#fff",fontWeight:700,flexShrink:0,marginTop:1}}>{o.rule}</span>
+                    <span style={{fontSize:9,color:"#334155",lineHeight:1.5}}>{o.text}</span></div>)}
+                </div>
               </div>
-            </div>;})}
-        </div>
-        {/* RAG vs 온톨로지 비교 */}
-        <div style={{marginTop:14,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-          <div style={{padding:"10px 14px",borderRadius:10,background:"#1e293b",border:"1px solid #334155"}}>
-            <div style={{fontSize:10,fontWeight:700,color:"#94a3b8",marginBottom:6}}>📚 기존 RAG 방식</div>
-            <div style={{fontSize:9.5,color:"#64748b",lineHeight:1.6}}>"14급이 뭐야?" → PDF에서 해당 문단 검색 → 텍스트 조각 반환. <b style={{color:"#f87171"}}>관계 추론 불가</b> — 여러 조건이 결합된 판단을 내릴 수 없음.</div>
-          </div>
-          <div style={{padding:"10px 14px",borderRadius:10,background:"#312e8130",border:"1px solid #6366f140"}}>
-            <div style={{fontSize:10,fontWeight:700,color:"#a5b4fc",marginBottom:6}}>🧠 온톨로지 추론</div>
-            <div style={{fontSize:9.5,color:"#c7d2fe",lineHeight:1.6}}>"14급 + 4주초과 + 과실50%일 때?" → R01(진단서) + R12(대인한도) + R13(상계) 체인 발동. <b style={{color:"#4ade80"}}>자동 추론</b> — 조건 조합별 판단 도출.</div>
-          </div>
+            </div>))}
         </div>
       </div>
       {/* 하단 요약 */}
