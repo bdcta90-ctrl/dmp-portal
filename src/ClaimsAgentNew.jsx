@@ -3632,13 +3632,13 @@ function TabKPI(){
     {type:"처리",cases:["종합처리 — ","합의 — ","협상 — "],vehicles:["그랜저 vs BMW","K8 vs 벤츠","투싼 vs RAV4","싼타페 vs CX-5"]},
     {type:"대인",cases:["대인접수 — ","보행자 — ","다중대인 — "],vehicles:["경추염좌 1명","경추+요추 2명","보행자 1명","다중 3명"]},
   ];
-  const generateReport=()=>{
+  const generateReport=(forceStatus)=>{
     const pk=["긴급","높음","보통","낮음"];const pw=[0.12,0.28,0.40,0.20];
     const r=Math.random();let priority=pk[3];let cum=0;for(let i=0;i<pw.length;i++){cum+=pw[i];if(r<cum){priority=pk[i];break;}}
     const tpl=CASE_TEMPLATES[Math.floor(Math.random()*CASE_TEMPLATES.length)];
     const caseName=tpl.cases[Math.floor(Math.random()*tpl.cases.length)]+tpl.vehicles[Math.floor(Math.random()*tpl.vehicles.length)];
-    const adj=TEAM[1+Math.floor(Math.random()*(TEAM.length-1))].name;// 센터장 제외 랜덤
-    const statuses=["분석완료","협의중","진행중"];const status=statuses[Math.floor(Math.random()*statuses.length)];
+    const adj=TEAM[1+Math.floor(Math.random()*(TEAM.length-1))].name;
+    const status=forceStatus||["분석완료","협의중","진행중","종결"][Math.floor(Math.random()*4)];
     const origClaim=Math.round((2000000+Math.random()*18000000)/100000)*100000;
     const savingPct=Math.random()*0.35;const aiSaving=Math.round(origClaim*savingPct/10000)*10000;
     const aiResult=origClaim-aiSaving;
@@ -3652,50 +3652,65 @@ function TabKPI(){
       priority,summary:caseName+" AI 분석 "+status+".",
       originalClaim:origClaim,aiResult,aiSaving,
       savingBasis:aiSaving>0?"최초 청구 ₩"+(origClaim/10000).toFixed(0)+"만 대비 AI 적정 ₩"+(aiResult/10000).toFixed(0)+"만":"적정 — 절감 없음",
-      unrepaired:Math.random()<0.15,fraudDetected:Math.random()<0.08,isNew:true};
+      unrepaired:Math.random()<0.15,fraudDetected:Math.random()<0.08,isNew:false};
   };
 
-  // 1분마다 배치 동기화: liveCount에 맞춰 reports 수 조정
+  // ═══ liveCount와 reports 동기화 ═══
   const[lastSync,setLastSync]=useState(Date.now());
   const[newBadge,setNewBadge]=useState(0);
-  const initialBurst=useRef(false);
+  const syncedRef=useRef(false);
+
+  // 초기 진입 시: liveCount에 맞춰 기존 reports(16건) 위에 나머지를 채움
   useEffect(()=>{
-    // 초기 진입 시 5초 후 첫 배치 (가시적 효과)
-    if(!initialBurst.current){
-      initialBurst.current=true;
-      setTimeout(()=>{
-        const batch=Math.ceil(Math.random()*4)+3;// 3~7건
-        const newRpts=[];for(let i=0;i<batch;i++)newRpts.push(generateReport());
-        setReports(prev=>[...newRpts,...prev]);
-        setNewBadge(batch);setTimeout(()=>setNewBadge(0),4000);
-        setLastSync(Date.now());
-      },5000);
+    if(syncedRef.current||liveCount<1)return;
+    syncedRef.current=true;
+    const target=liveCount;
+    if(reports.length>=target)return;
+    const fill=target-reports.length;
+    const newRpts=[];
+    // 채우는 건들은 종결:진행 비율 약 55:45 로 자연스럽게
+    for(let i=0;i<fill;i++){
+      const st=Math.random()<0.55?"종결":["분석완료","협의중","진행중"][Math.floor(Math.random()*3)];
+      newRpts.push(generateReport(st));
     }
+    setReports(prev=>[...prev,...newRpts]);
+  },[liveCount]);
+
+  // 15초마다: liveCount 증가 시 신규 배당 추가 + 일부 진행→종결 전환
+  useEffect(()=>{
     const syncIv=setInterval(()=>{
-      const target=16+Math.round(liveCount*0.08);
       setReports(prev=>{
-        if(prev.length>=target)return prev;
-        const batch=Math.min(target-prev.length,Math.ceil(Math.random()*5)+2);
-        const newRpts=[];for(let i=0;i<batch;i++)newRpts.push(generateReport());
-        setNewBadge(batch);setTimeout(()=>setNewBadge(0),4000);
-        return[...newRpts,...prev];
-      });
-      // 일부 기존 건 상태 변화 (진행→종결 등)
-      setReports(prev=>{
-        const cp=[...prev];
+        let cp=[...prev];
+        const target=liveCount;
+        // 1) 부족분 추가 (신규 배당)
+        if(cp.length<target){
+          const batch=Math.min(target-cp.length,Math.ceil(Math.random()*4)+1);
+          const newRpts=[];
+          for(let i=0;i<batch;i++){
+            const nr=generateReport(["분석완료","협의중","진행중"][Math.floor(Math.random()*3)]);
+            nr.isNew=true;
+            newRpts.push(nr);
+          }
+          cp=[...newRpts,...cp];
+          setNewBadge(batch);setTimeout(()=>setNewBadge(0),4000);
+        }
+        // 2) 자연 상태 전환: 진행중→종결 (15초마다 0~2건)
         const actives=cp.filter(r=>r.status!=="종결");
-        if(actives.length>3&&Math.random()<0.4){
+        const transCount=Math.floor(Math.random()*3);
+        for(let i=0;i<transCount&&actives.length>5;i++){
           const pick=actives[Math.floor(Math.random()*actives.length)];
           const idx=cp.findIndex(r=>r.id===pick.id);
-          if(idx>=0){
-            const ns=Math.random()<0.3?"종결":Math.random()<0.5?"협의중":"진행중";
-            cp[idx]={...cp[idx],status:ns};
+          if(idx>=0&&!pick.isNew){
+            if(pick.status==="분석완료")cp[idx]={...cp[idx],status:Math.random()<0.5?"진행중":"협의중"};
+            else if(pick.status==="협의중"||pick.status==="진행중")cp[idx]={...cp[idx],status:Math.random()<0.4?"종결":pick.status==="협의중"?"진행중":"협의중"};
           }
         }
+        // 3) isNew 플래그 해제 (30초 이상 지난 건)
+        cp=cp.map(r=>r.isNew?{...r,isNew:false}:r);
         return cp;
       });
       setLastSync(Date.now());
-    },60000);
+    },15000);
     return()=>clearInterval(syncIv);
   },[liveCount]);
 
@@ -3751,15 +3766,17 @@ function TabKPI(){
       <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",borderRadius:12,padding:"14px 18px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <div style={{width:8,height:8,borderRadius:"50%",background:"#4ade80",boxShadow:"0 0 8px #4ade80",animation:"pulse 1.5s infinite"}}/>
-          <div><div style={{fontSize:11,fontWeight:700,color:"#f1f5f9"}}>실시간 배당 유입 <span style={{fontSize:9,color:"#94a3b8"}}>{liveTime.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})} 기준</span>{newBadge>0&&<span style={{marginLeft:6,fontSize:9,padding:"2px 8px",borderRadius:10,background:"#4ade80",color:"#052e16",fontWeight:700,animation:"fadeIn .3s"}}>+{newBadge}건 배당</span>}</div>
-            <div style={{fontSize:9,color:"#64748b"}}>일 평균 150~200건 · 업무시간 09:00~18:00 · <span style={{color:"#60a5fa"}}>1분 주기 동기화</span> · AI분석 {totalAssigned}건 완료</div></div>
+          <div><div style={{fontSize:11,fontWeight:700,color:"#f1f5f9"}}>실시간 배당 현황 <span style={{fontSize:9,color:"#94a3b8"}}>{liveTime.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})} 기준</span>{newBadge>0&&<span style={{marginLeft:6,fontSize:9,padding:"2px 8px",borderRadius:10,background:"#4ade80",color:"#052e16",fontWeight:700,animation:"fadeIn .3s"}}>+{newBadge}건 신규배당</span>}</div>
+            <div style={{fontSize:9,color:"#64748b"}}>일 평균 150~200건 · 업무시간 09:00~18:00 · <span style={{color:"#60a5fa"}}>15초 주기 동기화</span></div></div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:14}}>
-          <div style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#4ade80",fontFamily:"'DM Mono',monospace"}}>{liveCount}</div><div style={{fontSize:8,color:"#64748b"}}>오늘 유입</div></div>
+          <div style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#4ade80",fontFamily:"'DM Mono',monospace"}}>{reports.length}</div><div style={{fontSize:8,color:"#64748b"}}>배당 건수</div></div>
           <div style={{width:1,height:28,background:"rgba(255,255,255,.1)"}}/>
-          <div style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#f59e0b",fontFamily:"'DM Mono',monospace"}}>{Math.round(liveCount/TEAM.length)}</div><div style={{fontSize:8,color:"#64748b"}}>1인당</div></div>
+          <div style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#f59e0b",fontFamily:"'DM Mono',monospace"}}>{Math.round(reports.length/Math.max(TEAM.length-1,1))}</div><div style={{fontSize:8,color:"#64748b"}}>1인당</div></div>
           <div style={{width:1,height:28,background:"rgba(255,255,255,.1)"}}/>
-          <div style={{width:80}}><div style={{height:6,borderRadius:3,background:"rgba(255,255,255,.1)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:3,background:liveCount>=DAILY_TARGET?"#4ade80":"linear-gradient(90deg,#60a5fa,#4ade80)",width:Math.min(100,Math.round(liveCount/DAILY_TARGET*100))+"%",transition:"width 1s"}}/></div><div style={{fontSize:8,color:"#64748b",textAlign:"center",marginTop:2}}>{Math.round(liveCount/DAILY_TARGET*100)}%</div></div>
+          <div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:800,color:"#60a5fa",fontFamily:"'DM Mono',monospace"}}>{closedCount}</div><div style={{fontSize:8,color:"#64748b"}}>종결</div></div>
+          <div style={{width:1,height:28,background:"rgba(255,255,255,.1)"}}/>
+          <div style={{width:80}}><div style={{height:6,borderRadius:3,background:"rgba(255,255,255,.1)",overflow:"hidden"}}><div style={{height:"100%",borderRadius:3,background:closeRate>=50?"#4ade80":"linear-gradient(90deg,#60a5fa,#f59e0b)",width:Math.min(100,closeRate)+"%",transition:"width 1s"}}/></div><div style={{fontSize:8,color:"#64748b",textAlign:"center",marginTop:2}}>종결률 {closeRate}%</div></div>
         </div>
       </div>
 
@@ -3768,20 +3785,24 @@ function TabKPI(){
         <div style={{display:"flex",alignItems:"center",gap:6}}>
           <div style={{width:6,height:6,borderRadius:"50%",background:"#3b82f6",animation:"pulse 2s infinite"}}/>
           <span style={{fontSize:10,color:"#64748b"}}>마지막 동기화: {new Date(lastSync).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}</span>
-          <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:"#eff6ff",color:"#3b82f6",fontWeight:600}}>1분 주기</span>
+          <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:"#eff6ff",color:"#3b82f6",fontWeight:600}}>15초 주기</span>
         </div>
-        <span style={{fontSize:10,color:"#94a3b8"}}>총 AI 분석 완료 <strong style={{color:"#0f172a"}}>{reports.length}건</strong></span>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <span style={{fontSize:10,color:"#94a3b8"}}>배당 <strong style={{color:"#3b82f6"}}>{totalAssigned}</strong></span>
+          <span style={{fontSize:10,color:"#94a3b8"}}>진행 <strong style={{color:"#f59e0b"}}>{activeCount}</strong></span>
+          <span style={{fontSize:10,color:"#94a3b8"}}>종결 <strong style={{color:"#10b981"}}>{closedCount}</strong></span>
+        </div>
       </div>
       {/* KPI Cards */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>
-        {[{label:"배당 건수",value:totalAssigned+"건",sub:"AI 분석 기준",color:"#3b82f6",icon:"📋",fk:"all"},
-          {label:"진행 중",value:activeCount+"건",sub:"미종결",color:"#f59e0b",icon:"⏳",fk:"active"},
+        {[{label:"배당 건수",value:totalAssigned+"건",sub:"오늘 AI 분석 완료",color:"#3b82f6",icon:"📋",fk:"all"},
+          {label:"진행 중",value:activeCount+"건",sub:reports.filter(r=>r.status==="분석완료").length+"건 분석완료 · "+reports.filter(r=>r.status==="협의중").length+"건 협의중",color:"#f59e0b",icon:"⏳",fk:"active"},
           {label:"종결",value:closedCount+"건",sub:"처리 완료",color:"#10b981",icon:"✅",fk:"closed"},
           {label:"종결률",value:closeRate+"%",sub:closedCount+"/"+totalAssigned,color:closeRate>=50?"#059669":"#dc2626",icon:"📈",fk:null},
         ].map((k,i)=>(<div key={i} onClick={()=>{if(k.fk){setFilterStatus(filterStatus===k.fk?null:k.fk);}}} style={{background:filterStatus===k.fk?"#f0f9ff":"#fff",borderRadius:12,padding:"12px 14px",border:filterStatus===k.fk?`2px solid ${k.color}`:"1px solid #e2e8f0",cursor:k.fk?"pointer":"default",transition:"all .2s"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{fontSize:10,color:"#94a3b8",fontWeight:600}}>{k.label}</span><span style={{fontSize:13}}>{k.icon}</span></div>
           <div style={{fontSize:20,fontWeight:800,color:k.color,fontFamily:"'DM Mono',monospace"}}>{k.value}</div>
-          <div style={{fontSize:9,color:"#cbd5e1"}}>{k.fk?"클릭 시 목록 표시":k.sub}</div></div>))}
+          <div style={{fontSize:9,color:"#cbd5e1"}}>{k.fk?"클릭 시 목록 · "+k.sub:k.sub}</div></div>))}
       </div>
       {/* 카드 클릭 시 필터된 목록 */}
       {filterStatus&&<div style={{background:"#fff",borderRadius:14,padding:16,border:"1px solid #e2e8f0",marginBottom:14,animation:"fadeIn .3s"}}>
