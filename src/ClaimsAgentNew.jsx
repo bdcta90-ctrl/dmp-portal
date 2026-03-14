@@ -4704,18 +4704,30 @@ function TabData(){
             </svg>
             {/* 엔티티 노드 */}
             {nodes.map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;const dbs=nodeDBs[n.id]||[];
+              // DB 태그 위치: 좌측 노드는 왼쪽, 우측 노드는 오른쪽, 중앙 노드는 교대
+              const dbSide=n.x<30?"left":n.x>70?"right":{"피해자":"right","사고":"left","견적":"right","보험":"left","처리":"right"}[n.id]||"right";
               return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:3}}>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
-                  <div style={{width:46,height:46,borderRadius:12,background:"#fff",border:`2.5px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 12px ${ent.color}18`}}>{ent.icon}</div>
-                  <div style={{background:"#fff",padding:"3px 10px",borderRadius:6,border:`1.5px solid ${ent.color}`,boxShadow:`0 2px 6px ${ent.color}10`}}>
-                    <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
-                    <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
+                <div style={{display:"flex",alignItems:isDetail?"center":"center",gap:isDetail?6:0,flexDirection:isDetail?(dbSide==="left"?"row":"row"):"column"}}>
+                  {/* DB 태그 - 왼쪽 배치 */}
+                  {isDetail&&dbSide==="left"&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,alignItems:"flex-end",animation:"fadeIn .3s",order:-1}}>
+                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:"#fff",border:`1.5px solid ${ent.color}25`,whiteSpace:"nowrap",boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+                      <span style={{fontSize:10}}>{d.icon}</span>
+                      <span style={{fontSize:8,fontWeight:600,color:ent.color}}>{d.label}</span>
+                    </div>)}
+                  </div>}
+                  {/* 노드 본체 */}
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
+                    <div style={{width:46,height:46,borderRadius:12,background:"#fff",border:`2.5px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 12px ${ent.color}18`}}>{ent.icon}</div>
+                    <div style={{background:"#fff",padding:"3px 10px",borderRadius:6,border:`1.5px solid ${ent.color}`,boxShadow:`0 2px 6px ${ent.color}10`}}>
+                      <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
+                      <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
+                    </div>
                   </div>
-                  {/* Detail 모드: DB 태그 표시 */}
-                  {isDetail&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,marginTop:1,animation:"fadeIn .3s"}}>
-                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"2px 7px",borderRadius:5,background:ent.color+"08",border:`1px solid ${ent.color}20`,whiteSpace:"nowrap"}}>
-                      <span style={{fontSize:9}}>{d.icon}</span>
-                      <span style={{fontSize:7.5,fontWeight:600,color:ent.color}}>{d.label}</span>
+                  {/* DB 태그 - 오른쪽 배치 */}
+                  {isDetail&&dbSide==="right"&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,alignItems:"flex-start",animation:"fadeIn .3s"}}>
+                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:"#fff",border:`1.5px solid ${ent.color}25`,whiteSpace:"nowrap",boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+                      <span style={{fontSize:10}}>{d.icon}</span>
+                      <span style={{fontSize:8,fontWeight:600,color:ent.color}}>{d.label}</span>
                     </div>)}
                   </div>}
                 </div></div>;})}
