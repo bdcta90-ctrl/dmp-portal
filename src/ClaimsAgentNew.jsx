@@ -4641,10 +4641,10 @@ function TabData(){
               {x1:50,y1:33,x2:26,y2:52, l:"determines (과실결정)", c:"#6366f1", m:"arrowP"},
               {x1:26,y1:18,x2:14,y2:38, l:"has_damage", c:"#0891b2", m:"arrowT"},
               {x1:74,y1:18,x2:86,y2:38, l:"has_damage", c:"#f97316", m:"arrowG"},
-              {x1:14,y1:38,x2:42,y2:52, l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
-              {x1:86,y1:38,x2:58,y2:52, l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
+              {x1:14,y1:38,x2:50,y2:52, l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
+              {x1:86,y1:38,x2:50,y2:52, l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
               {x1:50,y1:10,x2:50,y2:68, l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
-              {x1:26,y1:52,x2:42,y2:68, l:"applies (과실상계)", c:"#6366f1", m:"arrowP"},
+              {x1:26,y1:52,x2:50,y2:68, l:"applies (과실상계)", c:"#6366f1", m:"arrowP"},
               {x1:50,y1:52,x2:50,y2:68, l:"validates (적정성검증)", c:"#059669", m:"arrowE"},
               {x1:50,y1:68,x2:50,y2:85, l:"produces (처리안도출)", c:"#059669", m:"arrowE"},
             ].map((l,i)=><g key={i}>
