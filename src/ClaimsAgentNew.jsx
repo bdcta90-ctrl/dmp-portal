@@ -4362,8 +4362,9 @@ function TabData(){
   const[fullData,setFullData]=useState({});
   const[uploading,setUploading]=useState(false);
   const[toast,setToast]=useState("");
-  const[dataView,setDataView]=useState("explorer");// "explorer" or "map"
+  const[dataView,setDataView]=useState("explorer");// "explorer" or "map" or "ontology"
   const[expandedMap,setExpandedMap]=useState(null);
+  const[graphMode,setGraphMode]=useState("default");// "default" or "detail"
   const fileRef=useRef(null);
   const PER=100;
   const ds=DATASETS[DK[dk]];
@@ -4616,45 +4617,47 @@ function TabData(){
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <div style={{width:7,height:7,borderRadius:"50%",background:"#6366f1"}}/>
             <span style={{fontSize:12.5,fontWeight:700,color:"#0f172a"}}>지식 그래프 (Knowledge Graph)</span></div>
-          <div style={{display:"flex",gap:4}}>
-            {[{c:"#2563eb",l:"object"},{c:"#dc2626",l:"event"},{c:"#7c3aed",l:"ratio"},{c:"#059669",l:"money"},{c:"#b45309",l:"contract"}].map((t,i)=>(
-              <span key={i} style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:t.c+"10",color:t.c,fontWeight:600,border:`1px solid ${t.c}20`}}>{t.l}</span>))}
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            {/* Default / Detail 토글 */}
+            <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
+              {[{id:"default",l:"기본"},{id:"detail",l:"상세 (DB)"}].map(m=>(
+                <button key={m.id} onClick={()=>setGraphMode(m.id)} style={{padding:"4px 12px",borderRadius:6,border:"none",fontSize:10,fontWeight:graphMode===m.id?700:500,background:graphMode===m.id?"#fff":"transparent",color:graphMode===m.id?"#6366f1":"#94a3b8",cursor:"pointer",boxShadow:graphMode===m.id?"0 1px 3px rgba(0,0,0,.06)":"none",transition:"all .15s"}}>{m.l}</button>))}
+            </div>
+            <div style={{display:"flex",gap:4}}>
+              {[{c:"#2563eb",l:"object"},{c:"#dc2626",l:"event"},{c:"#7c3aed",l:"ratio"},{c:"#059669",l:"money"},{c:"#b45309",l:"contract"}].map((t,i)=>(
+                <span key={i} style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:t.c+"10",color:t.c,fontWeight:600,border:`1px solid ${t.c}20`}}>{t.l}</span>))}
+            </div>
           </div>
         </div>
-        <div style={{position:"relative",height:520,background:"#fafbfc",padding:"20px 10px"}}>
-          {/* 도트 그리드 배경 */}
-          <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"24px 24px",opacity:.5}}/>
-          {/* ═══ 관계선 (SVG) + 라벨 ═══ */}
-          <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
-            <defs>
-              <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/></marker>
-              <marker id="arrowB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
-              <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker>
-              <marker id="arrowP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7c3aed"/></marker>
-              <marker id="arrowT" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0891b2"/></marker>
-              <marker id="arrowE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#059669"/></marker>
-            </defs>
-            {[
-              {x1:50,y1:33,x2:26,y2:18, l:"involves (자사)", c:"#2563eb", m:"arrowB"},
-              {x1:50,y1:33,x2:74,y2:18, l:"involves (타사)", c:"#dc2626", m:"arrowR"},
-              {x1:50,y1:33,x2:50,y2:10, l:"causes (피해발생)", c:"#7c3aed", m:"arrowP"},
-              {x1:50,y1:33,x2:26,y2:52, l:"determines (과실결정)", c:"#6366f1", m:"arrowP"},
-              {x1:26,y1:18,x2:14,y2:38, l:"has_damage", c:"#0891b2", m:"arrowT"},
-              {x1:74,y1:18,x2:86,y2:38, l:"has_damage", c:"#f97316", m:"arrowG"},
-              {x1:14,y1:38,x2:50,y2:52, l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
-              {x1:86,y1:38,x2:50,y2:52, l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
-              {x1:50,y1:10,x2:50,y2:68, l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
-              {x1:26,y1:52,x2:50,y2:68, l:"applies (과실상계)", c:"#6366f1", m:"arrowP"},
-              {x1:50,y1:52,x2:50,y2:68, l:"validates (적정성검증)", c:"#059669", m:"arrowE"},
-              {x1:50,y1:68,x2:50,y2:85, l:"produces (처리안도출)", c:"#059669", m:"arrowE"},
-            ].map((l,i)=><g key={i}>
-              <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke={l.c} strokeWidth="1.5" strokeOpacity=".5" markerEnd={`url(#${l.m})`}/>
-              <rect x={((l.x1+l.x2)/2-0.1)+"%"} y={((l.y1+l.y2)/2-1.5)+"%"} width={Math.max(l.l.length*3.5,40)} height="14" rx="4" fill="#fff" stroke={l.c} strokeWidth=".5" strokeOpacity=".4" transform={`translate(-${Math.max(l.l.length*1.7,20)},0)`}/>
-              <text x={((l.x1+l.x2)/2)+"%"} y={((l.y1+l.y2)/2+0.8)+"%"} fill={l.c} fontSize="7.5" fontWeight="600" textAnchor="middle">{l.l}</text>
-            </g>)}
-          </svg>
-          {/* ═══ 엔티티 노드 (확대) ═══ */}
-          {[
+        {(()=>{
+          // 노드별 DB 매핑 (Detail 모드에서 표시)
+          const nodeDBs={
+            "사고":    [{db:"ACCIDENT_TYPES",icon:"🚦",label:"사고유형 10+종"},{db:"UC_SCENARIOS",icon:"⭐",label:"시나리오 3건"}],
+            "차량A":   [{db:"VEHICLE_DB",icon:"🚗",label:"36브랜드 263모델"},{db:"CASE_CARS",icon:"🔄",label:"A차 연동 3세트"}],
+            "차량B":   [{db:"VEHICLE_DB",icon:"🚙",label:"36브랜드 263모델"},{db:"CASE_CARS",icon:"🔄",label:"B차 연동 3세트"}],
+            "파손A":   [{db:"DAMAGE_CATS",icon:"🔧",label:"8카테고리 50+부위"},{db:"DAMAGE_CONFIGS",icon:"🎯",label:"A차 다이어그램"}],
+            "파손B":   [{db:"DAMAGE_CATS",icon:"🔩",label:"8카테고리 50+부위"},{db:"DAMAGE_CONFIGS",icon:"🎯",label:"B차 다이어그램"}],
+            "피해자":  [{db:"injuryGrades",icon:"🏥",label:"상해등급 1~14급"},{db:"consolation",icon:"💐",label:"위자료 기준"}],
+            "과실":    [{db:"faultRules",icon:"⚖️",label:"과실비율 5유형"},{db:"majorFaults",icon:"⚠️",label:"12대 중과실"}],
+            "견적":    [{db:"PP",icon:"💰",label:"부품가격 15종"},{db:"부품DB",icon:"⚙️",label:"48,637건"},{db:"certifiedParts",icon:"🔩",label:"품질인증부품"}],
+            "보험":    [{db:"coverage",icon:"🛡️",label:"보장종목 7종"},{db:"deductible",icon:"💳",label:"자기부담금"},{db:"rental",icon:"🚗",label:"렌트 6등급"},{db:"penalties",icon:"🍺",label:"음주·무면허"}],
+            "처리":    [{db:"UC_PROCESS_*",icon:"📐",label:"처리방법 3안"},{db:"CUST_PREFS",icon:"🎯",label:"고객성향 6종"},{db:"claimProcess",icon:"📋",label:"지급프로세스 6단계"}],
+          };
+          const isDetail=graphMode==="detail";
+          const gH=isDetail?620:520;
+          // Detail 모드에서 노드 간격을 더 벌림
+          const nodes=isDetail?[
+            {id:"피해자",  x:50, y:8,  w:56},
+            {id:"차량A",   x:22, y:17, w:60},
+            {id:"차량B",   x:78, y:17, w:60},
+            {id:"사고",    x:50, y:30, w:70},
+            {id:"파손A",   x:12, y:40, w:56},
+            {id:"파손B",   x:88, y:40, w:56},
+            {id:"과실",    x:22, y:54, w:56},
+            {id:"견적",    x:50, y:54, w:56},
+            {id:"보험",    x:50, y:70, w:64},
+            {id:"처리",    x:50, y:87, w:64},
+          ]:[
             {id:"피해자",  x:50, y:10, w:56},
             {id:"차량A",   x:26, y:18, w:60},
             {id:"차량B",   x:74, y:18, w:60},
@@ -4665,16 +4668,59 @@ function TabData(){
             {id:"견적",    x:50, y:52, w:56},
             {id:"보험",    x:50, y:68, w:64},
             {id:"처리",    x:50, y:85, w:64},
-          ].map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;
-            return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:3}}>
-              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
-                <div style={{width:46,height:46,borderRadius:12,background:"#fff",border:`2.5px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 12px ${ent.color}18`}}>{ent.icon}</div>
-                <div style={{background:"#fff",padding:"3px 10px",borderRadius:6,border:`1.5px solid ${ent.color}`,boxShadow:`0 2px 6px ${ent.color}10`}}>
-                  <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
-                  <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
-                </div>
-              </div></div>;})}
-        </div>
+          ];
+          const edges=nodes.length?[
+            {from:"사고",to:"차량A",  l:"involves (자사)",    c:"#2563eb", m:"arrowB"},
+            {from:"사고",to:"차량B",  l:"involves (타사)",    c:"#dc2626", m:"arrowR"},
+            {from:"사고",to:"피해자", l:"causes (피해발생)",   c:"#7c3aed", m:"arrowP"},
+            {from:"사고",to:"과실",   l:"determines (과실결정)",c:"#6366f1", m:"arrowP"},
+            {from:"차량A",to:"파손A", l:"has_damage",         c:"#0891b2", m:"arrowT"},
+            {from:"차량B",to:"파손B", l:"has_damage",         c:"#f97316", m:"arrowG"},
+            {from:"파손A",to:"견적",  l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
+            {from:"파손B",to:"견적",  l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
+            {from:"피해자",to:"보험", l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
+            {from:"과실",to:"보험",   l:"applies (과실상계)",  c:"#6366f1", m:"arrowP"},
+            {from:"견적",to:"보험",   l:"validates (적정성검증)",c:"#059669",m:"arrowE"},
+            {from:"보험",to:"처리",   l:"produces (처리안도출)",c:"#059669", m:"arrowE"},
+          ].map(e=>{const fn=nodes.find(n=>n.id===e.from);const tn=nodes.find(n=>n.id===e.to);return{...e,x1:fn.x,y1:fn.y,x2:tn.x,y2:tn.y};}):[];
+
+          return <div style={{position:"relative",height:gH,background:"#fafbfc",padding:"20px 10px",transition:"height .3s"}}>
+            <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"24px 24px",opacity:.5}}/>
+            {/* SVG 관계선 */}
+            <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
+              <defs>
+                <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/></marker>
+                <marker id="arrowB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+                <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#dc2626"/></marker>
+                <marker id="arrowP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7c3aed"/></marker>
+                <marker id="arrowT" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0891b2"/></marker>
+                <marker id="arrowE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#059669"/></marker>
+              </defs>
+              {edges.map((l,i)=><g key={i}>
+                <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke={l.c} strokeWidth="1.5" strokeOpacity=".5" markerEnd={`url(#${l.m})`}/>
+                <rect x={((l.x1+l.x2)/2-0.1)+"%"} y={((l.y1+l.y2)/2-1.5)+"%"} width={Math.max(l.l.length*3.5,40)} height="14" rx="4" fill="#fff" stroke={l.c} strokeWidth=".5" strokeOpacity=".4" transform={`translate(-${Math.max(l.l.length*1.7,20)},0)`}/>
+                <text x={((l.x1+l.x2)/2)+"%"} y={((l.y1+l.y2)/2+0.8)+"%"} fill={l.c} fontSize="7.5" fontWeight="600" textAnchor="middle">{l.l}</text>
+              </g>)}
+            </svg>
+            {/* 엔티티 노드 */}
+            {nodes.map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;const dbs=nodeDBs[n.id]||[];
+              return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:3}}>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
+                  <div style={{width:46,height:46,borderRadius:12,background:"#fff",border:`2.5px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 12px ${ent.color}18`}}>{ent.icon}</div>
+                  <div style={{background:"#fff",padding:"3px 10px",borderRadius:6,border:`1.5px solid ${ent.color}`,boxShadow:`0 2px 6px ${ent.color}10`}}>
+                    <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
+                    <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
+                  </div>
+                  {/* Detail 모드: DB 태그 표시 */}
+                  {isDetail&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,marginTop:1,animation:"fadeIn .3s"}}>
+                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"2px 7px",borderRadius:5,background:ent.color+"08",border:`1px solid ${ent.color}20`,whiteSpace:"nowrap"}}>
+                      <span style={{fontSize:9}}>{d.icon}</span>
+                      <span style={{fontSize:7.5,fontWeight:600,color:ent.color}}>{d.label}</span>
+                    </div>)}
+                  </div>}
+                </div></div>;})}
+          </div>;
+        })()}
       </div>
 
       {/* ═══ 추론 규칙 R01~R15 (카테고리별 그룹) ═══ */}
