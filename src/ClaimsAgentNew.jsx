@@ -2293,8 +2293,8 @@ function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
           {/* Summary Cards — 대인 있는 경우만 */}
           {!result.noInjury&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
             <MC label="총 접수자" value={result.totalClaimants+"명"} ac="#dc2626" big/>
-            <MC label="총 청구액" value={"₩"+((result.totalClaimed||0)/10000).toFixed(0)+"만"} ac="#f97316"/>
-            <MC label="AI 적정" value={"₩"+(((result.aiTotalProper||[0])[0]||0)/10000).toFixed(0)+"~"+(((result.aiTotalProper||[0,0])[1]||0)/10000).toFixed(0)+"만"} ac="#059669"/>
+            <MC label="총 청구액" value={"₩"+(result.totalClaimed||0).toLocaleString()} ac="#f97316"/>
+            <MC label="AI 적정" value={"₩"+((result.aiTotalProper||[0])[0]||0).toLocaleString()+"~"+((result.aiTotalProper||[0,0])[1]||0).toLocaleString()} ac="#059669"/>
           </div>}
 
           {/* ═══ 타사 대인 섹션 ═══ */}
@@ -2320,9 +2320,9 @@ function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
                   <td style={{padding:"8px 10px",fontWeight:600}}>{p.name}</td>
                   <td style={{padding:"8px 10px",color:"#64748b"}}>{p.injury}</td>
                   <td style={{padding:"8px 10px",textAlign:"center"}}><span style={{padding:"2px 8px",borderRadius:5,fontSize:9,fontWeight:700,background:p.grade==="14급"?"#fef3c7":"#f1f5f9",color:p.grade==="14급"?"#d97706":"#94a3b8"}}>{p.grade}</span></td>
-                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#dc2626",fontWeight:600}}>₩{(p.claimed/10000).toFixed(0)}만</td>
-                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#059669",fontWeight:700}}>₩{(p.aiProper[0]/10000).toFixed(0)}~{(p.aiProper[1]/10000).toFixed(0)}만</td>
-                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#dc2626",fontSize:10}}>▼₩{((p.claimed-p.aiProper[1])/10000).toFixed(0)}만</td>
+                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#dc2626",fontWeight:600}}>₩{p.claimed.toLocaleString()}</td>
+                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#059669",fontWeight:700}}>₩{p.aiProper[0].toLocaleString()}~{p.aiProper[1].toLocaleString()}</td>
+                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#dc2626",fontSize:10}}>▼₩{(p.claimed-p.aiProper[1]).toLocaleString()}</td>
                 </tr>)}</tbody>
               </table>
             </div>
@@ -2353,8 +2353,8 @@ function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
                   <td style={{padding:"8px 10px",fontWeight:600}}>{p.name}</td>
                   <td style={{padding:"8px 10px",color:"#64748b"}}>{p.injury}</td>
                   <td style={{padding:"8px 10px",textAlign:"center"}}><span style={{padding:"2px 8px",borderRadius:5,fontSize:9,fontWeight:700,background:p.grade==="14급"?"#fef3c7":"#f1f5f9",color:p.grade==="14급"?"#d97706":"#94a3b8"}}>{p.grade}</span></td>
-                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontWeight:600}}>₩{(p.aiProper[0]/10000).toFixed(0)}~{(p.aiProper[1]/10000).toFixed(0)}만</td>
-                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#2563eb",fontWeight:700}}>₩{(p.aiProper[0]*0.5/10000).toFixed(0)}~{(p.aiProper[1]*0.5/10000).toFixed(0)}만</td>
+                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",fontWeight:600}}>₩{p.aiProper[0].toLocaleString()}~{p.aiProper[1].toLocaleString()}</td>
+                  <td style={{padding:"8px 10px",textAlign:"right",fontFamily:"'DM Mono',monospace",color:"#2563eb",fontWeight:700}}>₩{Math.round(p.aiProper[0]*0.5).toLocaleString()}~{Math.round(p.aiProper[1]*0.5).toLocaleString()}</td>
                 </tr>)}</tbody>
               </table>
             </div>
@@ -3606,22 +3606,22 @@ function TabKPI(){
   ];
 
   const[reports,setReports]=useState([
-    {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M.",originalClaim:10000000,aiResult:6380000,aiSaving:3620000,savingBasis:"타사 보험사 최초 청구액 ₩10,000,000 대비 AI 적정 견적 ₩6,380,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:2,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 → AI 85:15 판정.",originalClaim:15800000,aiResult:7300000,aiSaving:8500000,savingBasis:"타사 100:0 주장 시 자사 전액부담 ₩15,800,000 대비 AI 85:15 판정 ₩7,300,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000",unrepaired:false,fraudDetected:true},
-    {id:"RPT-004",date:"2025.03.03",type:"견적",case:"후미추돌 — 쏘나타 vs K5",adjuster:"정태우 사정사",status:"종결",cost:2800000,repairDays:7,faultRatio:"0:100(타사과실)",severity:"경미",claimants:0,priority:"보통",summary:"후미추돌. 자사 쏘나타 리어범퍼 파손.",originalClaim:2800000,aiResult:2800000,aiSaving:0,savingBasis:"자사 인지 손해액 ₩2,800,000 — AI 검증 결과 적정",unrepaired:true,fraudDetected:false},
-    {id:"RPT-005",date:"2025.03.03",type:"대인",case:"Case 1 교차로 — 대인 5명",adjuster:"김민준 사정사",status:"진행중",cost:6400000,repairDays:0,faultRatio:"50:50",severity:"중간",claimants:5,priority:"높음",summary:"타사 3명 + 자사 2명. 개별합의 또는 일괄패키지.",originalClaim:10500000,aiResult:7200000,aiSaving:3300000,savingBasis:"타사 대인 3명 최초 청구 ₩10,500,000 대비 AI 적정 합의 ₩7,200,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-006",date:"2025.03.02",type:"과실",case:"신호위반 — 좌회전 충돌",adjuster:"한예진 사정사",status:"종결",cost:4200000,repairDays:10,faultRatio:"20:80(확정)",severity:"중간",claimants:2,priority:"낮음",summary:"신호위반 좌회전 충돌. 과실 20:80 확정.",originalClaim:5400000,aiResult:4200000,aiSaving:1200000,savingBasis:"자사 최초 인지 ₩5,400,000 대비 AI 과실 적용 후 ₩4,200,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-007",date:"2025.03.01",type:"견적",case:"주차장 후진 — 벤츠 E300",adjuster:"이현수 사정사",status:"종결",cost:3500000,repairDays:10,faultRatio:"80:20",severity:"경미",claimants:0,priority:"보통",summary:"주차장 후진 접촉. 벤츠 E300 리어범퍼.",originalClaim:3950000,aiResult:3500000,aiSaving:450000,savingBasis:"타사 최초 청구 ₩3,950,000 대비 AI 적정 ₩3,500,000",unrepaired:true,fraudDetected:false},
-    {id:"RPT-008",date:"2025.03.04",type:"견적",case:"고속도로 추돌 — 아반떼 vs 투싼",adjuster:"윤동훈 사정사",status:"분석완료",cost:4500000,repairDays:12,faultRatio:"10:90",severity:"중간",claimants:1,priority:"보통",summary:"고속도로 다차로 추돌.",originalClaim:5300000,aiResult:4500000,aiSaving:800000,savingBasis:"타사 최초 청구 ₩5,300,000 대비 AI 적정 ₩4,500,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-009",date:"2025.03.03",type:"처리",case:"이면도로 측면충돌 — K8 vs 말리부",adjuster:"서수빈 사정사",status:"진행중",cost:8200000,repairDays:18,faultRatio:"40:60",severity:"중간",claimants:2,priority:"높음",summary:"이면도로 측면충돌. 쌍방 과실.",originalClaim:10300000,aiResult:8200000,aiSaving:2100000,savingBasis:"자사 최초 인지 ₩10,300,000 대비 AI 최적 처리 ₩8,200,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-010",date:"2025.03.02",type:"과실",case:"유턴사고 — 쏘렌토 vs 셀토스",adjuster:"강재현 사정사",status:"종결",cost:3100000,repairDays:8,faultRatio:"70:30(확정)",severity:"경미",claimants:0,priority:"낮음",summary:"유턴 중 직진차량 접촉. 종결.",originalClaim:3750000,aiResult:3100000,aiSaving:650000,savingBasis:"자사 최초 인지 ₩3,750,000 대비 AI 적정 과실 ₩3,100,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-011",date:"2025.03.04",type:"대인",case:"횡단보도 보행자 — 카니발",adjuster:"조소영 사정사",status:"진행중",cost:12000000,repairDays:0,faultRatio:"60:40",severity:"심각",claimants:1,priority:"긴급",summary:"횡단보도 보행자 접촉. 합의금 산정 중.",originalClaim:15500000,aiResult:12000000,aiSaving:3500000,savingBasis:"피해자 최초 청구 ₩15,500,000 대비 AI 적정 합의 ₩12,000,000",unrepaired:false,fraudDetected:true},
-    {id:"RPT-012",date:"2025.03.01",type:"견적",case:"후진사고 — 팰리세이드",adjuster:"정태우 사정사",status:"종결",cost:1800000,repairDays:5,faultRatio:"100:0",severity:"경미",claimants:0,priority:"낮음",summary:"후진 시 기둥 접촉. 단독 과실.",originalClaim:1800000,aiResult:1800000,aiSaving:0,savingBasis:"자사 인지 ₩1,800,000 — 단독사고 절감 대상 아님",unrepaired:true,fraudDetected:false},
-    {id:"RPT-013",date:"2025.03.03",type:"처리",case:"끼어들기 — 제네시스 G80",adjuster:"박서연 사정사",status:"종결",cost:5600000,repairDays:14,faultRatio:"65:35(확정)",severity:"중간",claimants:1,priority:"보통",summary:"끼어들기 접촉. 종결.",originalClaim:7400000,aiResult:5600000,aiSaving:1800000,savingBasis:"타사 최초 청구 ₩7,400,000 대비 AI 종합 처리 ₩5,600,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-014",date:"2025.03.04",type:"견적",case:"중앙선침범 — 스타리아 vs K5",adjuster:"윤동훈 사정사",status:"협의중",cost:15000000,repairDays:25,faultRatio:"90:10",severity:"심각",claimants:3,priority:"긴급",summary:"커브구간 중앙선침범 정면충돌.",originalClaim:19200000,aiResult:15000000,aiSaving:4200000,savingBasis:"타사 최초 청구 ₩19,200,000 대비 AI 적정 견적 ₩15,000,000",unrepaired:false,fraudDetected:true},
-    {id:"RPT-015",date:"2025.03.02",type:"과실",case:"비접촉사고 — 오토바이 전도",adjuster:"한예진 사정사",status:"협의중",cost:2200000,repairDays:0,faultRatio:"30:70(AI판정)",severity:"중간",claimants:1,priority:"보통",summary:"차선변경 시 오토바이 회피 전도.",originalClaim:3100000,aiResult:2200000,aiSaving:900000,savingBasis:"피해자 최초 청구 ₩3,100,000 대비 AI 과실 적용 ₩2,200,000",unrepaired:false,fraudDetected:false},
-    {id:"RPT-016",date:"2025.03.01",type:"견적",case:"주차장 접촉 — BMW X5 vs 벤츠 GLC",adjuster:"강재현 사정사",status:"종결",cost:6800000,repairDays:12,faultRatio:"50:50",severity:"중간",claimants:0,priority:"보통",summary:"주차장 통로 쌍방 접촉. 외제차 검증.",originalClaim:8300000,aiResult:6800000,aiSaving:1500000,savingBasis:"타사 최초 청구 ₩8,300,000 대비 AI 적정 ₩6,800,000",unrepaired:true,fraudDetected:false},
+    {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M.",originalClaim:10000000,aiResult:6380000,aiSaving:3620000,savingBasis:"타사 보험사 최초 청구액 ₩10,000,000 대비 AI 적정 견적 ₩6,380,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:2,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 → AI 85:15 판정.",originalClaim:15800000,aiResult:7300000,aiSaving:8500000,savingBasis:"타사 100:0 주장 시 자사 전액부담 ₩15,800,000 대비 AI 85:15 판정 ₩7,300,000",unrepaired:false,fraudDetected:false,complaint:true},
+    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000",unrepaired:false,fraudDetected:true,complaint:true},
+    {id:"RPT-004",date:"2025.03.03",type:"견적",case:"후미추돌 — 쏘나타 vs K5",adjuster:"정태우 사정사",status:"종결",cost:2800000,repairDays:7,faultRatio:"0:100(타사과실)",severity:"경미",claimants:0,priority:"보통",summary:"후미추돌. 자사 쏘나타 리어범퍼 파손.",originalClaim:2800000,aiResult:2800000,aiSaving:0,savingBasis:"자사 인지 손해액 ₩2,800,000 — AI 검증 결과 적정",unrepaired:true,fraudDetected:false,complaint:false},
+    {id:"RPT-005",date:"2025.03.03",type:"대인",case:"Case 1 교차로 — 대인 5명",adjuster:"김민준 사정사",status:"진행중",cost:6400000,repairDays:0,faultRatio:"50:50",severity:"중간",claimants:5,priority:"높음",summary:"타사 3명 + 자사 2명. 개별합의 또는 일괄패키지.",originalClaim:10500000,aiResult:7200000,aiSaving:3300000,savingBasis:"타사 대인 3명 최초 청구 ₩10,500,000 대비 AI 적정 합의 ₩7,200,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-006",date:"2025.03.02",type:"과실",case:"신호위반 — 좌회전 충돌",adjuster:"한예진 사정사",status:"종결",cost:4200000,repairDays:10,faultRatio:"20:80(확정)",severity:"중간",claimants:2,priority:"낮음",summary:"신호위반 좌회전 충돌. 과실 20:80 확정.",originalClaim:5400000,aiResult:4200000,aiSaving:1200000,savingBasis:"자사 최초 인지 ₩5,400,000 대비 AI 과실 적용 후 ₩4,200,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-007",date:"2025.03.01",type:"견적",case:"주차장 후진 — 벤츠 E300",adjuster:"이현수 사정사",status:"종결",cost:3500000,repairDays:10,faultRatio:"80:20",severity:"경미",claimants:0,priority:"보통",summary:"주차장 후진 접촉. 벤츠 E300 리어범퍼.",originalClaim:3950000,aiResult:3500000,aiSaving:450000,savingBasis:"타사 최초 청구 ₩3,950,000 대비 AI 적정 ₩3,500,000",unrepaired:true,fraudDetected:false,complaint:false},
+    {id:"RPT-008",date:"2025.03.04",type:"견적",case:"고속도로 추돌 — 아반떼 vs 투싼",adjuster:"윤동훈 사정사",status:"분석완료",cost:4500000,repairDays:12,faultRatio:"10:90",severity:"중간",claimants:1,priority:"보통",summary:"고속도로 다차로 추돌.",originalClaim:5300000,aiResult:4500000,aiSaving:800000,savingBasis:"타사 최초 청구 ₩5,300,000 대비 AI 적정 ₩4,500,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-009",date:"2025.03.03",type:"처리",case:"이면도로 측면충돌 — K8 vs 말리부",adjuster:"서수빈 사정사",status:"진행중",cost:8200000,repairDays:18,faultRatio:"40:60",severity:"중간",claimants:2,priority:"높음",summary:"이면도로 측면충돌. 쌍방 과실.",originalClaim:10300000,aiResult:8200000,aiSaving:2100000,savingBasis:"자사 최초 인지 ₩10,300,000 대비 AI 최적 처리 ₩8,200,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-010",date:"2025.03.02",type:"과실",case:"유턴사고 — 쏘렌토 vs 셀토스",adjuster:"강재현 사정사",status:"종결",cost:3100000,repairDays:8,faultRatio:"70:30(확정)",severity:"경미",claimants:0,priority:"낮음",summary:"유턴 중 직진차량 접촉. 종결.",originalClaim:3750000,aiResult:3100000,aiSaving:650000,savingBasis:"자사 최초 인지 ₩3,750,000 대비 AI 적정 과실 ₩3,100,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-011",date:"2025.03.04",type:"대인",case:"횡단보도 보행자 — 카니발",adjuster:"조소영 사정사",status:"진행중",cost:12000000,repairDays:0,faultRatio:"60:40",severity:"심각",claimants:1,priority:"긴급",summary:"횡단보도 보행자 접촉. 합의금 산정 중.",originalClaim:15500000,aiResult:12000000,aiSaving:3500000,savingBasis:"피해자 최초 청구 ₩15,500,000 대비 AI 적정 합의 ₩12,000,000",unrepaired:false,fraudDetected:true,complaint:true},
+    {id:"RPT-012",date:"2025.03.01",type:"견적",case:"후진사고 — 팰리세이드",adjuster:"정태우 사정사",status:"종결",cost:1800000,repairDays:5,faultRatio:"100:0",severity:"경미",claimants:0,priority:"낮음",summary:"후진 시 기둥 접촉. 단독 과실.",originalClaim:1800000,aiResult:1800000,aiSaving:0,savingBasis:"자사 인지 ₩1,800,000 — 단독사고 절감 대상 아님",unrepaired:true,fraudDetected:false,complaint:false},
+    {id:"RPT-013",date:"2025.03.03",type:"처리",case:"끼어들기 — 제네시스 G80",adjuster:"박서연 사정사",status:"종결",cost:5600000,repairDays:14,faultRatio:"65:35(확정)",severity:"중간",claimants:1,priority:"보통",summary:"끼어들기 접촉. 종결.",originalClaim:7400000,aiResult:5600000,aiSaving:1800000,savingBasis:"타사 최초 청구 ₩7,400,000 대비 AI 종합 처리 ₩5,600,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-014",date:"2025.03.04",type:"견적",case:"중앙선침범 — 스타리아 vs K5",adjuster:"윤동훈 사정사",status:"협의중",cost:15000000,repairDays:25,faultRatio:"90:10",severity:"심각",claimants:3,priority:"긴급",summary:"커브구간 중앙선침범 정면충돌.",originalClaim:19200000,aiResult:15000000,aiSaving:4200000,savingBasis:"타사 최초 청구 ₩19,200,000 대비 AI 적정 견적 ₩15,000,000",unrepaired:false,fraudDetected:true,complaint:false},
+    {id:"RPT-015",date:"2025.03.02",type:"과실",case:"비접촉사고 — 오토바이 전도",adjuster:"한예진 사정사",status:"협의중",cost:2200000,repairDays:0,faultRatio:"30:70(AI판정)",severity:"중간",claimants:1,priority:"보통",summary:"차선변경 시 오토바이 회피 전도.",originalClaim:3100000,aiResult:2200000,aiSaving:900000,savingBasis:"피해자 최초 청구 ₩3,100,000 대비 AI 과실 적용 ₩2,200,000",unrepaired:false,fraudDetected:false,complaint:false},
+    {id:"RPT-016",date:"2025.03.01",type:"견적",case:"주차장 접촉 — BMW X5 vs 벤츠 GLC",adjuster:"강재현 사정사",status:"종결",cost:6800000,repairDays:12,faultRatio:"50:50",severity:"중간",claimants:0,priority:"보통",summary:"주차장 통로 쌍방 접촉. 외제차 검증.",originalClaim:8300000,aiResult:6800000,aiSaving:1500000,savingBasis:"타사 최초 청구 ₩8,300,000 대비 AI 적정 ₩6,800,000",unrepaired:true,fraudDetected:false,complaint:false},
   ]);
 
   // 동적 배당건 생성기
@@ -3651,8 +3651,8 @@ function TabKPI(){
       claimants:tpl.type==="대인"?Math.ceil(Math.random()*5):Math.random()>0.6?Math.ceil(Math.random()*3):0,
       priority,summary:caseName+" AI 분석 "+status+".",
       originalClaim:origClaim,aiResult,aiSaving,
-      savingBasis:aiSaving>0?"최초 청구 ₩"+(origClaim/10000).toFixed(0)+"만 대비 AI 적정 ₩"+(aiResult/10000).toFixed(0)+"만":"적정 — 절감 없음",
-      unrepaired:Math.random()<0.15,fraudDetected:Math.random()<0.08,isNew:false};
+      savingBasis:aiSaving>0?"최초 청구 ₩"+origClaim.toLocaleString()+" 대비 AI 적정 ₩"+aiResult.toLocaleString():"적정 — 절감 없음",
+      unrepaired:Math.random()<0.15,fraudDetected:Math.random()<0.08,complaint:Math.random()<0.10,isNew:false};
   };
 
   // ═══ liveCount와 reports 동기화 ═══
@@ -3739,19 +3739,20 @@ function TabKPI(){
     </div>}
     <div style={{border:"1px solid #e2e8f0",borderRadius:12,overflow:"hidden"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:10}}>
       <thead><tr style={{background:"#f8fafc",borderBottom:"2px solid #e2e8f0"}}>
-        {["ID","일자","유형","사건명","담당자","상태","최초청구","AI적정","절감","우선순위",""].map((h,i)=>(<th key={i} style={{padding:"7px 7px",textAlign:"left",fontWeight:600,color:"#64748b",fontSize:9,whiteSpace:"nowrap"}}>{h}</th>))}
+        {["ID","일자","유형","사건명","담당자","상태","최초청구","AI적정","절감","우선순위","민원",""].map((h,i)=>(<th key={i} style={{padding:"7px 7px",textAlign:"left",fontWeight:600,color:"#64748b",fontSize:9,whiteSpace:"nowrap"}}>{h}</th>))}
       </tr></thead>
-      <tbody>{list.map(r=>(<tr key={r.id} onClick={()=>setSelReport(r)} style={{borderBottom:"1px solid #f1f5f9",cursor:"pointer",transition:"background .15s",background:r.isNew?"#f0fdf4":"transparent",animation:r.isNew?"fadeIn .5s":"none"}} onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"} onMouseLeave={e=>e.currentTarget.style.background=r.isNew?"#f0fdf4":"transparent"}>
+      <tbody>{list.map(r=>(<tr key={r.id} onClick={()=>setSelReport(r)} style={{borderBottom:"1px solid #f1f5f9",cursor:"pointer",transition:"background .15s",background:r.complaint&&r.status!=="종결"?"#fef2f2":r.isNew?"#f0fdf4":"transparent",animation:r.isNew?"fadeIn .5s":"none"}} onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"} onMouseLeave={e=>e.currentTarget.style.background=r.complaint&&r.status!=="종결"?"#fef2f2":r.isNew?"#f0fdf4":"transparent"}>
         <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",color:"#64748b",fontSize:9}}>{r.id}</td>
         <td style={{padding:"6px 7px",fontSize:9,color:"#94a3b8"}}>{r.date}</td>
         <td style={{padding:"6px 7px"}}><span style={{padding:"2px 5px",borderRadius:4,fontSize:8,fontWeight:700,color:typeColors[r.type],background:typeColors[r.type]+"12"}}>{r.type}</span></td>
         <td style={{padding:"6px 7px",fontWeight:600,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontSize:9.5}}>{r.case}</td>
         <td style={{padding:"6px 7px",color:"#475569",fontSize:9}}>{r.adjuster.replace(" 사정사","").replace(" 센터장","")}</td>
         <td style={{padding:"6px 7px"}}><span style={{padding:"2px 5px",borderRadius:4,fontSize:8,fontWeight:700,color:statusColors[r.status],background:statusColors[r.status]+"12"}}>{r.status}</span></td>
-        <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#64748b"}}>₩{(r.originalClaim/10000).toFixed(0)}만</td>
-        <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#0891b2",fontWeight:600}}>₩{(r.aiResult/10000).toFixed(0)}만</td>
-        <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:r.aiSaving>0?"#059669":"#94a3b8",fontWeight:700}}>{r.aiSaving>0?"▼₩"+(r.aiSaving/10000).toFixed(0)+"만":"—"}</td>
+        <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#64748b"}}>₩{r.originalClaim.toLocaleString()}</td>
+        <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#0891b2",fontWeight:600}}>₩{r.aiResult.toLocaleString()}</td>
+        <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:r.aiSaving>0?"#059669":"#94a3b8",fontWeight:700}}>{r.aiSaving>0?"▼₩"+r.aiSaving.toLocaleString():"—"}</td>
         <td style={{padding:"6px 7px"}}><span style={{padding:"2px 5px",borderRadius:4,fontSize:8,fontWeight:700,color:priorityColors[r.priority],background:priorityColors[r.priority]+"12"}}>{r.priority}</span></td>
+        <td style={{padding:"6px 7px"}}>{r.complaint&&r.status!=="종결"?<span style={{padding:"2px 5px",borderRadius:4,fontSize:8,fontWeight:700,color:"#dc2626",background:"#fef2f2",border:"1px solid #fecaca"}}>⚠️민원</span>:""}</td>
         <td style={{padding:"6px 7px",color:"#3b82f6",fontSize:9}}>→</td>
       </tr>))}</tbody></table></div></div>);
 
@@ -3828,15 +3829,15 @@ function TabKPI(){
             <button onClick={()=>setSavingDetail(!savingDetail)} style={{fontSize:9,padding:"3px 8px",borderRadius:5,border:"1px solid #86efac",background:"#ecfdf5",color:"#059669",fontWeight:600,cursor:"pointer"}}>{savingDetail?"접기 ▲":"세부 조회 ▼"}</button>
           </div>
           <div style={{textAlign:"center",padding:"6px 0",marginBottom:8}}>
-            <div style={{fontSize:26,fontWeight:800,color:"#059669",fontFamily:"'DM Mono',monospace"}}>₩{(totalSaving/10000).toFixed(0)}만</div>
+            <div style={{fontSize:26,fontWeight:800,color:"#059669",fontFamily:"'DM Mono',monospace"}}>₩{totalSaving.toLocaleString()}</div>
             <div style={{fontSize:10,color:"#6b7280"}}>절감률 {savingRate}%</div>
           </div>
           <div style={{padding:"7px 10px",borderRadius:8,background:"#f0fdf4",border:"1px solid #bbf7d0",fontSize:9.5,color:"#065f46",lineHeight:1.5,marginBottom:8}}>
             <strong>기준:</strong> 상대방 보험사 최초 청구액 또는 자사 최초 인지 손해사정 금액 대비 AI 분석 적정 금액과의 차이</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5}}>
-            <div style={{textAlign:"center",padding:"5px 0",borderRadius:6,background:"#fef2f2",border:"1px solid #fecaca"}}><div style={{fontSize:11,fontWeight:700,color:"#dc2626",fontFamily:"'DM Mono',monospace"}}>₩{(totalOriginal/10000).toFixed(0)}만</div><div style={{fontSize:7,color:"#991b1b"}}>최초 청구/인지</div></div>
-            <div style={{textAlign:"center",padding:"5px 0",borderRadius:6,background:"#eff6ff",border:"1px solid #bfdbfe"}}><div style={{fontSize:11,fontWeight:700,color:"#2563eb",fontFamily:"'DM Mono',monospace"}}>₩{(reports.reduce((s,r)=>s+r.aiResult,0)/10000).toFixed(0)}만</div><div style={{fontSize:7,color:"#1e40af"}}>AI 적정</div></div>
-            <div style={{textAlign:"center",padding:"5px 0",borderRadius:6,background:"#ecfdf5",border:"1px solid #86efac"}}><div style={{fontSize:11,fontWeight:700,color:"#059669",fontFamily:"'DM Mono',monospace"}}>▼₩{(totalSaving/10000).toFixed(0)}만</div><div style={{fontSize:7,color:"#065f46"}}>절감</div></div>
+            <div style={{textAlign:"center",padding:"5px 0",borderRadius:6,background:"#fef2f2",border:"1px solid #fecaca"}}><div style={{fontSize:11,fontWeight:700,color:"#dc2626",fontFamily:"'DM Mono',monospace"}}>₩{totalOriginal.toLocaleString()}</div><div style={{fontSize:7,color:"#991b1b"}}>최초 청구/인지</div></div>
+            <div style={{textAlign:"center",padding:"5px 0",borderRadius:6,background:"#eff6ff",border:"1px solid #bfdbfe"}}><div style={{fontSize:11,fontWeight:700,color:"#2563eb",fontFamily:"'DM Mono',monospace"}}>₩{reports.reduce((s,r)=>s+r.aiResult,0).toLocaleString()}</div><div style={{fontSize:7,color:"#1e40af"}}>AI 적정</div></div>
+            <div style={{textAlign:"center",padding:"5px 0",borderRadius:6,background:"#ecfdf5",border:"1px solid #86efac"}}><div style={{fontSize:11,fontWeight:700,color:"#059669",fontFamily:"'DM Mono',monospace"}}>▼₩{totalSaving.toLocaleString()}</div><div style={{fontSize:7,color:"#065f46"}}>절감</div></div>
           </div>
         </div>
       </div>
@@ -3851,9 +3852,9 @@ function TabKPI(){
           <tbody>{reports.filter(r=>r.aiSaving>0).sort((a,b)=>b.aiSaving-a.aiSaving).map(r=>(<tr key={r.id} style={{borderBottom:"1px solid #f1f5f9"}}>
             <td style={{padding:"6px 7px",fontWeight:600,fontSize:9,maxWidth:130,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.case}</td>
             <td style={{padding:"6px 7px"}}><span style={{padding:"1px 4px",borderRadius:3,fontSize:7.5,fontWeight:700,color:typeColors[r.type],background:typeColors[r.type]+"12"}}>{r.type}</span></td>
-            <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#dc2626"}}>₩{(r.originalClaim/10000).toFixed(0)}만</td>
-            <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#2563eb"}}>₩{(r.aiResult/10000).toFixed(0)}만</td>
-            <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#059669",fontWeight:700}}>▼₩{(r.aiSaving/10000).toFixed(0)}만</td>
+            <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#dc2626"}}>₩{r.originalClaim.toLocaleString()}</td>
+            <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#2563eb"}}>₩{r.aiResult.toLocaleString()}</td>
+            <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#059669",fontWeight:700}}>▼₩{r.aiSaving.toLocaleString()}</td>
             <td style={{padding:"6px 7px",fontFamily:"'DM Mono',monospace",fontSize:9,color:"#059669"}}>{Math.round(r.aiSaving/r.originalClaim*100)}%</td>
             <td style={{padding:"6px 7px",fontSize:8,color:"#64748b",maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.savingBasis}</td>
           </tr>))}</tbody></table></div>
@@ -3878,6 +3879,7 @@ function TabKPI(){
                 {m.strengths.map(s=><span key={s} style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#dcfce7",color:"#16a34a",fontWeight:600}}>💪{s}</span>)}
                 {rs.filter(r=>r.unrepaired).length>0&&<span style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#fefce8",color:"#ca8a04",fontWeight:600}}>🔧{rs.filter(r=>r.unrepaired).length}</span>}
                 {rs.filter(r=>r.fraudDetected).length>0&&<span style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#fef2f2",color:"#dc2626",fontWeight:600}}>🚨{rs.filter(r=>r.fraudDetected).length}</span>}
+                {rs.filter(r=>r.complaint&&r.status!=="종결").length>0&&<span style={{fontSize:6.5,padding:"1px 3px",borderRadius:2,background:"#fef2f2",color:"#dc2626",fontWeight:700,border:"1px solid #fca5a5",animation:"pulse 2s infinite"}}>⚠️민원{rs.filter(r=>r.complaint&&r.status!=="종결").length}</span>}
               </div>
             </div>);})}
         </div>
@@ -3887,7 +3889,7 @@ function TabKPI(){
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
               <div style={{display:"flex",alignItems:"center",gap:10}}>
                 <span style={{fontSize:22}}>{m.emoji}</span>
-                <div><div style={{fontSize:14,fontWeight:800}}>{m.name}</div><div style={{fontSize:10,color:"#64748b"}}>{rs.length}건 · 종결률 {rate}% · 절감 ₩{(saving/10000).toFixed(0)}만</div></div>
+                <div><div style={{fontSize:14,fontWeight:800}}>{m.name}</div><div style={{fontSize:10,color:"#64748b"}}>{rs.length}건 · 종결률 {rate}% · 절감 ₩{saving.toLocaleString()}{rs.filter(r=>r.complaint&&r.status!=="종결").length>0?<span style={{color:"#dc2626",fontWeight:700}}> · ⚠️민원 {rs.filter(r=>r.complaint&&r.status!=="종결").length}건</span>:""}</div></div>
               </div>
               <button onClick={()=>{setFilterMember(m.name);setView("list");setSelReport(null);}} style={{padding:"5px 11px",borderRadius:7,border:"1px solid #3b82f6",background:"#eff6ff",color:"#3b82f6",fontSize:10,fontWeight:700,cursor:"pointer"}}>📋 일보</button>
             </div>
@@ -3907,7 +3909,7 @@ function TabKPI(){
             <div style={{display:"flex",gap:5}}>{["견적","과실","처리","대인"].map(type=>{const cnt=rs.filter(r=>r.type===type).length;const isS=m.strengths.includes(type);const isW=m.weaknesses.includes(type);
               return<div key={type} style={{flex:1,textAlign:"center",padding:"5px 0",borderRadius:6,background:isS?"#dcfce7":isW?"#fef2f2":"#f8fafc",border:`1px solid ${isS?"#86efac":isW?"#fecaca":"#e2e8f0"}`}}>
                 <div style={{fontSize:13,fontWeight:800,color:typeColors[type],fontFamily:"'DM Mono',monospace"}}>{cnt}</div><div style={{fontSize:7.5,color:"#64748b"}}>{type}</div></div>;})}</div>
-            {/* 미수선 + 보험사기 */}
+            {/* 미수선 + 보험사기 + 민원 */}
             <div style={{display:"flex",gap:8,marginTop:8}}>
               <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"#fefce8",border:"1px solid #fef08a",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <div><div style={{fontSize:9,fontWeight:600,color:"#a16207"}}>🔧 미수선 처리</div><div style={{fontSize:8,color:"#ca8a04"}}>현금 정산 건</div></div>
@@ -3916,6 +3918,10 @@ function TabKPI(){
               <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:"#fef2f2",border:"1px solid #fecaca",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <div><div style={{fontSize:9,fontWeight:600,color:"#991b1b"}}>🚨 보험사기 적발</div><div style={{fontSize:8,color:"#dc2626"}}>AI 탐지 건</div></div>
                 <div style={{fontSize:18,fontWeight:800,color:"#dc2626",fontFamily:"'DM Mono',monospace"}}>{rs.filter(r=>r.fraudDetected).length}</div>
+              </div>
+              <div style={{flex:1,padding:"8px 12px",borderRadius:8,background:rs.filter(r=>r.complaint&&r.status!=="종결").length>0?"#fef2f2":"#f8fafc",border:rs.filter(r=>r.complaint&&r.status!=="종결").length>0?"2px solid #dc2626":"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div><div style={{fontSize:9,fontWeight:600,color:rs.filter(r=>r.complaint&&r.status!=="종결").length>0?"#dc2626":"#64748b"}}>⚠️ 민원 진행</div><div style={{fontSize:8,color:rs.filter(r=>r.complaint&&r.status!=="종결").length>0?"#dc2626":"#94a3b8"}}>리스크 관리</div></div>
+                <div style={{fontSize:18,fontWeight:800,color:rs.filter(r=>r.complaint&&r.status!=="종결").length>0?"#dc2626":"#94a3b8",fontFamily:"'DM Mono',monospace"}}>{rs.filter(r=>r.complaint&&r.status!=="종결").length}</div>
               </div>
             </div>
           </div>);})()}
@@ -3966,12 +3972,13 @@ function TabKPI(){
           <div style={{display:"flex",gap:5}}>
             <span style={{padding:"3px 8px",borderRadius:5,fontSize:9,fontWeight:700,color:statusColors[selReport.status],background:statusColors[selReport.status]+"12"}}>{selReport.status}</span>
             <span style={{padding:"3px 8px",borderRadius:5,fontSize:9,fontWeight:700,color:priorityColors[selReport.priority],background:priorityColors[selReport.priority]+"12"}}>{selReport.priority}</span>
+            {selReport.complaint&&<span style={{padding:"3px 8px",borderRadius:5,fontSize:9,fontWeight:700,color:"#dc2626",background:"#fef2f2",border:"1px solid #fecaca"}}>⚠️ 민원 진행</span>}
           </div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:14}}>
-          {[{label:"최초 청구/인지",value:"₩"+(selReport.originalClaim/10000).toFixed(0)+"만",color:"#dc2626"},
-            {label:"AI 적정 산정",value:"₩"+(selReport.aiResult/10000).toFixed(0)+"만",color:"#2563eb"},
-            {label:"AI 절감액",value:selReport.aiSaving>0?"▼₩"+(selReport.aiSaving/10000).toFixed(0)+"만":"—",color:selReport.aiSaving>0?"#059669":"#94a3b8"},
+          {[{label:"최초 청구/인지",value:"₩"+selReport.originalClaim.toLocaleString(),color:"#dc2626"},
+            {label:"AI 적정 산정",value:"₩"+selReport.aiResult.toLocaleString(),color:"#2563eb"},
+            {label:"AI 절감액",value:selReport.aiSaving>0?"▼₩"+selReport.aiSaving.toLocaleString():"—",color:selReport.aiSaving>0?"#059669":"#94a3b8"},
             {label:"과실 비율",value:selReport.faultRatio,color:"#7c3aed"},
             {label:"대인 접수",value:selReport.claimants>0?selReport.claimants+"명":"없음",color:selReport.claimants>0?"#dc2626":"#94a3b8"},
             {label:"예상 기간",value:selReport.repairDays>0?selReport.repairDays+"일":"—",color:"#8b5cf6"},
