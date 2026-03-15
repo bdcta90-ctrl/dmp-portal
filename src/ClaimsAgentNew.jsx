@@ -292,6 +292,61 @@ const UC_PROCESS_BASELINE = {
   ]
 };
 
+// ═══ 3안별 비용 상세 내역 (수리방식별 비교 포함) ═══
+const UC_COST_DETAIL = [
+  {// 🏆 최적안
+    summary:"과실 50:50으로 합의하면서, B차 수리비를 제휴센터로 유도하여 ₩25M → ₩15M으로 대폭 절감. 렌트도 동종동급 정정. 대인 일괄 합의로 개별처리 대비 ₩4M 절감.",
+    rows:[
+      {cat:"B차 수리비",method:"제휴센터",detail:"₩25M 청구 → 과다청구 ₩10M 삭감 → 제휴센터 ₩15M 합의",gross:15000000,faultPct:50,net:7500000,color:"#dc2626"},
+      {cat:"B차 렌트",method:"5시리즈(동급 정정)",detail:"7시리즈 ₩375,000/일 → 5시리즈 ₩225,000/일 × 14일",gross:3150000,faultPct:50,net:1575000,color:"#f97316"},
+      {cat:"대인 5명",method:"일괄 합의",detail:"타사3명+자사2명 일괄 ₩6M (개별처리 시 ₩10M 예상)",gross:6000000,faultPct:0,net:6000000,color:"#d97706",note:"과실 무관 정액"},
+      {cat:"A차 수리비",method:"미수선 제안",detail:"고객 동의 시 현금정산 70% ≒ ₩3.5M → 미수선 ₩0 (고객 현금수령)",gross:0,faultPct:0,net:0,color:"#2563eb",note:"미수선 시 자사부담 없음"},
+      {cat:"A차 렌트",method:"불필요",detail:"미수선 선택 시 렌트 불필요",gross:0,faultPct:0,net:0,color:"#0891b2"},
+    ],
+    total:14500000,
+    repairCompare:[
+      {method:"미수선 처리",aCarCost:"₩0 (현금 ₩3,500,000 고객 지급)",bCarCost:"해당 없음 (타사 차량)",totalImpact:"A차 수리비 ₩0 → 자사 부담 최소화",icon:"💵"},
+      {method:"제휴 서비스센터",aCarCost:"₩3,500,000 (국산 부품·15% 절감)",bCarCost:"₩15,000,000 (OEM 동급 부품·공임 20% 절감)",totalImpact:"B차 과다청구 ₩10M 삭감 핵심 근거",icon:"🏭"},
+      {method:"공식 서비스센터",aCarCost:"₩5,000,000 (순정부품 풀가격)",bCarCost:"₩25,000,000 (BMW 공식단가 그대로)",totalImpact:"사용 시 자사 총비용 ₩21,000,000 이상",icon:"🏢"},
+    ],
+    whyThisCost:"과실 50:50 합의 → 자사는 B차 비용의 50%만 부담. B차 수리를 제휴센터로 유도하여 ₩15M으로 협상 (공식센터 ₩25M 대비 ₩10M 절감). 렌트를 동종동급 5시리즈로 정정하여 ₩2.1M 절감. 대인은 일괄 합의로 ₩4M 절감. A차는 미수선 처리로 자사 수리비 부담 ₩0."
+  },
+  {// ⚡ 공격안
+    summary:"과실 30:70을 관철하여 자사 부담 비율 자체를 최소화. B차 수리비 인정액도 30%만 부담하므로 총액이 가장 낮음. 단, 분쟁 리스크.",
+    rows:[
+      {cat:"B차 수리비",method:"제휴센터 유도",detail:"₩25M 중 30%만 인정 = ₩7.5M (70%는 타사 부담)",gross:25000000,faultPct:30,net:7500000,color:"#dc2626"},
+      {cat:"B차 렌트",method:"5시리즈 + 10일 단축",detail:"5시리즈 ₩225,000 × 10일 × 30%",gross:2250000,faultPct:30,net:675000,color:"#f97316"},
+      {cat:"대인 5명",method:"개별 최소 합의",detail:"타사3명 저액 + 자사2명 최소",gross:5000000,faultPct:0,net:5000000,color:"#d97706",note:"개별 협상"},
+      {cat:"A차 수리비",method:"타사 70% 회수",detail:"₩5M × 자사30% = ₩1.5M 자부담 (70% = ₩3.5M 타사 청구)",gross:5000000,faultPct:30,net:1500000,color:"#2563eb",note:"타사에서 ₩3.5M 회수"},
+      {cat:"A차 렌트 회수",method:"타사 70% 부담",detail:"그랜저 동급 14일 × 30%",gross:1050000,faultPct:30,net:315000,color:"#0891b2"},
+    ],
+    total:13600000,
+    repairCompare:[
+      {method:"미수선 처리",aCarCost:"₩0 + 타사에서 ₩3.5M 회수 가능",bCarCost:"해당 없음",totalImpact:"A차 미수선 시 오히려 ₩3.5M 수입 발생",icon:"💵"},
+      {method:"제휴 서비스센터",aCarCost:"₩1,500,000 (30% 자부담)",bCarCost:"₩7,500,000 (30%만 인정)",totalImpact:"30% 비율 관철이 핵심 절감 요인",icon:"🏭"},
+      {method:"공식 서비스센터",aCarCost:"₩1,500,000 (동일)",bCarCost:"₩7,500,000 (30% 고정이므로 동일)",totalImpact:"공식이든 제휴든 30% 비율이 핵심",icon:"🏢"},
+    ],
+    whyThisCost:"과실 30:70 관철이 핵심 — 모든 비용의 30%만 자사 부담. B차 ₩25M × 30% = ₩7.5M. A차 ₩5M × 30% = ₩1.5M + 타사에서 70% = ₩3.5M 회수. 총액이 가장 낮지만, 타사가 7:3을 주장 중이라 분쟁 장기화 리스크가 있고 과실심의위 회부 시 2~4주 추가 소요."
+  },
+  {// 🤝 안전안
+    summary:"과실 40:60 양보하되 빠르게 종결. B차 수리비 협상 폭이 작아 ₩22M으로 소폭만 조정. 대인도 개별처리하여 합의금이 최적안보다 ₩4M 높음.",
+    rows:[
+      {cat:"B차 수리비",method:"공식센터 수용",detail:"₩25M → ₩22M 소폭 합의 × 40% = ₩8.8M",gross:22000000,faultPct:40,net:8800000,color:"#dc2626",note:"공식센터 가격 대부분 수용"},
+      {cat:"B차 렌트",method:"7시리즈 동급 유지",detail:"7시리즈 ₩375,000 × 14일 × 40%",gross:5250000,faultPct:40,net:2100000,color:"#f97316",note:"렌트 정정 안 함"},
+      {cat:"대인 5명",method:"일괄 합의 (타협)",detail:"타사3명+자사2명 일괄 ₩10M",gross:10000000,faultPct:0,net:10000000,color:"#d97706",note:"최적안 대비 +₩4M"},
+      {cat:"A차 수리비",method:"제휴센터",detail:"₩5M × 40% = ₩2M 자부담",gross:5000000,faultPct:40,net:2000000,color:"#2563eb"},
+      {cat:"A차 렌트",method:"그랜저 동급",detail:"그랜저 ₩90,000 × 14일 × 40%",gross:1260000,faultPct:40,net:504000,color:"#0891b2"},
+    ],
+    total:16800000,
+    repairCompare:[
+      {method:"미수선 처리",aCarCost:"₩0 + 타사에서 ₩3M 회수",bCarCost:"해당 없음",totalImpact:"A차 미수선 시 절감 가능하나 안전안에서는 미적용",icon:"💵"},
+      {method:"제휴 서비스센터",aCarCost:"₩2,000,000 (40% 자부담)",bCarCost:"₩15,000,000 × 40% = ₩6M (가정)",totalImpact:"제휴 유도 시 ₩3.2M 추가 절감 가능했으나 미적용",icon:"🏭"},
+      {method:"공식 서비스센터 ✓",aCarCost:"₩2,000,000",bCarCost:"₩22,000,000 × 40% = ₩8.8M",totalImpact:"타사 요구 공식센터를 수용 → 수리비 높음",icon:"🏢"},
+    ],
+    whyThisCost:"안전안이 최적안보다 ₩2.3M 비싼 이유: ① 과실 40%로 자사 부담 비율 ↑ (50% → 40%지만 타사 비용이 높아 상쇄), ② B차 수리비를 공식센터 ₩22M으로 수용 (최적안은 제휴센터 ₩15M), ③ B차 렌트 7시리즈 정정 안 함 (₩1.575M → ₩2.1M), ④ 대인 합의금 ₩10M (최적안 ₩6M 대비 +₩4M). 빠른 종결을 우선시하여 협상 양보폭이 큼."
+  },
+];
+
 const UC_PROCESS_AI_ANALYSIS = `## 📊 AI 종합 분석 보고서
 
 ### 사고 개요
@@ -3728,6 +3783,8 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
               </div>}
               {/* 절감액 배지 */}
               {p.savingNote&&<div style={{padding:"5px 8px",borderRadius:7,background:p.recommended?"#dcfce7":"#f0fdf4",border:"1px solid #bbf7d0",fontSize:10,fontWeight:700,color:"#15803d",textAlign:"center",marginBottom:6}}>💰 {p.savingNote}</div>}
+              {/* 비용 차이 설명 한줄 */}
+              {useCase==="uc1"&&UC_COST_DETAIL[idx]&&<div style={{padding:"5px 8px",borderRadius:7,background:"#fffbeb",border:"1px solid #fde68a",fontSize:9,color:"#92400e",lineHeight:1.5,marginBottom:6}}>{UC_COST_DETAIL[idx].summary}</div>}
               <div style={{display:"flex",alignItems:"center",gap:2,marginBottom:4}}>
                 <span style={{color:"#f59e0b",display:"flex",gap:1}}>{[1,2,3,4,5].map(s=><span key={s} style={{opacity:s<=Math.round(p.satisfaction)?1:.2,fontSize:11}}>{IC.st}</span>)}</span>
                 <span style={{fontSize:10.5,fontWeight:600,color:"#64748b",marginLeft:2}}>{p.satisfaction}</span></div>
@@ -3757,6 +3814,71 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
             </div>)}
           </div>
           {proposals[selIdx].savingNote&&<div style={{marginTop:8,padding:"6px 10px",borderRadius:8,background:"#dcfce7",border:"1px solid #86efac",fontSize:11.5,fontWeight:700,color:"#15803d",textAlign:"center"}}>💰 {proposals[selIdx].savingNote}</div>}
+          {/* ═══ 비용 상세 내역서 ═══ */}
+          {useCase==="uc1"&&UC_COST_DETAIL[selIdx]&&(()=>{const cd=UC_COST_DETAIL[selIdx];return<div style={{marginTop:10}}>
+            {/* 왜 이 금액인가? */}
+            <div style={{padding:"10px 14px",borderRadius:10,background:"#fffbeb",border:"1.5px solid #fde68a",marginBottom:10}}>
+              <div style={{fontSize:10.5,fontWeight:700,color:"#92400e",marginBottom:4}}>💡 왜 이 금액인가?</div>
+              <div style={{fontSize:10.5,color:"#78350f",lineHeight:1.7}}>{cd.whyThisCost}</div>
+            </div>
+            {/* 항목별 비용 산출표 */}
+            <div style={{borderRadius:10,border:"1px solid #e2e8f0",overflow:"hidden",marginBottom:10}}>
+              <div style={{padding:"8px 14px",background:"#f8fafc",borderBottom:"1px solid #e2e8f0",display:"flex",alignItems:"center",gap:5}}>
+                <span style={{fontSize:12}}>📊</span>
+                <span style={{fontSize:11,fontWeight:700,color:"#0f172a"}}>항목별 비용 산출 내역</span>
+              </div>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:10}}>
+                <thead><tr style={{background:"#f1f5f9"}}>
+                  {["항목","수리방식","산출 근거","총액","과실%","자사 부담"].map((h,hi)=><th key={hi} style={{padding:"7px 10px",textAlign:hi>=3?"right":"left",fontWeight:700,color:"#475569",borderBottom:"1px solid #e2e8f0",fontSize:9.5}}>{h}</th>)}
+                </tr></thead>
+                <tbody>{cd.rows.map((r,ri)=><tr key={ri} style={{borderBottom:"1px solid #f1f5f9"}}>
+                  <td style={{padding:"7px 10px",fontWeight:600,color:r.color}}>
+                    <div style={{display:"flex",alignItems:"center",gap:4}}>
+                      <div style={{width:4,height:16,borderRadius:2,background:r.color}}/>
+                      {r.cat}
+                    </div></td>
+                  <td style={{padding:"7px 10px",color:"#64748b"}}>{r.method}</td>
+                  <td style={{padding:"7px 10px",color:"#64748b",fontSize:9}}>{r.detail}</td>
+                  <td style={{padding:"7px 10px",textAlign:"right",fontWeight:600,color:"#0f172a",fontFamily:"'DM Mono',monospace"}}>{r.gross>0?"₩"+r.gross.toLocaleString():"—"}</td>
+                  <td style={{padding:"7px 10px",textAlign:"right",color:"#6366f1",fontWeight:600}}>{r.faultPct>0?r.faultPct+"%":(r.note||"—")}</td>
+                  <td style={{padding:"7px 10px",textAlign:"right",fontWeight:700,color:r.net>0?CC[selIdx]:"#94a3b8",fontFamily:"'DM Mono',monospace"}}>{r.net>0?"₩"+r.net.toLocaleString():"₩0"}</td>
+                </tr>)}
+                <tr style={{background:"#f8fafc",borderTop:"2px solid #e2e8f0"}}>
+                  <td colSpan={5} style={{padding:"8px 10px",fontWeight:800,color:"#0f172a",fontSize:11}}>자사 보험사 총 지출</td>
+                  <td style={{padding:"8px 10px",textAlign:"right",fontWeight:800,color:CC[selIdx],fontSize:14,fontFamily:"'DM Mono',monospace"}}>₩{cd.total.toLocaleString()}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            {/* 수리방식별 비용 비교 */}
+            <div style={{borderRadius:10,border:"1px solid #e2e8f0",overflow:"hidden",marginBottom:10}}>
+              <div style={{padding:"8px 14px",background:"#f8fafc",borderBottom:"1px solid #e2e8f0",display:"flex",alignItems:"center",gap:5}}>
+                <span style={{fontSize:12}}>🔧</span>
+                <span style={{fontSize:11,fontWeight:700,color:"#0f172a"}}>수리방식별 비용 비교 (A차 / B차)</span>
+                <span style={{fontSize:9,color:"#94a3b8",marginLeft:4}}>— 수리방식 선택에 따른 비용 차이</span>
+              </div>
+              {cd.repairCompare.map((rc,rci)=><div key={rci} style={{padding:"10px 14px",borderBottom:rci<cd.repairCompare.length-1?"1px solid #f1f5f9":"none",display:"grid",gridTemplateColumns:"140px 1fr 1fr 1fr",gap:8,alignItems:"center",background:rc.method.includes("✓")?CC[selIdx]+"05":"transparent"}}>
+                <div style={{display:"flex",alignItems:"center",gap:5}}>
+                  <span style={{fontSize:14}}>{rc.icon}</span>
+                  <div>
+                    <div style={{fontSize:10,fontWeight:700,color:rc.method.includes("✓")?CC[selIdx]:"#0f172a"}}>{rc.method}</div>
+                  </div>
+                </div>
+                <div>
+                  <div style={{fontSize:8,color:"#94a3b8",fontWeight:600}}>A차 (자사 그랜저)</div>
+                  <div style={{fontSize:9.5,color:"#334155",lineHeight:1.5}}>{rc.aCarCost}</div>
+                </div>
+                <div>
+                  <div style={{fontSize:8,color:"#94a3b8",fontWeight:600}}>B차 (타사 BMW)</div>
+                  <div style={{fontSize:9.5,color:"#334155",lineHeight:1.5}}>{rc.bCarCost}</div>
+                </div>
+                <div>
+                  <div style={{fontSize:8,color:"#94a3b8",fontWeight:600}}>영향</div>
+                  <div style={{fontSize:9.5,color:rc.method.includes("✓")?CC[selIdx]:"#475569",fontWeight:600,lineHeight:1.5}}>{rc.totalImpact}</div>
+                </div>
+              </div>)}
+            </div>
+          </div>;})()}
           {/* 장점/단점 */}
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:10}}>
             <div style={{padding:"8px 10px",borderRadius:8,background:"#f0fdf4",border:"1px solid #bbf7d0"}}>
