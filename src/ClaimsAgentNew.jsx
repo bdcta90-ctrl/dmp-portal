@@ -4611,6 +4611,7 @@ function TabData(){
   const[expandedMap,setExpandedMap]=useState(null);
   const[graphMode,setGraphMode]=useState("default");// "default" or "detail"
   const[expandedRule,setExpandedRule]=useState(null);
+  const[graphCase,setGraphCase]=useState("generic");// "generic","uc1","uc2","uc3"
   const fileRef=useRef(null);
   const PER=100;
   const ds=DATASETS[DK[dk]];
@@ -4859,80 +4860,82 @@ function TabData(){
 
       {/* ═══ 확대 지식 그래프 ═══ */}
       <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",marginBottom:14,overflow:"hidden"}}>
-        <div style={{padding:"12px 20px",borderBottom:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        {/* 헤더 */}
+        <div style={{padding:"12px 20px",borderBottom:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6}}>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <div style={{width:7,height:7,borderRadius:"50%",background:"#6366f1"}}/>
             <span style={{fontSize:12.5,fontWeight:700,color:"#0f172a"}}>지식 그래프 (Knowledge Graph)</span></div>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            {/* Default / Detail 토글 */}
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            {/* Case 선택 */}
             <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
-              {[{id:"default",l:"기본"},{id:"detail",l:"상세 (DB)"}].map(m=>(
-                <button key={m.id} onClick={()=>setGraphMode(m.id)} style={{padding:"4px 12px",borderRadius:6,border:"none",fontSize:10,fontWeight:graphMode===m.id?700:500,background:graphMode===m.id?"#fff":"transparent",color:graphMode===m.id?"#6366f1":"#94a3b8",cursor:"pointer",boxShadow:graphMode===m.id?"0 1px 3px rgba(0,0,0,.06)":"none",transition:"all .15s"}}>{m.l}</button>))}
+              {[{id:"generic",l:"일반 구조"},{id:"uc1",l:"Case 1",c:"#dc2626"},{id:"uc2",l:"Case 2",c:"#f59e0b"},{id:"uc3",l:"Case 3",c:"#7c3aed"}].map(m=>(
+                <button key={m.id} onClick={()=>setGraphCase(m.id)} style={{padding:"4px 10px",borderRadius:6,border:"none",fontSize:9.5,fontWeight:graphCase===m.id?700:500,background:graphCase===m.id?"#fff":"transparent",color:graphCase===m.id?(m.c||"#0f172a"):"#94a3b8",cursor:"pointer",boxShadow:graphCase===m.id?"0 1px 3px rgba(0,0,0,.06)":"none",transition:"all .15s"}}>{m.l}</button>))}
             </div>
-            <div style={{display:"flex",gap:4}}>
-              {[{c:"#2563eb",l:"object"},{c:"#dc2626",l:"event"},{c:"#7c3aed",l:"ratio"},{c:"#059669",l:"money"},{c:"#b45309",l:"contract"}].map((t,i)=>(
-                <span key={i} style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:t.c+"10",color:t.c,fontWeight:600,border:`1px solid ${t.c}20`}}>{t.l}</span>))}
+            <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
+              {[{id:"default",l:"기본"},{id:"detail",l:"상세"}].map(m=>(
+                <button key={m.id} onClick={()=>setGraphMode(m.id)} style={{padding:"4px 10px",borderRadius:6,border:"none",fontSize:9.5,fontWeight:graphMode===m.id?700:500,background:graphMode===m.id?"#fff":"transparent",color:graphMode===m.id?"#6366f1":"#94a3b8",cursor:"pointer",transition:"all .15s"}}>{m.l}</button>))}
             </div>
           </div>
         </div>
+        {/* Case 요약 배너 */}
+        {graphCase!=="generic"&&(()=>{
+          const ci={uc1:{t:"Case 1: 교차로 골목길 충돌",c:"#dc2626",d:"그랜저 vs BMW 7시리즈 · 과실 50:50 분쟁 · 대인 5명 · 수리비 ₩30M"},uc2:{t:"Case 2: 주차장 신차 충돌",c:"#f59e0b",d:"그랜저 vs GV80(3개월) · 100% 자사과실 · 감가 리스크 · 수리비 ₩10M"},uc3:{t:"Case 3: 차선변경 과실 분쟁",c:"#7c3aed",d:"A차 vs BMW 5시리즈 · 타사 0:100 주장 vs AI 85:15 · 경상 12급 2명"}}[graphCase];
+          const oR=runOntologyInference(buildContextFromCase(graphCase));
+          return<div>
+            <div style={{padding:"10px 20px",background:ci.c+"06",borderBottom:"1px solid "+ci.c+"15",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <div style={{width:10,height:10,borderRadius:"50%",background:ci.c}}/>
+                <span style={{fontSize:12,fontWeight:700,color:ci.c}}>{ci.t}</span>
+                <span style={{fontSize:10,color:"#64748b"}}>{ci.d}</span></div>
+              <div style={{padding:"3px 10px",borderRadius:6,background:ci.c+"12",border:"1px solid "+ci.c+"25",fontSize:9.5,fontWeight:700,color:ci.c}}>🧠 {oR.rulesFired}개 규칙 발동</div>
+            </div>
+            <div style={{padding:"6px 20px",background:"#f8fafc",borderBottom:"1px solid #e2e8f0",display:"flex",gap:4,flexWrap:"wrap"}}>
+              {oR.results.map((r,i)=>{const sc={critical:"#dc2626",warning:"#d97706",positive:"#059669",info:"#2563eb"}[r.severity]||"#94a3b8";
+                return<span key={i} style={{fontSize:8,padding:"2px 7px",borderRadius:5,background:sc+"10",color:sc,fontWeight:700,border:"1px solid "+sc+"18"}}>{r.ruleId} {r.flag}</span>;})}</div>
+          </div>;})()}
         {(()=>{
-          // 노드별 DB 매핑 (Detail 모드에서 표시)
-          const nodeDBs={
-            "사고":    [{db:"ACCIDENT_TYPES",icon:"🚦",label:"사고유형 10+종"},{db:"UC_SCENARIOS",icon:"⭐",label:"시나리오 3건"}],
-            "차량A":   [{db:"VEHICLE_DB",icon:"🚗",label:"36브랜드 263모델"},{db:"CASE_CARS",icon:"🔄",label:"A차 연동 3세트"}],
-            "차량B":   [{db:"VEHICLE_DB",icon:"🚙",label:"36브랜드 263모델"},{db:"CASE_CARS",icon:"🔄",label:"B차 연동 3세트"}],
-            "파손A":   [{db:"DAMAGE_CATS",icon:"🔧",label:"8카테고리 50+부위"},{db:"DAMAGE_CONFIGS",icon:"🎯",label:"A차 다이어그램"}],
-            "파손B":   [{db:"DAMAGE_CATS",icon:"🔩",label:"8카테고리 50+부위"},{db:"DAMAGE_CONFIGS",icon:"🎯",label:"B차 다이어그램"}],
-            "피해자":  [{db:"injuryGrades",icon:"🏥",label:"상해등급 1~14급"},{db:"consolation",icon:"💐",label:"위자료 기준"}],
-            "과실":    [{db:"faultRules",icon:"⚖️",label:"과실비율 5유형"},{db:"majorFaults",icon:"⚠️",label:"12대 중과실"}],
-            "견적":    [{db:"PP",icon:"💰",label:"부품가격 15종"},{db:"부품DB",icon:"⚙️",label:"48,637건"},{db:"certifiedParts",icon:"🔩",label:"품질인증부품"}],
-            "보험":    [{db:"coverage",icon:"🛡️",label:"보장종목 7종"},{db:"deductible",icon:"💳",label:"자기부담금"},{db:"rental",icon:"🚗",label:"렌트 6등급"},{db:"penalties",icon:"🍺",label:"음주·무면허"}],
-            "처리":    [{db:"UC_PROCESS_*",icon:"📐",label:"처리방법 3안"},{db:"CUST_PREFS",icon:"🎯",label:"자사성향6+타사성향6종"},{db:"claimProcess",icon:"📋",label:"지급프로세스 6단계"}],
+          const CND={
+            generic:{사고:{v:"사고 유형",s:"10+종"},차량A:{v:"자사 차량",s:"36브랜드"},차량B:{v:"타사 차량",s:"263모델"},파손A:{v:"A차 파손",s:"8카테고리"},파손B:{v:"B차 파손",s:"50+부위"},피해자:{v:"인적 피해",s:"14등급"},과실:{v:"과실 비율",s:"5유형"},견적:{v:"견적 산출",s:"15종 부품"},보험:{v:"보험 적용",s:"7종목"},처리:{v:"최종 처리",s:"3안"}},
+            uc1:{사고:{v:"교차로 골목길 충돌",s:"쌍방직진"},차량A:{v:"현대 그랜저 2023",s:"25,138km"},차량B:{v:"BMW 7시리즈 2023",s:"15,000km"},파손A:{v:"좌전면 4부위",s:"범퍼·펜더·도어·헤드"},파손B:{v:"우전면 6부위",s:"범퍼·본넷·헤드·그릴·라디"},피해자:{v:"5명 (타3+자2)",s:"12급 경상"},과실:{v:"50 : 50 (AI)",s:"타사 70:30 주장"},견적:{v:"A:₩5M / B:₩15M",s:"B차 ₩10M 삭감"},보험:{v:"대인Ⅰ+Ⅱ+대물+자차",s:"자기부담금 ₩50만"},처리:{v:"최적안 ₩14,500,000",s:"₩15.2M 절감"}},
+            uc2:{사고:{v:"지하주차장 후진충돌",s:"100% 자사과실"},차량A:{v:"그랜저 캘리 2024",s:"8,500km"},차량B:{v:"GV80 3.5T 2025",s:"출고3개월 3,000km"},파손A:{v:"우전면 3부위",s:"범퍼·헤드·펜더"},파손B:{v:"전면 7부위",s:"범퍼·본넷·헤드·그릴"},피해자:{v:"없음",s:"대물만"},과실:{v:"100 : 0 (자사)",s:"분쟁 없음"},견적:{v:"A:₩1.83M / B:₩6.38M",s:"₩3.62M 삭감+OEM25%"},보험:{v:"대물+자차",s:"OEM 인센티브 ₩1.6M"},처리:{v:"최적안 ₩8,210,000",s:"₩5.59M 절감"}},
+            uc3:{사고:{v:"차선변경 중 직진차 충돌",s:"급차선변경"},차량A:{v:"현대 그랜저 2022",s:"35,000km"},차량B:{v:"BMW 5시리즈 2024",s:"12,000km"},파손A:{v:"우후방 3부위",s:"리어범퍼·쿼터·도어"},파손B:{v:"좌전면 2부위",s:"범퍼·펜더"},피해자:{v:"2명 (12급)",s:"치료 21일 (<4주)"},과실:{v:"85 : 15 (AI)",s:"타사 0:100 주장"},견적:{v:"A:₩1.5M / B:₩1.2M",s:"소규모"},보험:{v:"대인Ⅰ+대물+자차",s:"자기부담금 ₩20만"},처리:{v:"최적안 ₩4,725,000",s:"₩1.98M 절감"}},
           };
-          const isDetail=graphMode==="detail";
-          const gH=isDetail?950:520;
-          // Detail 모드에서 노드 간격을 대폭 벌림 (DB 태그 겹침 방지)
-          const nodes=isDetail?[
-            {id:"피해자",  x:50, y:5,  w:56},
-            {id:"차량A",   x:20, y:17, w:60},
-            {id:"차량B",   x:80, y:17, w:60},
-            {id:"사고",    x:50, y:30, w:70},
-            {id:"파손A",   x:12, y:43, w:56},
-            {id:"파손B",   x:88, y:43, w:56},
-            {id:"과실",    x:20, y:57, w:56},
-            {id:"견적",    x:50, y:57, w:56},
-            {id:"보험",    x:50, y:73, w:64},
-            {id:"처리",    x:50, y:90, w:64},
+          const cData=CND[graphCase]||CND.generic;
+          const isCase=graphCase!=="generic";
+          const NDB={
+            "사고":[{icon:"🚦",label:"사고유형 10+종"},{icon:"⭐",label:"시나리오 3건"}],
+            "차량A":[{icon:"🚗",label:"36브랜드 263모델"},{icon:"🔄",label:"A차 연동"}],
+            "차량B":[{icon:"🚙",label:"36브랜드 263모델"},{icon:"🔄",label:"B차 연동"}],
+            "파손A":[{icon:"🔧",label:"8카테고리 50+부위"},{icon:"🎯",label:"다이어그램"}],
+            "파손B":[{icon:"🔩",label:"8카테고리 50+부위"},{icon:"🎯",label:"다이어그램"}],
+            "피해자":[{icon:"🏥",label:"상해등급 1~14급"},{icon:"💐",label:"위자료"}],
+            "과실":[{icon:"⚖️",label:"과실비율 5유형"},{icon:"⚠️",label:"12대 중과실"}],
+            "견적":[{icon:"💰",label:"부품가격 15종"},{icon:"⚙️",label:"부품DB 48,637건"}],
+            "보험":[{icon:"🛡️",label:"보장종목 7종"},{icon:"💳",label:"자기부담금"},{icon:"🚗",label:"렌트 6등급"}],
+            "처리":[{icon:"📐",label:"처리방법 3안"},{icon:"🎯",label:"고객성향 12종"}],
+          };
+          const isD=graphMode==="detail";
+          const gH=isD?950:isCase?600:520;
+          const nodes=isD?[
+            {id:"피해자",x:50,y:5,w:56},{id:"차량A",x:20,y:17,w:60},{id:"차량B",x:80,y:17,w:60},
+            {id:"사고",x:50,y:30,w:70},{id:"파손A",x:12,y:43,w:56},{id:"파손B",x:88,y:43,w:56},
+            {id:"과실",x:20,y:57,w:56},{id:"견적",x:50,y:57,w:56},{id:"보험",x:50,y:73,w:64},{id:"처리",x:50,y:90,w:64},
           ]:[
-            {id:"피해자",  x:50, y:10, w:56},
-            {id:"차량A",   x:26, y:18, w:60},
-            {id:"차량B",   x:74, y:18, w:60},
-            {id:"사고",    x:50, y:33, w:70},
-            {id:"파손A",   x:14, y:38, w:56},
-            {id:"파손B",   x:86, y:38, w:56},
-            {id:"과실",    x:26, y:52, w:56},
-            {id:"견적",    x:50, y:52, w:56},
-            {id:"보험",    x:50, y:68, w:64},
-            {id:"처리",    x:50, y:85, w:64},
+            {id:"피해자",x:50,y:10,w:56},{id:"차량A",x:26,y:18,w:60},{id:"차량B",x:74,y:18,w:60},
+            {id:"사고",x:50,y:33,w:70},{id:"파손A",x:14,y:38,w:56},{id:"파손B",x:86,y:38,w:56},
+            {id:"과실",x:26,y:52,w:56},{id:"견적",x:50,y:52,w:56},{id:"보험",x:50,y:68,w:64},{id:"처리",x:50,y:85,w:64},
           ];
-          const edges=nodes.length?[
-            {from:"사고",to:"차량A",  l:"involves (자사)",    c:"#2563eb", m:"arrowB"},
-            {from:"사고",to:"차량B",  l:"involves (타사)",    c:"#dc2626", m:"arrowR"},
-            {from:"사고",to:"피해자", l:"causes (피해발생)",   c:"#7c3aed", m:"arrowP"},
-            {from:"사고",to:"과실",   l:"determines (과실결정)",c:"#6366f1", m:"arrowP"},
-            {from:"차량A",to:"파손A", l:"has_damage",         c:"#0891b2", m:"arrowT"},
-            {from:"차량B",to:"파손B", l:"has_damage",         c:"#f97316", m:"arrowG"},
-            {from:"파손A",to:"견적",  l:"calculates (A견적)", c:"#0891b2", m:"arrowT"},
-            {from:"파손B",to:"견적",  l:"calculates (B견적)", c:"#f97316", m:"arrowG"},
-            {from:"피해자",to:"보험", l:"triggers (보험적용)", c:"#b45309", m:"arrowG"},
-            {from:"과실",to:"보험",   l:"applies (과실상계)",  c:"#6366f1", m:"arrowP"},
-            {from:"견적",to:"보험",   l:"validates (적정성검증)",c:"#059669",m:"arrowE"},
-            {from:"보험",to:"처리",   l:"produces (처리안도출)",c:"#059669", m:"arrowE"},
-          ].map(e=>{const fn=nodes.find(n=>n.id===e.from);const tn=nodes.find(n=>n.id===e.to);return{...e,x1:fn.x,y1:fn.y,x2:tn.x,y2:tn.y};}):[];
-
+          const ccol={uc1:"#dc2626",uc2:"#f59e0b",uc3:"#7c3aed"}[graphCase]||"#6366f1";
+          const edges=[
+            {from:"사고",to:"차량A",l:"involves (자사)",c:"#2563eb",m:"arrowB"},{from:"사고",to:"차량B",l:"involves (타사)",c:"#dc2626",m:"arrowR"},
+            {from:"사고",to:"피해자",l:"causes (피해발생)",c:"#7c3aed",m:"arrowP"},{from:"사고",to:"과실",l:"determines (과실결정)",c:"#6366f1",m:"arrowP"},
+            {from:"차량A",to:"파손A",l:"has_damage",c:"#0891b2",m:"arrowT"},{from:"차량B",to:"파손B",l:"has_damage",c:"#f97316",m:"arrowG"},
+            {from:"파손A",to:"견적",l:"calculates (A견적)",c:"#0891b2",m:"arrowT"},{from:"파손B",to:"견적",l:"calculates (B견적)",c:"#f97316",m:"arrowG"},
+            {from:"피해자",to:"보험",l:"triggers (보험적용)",c:"#b45309",m:"arrowG"},{from:"과실",to:"보험",l:"applies (과실상계)",c:"#6366f1",m:"arrowP"},
+            {from:"견적",to:"보험",l:"validates (적정성검증)",c:"#059669",m:"arrowE"},{from:"보험",to:"처리",l:"produces (처리안도출)",c:"#059669",m:"arrowE"},
+          ].map(e=>{const fn=nodes.find(n=>n.id===e.from);const tn=nodes.find(n=>n.id===e.to);return{...e,x1:fn.x,y1:fn.y,x2:tn.x,y2:tn.y};});
           return <div style={{position:"relative",height:gH,background:"#fafbfc",padding:"20px 10px",transition:"height .3s"}}>
             <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,#e2e8f0 1px,transparent 1px)",backgroundSize:"24px 24px",opacity:.5}}/>
-            {/* SVG 관계선 */}
             <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:1}}>
               <defs>
                 <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/></marker>
@@ -4943,39 +4946,34 @@ function TabData(){
                 <marker id="arrowE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#059669"/></marker>
               </defs>
               {edges.map((l,i)=><g key={i}>
-                <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke={l.c} strokeWidth="1.5" strokeOpacity=".5" markerEnd={`url(#${l.m})`}/>
-                <rect x={((l.x1+l.x2)/2-0.1)+"%"} y={((l.y1+l.y2)/2-1.5)+"%"} width={Math.max(l.l.length*3.5,40)} height="14" rx="4" fill="#fff" stroke={l.c} strokeWidth=".5" strokeOpacity=".4" transform={`translate(-${Math.max(l.l.length*1.7,20)},0)`}/>
+                <line x1={l.x1+"%"} y1={l.y1+"%"} x2={l.x2+"%"} y2={l.y2+"%"} stroke={l.c} strokeWidth="1.5" strokeOpacity=".5" markerEnd={"url(#"+l.m+")"}/>
+                <rect x={((l.x1+l.x2)/2-0.1)+"%"} y={((l.y1+l.y2)/2-1.5)+"%"} width={Math.max(l.l.length*3.5,40)} height="14" rx="4" fill="#fff" stroke={l.c} strokeWidth=".5" strokeOpacity=".4" transform={"translate(-"+Math.max(l.l.length*1.7,20)+",0)"}/>
                 <text x={((l.x1+l.x2)/2)+"%"} y={((l.y1+l.y2)/2+0.8)+"%"} fill={l.c} fontSize="7.5" fontWeight="600" textAnchor="middle">{l.l}</text>
               </g>)}
             </svg>
-            {/* 엔티티 노드 */}
-            {nodes.map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;const dbs=nodeDBs[n.id]||[];
-              // DB 태그 위치: 좌측 노드는 왼쪽, 우측 노드는 오른쪽, 중앙 노드는 교대
-              const dbSide=n.x<30?"left":n.x>70?"right":{"피해자":"right","사고":"left","견적":"right","보험":"left","처리":"right"}[n.id]||"right";
+            {nodes.map(n=>{const ent=ONTOLOGY.entities[n.id];if(!ent)return null;const dbs=NDB[n.id]||[];const cv=cData[n.id];
+              const ds=n.x<30?"left":n.x>70?"right":{"피해자":"right","사고":"left","견적":"right","보험":"left","처리":"right"}[n.id]||"right";
               return<div key={n.id} style={{position:"absolute",left:n.x+"%",top:n.y+"%",transform:"translate(-50%,-50%)",zIndex:3}}>
-                <div style={{display:"flex",alignItems:isDetail?"center":"center",gap:isDetail?6:0,flexDirection:isDetail?(dbSide==="left"?"row":"row"):"column"}}>
-                  {/* DB 태그 - 왼쪽 배치 */}
-                  {isDetail&&dbSide==="left"&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,alignItems:"flex-end",animation:"fadeIn .3s",order:-1}}>
-                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:"#fff",border:`1.5px solid ${ent.color}25`,whiteSpace:"nowrap",boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
-                      <span style={{fontSize:10}}>{d.icon}</span>
-                      <span style={{fontSize:8,fontWeight:600,color:ent.color}}>{d.label}</span>
-                    </div>)}
-                  </div>}
-                  {/* 노드 본체 */}
+                <div style={{display:"flex",alignItems:isD||isCase?"center":"center",gap:isD||isCase?6:0,flexDirection:isD?(ds==="left"?"row":"row"):"column"}}>
+                  {isD&&ds==="left"&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,alignItems:"flex-end",animation:"fadeIn .3s",order:-1}}>
+                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:"#fff",border:"1.5px solid "+ent.color+"25",whiteSpace:"nowrap",boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+                      <span style={{fontSize:10}}>{d.icon}</span><span style={{fontSize:8,fontWeight:600,color:ent.color}}>{d.label}</span></div>)}</div>}
                   <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:n.w}}>
-                    <div style={{width:46,height:46,borderRadius:12,background:"#fff",border:`2.5px solid ${ent.color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:`0 3px 12px ${ent.color}18`}}>{ent.icon}</div>
-                    <div style={{background:"#fff",padding:"3px 10px",borderRadius:6,border:`1.5px solid ${ent.color}`,boxShadow:`0 2px 6px ${ent.color}10`}}>
-                      <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
-                      <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
+                    <div style={{width:46,height:46,borderRadius:12,background:isCase?ccol+"06":"#fff",border:"2.5px solid "+(isCase?ccol:ent.color),display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,boxShadow:"0 3px 12px "+ent.color+"18"}}>{ent.icon}</div>
+                    <div style={{background:"#fff",padding:isCase?"4px 10px":"3px 10px",borderRadius:6,border:"1.5px solid "+ent.color,boxShadow:"0 2px 6px "+ent.color+"10",maxWidth:isCase?160:100}}>
+                      {isCase&&cv?<>
+                        <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
+                        <div style={{fontSize:8.5,fontWeight:600,color:"#0f172a",textAlign:"center",lineHeight:1.4}}>{cv.v}</div>
+                        <div style={{fontSize:7.5,color:"#64748b",textAlign:"center"}}>{cv.s}</div>
+                      </>:<>
+                        <div style={{fontSize:9.5,fontWeight:800,color:ent.color,textAlign:"center"}}>{n.id}</div>
+                        <div style={{fontSize:7,color:"#94a3b8",textAlign:"center"}}>{ent.desc}</div>
+                      </>}
                     </div>
                   </div>
-                  {/* DB 태그 - 오른쪽 배치 */}
-                  {isDetail&&dbSide==="right"&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,alignItems:"flex-start",animation:"fadeIn .3s"}}>
-                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:"#fff",border:`1.5px solid ${ent.color}25`,whiteSpace:"nowrap",boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
-                      <span style={{fontSize:10}}>{d.icon}</span>
-                      <span style={{fontSize:8,fontWeight:600,color:ent.color}}>{d.label}</span>
-                    </div>)}
-                  </div>}
+                  {isD&&ds==="right"&&dbs.length>0&&<div style={{display:"flex",flexDirection:"column",gap:2,alignItems:"flex-start",animation:"fadeIn .3s"}}>
+                    {dbs.map((d,di)=><div key={di} style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:6,background:"#fff",border:"1.5px solid "+ent.color+"25",whiteSpace:"nowrap",boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+                      <span style={{fontSize:10}}>{d.icon}</span><span style={{fontSize:8,fontWeight:600,color:ent.color}}>{d.label}</span></div>)}</div>}
                 </div></div>;})}
           </div>;
         })()}
