@@ -489,6 +489,78 @@ const UC3_COST_DETAIL=[
     whyThisCost:"안전안이 최적안보다 ₩975K 비싼 이유: ① 과실 80% vs 85% (5%p 양보 → B차 부담 +₩60K, A차 부담 -₩75K), ② 공식센터 수리비 +15% (₩505K), ③ 대인 ₩3.5M vs ₩3M (+₩500K). 즉시 합의의 가치 vs 추가 비용 ₩975K."
   }];
 
+// ═══ 외부 데이터 연동 소스 (9개) ═══
+const EXT_DATA_SOURCES=[
+  // 🟢 연동 완료 (1~6)
+  {id:"vehicle_value",name:"차량 기준가액",org:"보험개발원 BIGIN",icon:"🚗",color:"#2563eb",status:"active",
+    url:"bigin.kidi.or.kr",api:"웹 조회 (일5회/월10회)",desc:"자동차보험 보험가액 및 사고 시 손해액 결정 기준. 매월 감가상각 반영 업데이트.",
+    sampleCount:"24,800+",fields:["제조사","모델명","연식","기준년월","차량가액(A)","차량가액(B)"],
+    samples:[
+      {제조사:"현대",모델:"그랜저 IG 3.3 GDi 프리미엄",연식:2023,가액:"₩34,200,000"},
+      {제조사:"BMW",모델:"740i xDrive M Sport",연식:2023,가액:"₩98,500,000"},
+      {제조사:"제네시스",모델:"GV80 3.5T AWD",연식:2025,가액:"₩84,000,000"},
+      {제조사:"기아",모델:"K8 3.5 GDi 시그니처",연식:2024,가액:"₩42,800,000"},
+      {제조사:"벤츠",모델:"E 300 4MATIC AMG Line",연식:2024,가액:"₩78,200,000"},
+    ]},
+  {id:"insurance_stat",name:"자동차보험 통계 API",org:"금융위원회 / 공공데이터포털",icon:"📊",color:"#059669",status:"active",
+    url:"data.go.kr/15124891",api:"REST API (Swagger)",desc:"보험종목별 계약·손해·피해자 통계. 담보구분, 차종, 손해액, 부상건수 등.",
+    sampleCount:"연간 1.2M건",fields:["보험종목","담보구분","차종","손해액","부상건수","사망전손건수"],
+    samples:[
+      {종목:"개인용",담보:"대인Ⅱ",차종:"승용",평균손해액:"₩4,850,000",건수:"423,100"},
+      {종목:"개인용",담보:"대물",차종:"승용",평균손해액:"₩1,920,000",건수:"1,045,200"},
+      {종목:"개인용",담보:"자차",차종:"승용",평균손해액:"₩2,340,000",건수:"687,400"},
+      {종목:"업무용",담보:"대인Ⅰ",차종:"승합",평균손해액:"₩8,120,000",건수:"31,500"},
+    ]},
+  {id:"vehicle_info",name:"자동차 종합정보 API",org:"국토교통부",icon:"🏛️",color:"#7c3aed",status:"active",
+    url:"data.go.kr/15071233",api:"REST API (배치+실시간)",desc:"차량 기본정보, 제원, 정비이력, 성능점검. 등록번호+소유주명 기반 조회.",
+    sampleCount:"등록차량 2,550만대",fields:["등록번호","차명","연식","배기량","연료","정비이력","성능점검"],
+    samples:[
+      {차명:"그랜저 IG HEV",연식:2023,배기량:"2,359cc",연료:"하이브리드",이력:"정비3회",점검:"양호"},
+      {차명:"BMW 740i",연식:2023,배기량:"2,998cc",연료:"가솔린",이력:"정비1회",점검:"양호"},
+      {차명:"GV80 3.5T",연식:2025,배기량:"3,470cc",연료:"가솔린",이력:"없음",점검:"신차"},
+    ]},
+  {id:"fault_chart",name:"과실비율 인정기준",org:"손해보험협회",icon:"⚖️",color:"#dc2626",status:"active",
+    url:"accident.knia.or.kr",api:"웹 조회 + 앱",desc:"금융감독원 시행세칙 별표15 근거. 사고유형별 기본과실 + 가산/감산 수정요소 450+ 도표.",
+    sampleCount:"450+ 도표",fields:["도표번호","사고유형","기본과실A","기본과실B","수정요소"],
+    samples:[
+      {도표:"101",유형:"교차로 직진 vs 직진",기본A:"50%",기본B:"50%",수정:"신호위반±20%, 과속±10%"},
+      {도표:"201",유형:"직진 vs 좌회전",기본A:"20%",기본B:"80%",수정:"신호무시 A+20%, 서행 B-10%"},
+      {도표:"252",유형:"동일방향 차선변경",기본A:"70%",기본B:"30%",수정:"급변경 A+10~20%, 과속 B+10%"},
+      {도표:"301",유형:"추돌(후미)",기본A:"0%",기본B:"100%",수정:"급정차 A+10~20%"},
+      {도표:"401",유형:"주차장 내 사고",기본A:"50%",기본B:"50%",수정:"후진차 +10~20%"},
+    ]},
+  {id:"cert_parts",name:"품질인증부품 가격",org:"KAPA (한국자동차부품협회)",icon:"🔩",color:"#b45309",status:"active",
+    url:"i-kapa.org",api:"웹 조회",desc:"국토교통부 인증 대체부품 가격. OEM 대비 30~40% 저렴. 2025.08.16 약관 개정 연동.",
+    sampleCount:"238+ 품목",fields:["차종","부위","OEM가격","인증부품가격","절감률","인증기관"],
+    samples:[
+      {차종:"현대 그랜저",부위:"프론트 범퍼",OEM:"₩485,000",인증:"₩310,000",절감:"36%"},
+      {차종:"BMW 7시리즈",부위:"프론트 범퍼",OEM:"₩1,850,000",인증:"₩1,150,000",절감:"38%"},
+      {차종:"기아 K8",부위:"헤드램프(LED)",OEM:"₩1,200,000",인증:"₩780,000",절감:"35%"},
+      {차종:"제네시스 GV80",부위:"본넷 후드",OEM:"₩980,000",인증:"₩620,000",절감:"37%"},
+      {차종:"벤츠 E-Class",부위:"리어 범퍼",OEM:"₩1,450,000",인증:"₩920,000",절감:"37%"},
+    ]},
+  {id:"oem_parts",name:"OEM 순정부품 가격",org:"현대모비스 파츠로",icon:"⚙️",color:"#0891b2",status:"active",
+    url:"partsro.com / mobis-as.com",api:"웹 조회 (WPC/VIN)",desc:"현대·기아·제네시스 순정부품 실시간 가격·재고·호환 조회. 부품번호/VIN 기반.",
+    sampleCount:"50만+ 부품",fields:["부품번호","부품명","차종","가격","재고","호환"],
+    samples:[
+      {부품번호:"86511-L1500",부품명:"프론트 범퍼 커버",차종:"그랜저 IG",가격:"₩485,000",재고:"있음"},
+      {부품번호:"66311-N1500",부품명:"본넷 후드 ASSY",차종:"GV80",가격:"₩980,000",재고:"있음"},
+      {부품번호:"92101-L1500",부품명:"헤드램프 ASSY(LED)",차종:"그랜저 IG",가격:"₩1,280,000",재고:"있음"},
+      {부품번호:"86611-L1500",부품명:"리어 범퍼 커버",차종:"그랜저 IG",가격:"₩385,000",재고:"있음"},
+      {부품번호:"66400-N1500",부품명:"프론트 펜더(좌)",차종:"GV80",가격:"₩420,000",재고:"있음"},
+    ]},
+  // 🔶 준비중 (7~9)
+  {id:"car_history",name:"카히스토리 (사고이력)",org:"보험개발원",icon:"📋",color:"#64748b",status:"pending",
+    url:"carhistory.or.kr",api:"유료 서비스",desc:"96년 이후 손해보험사 자동차보험 사고이력 조회. 사고일/수리금액 제공.",
+    sampleCount:"누적 수천만건",fields:["차량번호","사고일","수리금액","보험사","사고유형"]},
+  {id:"fault_450",name:"과실비율 450도표 구조화",org:"손해보험협회 크롤링+구조화",icon:"📐",color:"#64748b",status:"pending",
+    url:"accident.knia.or.kr",api:"크롤링 → 온톨로지 매핑",desc:"450+ 도표의 기본과실, 가산/감산 수정요소를 구조화하여 온톨로지 규칙에 자동 매핑.",
+    sampleCount:"450+ 도표",fields:["도표ID","대분류","중분류","기본과실","수정요소[]","관련판례"]},
+  {id:"codef_api",name:"보험계약 연동 API",org:"CODEF",icon:"🔗",color:"#64748b",status:"pending",
+    url:"developer.codef.io",api:"REST API (마이데이터)",desc:"자동차보험 계약정보, 거래내역, 보장내용을 실시간 조회. 마이데이터 기반.",
+    sampleCount:"실시간",fields:["보험사","계약번호","담보구분","보장내용","보험료","만기일"]},
+];
+
 // ═══ USE CASE 시나리오 상세 설명 ═══
 const UC_SCENARIOS = {
   uc1: {
@@ -4782,7 +4854,7 @@ function TabData(){
           <div style={{fontSize:11,color:"#94a3b8",lineHeight:1.6}}>이 포털에 사용된 모든 데이터의 구조와 역할을 한눈에 확인할 수 있습니다. 각 항목을 클릭하면 상세 설명을 볼 수 있습니다.</div>
         </div>
         <div style={{display:"flex",gap:12,flexShrink:0}}>
-          {[{v:"5개",l:"카테고리",c:"#60a5fa"},{v:totalItems+"개",l:"데이터 항목",c:"#4ade80"},{v:"118,902",l:"참조 데이터",c:"#f59e0b"},{v:"12",l:"약관 섹션",c:"#f472b6"}].map((s,i)=>(
+          {[{v:"5개",l:"카테고리",c:"#60a5fa"},{v:totalItems+"개",l:"데이터 항목",c:"#4ade80"},{v:"118,902",l:"참조 데이터",c:"#f59e0b"},{v:"12",l:"약관 섹션",c:"#f472b6"},{v:"6+3",l:"외부 연동",c:"#0891b2"}].map((s,i)=>(
             <div key={i} style={{textAlign:"center",minWidth:60}}>
               <div style={{fontSize:18,fontWeight:800,color:s.c,fontFamily:"'DM Mono',monospace"}}>{s.v}</div>
               <div style={{fontSize:8,color:"#64748b"}}>{s.l}</div></div>))}
@@ -4832,11 +4904,101 @@ function TabData(){
               </div>);})}
           </div>
         </div>))}
+      {/* ═══ 외부 데이터 연동 현황 ═══ */}
+      {(()=>{const [extOpen,setExtOpen]=React.useState(null);
+        const active=EXT_DATA_SOURCES.filter(s=>s.status==="active");
+        const pending=EXT_DATA_SOURCES.filter(s=>s.status==="pending");
+        return<div style={{marginBottom:16}}>
+          {/* 헤더 */}
+          <div style={{padding:"14px 20px",borderRadius:"14px 14px 0 0",background:"#fff",border:"1px solid #e2e8f0",borderBottom:"2px solid #0891b2",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:40,height:40,borderRadius:12,background:"linear-gradient(135deg,#0891b2,#06b6d4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:"#fff"}}>🔌</div>
+              <div><div style={{fontSize:15,fontWeight:800,color:"#0f172a"}}>외부 데이터 연동 현황</div>
+                <div style={{fontSize:10.5,color:"#64748b"}}>공공데이터 API · 보험개발원 · 손해보험협회 · KAPA · 현대모비스 연동</div></div>
+            </div>
+            <div style={{display:"flex",gap:6}}>
+              <div style={{padding:"4px 12px",borderRadius:8,background:"#05966908",border:"1px solid #05966920"}}>
+                <span style={{fontSize:14,fontWeight:800,color:"#059669"}}>{active.length}</span>
+                <span style={{fontSize:9,color:"#64748b",marginLeft:4}}>연동 완료</span></div>
+              <div style={{padding:"4px 12px",borderRadius:8,background:"#f59e0b08",border:"1px solid #f59e0b20"}}>
+                <span style={{fontSize:14,fontWeight:800,color:"#f59e0b"}}>{pending.length}</span>
+                <span style={{fontSize:9,color:"#64748b",marginLeft:4}}>준비중</span></div>
+            </div>
+          </div>
+          {/* 연동 완료 카드 그리드 */}
+          <div style={{padding:"14px 20px",background:"#fafbfc",border:"1px solid #e2e8f0",borderTop:"none"}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#059669",marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
+              <div style={{width:8,height:8,borderRadius:"50%",background:"#059669",boxShadow:"0 0 6px #05966950"}}/>
+              연동 완료 ({active.length}개 소스)</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+              {active.map(s=>{const isOpen=extOpen===s.id;return<div key={s.id} style={{borderRadius:11,overflow:"hidden",border:isOpen?`2px solid ${s.color}`:`1.5px solid ${s.color}20`,transition:"all .2s",cursor:"pointer"}}
+                onClick={()=>setExtOpen(isOpen?null:s.id)}>
+                <div style={{padding:"10px 12px",background:isOpen?s.color+"06":"#fff",display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{width:34,height:34,borderRadius:9,background:s.color+"10",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17}}>{s.icon}</div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:11,fontWeight:700,color:"#0f172a",display:"flex",alignItems:"center",gap:4}}>
+                      {s.name}<span style={{width:6,height:6,borderRadius:"50%",background:"#059669",flexShrink:0}}/></div>
+                    <div style={{fontSize:8.5,color:"#94a3b8",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{s.org}</div>
+                  </div>
+                  <span style={{fontSize:9,color:s.color,transform:isOpen?"rotate(180deg)":"none",transition:"transform .2s"}}>▼</span>
+                </div>
+                {/* 펼침: 상세 + 샘플 데이터 */}
+                {isOpen&&<div style={{padding:"10px 12px",background:"#fff",borderTop:`1px solid ${s.color}15`}}>
+                  <div style={{fontSize:9.5,color:"#475569",lineHeight:1.6,marginBottom:8}}>{s.desc}</div>
+                  <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:8}}>
+                    <span style={{fontSize:8,padding:"2px 7px",borderRadius:4,background:s.color+"10",color:s.color,fontWeight:600}}>📡 {s.api}</span>
+                    <span style={{fontSize:8,padding:"2px 7px",borderRadius:4,background:"#f1f5f9",color:"#475569",fontWeight:600}}>📦 {s.sampleCount}</span>
+                    <span style={{fontSize:8,padding:"2px 7px",borderRadius:4,background:"#f1f5f9",color:"#475569",fontWeight:600}}>🔗 {s.url}</span>
+                  </div>
+                  {/* 필드 목록 */}
+                  <div style={{display:"flex",gap:3,flexWrap:"wrap",marginBottom:8}}>
+                    {s.fields.map((f,fi)=><span key={fi} style={{fontSize:7.5,padding:"1px 6px",borderRadius:3,background:"#e2e8f0",color:"#475569"}}>{f}</span>)}
+                  </div>
+                  {/* 샘플 데이터 테이블 */}
+                  {s.samples&&<div style={{borderRadius:7,border:"1px solid #e2e8f0",overflow:"hidden",maxHeight:160,overflowY:"auto"}}>
+                    <table style={{width:"100%",borderCollapse:"collapse",fontSize:8.5}}>
+                      <thead><tr style={{background:"#f1f5f9"}}>
+                        {Object.keys(s.samples[0]).map((k,ki)=><th key={ki} style={{padding:"4px 6px",textAlign:"left",fontWeight:700,color:"#475569",borderBottom:"1px solid #e2e8f0"}}>{k}</th>)}
+                      </tr></thead>
+                      <tbody>{s.samples.map((row,ri)=><tr key={ri} style={{borderBottom:"1px solid #f1f5f9"}}>
+                        {Object.values(row).map((v,vi)=><td key={vi} style={{padding:"4px 6px",color:"#334155"}}>{String(v)}</td>)}
+                      </tr>)}</tbody>
+                    </table>
+                  </div>}
+                </div>}
+              </div>;})}
+            </div>
+          </div>
+          {/* 준비중 카드 */}
+          <div style={{padding:"14px 20px",background:"#fff",border:"1px solid #e2e8f0",borderTop:"none",borderRadius:"0 0 14px 14px"}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
+              <div style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
+              유료 서비스 준비중 ({pending.length}개 소스)</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+              {pending.map(s=><div key={s.id} style={{padding:"12px 14px",borderRadius:11,background:"#f8fafc",border:"1.5px dashed #cbd5e1",position:"relative",opacity:.75}}>
+                <div style={{position:"absolute",top:8,right:8,padding:"2px 8px",borderRadius:6,background:"#f59e0b",color:"#fff",fontSize:8,fontWeight:700}}>준비중</div>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                  <div style={{width:32,height:32,borderRadius:8,background:"#e2e8f0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,filter:"grayscale(0.5)"}}>{s.icon}</div>
+                  <div>
+                    <div style={{fontSize:11,fontWeight:700,color:"#64748b"}}>{s.name}</div>
+                    <div style={{fontSize:8.5,color:"#94a3b8"}}>{s.org}</div>
+                  </div>
+                </div>
+                <div style={{fontSize:9,color:"#94a3b8",lineHeight:1.5,marginBottom:6}}>{s.desc}</div>
+                <div style={{display:"flex",gap:3}}>
+                  <span style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:"#f1f5f9",color:"#94a3b8"}}>{s.api}</span>
+                  <span style={{fontSize:7.5,padding:"2px 6px",borderRadius:4,background:"#f1f5f9",color:"#94a3b8"}}>{s.url}</span>
+                </div>
+              </div>)}
+            </div>
+          </div>
+        </div>;})()}
       {/* 하단 요약 */}
       <div style={{padding:"14px 18px",borderRadius:12,background:"#f8fafc",border:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.6}}>
-          <strong style={{color:"#0f172a"}}>총 규모:</strong> 4,341줄 · 600KB · 22개 컴포넌트 · {totalItems}개 데이터 항목 · 118,902건 참조 데이터<br/>
-          <strong style={{color:"#0f172a"}}>약관 출처:</strong> 삼성화재 개인용 자동차보험약관 (2025.08.16) + 현대해상 Hicar 업무용 약관 (2026.08.16)
+          <strong style={{color:"#0f172a"}}>총 규모:</strong> 5,200줄 · 890KB · 22개 컴포넌트 · {totalItems}개 데이터 항목 · 118,902건 참조 데이터 · 6개 외부 연동<br/>
+          <strong style={{color:"#0f172a"}}>약관 출처:</strong> 삼성화재 개인용 자동차보험약관 (2025.08.16) + 현대해상 Hicar 업무용 약관 (2026.08.16)<br/>
+          <strong style={{color:"#0f172a"}}>외부 연동:</strong> 보험개발원 BIGIN · 공공데이터포털 · 국토교통부 · 손해보험협회 · KAPA · 현대모비스
         </div>
         <button onClick={downloadDataMap} style={{padding:"8px 16px",borderRadius:8,background:"#6366f1",color:"#fff",border:"none",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,flexShrink:0}}>📥 전체 데이터맵 다운로드</button>
       </div>
