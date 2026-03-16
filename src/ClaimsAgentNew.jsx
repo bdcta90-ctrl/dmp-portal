@@ -4684,6 +4684,7 @@ function TabData(){
   const[graphMode,setGraphMode]=useState("default");// "default" or "detail"
   const[expandedRule,setExpandedRule]=useState(null);
   const[graphCase,setGraphCase]=useState("generic");// "generic","uc1","uc2","uc3"
+  const[extOpen,setExtOpen]=useState(null);
   const fileRef=useRef(null);
   const PER=100;
   const ds=DATASETS[DK[dk]];
@@ -4905,7 +4906,7 @@ function TabData(){
           </div>
         </div>))}
       {/* ═══ 외부 데이터 연동 현황 ═══ */}
-      {(()=>{const [extOpen,setExtOpen]=React.useState(null);
+      {(()=>{
         const active=EXT_DATA_SOURCES.filter(s=>s.status==="active");
         const pending=EXT_DATA_SOURCES.filter(s=>s.status==="pending");
         return<div style={{marginBottom:16}}>
