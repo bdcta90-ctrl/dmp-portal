@@ -2199,6 +2199,13 @@ const CASES_INFO=[
   {id:"uc1",label:"Case 1",desc:"교차로 골목길 충돌 — 그랜저 vs BMW 7시리즈",color:"#059669",icon:"🚗"},
   {id:"uc2",label:"Case 2",desc:"주차장 신차 충돌 — GV80 3.5T AWD (3개월)",color:"#3b82f6",icon:"🅿️"},
   {id:"uc3",label:"Case 3",desc:"차선변경 과실 분쟁 — 9:1 vs 10:0",color:"#7c3aed",icon:"🔀"},
+  {id:"uc4",label:"Case 4",desc:"음주+12대중과실+무보험 — K5 vs 투싼",color:"#dc2626",icon:"🍺"},
+  {id:"uc5",label:"Case 5",desc:"렌터카 영업차량 휴차료 — 쏘나타(영업용)",color:"#f97316",icon:"🚕"},
+  {id:"uc6",label:"Case 6",desc:"3중 추돌 다수 과실 배분 — A→B→C",color:"#0891b2",icon:"💥"},
+  {id:"uc7",label:"Case 7",desc:"전부손해+잔존물+할부 — 모하비 전복",color:"#059669",icon:"🔥"},
+  {id:"uc8",label:"Case 8",desc:"동승자 사망+유족 다수 — 스타리아 vs 트럭",color:"#7c3aed",icon:"💀"},
+  {id:"uc9",label:"Case 9",desc:"보험사기 패턴 탐지 — 반복접수 의심",color:"#991b1b",icon:"🚨"},
+  {id:"uc10",label:"Case 10",desc:"태풍 침수+청구 시효 — G80 침수",color:"#1d4ed8",icon:"🌊"},
 ];
 function CaseBar({activeCase,setActiveCase,agentName,agentColor,currentStep,completed,scenarioOpen,setScenarioOpen}){
   const STEPS=["견적 산정","대인 피해","과실 산정","처리 방법"];
@@ -2293,7 +2300,13 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
     applyCarInfo(useCase,side);
   },[dmgTab]);
   useEffect(()=>{
-    if(activeCase==="uc1")loadUC1();else if(activeCase==="uc2")loadUC2();else if(activeCase==="uc3")loadUC3();else clearUC();
+    if(activeCase==="uc1")loadUC1();else if(activeCase==="uc2")loadUC2();else if(activeCase==="uc3")loadUC3();
+    else if(activeCase&&activeCase.startsWith("uc")){
+      // uc4~uc10: UC_SCENARIOS에서 기본 정보 로드, AI가 동적 처리
+      const ctx=buildContextFromCase(activeCase);
+      if(ctx.vehicleA){const parts=ctx.vehicleA.split(" ");if(parts.length>=2){sMk(parts[0]);sMd(parts.slice(1).join(" "));}}
+      setUseCase(activeCase);setVehTab(0);setDmgTab(0);setSmsOpen(false);setReportOpen(false);
+    }else clearUC();
   },[activeCase]);
 
   const filteredMakes=VEHICLE_DB.filter(v=>origin==="전체"||v.origin===origin);
@@ -2827,6 +2840,10 @@ function TabInjury({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
     if(activeCaseProp==="uc1")loadUC();
     else if(activeCaseProp==="uc2"){setInput("[대인 접수 정보 — Case 2 주차장 충돌]\n■ 사고 유형: 주차장 내 주정차 차량 충돌 (100% 자사 과실)\n■ 대인 접수: 없음 (쌍방 무상해)\n\n※ 이 사고는 물적 손해만 발생하여 대인 접수 대상이 아닙니다.");setUseCase("uc2");setResult(null);setAiText("");}
     else if(activeCaseProp==="uc3"){setInput("[대인 접수 정보 — Case 3 차선변경 충돌]\n■ 사고 유형: 차선변경 중 직진차량 충돌\n■ 과실 비율: AI 판정 85:15\n\n[타사 대인 접수 — 1명]\n1. 타사 운전자 (직진 차량)\n   - 상해: 경추 염좌 (목 통증)\n   - 진단: 2주, 통원 치료\n   - 치료비: ₩1,200,000\n   - 위자료: ₩2,500,000\n   - 합의금 요구: ₩4,000,000\n\n[자사 대인 접수 — 1명]\n1. 자사 운전자 (차선변경 차량)\n   - 상해: 경추 불편 호소\n   - 진단: 1주\n   - 치료비: ₩500,000\n   - 접수 고민 중");setUseCase("uc3");setResult(null);setAiText("");}
+    else if(activeCaseProp&&activeCaseProp.startsWith("uc")){
+      const ctx=buildContextFromCase(activeCaseProp);const sc=UC_SCENARIOS[activeCaseProp];
+      const info=`[대인 접수 정보 — ${sc?.title||activeCaseProp}]\n■ 사고 유형: ${ctx.accidentType}\n■ 차량: ${ctx.vehicleA} vs ${ctx.vehicleB}\n■ 피해자: ${ctx.claimants}명 (상해${ctx.injuryGrade}급)\n■ 치료기간: ${ctx.treatDays}일\n■ 과실: ${ctx.faultA}:${ctx.faultB}${ctx.hasFatality?"\n■ ⚠️ 사망 포함 — 유족 "+ctx.heirCount+"명":""}${ctx.dui?"\n■ ⚠️ 음주운전":""}`;
+      setInput(info);setUseCase(activeCaseProp);setResult(null);setAiText("");}
     else clearAll();
   },[activeCaseProp]);
 
@@ -3119,7 +3136,14 @@ function Tab2({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
   };
   const clearUC=()=>{sAt("");sRt("");sWt("");sSg("");sMd("");sOd("");sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setUseCase(null);setReportOpen(false);setAiProg({step:0,msg:"",pct:0});};
   useEffect(()=>{
-    if(activeCaseProp==="uc1")loadUC1();else if(activeCaseProp==="uc2")loadUC2();else if(activeCaseProp==="uc3")loadUC3();else clearUC();
+    if(activeCaseProp==="uc1")loadUC1();else if(activeCaseProp==="uc2")loadUC2();else if(activeCaseProp==="uc3")loadUC3();
+    else if(activeCaseProp&&activeCaseProp.startsWith("uc")){
+      const ctx=buildContextFromCase(activeCaseProp);const sc=UC_SCENARIOS[activeCaseProp];
+      sAt(ctx.accidentType);sRt("편도2차로");sWt("맑음");sSg("신호없음");
+      sMd(`${sc?.title||""} — ${ctx.vehicleA} 사고. 과실 ${ctx.faultA}:${ctx.faultB}.`);
+      sOd(`타사 주장 확인 필요.`);
+      sDc(false);sPr(false);sCctv(false);sWit(false);sRs(null);sAi("");setUseCase(activeCaseProp);setReportOpen(false);
+    }else clearUC();
   },[activeCaseProp]);
 
   const calc=async()=>{if(!at)return;sLd(true);sRs(null);sAi("");
@@ -3535,7 +3559,20 @@ function Tab3({activeCase:activeCaseProp,setActiveCase,flow,onNext}){
     setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});
   };
   useEffect(()=>{
-    if(activeCaseProp==="uc1")loadUC1();else if(activeCaseProp==="uc2")loadUC2();else if(activeCaseProp==="uc3")loadUC3();else clearAll();
+    if(activeCaseProp==="uc1")loadUC1();else if(activeCaseProp==="uc2")loadUC2();else if(activeCaseProp==="uc3")loadUC3();
+    else if(activeCaseProp&&activeCaseProp.startsWith("uc")){
+      const ctx=buildContextFromCase(activeCaseProp);const sc=UC_SCENARIOS[activeCaseProp];
+      setInput(`[${sc?.title||activeCaseProp}]
+사고유형: ${ctx.accidentType}
+자사 차량: ${ctx.vehicleA} / 과실 ${ctx.faultA}%
+타사 차량: ${ctx.vehicleB} / 과실 ${ctx.faultB}%
+수리비: A차 ₩${(ctx.repairCostA||0).toLocaleString()} / B차 ₩${(ctx.repairCostB||0).toLocaleString()}
+피해자: ${ctx.claimants}명 (상해${ctx.injuryGrade}급, 치료${ctx.treatDays}일)
+차량가액: ₩${(ctx.vehicleValue||0).toLocaleString()}${ctx.dui?"\n⚠️ 음주운전 (면책 대상)":""}${ctx.totalLoss?"\n⚠️ 전부손해 검토 대상":""}${ctx.hasFatality?"\n⚠️ 사망 포함 — 유족 "+ctx.heirCount+"명":""}${ctx.isCommercial?"\n⚠️ 영업용 차량 — 휴차료 적용":""}${ctx.fraudScore?"\n⚠️ 사기 의심 스코어 "+ctx.fraudScore+"점":""}${ctx.isFlood?"\n⚠️ 침수 차량 — 전손 특례 검토":""}${ctx.multiVehicle?"\n⚠️ 다중차량("+ctx.vehicleCount+"대) 사고":""}${ctx.hasLoan?"\n⚠️ 할부잔금 ₩"+ctx.loanBalance.toLocaleString():""}
+핵심쟁점: ${sc?.sections?.[1]?.items?.[0]||""}`);
+      setCustPref("");setCustPrefB("");setUseCase(activeCaseProp);setReportOpen(false);
+      setStage("idle");setSummary(null);setProposals(null);setSelIdx(null);setDetText("");setSumText("");setIntakeQs([]);setIntakeAs({});
+    }else clearAll();
   },[activeCaseProp]);
 
   const CUST_PREFS=[
