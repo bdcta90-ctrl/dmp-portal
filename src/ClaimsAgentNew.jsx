@@ -5224,10 +5224,19 @@ function TabData(){
             <span style={{fontSize:12.5,fontWeight:700,color:"#0f172a"}}>지식 그래프 (Knowledge Graph)</span></div>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             {/* Case 선택 */}
-            <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
-              {[{id:"generic",l:"일반"},{id:"uc1",l:"C1",c:"#dc2626"},{id:"uc2",l:"C2",c:"#f59e0b"},{id:"uc3",l:"C3",c:"#7c3aed"},{id:"uc4",l:"C4",c:"#dc2626"},{id:"uc5",l:"C5",c:"#f97316"},{id:"uc6",l:"C6",c:"#0891b2"},{id:"uc7",l:"C7",c:"#059669"},{id:"uc8",l:"C8",c:"#7c3aed"},{id:"uc9",l:"C9",c:"#991b1b"},{id:"uc10",l:"C10",c:"#1d4ed8"}].map(m=>(
-                <button key={m.id} onClick={()=>setGraphCase(m.id)} style={{padding:"4px 10px",borderRadius:6,border:"none",fontSize:9.5,fontWeight:graphCase===m.id?700:500,background:graphCase===m.id?"#fff":"transparent",color:graphCase===m.id?(m.c||"#0f172a"):"#94a3b8",cursor:"pointer",boxShadow:graphCase===m.id?"0 1px 3px rgba(0,0,0,.06)":"none",transition:"all .15s"}}>{m.l}</button>))}
-            </div>
+            <select value={graphCase} onChange={e=>setGraphCase(e.target.value)} style={{padding:"5px 10px",borderRadius:7,border:"1px solid #e2e8f0",background:"#f8fafc",color:"#0f172a",fontSize:10.5,fontWeight:600,cursor:"pointer",outline:"none",minWidth:200}}>
+              <option value="generic">📊 일반 구조</option>
+              <option value="uc1">🚗 Case 1 — 교차로 골목길 충돌</option>
+              <option value="uc2">🅿️ Case 2 — 주차장 신차 충돌</option>
+              <option value="uc3">🔀 Case 3 — 차선변경 과실 분쟁</option>
+              <option value="uc4">🍺 Case 4 — 음주+12대중과실+무보험</option>
+              <option value="uc5">🚕 Case 5 — 렌터카 영업차량 휴차료</option>
+              <option value="uc6">💥 Case 6 — 3중 추돌 다수 배분</option>
+              <option value="uc7">🔥 Case 7 — 전부손해+잔존물+할부</option>
+              <option value="uc8">💀 Case 8 — 동승자 사망+유족 다수</option>
+              <option value="uc9">🚨 Case 9 — 보험사기 패턴 탐지</option>
+              <option value="uc10">🌊 Case 10 — 태풍 침수+청구 시효</option>
+            </select>
             <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
               {[{id:"default",l:"기본"},{id:"detail",l:"상세"}].map(m=>(
                 <button key={m.id} onClick={()=>setGraphMode(m.id)} style={{padding:"4px 10px",borderRadius:6,border:"none",fontSize:9.5,fontWeight:graphMode===m.id?700:500,background:graphMode===m.id?"#fff":"transparent",color:graphMode===m.id?"#6366f1":"#94a3b8",cursor:"pointer",transition:"all .15s"}}>{m.l}</button>))}
