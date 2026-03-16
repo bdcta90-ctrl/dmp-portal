@@ -5453,54 +5453,123 @@ function TabData(){
         </div>;
       })()}
 
-      {/* ═══ RAG vs 온톨로지 — 일반 비교 ═══ */}
+      {/* ═══ RAG vs 온톨로지 — 이해하기 쉬운 비교 ═══ */}
       <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
-        <div style={{fontSize:13,fontWeight:800,color:"#0f172a",marginBottom:12}}>🔬 RAG vs 온톨로지 추론</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
-          <div style={{padding:"14px 16px",borderRadius:12,background:"#fef2f2",border:"1.5px solid #fecaca"}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#dc2626",marginBottom:8}}>📚 기존 RAG 방식</div>
-            <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.8}}>PDF에서 키워드 검색 → 텍스트 조각 반환<br/>
-              "14급이 뭐야?" → 해당 문단만 반환<br/>
-              <b style={{color:"#dc2626"}}>한계:</b> 여러 조건이 결합된 판단 불가<br/>
-              약관 A 페이지 + B 페이지 + C 페이지를 연결하지 못함</div>
+        <div style={{fontSize:14,fontWeight:800,color:"#0f172a",marginBottom:6}}>🔬 RAG vs 온톨로지 추론 — 무엇이 다른가?</div>
+        <div style={{fontSize:10.5,color:"#64748b",marginBottom:14,lineHeight:1.7}}>
+          보험 사고를 처리할 때, AI가 약관·규정·판례를 참조하는 방식은 크게 두 가지입니다. <b style={{color:"#0f172a"}}>RAG</b>(문서 검색)와 <b style={{color:"#0f172a"}}>온톨로지 추론</b>(지식 그래프 기반 판단)의 차이를 이해하면, 왜 복잡한 사고에서 온톨로지가 필요한지 알 수 있습니다.
+        </div>
+        {/* 쉬운 비유 */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 40px 1fr",gap:0,marginBottom:16,alignItems:"stretch"}}>
+          <div style={{padding:"16px 18px",borderRadius:"12px 0 0 12px",background:"#fef2f2",border:"1.5px solid #fecaca",borderRight:"none"}}>
+            <div style={{fontSize:13,fontWeight:700,color:"#dc2626",marginBottom:10}}>📚 RAG (문서 검색)</div>
+            <div style={{fontSize:11,fontWeight:700,color:"#991b1b",marginBottom:8}}>비유: 도서관에서 책 찾기</div>
+            <div style={{fontSize:10,color:"#64748b",lineHeight:1.8,marginBottom:10}}>
+              "교차로 과실"이라고 물으면 → 약관 PDF에서 해당 문단을 찾아서 보여줍니다.<br/>
+              마치 도서관 사서가 "이 책 몇 페이지에 그 내용이 있어요"라고 알려주는 것과 같습니다.</div>
+            <div style={{padding:"10px 12px",borderRadius:8,background:"#fff",border:"1px solid #fecaca"}}>
+              <div style={{fontSize:9.5,fontWeight:700,color:"#dc2626",marginBottom:4}}>✅ 잘하는 것</div>
+              <div style={{fontSize:9.5,color:"#475569",lineHeight:1.6}}>• 단일 질문에 대한 정확한 문구 찾기<br/>• "14급이 뭐야?" → 해당 조항 즉시 반환<br/>• 대량 문서에서 키워드 검색</div>
+            </div>
+            <div style={{padding:"10px 12px",borderRadius:8,background:"#fff",border:"1px solid #fecaca",marginTop:6}}>
+              <div style={{fontSize:9.5,fontWeight:700,color:"#dc2626",marginBottom:4}}>❌ 못하는 것</div>
+              <div style={{fontSize:9.5,color:"#475569",lineHeight:1.6}}>• 여러 조건을 조합한 판단 (A+B+C → 결론)<br/>• 약관 23조 + 별표1 + 별표3을 연결한 추론<br/>• 구체적인 금액 계산 (₩ 단위)</div>
+            </div>
           </div>
-          <div style={{padding:"14px 16px",borderRadius:12,background:"#f0fdf4",border:"1.5px solid #86efac"}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#059669",marginBottom:8}}>🧠 온톨로지 추론</div>
-            <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.8}}>엔티티 관계 + IF-THEN 규칙 → 추론 체인 작동<br/>
-              "14급 + 4주초과 + 과실50%?" → R01→R12→R13 체인<br/>
-              <b style={{color:"#059669"}}>강점:</b> 조건 조합별 자동 판단 도출<br/>
-              약관 전체를 구조화하여 관계 기반 추론 가능</div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(180deg,#fef2f2,#f0fdf4)",fontSize:18,color:"#94a3b8"}}>→</div>
+          <div style={{padding:"16px 18px",borderRadius:"0 12px 12px 0",background:"#f0fdf4",border:"1.5px solid #86efac",borderLeft:"none"}}>
+            <div style={{fontSize:13,fontWeight:700,color:"#059669",marginBottom:10}}>🧠 온톨로지 추론 (지식 그래프)</div>
+            <div style={{fontSize:11,fontWeight:700,color:"#065f46",marginBottom:8}}>비유: 전문가의 두뇌</div>
+            <div style={{fontSize:10,color:"#64748b",lineHeight:1.8,marginBottom:10}}>
+              "교차로 + 음주 + 외산차 + 12급 상해"라고 입력하면 → 관련 규칙들이 자동으로 연쇄 작동합니다.<br/>
+              마치 베테랑 손해사정사가 머릿속에서 여러 조건을 동시에 판단하는 것과 같습니다.</div>
+            <div style={{padding:"10px 12px",borderRadius:8,background:"#fff",border:"1px solid #86efac"}}>
+              <div style={{fontSize:9.5,fontWeight:700,color:"#059669",marginBottom:4}}>✅ 잘하는 것</div>
+              <div style={{fontSize:9.5,color:"#475569",lineHeight:1.6}}>• 여러 조건 조합 → 자동 판단 체인 작동<br/>• R04(과실) → R13(상계) → R09(부담금) 연쇄 추론<br/>• 구체적 금액까지 자동 계산 (₩ 단위)</div>
+            </div>
+            <div style={{padding:"10px 12px",borderRadius:8,background:"#fff",border:"1px solid #86efac",marginTop:6}}>
+              <div style={{fontSize:9.5,fontWeight:700,color:"#059669",marginBottom:4}}>🔗 추가 강점</div>
+              <div style={{fontSize:9.5,color:"#475569",lineHeight:1.6}}>• 새로운 조건이 추가되면 규칙이 자동 재평가<br/>• "만약 음주가 확인되면?" → R05 자동 발동<br/>• 사람이 놓치기 쉬운 규칙도 빠짐없이 체크</div>
+            </div>
           </div>
         </div>
-        {/* ═══ Case별 상세 비교 ═══ */}
-        <div style={{fontSize:12,fontWeight:800,color:"#475569",marginBottom:10}}>📋 Case별 비교 — RAG의 한계 vs 온톨로지의 추론</div>
-        {[{case_:"Case 1: 교차로 충돌 (그랜저 vs BMW 7시리즈)",color:"#dc2626",
-            rag:["\"교차로 과실비율\" 검색 → 약관 50:50 문단 반환 (끝)","\"BMW 수리비 적정\" → 관련 문단 없음 (PDF에 개별 차종 수리비 없음)","\"렌트 동종동급\" → 약관 문구만 반환, 7시리즈→5시리즈 정정은 판단 불가","\"대인 5명 일괄합의\" → 일괄합의 개념 자체가 PDF에 없음"],
-            onto:[{rule:"R04",text:"사고유형 [교차로 골목길] → 자동으로 기본 과실 50:50 산정"},{rule:"R10",text:"BMW(외산) → ×1.6 배수 자동 적용 → 수리비 적정성 검증"},{rule:"R07",text:"7시리즈 렌트 요구 > 동급 → 자동 부적정 판정 + 절감액 산출"},{rule:"R12+R13",text:"상해12급 + 과실50% → 대인Ⅰ 한도₩15M + 상계₩12.5M 자동"},{rule:"R09",text:"자기부담금 ₩5M × 20% → ₩500,000 자동 (최대 캡)"}]},
-          {case_:"Case 2: 주차장 신차 충돌 (그랜저 vs GV80 3개월)",color:"#f59e0b",
-            rag:["\"100% 과실 자기부담금\" → 약관 조항은 반환하지만 실제 계산은 못함","\"신차 감가\" → 판례 정보가 PDF에 없으면 답변 불가","\"품질인증부품 인센티브\" → 2025 개정 내용을 찾더라도 OEM 25% 계산은 불가"],
-            onto:[{rule:"R11",text:"출고 3개월 + 심각 파손 → 신차감가 경고 + ₩8.4M~12.6M 대비"},{rule:"R03",text:"품질인증부품 → OEM 25% 인센티브 = ₩1,595,000 자동 산출"},{rule:"R09",text:"₩1,830,000 × 20% → 최소₩200,000 자기부담금 자동 산출"}]},
-          {case_:"Case 3: 차선변경 과실 분쟁 (A차 vs B차)",color:"#7c3aed",
-            rag:["\"차선변경 과실\" → 70:30 문구만, 급변경 시 80~90% 조정은 판단 불가","\"경상환자 진단서\" → 4주 규정은 찾으나, 해당 건의 경상환자 여부 판단 불가","\"타사 10:0 주장 반박\" → 판례 기반 반박 논리 구성 불가"],
-            onto:[{rule:"R04",text:"차선변경 충돌 → 70:30 산정 + 급변경 시 80~90% 자동 조정"},{rule:"R01",text:"상해12급 + 21일(4주 미만) → 진단서 의무 해당 없음 자동 판정"},{rule:"R13",text:"과실 85:15 → 타사 손해₩5M × 85% = ₩4,250,000 자동"},{rule:"R12",text:"12급 → 대인Ⅰ 한도 ₩15,000,000 자동 + 경상환자 구분"}]}
-        ].map((cs,ci)=>(
-          <div key={ci} style={{marginBottom:10,borderRadius:12,overflow:"hidden",border:`1.5px solid ${cs.color}20`}}>
-            <div style={{padding:"9px 16px",background:cs.color+"06",borderBottom:`1px solid ${cs.color}15`,display:"flex",alignItems:"center",gap:8}}>
-              <div style={{width:10,height:10,borderRadius:"50%",background:cs.color}}/>
-              <span style={{fontSize:12,fontWeight:700,color:cs.color}}>{cs.case_}</span></div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr"}}>
-              <div style={{padding:"12px 16px",borderRight:`1px solid ${cs.color}10`,background:"#fff"}}>
-                <div style={{fontSize:10,fontWeight:700,color:"#dc2626",marginBottom:8}}>📚 RAG의 한계</div>
-                {cs.rag.map((r,ri)=><div key={ri} style={{display:"flex",gap:6,marginBottom:5,alignItems:"flex-start"}}>
-                  <span style={{color:"#dc2626",fontSize:9,marginTop:1,flexShrink:0}}>✗</span>
-                  <span style={{fontSize:9.5,color:"#64748b",lineHeight:1.6}}>{r}</span></div>)}</div>
-              <div style={{padding:"12px 16px",background:"#f0fdf408"}}>
-                <div style={{fontSize:10,fontWeight:700,color:"#059669",marginBottom:8}}>🧠 온톨로지 추론으로 가능</div>
-                {cs.onto.map((o,oi)=><div key={oi} style={{display:"flex",gap:6,marginBottom:5,alignItems:"flex-start"}}>
-                  <span style={{fontSize:8.5,padding:"2px 5px",borderRadius:4,background:"#059669",color:"#fff",fontWeight:700,flexShrink:0,marginTop:1,fontFamily:"'DM Mono',monospace"}}>{o.rule}</span>
-                  <span style={{fontSize:9.5,color:"#334155",lineHeight:1.6}}>{o.text}</span></div>)}</div>
-            </div>
-          </div>))}
+        {/* 한줄 요약 */}
+        <div style={{padding:"10px 14px",borderRadius:10,background:"linear-gradient(135deg,#eff6ff,#ecfdf5)",border:"1px solid #bae6fd",marginBottom:16,textAlign:"center"}}>
+          <span style={{fontSize:11,color:"#0f172a",fontWeight:600}}>💡 정리하면: <b>RAG</b>는 "무엇이 적혀 있는지" 찾아주고, <b>온톨로지</b>는 "이 상황에서 어떻게 판단해야 하는지" 알려줍니다.</span>
+        </div>
+
+        {/* ═══ 선택된 Case의 비교 ═══ */}
+        {(()=>{
+          const ALL_CASE_COMPARE={
+            uc1:{case_:"Case 1: 교차로 충돌 (그랜저 vs BMW 7시리즈)",color:"#dc2626",summary:"과실 분쟁 + 고액 수리비 + 렌트 정정 + 대인 5명이 동시에 얽힌 복합 사건",
+              rag:["\"교차로 과실비율\" 검색 → 약관 50:50 문단만 반환 (구체적 조건 미반영)","\"BMW 수리비 적정가\" → PDF에 개별 차종 수리비 정보 없음","\"렌트 동종동급\" → 약관 문구만 반환, 7시리즈→5시리즈 정정 판단 불가","\"대인 5명 일괄합의\" → 일괄합의 개념 자체가 약관 PDF에 없음"],
+              onto:[{rule:"R04",text:"사고유형 [교차로 골목길] → 기본 과실 50:50 자동 산정"},{rule:"R10",text:"BMW(외산) → ×1.6 배수 적용 → 수리비 적정성 근거"},{rule:"R07",text:"7시리즈 렌트 > 동급 → 부적정 판정 + 5시리즈 정정"},{rule:"R12+R13",text:"상해12급+과실50% → 대인Ⅰ ₩15M + 상계 ₩12.5M"},{rule:"R09",text:"자기부담금 ₩5M×20% → ₩500,000 자동 (최대 캡)"}]},
+            uc2:{case_:"Case 2: 주차장 신차 충돌 (그랜저 vs GV80 3개월)",color:"#f59e0b",summary:"100% 과실 + 신차 감가 리스크 + 품질인증부품 인센티브 활용",
+              rag:["\"100% 과실 자기부담금\" → 약관 조항은 반환하지만 실제 금액 계산 불가","\"신차 감가 청구\" → 판례 정보가 PDF에 없으면 답변 불가","\"품질인증부품 인센티브\" → 2025 개정 내용을 찾더라도 OEM 25% 계산 불가"],
+              onto:[{rule:"R11",text:"출고 3개월+심각 파손 → 감가 ₩8.4M~12.6M 경고"},{rule:"R03",text:"품질인증부품 → OEM 25% = ₩1,595,000 인센티브"},{rule:"R09",text:"₩1,830,000×20% → 최소₩200,000 자기부담금"}]},
+            uc3:{case_:"Case 3: 차선변경 과실 분쟁 (85:15)",color:"#7c3aed",summary:"타사 0:100 주장 반박 + 경상환자 4주 기준 + 과실 상계",
+              rag:["\"차선변경 과실\" → 70:30 문구만 반환, 급변경 80~90% 조정은 판단 불가","\"경상환자 진단서\" → 4주 규정은 찾으나 해당 건 적용 여부 판단 불가","\"타사 10:0 반박\" → 판례 기반 논리 구성 불가"],
+              onto:[{rule:"R04",text:"차선변경 → 70:30 + 급변경 시 80~90% 자동 조정"},{rule:"R01",text:"12급+21일(4주미만) → 진단서 의무 미해당"},{rule:"R13",text:"85:15 → 타사₩5M×85% = ₩4,250,000 자동"},{rule:"R12",text:"12급 → 대인Ⅰ ₩15M + 경상환자 구분"}]},
+            uc4:{case_:"Case 4: 음주+12대중과실+무보험 교차",color:"#dc2626",summary:"면책·사고부담금·형사처벌·정부보장사업 4가지가 동시에 판단되어야 하는 가장 복잡한 유형",
+              rag:["\"음주운전 보험\" → '면책' 문구만 반환, 부담금 10~20% 산출 불가","\"12대 중과실\" → 목록은 반환하나 형사처벌 가능성 판단 불가","\"무보험 상대방\" → 정부보장사업 연계 절차가 약관 PDF에 없음","\"면책+부담금+형사\" → 3가지 동시 판단은 텍스트 검색으로 불가능"],
+              onto:[{rule:"R05",text:"음주 BAC 0.08% → 자차 면책 + 대인Ⅱ·대물 부담금 10~20%"},{rule:"R08",text:"신호위반(12대 중과실) → 형사처벌 가능성 자동 경고"},{rule:"R21",text:"타사 무보험 → 정부보장사업(자배법 30조) 연계 안내"},{rule:"R12",text:"8급 중상 → 대인Ⅰ ₩30M 한도 자동 조회"}]},
+            uc5:{case_:"Case 5: 렌터카 영업차량 휴차료",color:"#f97316",summary:"개인차량과 완전히 다른 손해 구조 — 렌트비가 아닌 영업손실(휴차료)로 자동 전환",
+              rag:["\"렌터카 사고 보상\" → 일반 렌트비 기준 문구만 반환","\"휴차료 산정\" → 일평균매출·가동률 공식이 약관에 없음","\"영업용 vs 개인용\" → 처리 로직 차이를 구분하지 못함"],
+              onto:[{rule:"R17",text:"영업용 차량 → R07(렌트) 비적용, 휴차료 자동 전환"},{rule:"R17",text:"일매출 ₩180,000 × 12일 = ₩2,160,000 영업손실 산출"},{rule:"R15",text:"서류 접수 후 10일 이내 지급 의무 타임라인"}]},
+            uc6:{case_:"Case 6: 3중 추돌 A→B→C 다수 과실 배분",color:"#0891b2",summary:"B차가 가해자이자 피해자인 이중지위 — 6방향 비용 흐름을 자동 계산",
+              rag:["\"3중 추돌 과실\" → 2자 사고 기준만 반환, 3자 배분 공식 없음","\"B차 이중지위\" → 가해+피해 동시 개념이 약관에 명시되어 있지 않음","\"A→B, B→C 교차 상계\" → 6방향 비용 계산은 텍스트 검색 불가"],
+              onto:[{rule:"R16",text:"3대 사고 → 6방향(A→B,A→C,B→C 각 왕복) 비용 자동 배분"},{rule:"R04",text:"A:B:C = 70:20:10 과실 자동 산정"},{rule:"R13",text:"3자 교차 상계 자동 계산"},{rule:"R12",text:"4명 피해자 개별 대인한도 조회"}]},
+            uc7:{case_:"Case 7: 전부손해+잔존물+할부잔금",color:"#059669",summary:"수리 vs 폐차 분기 → 잔존물 경매 → 할부 우선변제 → 고객 실수령까지 3단 연쇄",
+              rag:["\"전부손해 기준\" → 80% 문구는 반환하나 실제 비교 계산 불가","\"잔존물 가치\" → 경매 예상가 산정 로직이 약관에 없음","\"할부 잔금 우선변제\" → 금융사 채무 처리 절차를 연결하지 못함"],
+              onto:[{rule:"R02",text:"수리비 ₩42M ÷ 가액 ₩48M = 87.5% → 전부손해 확정"},{rule:"R18",text:"잔존물 ₩3.84M(가액 8%) 자동 산정 → 경매 연계"},{rule:"R19",text:"보상금 - 잔존물 - 할부₩18M = 실수령 ₩26.16M"},{rule:"R12",text:"5급 중상 2명 → 대인Ⅰ ₩75M×2 한도 조회"}]},
+            uc8:{case_:"Case 8: 동승자 사망+유족 다수 (6명 동시처리)",color:"#7c3aed",summary:"사망1+중상2+경상3 = 6명에 대해 각기 다른 규칙 체인이 동시 평가",
+              rag:["\"사망 보상금\" → 대인Ⅰ 한도 문구만 반환, 유족 분배 계산 불가","\"복수 피해자 합의\" → 개별 vs 일괄 비교 로직 없음","\"동승자 감액\" → 유형별 감액률은 찾으나 6명 개별 적용 불가","\"경상환자 진단서\" → 6명 중 누가 해당되는지 구분 불가"],
+              onto:[{rule:"R25",text:"사망 1급 → 유족 4명(배우자+자녀3) 보상 ₩2억 분배"},{rule:"R24",text:"6명 개별 상해등급별 한도 조회 + 일괄 패키지 비교"},{rule:"R12",text:"1급·5급·12급 각각 한도: ₩2억/₩7.5천만/₩1.5천만"},{rule:"R01",text:"경상 3명(12급) 4주 기준 진단서 의무 자동 판정"}]},
+            uc9:{case_:"Case 9: 보험사기 패턴 탐지",color:"#991b1b",summary:"다중 이력 패턴을 교차 분석하여 SIU 의뢰 여부를 자동 판단",
+              rag:["\"보험사기 판별\" → 사기 유형 설명 문구만 반환, 이력 분석 불가","\"반복 접수 확인\" → 과거 이력 데이터에 접근 불가 (PDF 한계)","\"동일 정비소 패턴\" → 이력 간 상관관계 분석 불가"],
+              onto:[{rule:"R20",text:"사기점수 78점 → 3개 패턴 동시 탐지 → SIU 의뢰 자동"},{rule:"R20",text:"패턴: 6개월 3회 + 동일정비소 + 72시간 지연병원"},{rule:"R05",text:"면책 가능성 사전 판단 + 증거 보전 가이드"}]},
+            uc10:{case_:"Case 10: 태풍 침수+청구 시효",color:"#1d4ed8",summary:"자연재해 전손 특례 + 시효 관리 + 침수차 잔존물 할인이 교차하는 시간·재해 복합 판단",
+              rag:["\"침수 보상\" → 자차 특약 문구만 반환, 전손 특례 판단 불가","\"보험금 시효\" → 3년 조항은 찾으나 경과일 계산 + 경고 불가","\"침수차 전손\" → 수리비 낮아도 전손인 이유(전자장비)를 설명 불가"],
+              onto:[{rule:"R22",text:"침수 엔진룸 이상 → 수리비 무관 전손 처리 권고"},{rule:"R23",text:"13개월 경과 → 시효 3년 내 → '조속 청구' 자동 경고"},{rule:"R18",text:"침수차 잔존물 할인 반영 → 보상금 자동 산출"}]},
+          };
+          // 온톨로지 센터 graphCase에 연동 (기본은 일반 설명만)
+          const selCase=ALL_CASE_COMPARE[graphCase];
+          return<>
+            {/* Case 선택 안내 */}
+            {!selCase&&<div style={{padding:"14px 18px",borderRadius:10,background:"#f8fafc",border:"1px dashed #cbd5e1",textAlign:"center"}}>
+              <span style={{fontSize:11,color:"#94a3b8"}}>🎯 위 지식 그래프에서 Case를 선택하면, 해당 사건의 <b>RAG vs 온톨로지</b> 비교가 여기에 표시됩니다.</span>
+            </div>}
+            {/* 선택된 Case 비교 */}
+            {selCase&&<div style={{borderRadius:12,overflow:"hidden",border:`1.5px solid ${selCase.color}20`,animation:"fadeIn .3s"}}>
+              <div style={{padding:"10px 16px",background:selCase.color+"06",borderBottom:`1px solid ${selCase.color}15`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{width:10,height:10,borderRadius:"50%",background:selCase.color}}/>
+                  <span style={{fontSize:12.5,fontWeight:700,color:selCase.color}}>{selCase.case_}</span></div>
+                <span style={{fontSize:9.5,color:"#64748b",maxWidth:300}}>{selCase.summary}</span>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr"}}>
+                <div style={{padding:"14px 18px",borderRight:`1px solid ${selCase.color}10`,background:"#fff"}}>
+                  <div style={{fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:10,display:"flex",alignItems:"center",gap:4}}>📚 RAG가 이 사건에서 할 수 있는 것</div>
+                  {selCase.rag.map((r,ri)=><div key={ri} style={{display:"flex",gap:7,marginBottom:7,alignItems:"flex-start"}}>
+                    <span style={{color:"#dc2626",fontSize:10,marginTop:1,flexShrink:0}}>✗</span>
+                    <span style={{fontSize:10,color:"#64748b",lineHeight:1.7}}>{r}</span></div>)}
+                  <div style={{marginTop:8,padding:"8px 10px",borderRadius:7,background:"#fef2f2",border:"1px solid #fecaca",fontSize:9.5,color:"#991b1b",lineHeight:1.6}}>
+                    ⚠️ RAG는 각 조건을 <b>개별적으로</b> 검색할 수 있지만, 이들을 <b>조합하여 결론을 도출</b>하는 것은 불가능합니다.
+                  </div>
+                </div>
+                <div style={{padding:"14px 18px",background:"#f0fdf408"}}>
+                  <div style={{fontSize:11,fontWeight:700,color:"#059669",marginBottom:10,display:"flex",alignItems:"center",gap:4}}>🧠 온톨로지가 이 사건에서 추가로 할 수 있는 것</div>
+                  {selCase.onto.map((o,oi)=><div key={oi} style={{display:"flex",gap:7,marginBottom:7,alignItems:"flex-start"}}>
+                    <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background:"#059669",color:"#fff",fontWeight:700,flexShrink:0,marginTop:1,fontFamily:"'DM Mono',monospace"}}>{o.rule}</span>
+                    <span style={{fontSize:10,color:"#334155",lineHeight:1.7}}>{o.text}</span></div>)}
+                  <div style={{marginTop:8,padding:"8px 10px",borderRadius:7,background:"#f0fdf4",border:"1px solid #86efac",fontSize:9.5,color:"#065f46",lineHeight:1.6}}>
+                    ✅ 온톨로지는 위 규칙들이 <b>자동으로 연쇄 작동</b>하여, 사람이 놓치기 쉬운 조건까지 빠짐없이 체크합니다.
+                  </div>
+                </div>
+              </div>
+            </div>}
+          </>;
+        })()}
       </div>
     </div>}
     {/* ═══ DB 탐색기 뷰 ═══ */}
