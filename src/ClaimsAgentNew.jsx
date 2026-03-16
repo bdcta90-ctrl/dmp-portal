@@ -692,6 +692,76 @@ const UC_SCENARIOS = {
         ]},
     ]
   },
+  uc4: {
+    title: "Case 4 — 음주 + 12대 중과실 + 무보험 교차",
+    color: "#dc2626",
+    badge: "면책·부담금·형사 동시 판단",
+    sections: [
+      { icon: "🍺", title: "사고 상황",
+        items: ["음주상태(BAC 0.08%) 자사 K5가 신호위반(12대 중과실)으로 교차로 진입","타사 투싼과 충돌 — 타사 차량이 무보험 상태","자사 운전자 경상, 타사 탑승자 3명 중상(8급)"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R05(음주면책) + R08(12대중과실) + R21(정부보장사업) 3중 연쇄 발동","자차 수리비 전액 면책 → 고객 본인부담","대인Ⅱ·대물 사고부담금 10~20% 자동 산출","타사 무보험 → 정부보장사업 청구 경로 자동 안내","형사처벌 가능성(12대 중과실) 경고"]}]
+  },
+  uc5: {
+    title: "Case 5 — 렌터카 영업차량 휴차료",
+    color: "#f97316",
+    badge: "휴차료 vs 렌트비 자동 전환",
+    sections: [
+      { icon: "🚗", title: "사고 상황",
+        items: ["렌터카 회사 소유 쏘나타(영업용)가 후미 추돌을 당함 (100% 타사과실)","차량 수리 12일 소요 — 일평균 매출 ₩180,000","일반 렌트비가 아닌 영업손실(휴차료) 청구"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R17(영업용 휴차료 산정) 자동 발동 — R07(렌트 동종동급) 비적용","일평균매출 ₩180,000 × 12일 = ₩2,160,000 영업손실 자동 산출","가동률·감가상각 반영 정밀 계산","개인차량 vs 영업차량 처리 로직 자동 전환"]}]
+  },
+  uc6: {
+    title: "Case 6 — 3중 추돌 다수 과실 배분",
+    color: "#0891b2",
+    badge: "3자 과실 + 6방향 비용 흐름",
+    sections: [
+      { icon: "💥", title: "사고 상황",
+        items: ["A차(그랜저) → B차(K8) → C차(스포티지) 3중 추돌","B차는 가해자(→C)이면서 동시에 피해자(A→B)","A:B:C = 70:20:10 과실 배분 필요, 대인 4명"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R16(다중차량 과실배분) 발동 — 3대 × 양방향 = 6개 비용 흐름 자동 계산","B차 이중지위(가해+피해) 자동 판정","A→B, A→C, B→C 각각의 대물·대인·자차 교차 상계","3자 배분 과실비율 기반 최적 합의안 자동 도출"]}]
+  },
+  uc7: {
+    title: "Case 7 — 전부손해 + 잔존물 + 할부잔금",
+    color: "#059669",
+    badge: "수리/폐차 분기 + 채무 우선변제",
+    sections: [
+      { icon: "🚗", title: "사고 상황",
+        items: ["고속도로에서 모하비 단독 전복 — 수리비 ₩42M (가액의 87.5%)","할부 잔금 ₩18M 남아있는 상태","탑승자 2명 중상(5급), 치료 90일 예상"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R02(전부손해 판정) 자동 → R18(잔존물 가치 산정) 연쇄","R19(할부 잔여채무 우선변제) 발동 → 고객 실수령액 자동 계산","보상금 ₩48M - 잔존물 ₩3.84M - 할부잔금 ₩18M = 고객 ₩26.16M","수리 vs 폐차 분기점 자동 판정 + 경제성 비교"]}]
+  },
+  uc8: {
+    title: "Case 8 — 동승자 사망 + 유족 다수",
+    color: "#7c3aed",
+    badge: "6명 피해자 × 개별 규칙 체인",
+    sections: [
+      { icon: "💀", title: "사고 상황",
+        items: ["고속도로에서 스타리아(9인승)와 대형 트럭 충돌","사망 1명(1급) + 중상 2명(5급) + 경상 3명(12급) = 피해자 6명","사망자 유족: 배우자 + 자녀 3명 = 4명 분배"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R25(유족 보상 분배) + R24(복수 피해자 한도 분배) 동시 발동","6명 × 각기 다른 상해등급별 R12(대인한도) 개별 조회","R14(동승자 감액) + R01(경상환자 진단서) 조건별 적용","사망자 유족 4명 배분 + 중상 2명 합의 + 경상 3명 관리 동시 처리"]}]
+  },
+  uc9: {
+    title: "Case 9 — 보험사기 패턴 탐지",
+    color: "#991b1b",
+    badge: "다중 패턴 교차 분석",
+    sections: [
+      { icon: "🚨", title: "사고 상황",
+        items: ["BMW 5시리즈 vs 아반떼 쌍방 사고 — 외형상 일반 사고","6개월 내 동일 차량 3번째 접수, 동일 정비소 반복 고액 청구","접수 후 72시간 뒤 처음 병원 방문, 14급 과잉진단 의심"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R20(보험사기 패턴 탐지) P0 최우선 발동 — 사기점수 78점","3개 패턴 동시 일치: 반복접수 + 동일정비소 + 지연병원","보상 진행 전 SIU(특별조사팀) 의뢰 자동 권고","면책 가능성 사전 고지 + 증거 보전 가이드"]}]
+  },
+  uc10: {
+    title: "Case 10 — 태풍 침수 + 청구 시효",
+    color: "#1d4ed8",
+    badge: "재해 특약 + 시효 + 전손 특례",
+    sections: [
+      { icon: "🌊", title: "사고 상황",
+        items: ["태풍으로 제네시스 G80이 지하주차장에서 엔진룸까지 침수","사고 후 13개월 경과 시점에 보험금 청구","차량가액 ₩72M, 수리비 ₩15M이지만 전자장비 신뢰성 문제"]},
+      { icon: "⚖️", title: "AI 판단 포인트",
+        items: ["R22(침수차량 전손 특례) — 수리비 낮아도 전손 처리 가능","R23(청구 시효 확인) — 13개월 경과, 3년 시효 내 조속 청구 필요","침수 특약 가입 여부에 따른 분기 자동 판단","잔존물 경매(침수차 할인) + 보상금 산정 자동 체인"]}]
+  },
 };
 const ROAD_TYPES=["편도1차로","편도2차로","편도3차로이상","고속도로","골목길/이면도로","교차로","회전교차로","주차장내"];
 const WEATHER_TYPES=["맑음","흐림","비","눈","안개","야간"];
@@ -780,6 +850,39 @@ const ONTOLOGY = {
     {id:"R15",name:"보험금 지급 기한",cat:"처리",priority:3,
       condition:(ctx)=>ctx.claimFiled===true,
       then:()=>({flag:"지급_기한",msg:"서류 접수 후 10일 이내 지급 여부 결정 의무. 정당 사유 없이 지연 시 보험계약대출이율 가산.",clause:"보통약관 제35조",severity:"info"})},
+    // ═══ 신규 규칙 R16~R25 (7개 신규 Case 지원) ═══
+    {id:"R16",name:"다중차량 과실 배분",cat:"과실",priority:1,
+      condition:(ctx)=>ctx.multiVehicle===true&&ctx.vehicleCount>=3,
+      then:(ctx)=>({flag:"다중차량_과실",msg:`${ctx.vehicleCount}대 사고 — 각 차량별 가해/피해 이중지위 판단 필요. ${ctx.vehicleCount*(ctx.vehicleCount-1)}개 방향의 비용 흐름 자동 계산.`,clause:"별표3 다중사고 과실배분",severity:"critical"})},
+    {id:"R17",name:"영업용 휴차료 산정",cat:"견적",priority:1,
+      condition:(ctx)=>ctx.isCommercial===true,
+      then:(ctx)=>{const daily=ctx.dailyRevenue||150000;const days=ctx.repairDays||14;const loss=daily*days;
+        return{flag:"휴차료_산정",msg:`영업용 차량 — 렌트비 대신 휴차료 적용. 일평균매출 ₩${daily.toLocaleString()} × ${days}일 = ₩${loss.toLocaleString()} 영업손실.`,clause:"대법원 판례 (영업손실)",severity:"warning"};}},
+    {id:"R18",name:"잔존물 가치 산정",cat:"견적",priority:2,
+      condition:(ctx)=>ctx.totalLoss===true,
+      then:(ctx)=>{const salvage=Math.round((ctx.vehicleValue||0)*0.08);return{flag:"잔존물_산정",msg:`전부손해 확정 → 잔존물 가치 ₩${salvage.toLocaleString()} (가액의 ~8%). 보상금 = 가액 ₩${(ctx.vehicleValue||0).toLocaleString()} - 잔존물 = ₩${((ctx.vehicleValue||0)-salvage).toLocaleString()}`,clause:"보통약관 제24조",severity:"warning"};}},
+    {id:"R19",name:"할부·리스 잔여채무 우선변제",cat:"보험",priority:1,
+      condition:(ctx)=>ctx.hasLoan===true,
+      then:(ctx)=>{const loan=ctx.loanBalance||0;return{flag:"채무_우선변제",msg:`할부/리스 잔여채무 ₩${loan.toLocaleString()} → 보상금에서 우선 변제. 고객 실수령액 = 보상금 - 잔여채무.`,clause:"보통약관 제37조",severity:"critical"};}},
+    {id:"R20",name:"보험사기 패턴 탐지",cat:"처리",priority:0,
+      condition:(ctx)=>ctx.fraudScore>=60,
+      then:(ctx)=>({flag:"사기_의심",msg:`사기 의심 스코어 ${ctx.fraudScore}점 — SIU(특별조사팀) 의뢰 권고. ${ctx.fraudPatterns||"다중 패턴 일치"}.`,clause:"보험사기방지특별법",severity:"critical"})},
+    {id:"R21",name:"정부보장사업 연계",cat:"보험",priority:1,
+      condition:(ctx)=>ctx.uninsuredOpponent===true,
+      then:()=>({flag:"정부보장_연계",msg:"상대방 무보험 → 정부보장사업(대인·대물) 청구 가능. 국토부 자동차손해배상보장사업으로 연계.",clause:"자배법 제30조",severity:"warning"})},
+    {id:"R22",name:"침수차량 전손 특례",cat:"견적",priority:1,
+      condition:(ctx)=>ctx.isFlood===true,
+      then:(ctx)=>({flag:"침수_전손특례",msg:`침수 차량 — 수리비와 무관하게 전손 처리 가능(전자장비 신뢰성). 침수 높이: ${ctx.floodLevel||"불명"}. ${ctx.floodLevel==="엔진룸 이상"?"전손 처리 권고":"부분수리 가능 검토"}.`,clause:"업계 관행 (침수차 특례)",severity:"critical"})},
+    {id:"R23",name:"보험금 청구 시효 확인",cat:"보험",priority:0,
+      condition:(ctx)=>ctx.daysSinceAccident>365,
+      then:(ctx)=>{const yrs=Math.round(ctx.daysSinceAccident/365*10)/10;const expired=ctx.daysSinceAccident>1095;
+        return{flag:"청구_시효",msg:`사고 후 ${yrs}년 경과. 보험금 청구 시효 3년(상법 제662조). ${expired?"⚠️ 시효 만료 — 청구 불가 가능성":"시효 내 — 조속한 청구 필요"}.`,clause:"상법 제662조",severity:expired?"critical":"warning"};}},
+    {id:"R24",name:"복수 피해자 한도 분배",cat:"대인",priority:1,
+      condition:(ctx)=>ctx.claimants>=3&&ctx.multipleInjuryGrades===true,
+      then:(ctx)=>({flag:"복수피해자_분배",msg:`피해자 ${ctx.claimants}명 동시 처리 — 각기 다른 상해등급별 한도 조회 + 과실상계 개별 적용. 일괄 합의 패키지 vs 개별 처리 비교 필요.`,clause:"자배법 시행령 별표1",severity:"warning"})},
+    {id:"R25",name:"유족 보상 분배",cat:"대인",priority:0,
+      condition:(ctx)=>ctx.hasFatality===true,
+      then:(ctx)=>{const heirs=ctx.heirCount||1;return{flag:"유족_분배",msg:`사망 사고 → 유족 ${heirs}명에게 보상금 분배. 대인Ⅰ 사망한도 ₩200,000,000. 유족 순위: 배우자 > 자녀 > 부모.`,clause:"자배법 시행령 별표1 1급",severity:"critical"};}},
   ],
 };
 
@@ -825,6 +928,60 @@ function buildContextFromCase(useCase,extraData={}){
       vehicleValue:45000000,vehicleAge:3,injuryGrade:12,treatDays:21,
       claimants:2,selfDamage:true,damageAmount:1500000,
       totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:1200000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc4:{accidentType:"음주 신호위반 충돌",vehicleA:"기아 K5",vehicleB:"현대 투싼",
+      isImport:false,isSupercar:false,severity:"심각",faultA:100,faultB:0,
+      repairCostA:8500000,repairCostB:4200000,totalCostB:4200000,
+      vehicleValue:28000000,vehicleAge:4,injuryGrade:8,treatDays:56,
+      claimants:3,selfDamage:true,damageAmount:8500000,
+      totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:4200000,
+      dui:true,unlicensed:false,majorFault:true,claimFiled:true,uninsuredOpponent:true},
+    uc5:{accidentType:"렌터카 영업차량 추돌",vehicleA:"현대 쏘나타(렌터카)",vehicleB:"기아 스포티지",
+      isImport:false,isSupercar:false,severity:"중간",faultA:0,faultB:100,
+      repairCostA:3200000,repairCostB:1800000,totalCostB:1800000,
+      vehicleValue:32000000,vehicleAge:1,injuryGrade:0,treatDays:0,
+      claimants:0,selfDamage:true,damageAmount:3200000,isCommercial:true,
+      dailyRevenue:180000,repairDays:12,
+      totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:3200000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc6:{accidentType:"3중 추돌 (A→B→C)",vehicleA:"현대 그랜저",vehicleB:"기아 K8",
+      isImport:false,isSupercar:false,severity:"심각",faultA:70,faultB:20,
+      repairCostA:3500000,repairCostB:6800000,totalCostB:15000000,
+      vehicleValue:45000000,vehicleAge:2,injuryGrade:10,treatDays:28,
+      claimants:4,selfDamage:true,damageAmount:3500000,multiVehicle:true,vehicleCount:3,
+      totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:6800000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc7:{accidentType:"고속도로 전복 전손",vehicleA:"기아 모하비",vehicleB:"가드레일(시설물)",
+      isImport:false,isSupercar:false,severity:"심각",faultA:100,faultB:0,
+      repairCostA:42000000,repairCostB:0,totalCostB:0,
+      vehicleValue:48000000,vehicleAge:3,injuryGrade:5,treatDays:90,
+      claimants:2,selfDamage:true,damageAmount:42000000,
+      totalLoss:true,certifiedParts:false,minorDamage:false,partsCost:0,
+      hasLoan:true,loanBalance:18000000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc8:{accidentType:"고속도로 다중 충돌 사망사고",vehicleA:"현대 스타리아(9인승)",vehicleB:"대형 트럭",
+      isImport:false,isSupercar:false,severity:"심각",faultA:30,faultB:70,
+      repairCostA:35000000,repairCostB:5000000,totalCostB:5000000,
+      vehicleValue:55000000,vehicleAge:1,injuryGrade:1,treatDays:0,
+      claimants:6,selfDamage:true,damageAmount:35000000,
+      hasFatality:true,heirCount:4,multipleInjuryGrades:true,
+      totalLoss:true,certifiedParts:false,minorDamage:false,partsCost:0,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc9:{accidentType:"반복 접수 사기 의심",vehicleA:"BMW 5시리즈",vehicleB:"현대 아반떼",
+      isImport:true,isSupercar:false,severity:"중간",faultA:50,faultB:50,
+      repairCostA:4500000,repairCostB:2800000,totalCostB:2800000,
+      vehicleValue:52000000,vehicleAge:2,injuryGrade:14,treatDays:35,
+      claimants:2,selfDamage:true,damageAmount:4500000,
+      fraudScore:78,fraudPatterns:"6개월 내 3회 접수 · 동일 정비소 반복 · 접수 후 72시간 병원",
+      totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:4500000,
+      dui:false,unlicensed:false,majorFault:false,claimFiled:true},
+    uc10:{accidentType:"태풍 침수 (자연재해)",vehicleA:"제네시스 G80",vehicleB:"자연재해(태풍)",
+      isImport:false,isSupercar:false,severity:"심각",faultA:0,faultB:0,
+      repairCostA:15000000,repairCostB:0,totalCostB:0,
+      vehicleValue:72000000,vehicleAge:2,injuryGrade:0,treatDays:0,
+      claimants:0,selfDamage:true,damageAmount:15000000,isFlood:true,floodLevel:"엔진룸 이상",
+      daysSinceAccident:400,
+      totalLoss:true,certifiedParts:false,minorDamage:false,partsCost:0,
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
   };
   return{...(base[useCase]||{}), ...extraData};
@@ -5011,10 +5168,10 @@ function TabData(){
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <div style={{width:48,height:48,borderRadius:14,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,color:"#fff",boxShadow:"0 4px 12px rgba(99,102,241,.3)"}}>🧠</div>
           <div><div style={{fontSize:17,fontWeight:800,color:"#0f172a"}}>온톨로지 추론 센터</div>
-            <div style={{fontSize:11,color:"#64748b"}}>엔티티 관계 기반 IF-THEN 추론 체인 · 사고 데이터 입력 시 15개 규칙 자동 평가</div></div>
+            <div style={{fontSize:11,color:"#64748b"}}>엔티티 관계 기반 IF-THEN 추론 체인 · 사고 데이터 입력 시 25개 규칙 자동 평가</div></div>
         </div>
         <div style={{display:"flex",gap:8}}>
-          {[{v:"10",l:"엔티티",c:"#2563eb"},{v:"12",l:"관계",c:"#7c3aed"},{v:"15",l:"규칙",c:"#059669"},{v:"3",l:"Case",c:"#f59e0b"}].map((s,i)=>(
+          {[{v:"10",l:"엔티티",c:"#2563eb"},{v:"12",l:"관계",c:"#7c3aed"},{v:"25",l:"규칙",c:"#059669"},{v:"10",l:"Case",c:"#f59e0b"}].map((s,i)=>(
             <div key={i} style={{textAlign:"center",padding:"6px 14px",borderRadius:10,background:s.c+"08",border:`1.5px solid ${s.c}20`}}>
               <div style={{fontSize:18,fontWeight:800,color:s.c,fontFamily:"'DM Mono',monospace"}}>{s.v}</div>
               <div style={{fontSize:8.5,color:"#94a3b8",fontWeight:600}}>{s.l}</div></div>))}
@@ -5031,7 +5188,7 @@ function TabData(){
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             {/* Case 선택 */}
             <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
-              {[{id:"generic",l:"일반 구조"},{id:"uc1",l:"Case 1",c:"#dc2626"},{id:"uc2",l:"Case 2",c:"#f59e0b"},{id:"uc3",l:"Case 3",c:"#7c3aed"}].map(m=>(
+              {[{id:"generic",l:"일반"},{id:"uc1",l:"C1",c:"#dc2626"},{id:"uc2",l:"C2",c:"#f59e0b"},{id:"uc3",l:"C3",c:"#7c3aed"},{id:"uc4",l:"C4",c:"#dc2626"},{id:"uc5",l:"C5",c:"#f97316"},{id:"uc6",l:"C6",c:"#0891b2"},{id:"uc7",l:"C7",c:"#059669"},{id:"uc8",l:"C8",c:"#7c3aed"},{id:"uc9",l:"C9",c:"#991b1b"},{id:"uc10",l:"C10",c:"#1d4ed8"}].map(m=>(
                 <button key={m.id} onClick={()=>setGraphCase(m.id)} style={{padding:"4px 10px",borderRadius:6,border:"none",fontSize:9.5,fontWeight:graphCase===m.id?700:500,background:graphCase===m.id?"#fff":"transparent",color:graphCase===m.id?(m.c||"#0f172a"):"#94a3b8",cursor:"pointer",boxShadow:graphCase===m.id?"0 1px 3px rgba(0,0,0,.06)":"none",transition:"all .15s"}}>{m.l}</button>))}
             </div>
             <div style={{display:"flex",background:"#f1f5f9",borderRadius:7,padding:2}}>
@@ -5042,7 +5199,14 @@ function TabData(){
         </div>
         {/* Case 요약 배너 */}
         {graphCase!=="generic"&&(()=>{
-          const ci={uc1:{t:"Case 1: 교차로 골목길 충돌",c:"#dc2626",d:"그랜저 vs BMW 7시리즈 · 과실 50:50 분쟁 · 대인 5명 · 수리비 ₩30M"},uc2:{t:"Case 2: 주차장 신차 충돌",c:"#f59e0b",d:"그랜저 vs GV80(3개월) · 100% 자사과실 · 감가 리스크 · 수리비 ₩10M"},uc3:{t:"Case 3: 차선변경 과실 분쟁",c:"#7c3aed",d:"A차 vs BMW 5시리즈 · 타사 0:100 주장 vs AI 85:15 · 경상 12급 2명"}}[graphCase];
+          const ci={uc1:{t:"Case 1: 교차로 골목길 충돌",c:"#dc2626",d:"그랜저 vs BMW 7시리즈 · 과실 50:50 분쟁 · 대인 5명 · 수리비 ₩30M"},uc2:{t:"Case 2: 주차장 신차 충돌",c:"#f59e0b",d:"그랜저 vs GV80(3개월) · 100% 자사과실 · 감가 리스크 · 수리비 ₩10M"},uc3:{t:"Case 3: 차선변경 과실 분쟁",c:"#7c3aed",d:"A차 vs BMW 5시리즈 · 타사 0:100 주장 vs AI 85:15 · 경상 12급 2명"},
+            uc4:{t:"Case 4: 음주+12대중과실+무보험",c:"#dc2626",d:"K5(음주) vs 투싼(무보험) · 면책+부담금+형사+정부보장 4중 판단"},
+            uc5:{t:"Case 5: 렌터카 영업차량 휴차료",c:"#f97316",d:"쏘나타(렌터카) 추돌 · 렌트비→휴차료 자동 전환 · 영업손실 ₩2.16M"},
+            uc6:{t:"Case 6: 3중 추돌 다수 배분",c:"#0891b2",d:"그랜저→K8→스포티지 · 3자 과실 70:20:10 · 6방향 비용 흐름"},
+            uc7:{t:"Case 7: 전부손해+잔존물+할부",c:"#059669",d:"모하비 전복 · 수리비 87.5% · 할부잔금 ₩18M 우선변제"},
+            uc8:{t:"Case 8: 동승자 사망+유족 다수",c:"#7c3aed",d:"스타리아 vs 트럭 · 사망1+중상2+경상3 · 유족4명 분배"},
+            uc9:{t:"Case 9: 보험사기 패턴 탐지",c:"#991b1b",d:"BMW 5시리즈 · 6개월 3회 접수 · 사기점수 78점 · SIU 의뢰"},
+            uc10:{t:"Case 10: 태풍 침수+청구 시효",c:"#1d4ed8",d:"G80 침수 · 13개월 경과 · 전손 특례 · 시효 관리"}}[graphCase];
           const oR=runOntologyInference(buildContextFromCase(graphCase));
           return<div>
             <div style={{padding:"10px 20px",background:ci.c+"06",borderBottom:"1px solid "+ci.c+"15",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -5062,6 +5226,13 @@ function TabData(){
             uc1:{사고:{v:"교차로 골목길 충돌",s:"쌍방직진"},차량A:{v:"현대 그랜저 2023",s:"25,138km"},차량B:{v:"BMW 7시리즈 2023",s:"15,000km"},파손A:{v:"좌전면 4부위",s:"범퍼·펜더·도어·헤드"},파손B:{v:"우전면 6부위",s:"범퍼·본넷·헤드·그릴·라디"},피해자:{v:"5명 (타3+자2)",s:"12급 경상"},과실:{v:"50 : 50 (AI)",s:"타사 70:30 주장"},견적:{v:"A:₩5M / B:₩15M",s:"B차 ₩10M 삭감"},보험:{v:"대인Ⅰ+Ⅱ+대물+자차",s:"자기부담금 ₩50만"},처리:{v:"최적안 ₩14,500,000",s:"₩15.2M 절감"}},
             uc2:{사고:{v:"지하주차장 후진충돌",s:"100% 자사과실"},차량A:{v:"그랜저 캘리 2024",s:"8,500km"},차량B:{v:"GV80 3.5T 2025",s:"출고3개월 3,000km"},파손A:{v:"우전면 3부위",s:"범퍼·헤드·펜더"},파손B:{v:"전면 7부위",s:"범퍼·본넷·헤드·그릴"},피해자:{v:"없음",s:"대물만"},과실:{v:"100 : 0 (자사)",s:"분쟁 없음"},견적:{v:"A:₩1.83M / B:₩6.38M",s:"₩3.62M 삭감+OEM25%"},보험:{v:"대물+자차",s:"OEM 인센티브 ₩1.6M"},처리:{v:"최적안 ₩8,210,000",s:"₩5.59M 절감"}},
             uc3:{사고:{v:"차선변경 중 직진차 충돌",s:"급차선변경"},차량A:{v:"현대 그랜저 2022",s:"35,000km"},차량B:{v:"BMW 5시리즈 2024",s:"12,000km"},파손A:{v:"우후방 3부위",s:"리어범퍼·쿼터·도어"},파손B:{v:"좌전면 2부위",s:"범퍼·펜더"},피해자:{v:"2명 (12급)",s:"치료 21일 (<4주)"},과실:{v:"85 : 15 (AI)",s:"타사 0:100 주장"},견적:{v:"A:₩1.5M / B:₩1.2M",s:"소규모"},보험:{v:"대인Ⅰ+대물+자차",s:"자기부담금 ₩20만"},처리:{v:"최적안 ₩4,725,000",s:"₩1.98M 절감"}},
+            uc4:{사고:{v:"음주 신호위반 교차로 충돌",s:"12대 중과실"},차량A:{v:"기아 K5 2021",s:"음주 BAC 0.08%"},차량B:{v:"현대 투싼 2023",s:"⚠️ 무보험"},파손A:{v:"전면 전파",s:"범퍼·본넷·라디·헤드"},파손B:{v:"측면 5부위",s:"도어·쿼터·필러"},피해자:{v:"3명 (8급 중상)",s:"치료 56일"},과실:{v:"100 : 0 (자사)",s:"음주+신호위반"},견적:{v:"A:₩8.5M / B:₩4.2M",s:"자차 면책"},보험:{v:"면책+부담금10~20%",s:"R05+R08+R21 3중"},처리:{v:"정부보장사업 연계",s:"형사처벌 가능"}},
+            uc5:{사고:{v:"렌터카 후미 추돌",s:"100% 타사과실"},차량A:{v:"쏘나타 2024 (렌터카)",s:"영업용 일매출₩18만"},차량B:{v:"기아 스포티지 2023",s:"가해차량"},파손A:{v:"후면 4부위",s:"리어범퍼·트렁크·램프"},파손B:{v:"전면 2부위",s:"범퍼·헤드"},피해자:{v:"없음",s:"대물만"},과실:{v:"0 : 100 (타사)",s:"추돌 기본"},견적:{v:"A:₩3.2M / 수리12일",s:"휴차료 적용"},보험:{v:"휴차료 ₩2,160,000",s:"R17 렌트비 비적용"},처리:{v:"영업손실 + 수리비",s:"₩5,360,000"}},
+            uc6:{사고:{v:"A→B→C 3중 추돌",s:"3대 연쇄"},차량A:{v:"현대 그랜저 2023",s:"최초 추돌차"},차량B:{v:"기아 K8 2024",s:"이중지위(가해+피해)"},파손A:{v:"전면 3부위",s:"범퍼·본넷·헤드"},파손B:{v:"전후면 6부위",s:"양쪽 범퍼·도어"},피해자:{v:"4명 (10급)",s:"3대 합산"},과실:{v:"A70:B20:C10",s:"3자 배분"},견적:{v:"A:₩3.5M/B:₩6.8M/C:₩4.7M",s:"6방향 흐름"},보험:{v:"3자 교차 상계",s:"R16 다중차량"},처리:{v:"6방향 비용 자동계산",s:"₩15M 총액"}},
+            uc7:{사고:{v:"고속도로 단독 전복",s:"가드레일 충돌"},차량A:{v:"기아 모하비 2022",s:"할부잔금 ₩18M"},차량B:{v:"가드레일(시설물)",s:"시설물 배상"},파손A:{v:"전복 전파",s:"지붕·측면·하부"},파손B:{v:"가드레일 50m",s:"시설물 ₩12M"},피해자:{v:"2명 (5급 중상)",s:"치료 90일"},과실:{v:"100 : 0 (자사)",s:"단독사고"},견적:{v:"수리비 ₩42M(가액87%)",s:"전부손해 검토"},보험:{v:"전손+잔존물+할부",s:"R02→R18→R19"},처리:{v:"폐차 → 할부변제 우선",s:"실수령 ₩26.16M"}},
+            uc8:{사고:{v:"고속도로 트럭 충돌",s:"사망 포함"},차량A:{v:"스타리아 9인승 2024",s:"30:70 과실"},차량B:{v:"대형 트럭 2020",s:"가해차량"},파손A:{v:"전면 전파",s:"전손 처리"},파손B:{v:"전면 경미",s:"범퍼만"},피해자:{v:"사망1+중상2+경상3",s:"6명 동시"},과실:{v:"30 : 70 (자사:타사)",s:"속도초과 감안"},견적:{v:"전손 ₩55M",s:"대인 보상 별도"},보험:{v:"대인Ⅰ 사망₩2억",s:"R25+R24+R12"},처리:{v:"유족4명 분배+6명 동시",s:"복합 처리"}},
+            uc9:{사고:{v:"쌍방 경미 사고 (반복)",s:"사기 의심"},차량A:{v:"BMW 5시리즈 2023",s:"6개월 3회 접수"},차량B:{v:"현대 아반떼 2022",s:"동일 정비소"},파손A:{v:"후면 2부위",s:"범퍼·트렁크"},파손B:{v:"전면 1부위",s:"범퍼"},피해자:{v:"2명 (14급)",s:"72시간 뒤 병원"},과실:{v:"50 : 50",s:"외형상 일반"},견적:{v:"A:₩4.5M / B:₩2.8M",s:"고액 의심"},보험:{v:"사기점수 78점",s:"R20 SIU 의뢰"},처리:{v:"보상 중단 → 조사",s:"면책 가능"}},
+            uc10:{사고:{v:"태풍 침수 (자연재해)",s:"엔진룸 이상"},차량A:{v:"제네시스 G80 2023",s:"가액 ₩72M"},차량B:{v:"자연재해 (태풍)",s:"상대방 없음"},파손A:{v:"침수 전체",s:"전자장비 손상"},파손B:{v:"해당없음",s:"—"},피해자:{v:"없음",s:"대물만"},과실:{v:"자연재해",s:"과실 없음"},견적:{v:"수리₩15M/전손검토",s:"전자장비 불신"},보험:{v:"침수 특약 확인",s:"R22+R23"},처리:{v:"전손 특례 적용",s:"시효 13개월 경과"}},
           };
           const cData=CND[graphCase]||CND.generic;
           const isCase=graphCase!=="generic";
@@ -5160,11 +5331,21 @@ function TabData(){
           R13:{ifText:"자사 과실 > 0 AND 타사 과실 > 0 AND 타사 총비용 > 0",thenText:"타사 손해액 × 자사 과실비율 = 자사 실부담 자동 계산",example:"Case 1: 타사 ₩25,000,000 × 자사 50% = 자사 부담 ₩12,500,000",clause:"별표3 과실상계",related:["R04"],entities:["과실","보험"]},
           R14:{ifText:"동승자 유형이 존재 AND 유형 ≠ 업무",thenText:"동승자 유형별 감액률 적용 (무단 100%, 음주동승 40%, 요청 30%, 호의 20%)",example:"음주운전 차량에 알면서 동승 → R14 발동 → 대인 보상 40% 감액",clause:"별표5 동승자 유형별 감액비율표",related:["R12"],entities:["피해자"]},
           R15:{ifText:"보험금 청구 서류 접수 = true",thenText:"10일 이내 지급 여부 결정 의무 → 지연 시 보험계약대출이율 가산",example:"합의 완료 후 서류 접수 → R15 발동 → \"10일 이내 지급 결정\" 타임라인 시작",clause:"보통약관 제35조",related:[],entities:["처리"]},
+          R16:{ifText:"다중차량 사고 = true AND 차량수 ≥ 3",thenText:"각 차량별 가해/피해 이중지위 판단 + N×(N-1) 방향 비용 흐름 자동 계산",example:"Case 6: A→B→C 3중추돌 → B차 이중지위 → 6방향(A→B, A→C, B→C, B←A, C←A, C←B) 비용 배분",clause:"별표3 다중사고 과실배분",related:["R04","R13"],entities:["과실","보험"]},
+          R17:{ifText:"차량이 영업용(렌터카·화물·택시) = true",thenText:"렌트비 대신 휴차료(영업손실) 적용. 일평균매출 × 수리기간 산정",example:"Case 5: 렌터카 쏘나타 일매출 ₩18만 × 12일 = 휴차료 ₩2,160,000",clause:"대법원 판례 (영업손실 산정)",related:[],entities:["견적"]},
+          R18:{ifText:"전부손해 확정 = true (R02 연쇄)",thenText:"잔존물 가치 산정(가액의 ~8%) → 보상금 = 차량가액 - 잔존물",example:"Case 7: 모하비 가액 ₩48M - 잔존물 ₩3.84M = 보상금 ₩44.16M",clause:"보통약관 제24조",related:["R02","R19"],entities:["견적","보험"]},
+          R19:{ifText:"할부/리스 잔여채무 > 0",thenText:"보상금에서 금융사 잔여채무 우선 변제. 고객 실수령 = 보상금 - 잔여채무",example:"Case 7: 보상금 ₩44.16M - 할부잔금 ₩18M = 고객 실수령 ₩26.16M",clause:"보통약관 제37조",related:["R18"],entities:["보험","처리"]},
+          R20:{ifText:"사기 의심 스코어 ≥ 60점",thenText:"SIU(특별조사팀) 의뢰 권고. 보상 진행 중단 후 조사",example:"Case 9: 6개월 3회 접수+동일정비소+72시간 지연 → 78점 → SIU 의뢰",clause:"보험사기방지특별법",related:["R05"],entities:["처리"]},
+          R21:{ifText:"상대방 차량 = 무보험",thenText:"정부보장사업(자배법 제30조) 청구 경로 자동 안내",example:"Case 4: 타사 투싼 무보험 → R21 발동 → 국토부 자동차손해배상보장사업 연계",clause:"자배법 제30조",related:["R05","R08"],entities:["보험"]},
+          R22:{ifText:"침수 사고 = true",thenText:"수리비와 무관하게 전손 처리 가능(전자장비 신뢰성). 침수 높이 기반 판정",example:"Case 10: G80 엔진룸 침수 → 수리비 ₩15M이지만 전손 처리 권고",clause:"업계 관행 (침수차 특례)",related:["R18"],entities:["견적","보험"]},
+          R23:{ifText:"사고 후 경과일 > 365일",thenText:"보험금 청구 시효 3년(상법 제662조) 확인. 만료 임박 시 경고",example:"Case 10: 13개월 경과 → 시효 내 → '조속한 청구 필요' 안내",clause:"상법 제662조",related:["R15"],entities:["보험"]},
+          R24:{ifText:"피해자 ≥ 3명 AND 상해등급 다양",thenText:"각 피해자별 개별 한도 조회 + 과실상계 + 일괄 vs 개별 합의 비교",example:"Case 8: 사망1+중상2+경상3 = 6명 × 개별 R12 조회 → 총 합의안 산출",clause:"자배법 시행령 별표1",related:["R12","R14"],entities:["피해자","보험"]},
+          R25:{ifText:"사망자 발생 = true",thenText:"유족 보상 분배. 대인Ⅰ 사망한도 ₩2억. 유족 순위: 배우자 > 자녀 > 부모",example:"Case 8: 사망 1명 → 유족 4명(배우자+자녀3) → ₩2억 분배 산출",clause:"자배법 시행령 별표1 1급",related:["R24","R12"],entities:["피해자","보험"]},
         };
         return <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
           <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
             <span style={{fontSize:14}}>⚙️</span>
-            <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 15개</span>
+            <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 25개</span>
             <span style={{fontSize:10,color:"#94a3b8"}}>— 클릭하면 IF→THEN 조건과 적용 예시를 볼 수 있습니다</span>
           </div>
           <div style={{display:"flex",gap:4,marginBottom:12}}>
