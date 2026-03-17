@@ -403,7 +403,7 @@ export default function App() {
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall" || mvp.id === "claimsNew" || mvp.id === "stockpilot";
+            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall" || mvp.id === "claimsNew" || mvp.id === "stockpilot" || mvp.id === "koreaJobs";
             return (
               <div
                 key={mvp.id}
