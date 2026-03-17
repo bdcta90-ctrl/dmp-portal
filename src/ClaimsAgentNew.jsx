@@ -2289,6 +2289,115 @@ const DAMAGE_CONFIGS = {
       {id:"bumperF",label:"프론트 범퍼(좌측)",severity:"판금 도장",cost:"₩350,000",x:60,y:215,w:140,h:50,phase:1,color:"#f97316"},
       {id:"fenderL",label:"좌 프론트 펜더",severity:"판금 도장",cost:"₩450,000",x:55,y:155,w:55,h:50,phase:2,color:"#f97316"},
     ]},
+  uc4_a: { vehicle:"기아 K5", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩6,850,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼(좌측)",severity:"판금 교체",cost:"₩580,000",x:60,y:215,w:140,h:50,phase:1,color:"#dc2626"},
+      {id:"headL",label:"좌 헤드라이트",severity:"교체 필요",cost:"₩650,000",x:58,y:158,w:50,h:45,phase:2,color:"#dc2626"},
+      {id:"fenderL",label:"좌 프론트 펜더",severity:"판금 교체",cost:"₩780,000",x:55,y:155,w:55,h:50,phase:3,color:"#dc2626"},
+      {id:"doorL",label:"좌 프론트 도어",severity:"판금 교체",cost:"₩1,350,000",x:55,y:105,w:55,h:50,phase:4,color:"#dc2626"},
+      {id:"mirrorL",label:"좌 사이드미러",severity:"교체 필요",cost:"₩280,000",x:48,y:108,w:18,h:15,phase:5,color:"#f97316"},
+      {id:"pillarA",label:"좌 A필러",severity:"변형 점검",cost:"₩1,200,000",x:55,y:90,w:12,h:65,phase:6,color:"#dc2626"},
+      {id:"paint",label:"도장 (3면)",severity:"전체 도장",cost:"₩1,200,000",x:55,y:80,w:55,h:12,phase:7,color:"#8b5cf6"},
+    ]},
+  uc4_b: { vehicle:"현대 투싼", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩7,200,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼 ASSY",severity:"교체 필요",cost:"₩950,000",x:60,y:215,w:280,h:55,phase:1,color:"#dc2626"},
+      {id:"fenderR",label:"우 프론트 펜더",severity:"판금 교체",cost:"₩850,000",x:290,y:155,w:55,h:50,phase:2,color:"#dc2626"},
+      {id:"headR",label:"우 헤드라이트",severity:"교체 필요",cost:"₩780,000",x:292,y:158,w:50,h:45,phase:3,color:"#dc2626"},
+      {id:"grill",label:"프론트 그릴",severity:"교체",cost:"₩320,000",x:142,y:198,w:116,h:18,phase:4,color:"#f59e0b"},
+      {id:"hood",label:"본넷(후드)",severity:"판금 도장",cost:"₩1,100,000",x:90,y:100,w:220,h:105,phase:5,color:"#f97316"},
+      {id:"paint",label:"도장 (3면)",severity:"전체 도장",cost:"₩1,200,000",x:290,y:110,w:55,h:25,phase:6,color:"#8b5cf6"},
+    ]},
+  uc5_a: { vehicle:"현대 쏘나타 (렌터카)", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩4,350,000",
+    parts:[
+      {id:"bumperR",label:"리어 범퍼(상)",severity:"판금 교체",cost:"₩650,000",x:65,y:0,w:270,h:35,phase:1,color:"#dc2626"},
+      {id:"trunk",label:"트렁크/테일게이트",severity:"판금 교체",cost:"₩1,200,000",x:90,y:0,w:220,h:80,phase:2,color:"#dc2626"},
+      {id:"lampL",label:"좌 리어램프",severity:"교체 필요",cost:"₩450,000",x:58,y:5,w:50,h:40,phase:3,color:"#f97316"},
+      {id:"lampR",label:"우 리어램프",severity:"교체 필요",cost:"₩450,000",x:292,y:5,w:50,h:40,phase:4,color:"#f97316"},
+      {id:"glassR",label:"리어 유리",severity:"교체 필요",cost:"₩380,000",x:120,y:42,w:160,h:35,phase:5,color:"#f59e0b"},
+      {id:"paint",label:"도장 (2면)",severity:"도장",cost:"₩640,000",x:90,y:65,w:220,h:15,phase:6,color:"#8b5cf6"},
+    ]},
+  uc5_b: { vehicle:"기아 스포티지", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩3,650,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼(상)",severity:"판금 교체",cost:"₩680,000",x:60,y:215,w:280,h:35,phase:1,color:"#dc2626"},
+      {id:"hood",label:"본넷(후드)",severity:"판금 도장",cost:"₩850,000",x:90,y:100,w:220,h:105,phase:2,color:"#f97316"},
+      {id:"grill",label:"프론트 그릴",severity:"교체",cost:"₩280,000",x:142,y:198,w:116,h:18,phase:3,color:"#f59e0b"},
+      {id:"rad",label:"라디에이터",severity:"누수 점검",cost:"₩950,000",x:120,y:170,w:160,h:25,phase:4,color:"#f97316"},
+    ]},
+  uc6_a: { vehicle:"현대 그랜저", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩8,500,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼(상)",severity:"교체 필요",cost:"₩680,000",x:60,y:215,w:280,h:50,phase:1,color:"#dc2626"},
+      {id:"hood",label:"본넷(후드)",severity:"교체 필요",cost:"₩980,000",x:90,y:100,w:220,h:105,phase:2,color:"#dc2626"},
+      {id:"headL",label:"좌 헤드라이트",severity:"교체 필요",cost:"₩720,000",x:58,y:158,w:50,h:45,phase:3,color:"#dc2626"},
+      {id:"grill",label:"프론트 그릴",severity:"교체",cost:"₩350,000",x:142,y:198,w:116,h:18,phase:4,color:"#f59e0b"},
+      {id:"bumperR",label:"리어 범퍼(상)",severity:"판금 도장",cost:"₩550,000",x:65,y:0,w:270,h:35,phase:5,color:"#f97316"},
+      {id:"trunk",label:"트렁크/테일게이트",severity:"판금 도장",cost:"₩850,000",x:90,y:0,w:220,h:80,phase:6,color:"#f97316"},
+      {id:"lampR",label:"우 리어램프",severity:"교체 필요",cost:"₩480,000",x:292,y:5,w:50,h:40,phase:7,color:"#f97316"},
+    ]},
+  uc6_b: { vehicle:"기아 K8 (중간차)", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩14,200,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼 ASSY",severity:"교체 필요",cost:"₩1,100,000",x:60,y:215,w:280,h:55,phase:1,color:"#dc2626"},
+      {id:"hood",label:"본넷(후드)",severity:"교체 필요",cost:"₩1,200,000",x:90,y:100,w:220,h:105,phase:2,color:"#dc2626"},
+      {id:"rad",label:"라디에이터",severity:"교체 필요",cost:"₩1,350,000",x:120,y:170,w:160,h:25,phase:3,color:"#dc2626"},
+      {id:"bumperR",label:"리어 범퍼 ASSY",severity:"교체 필요",cost:"₩1,050,000",x:65,y:0,w:270,h:35,phase:4,color:"#dc2626"},
+      {id:"trunk",label:"트렁크/테일게이트",severity:"교체 필요",cost:"₩1,350,000",x:90,y:0,w:220,h:80,phase:5,color:"#dc2626"},
+      {id:"lampL",label:"좌 리어램프",severity:"교체 필요",cost:"₩580,000",x:58,y:5,w:50,h:40,phase:6,color:"#dc2626"},
+      {id:"lampR",label:"우 리어램프",severity:"교체 필요",cost:"₩580,000",x:292,y:5,w:50,h:40,phase:7,color:"#dc2626"},
+    ]},
+  uc7_a: { vehicle:"기아 모하비", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩전손 (시가 ₩48,000,000)",
+    parts:[
+      {id:"roof",label:"루프패널",severity:"붕괴 전손",cost:"₩2,500,000",x:90,y:40,w:220,h:60,phase:1,color:"#dc2626"},
+      {id:"pillarA",label:"좌 A필러",severity:"변형 전손",cost:"₩1,800,000",x:55,y:85,w:12,h:70,phase:2,color:"#dc2626"},
+      {id:"pillarB",label:"좌 B필러",severity:"변형 전손",cost:"₩1,500,000",x:55,y:100,w:12,h:55,phase:3,color:"#dc2626"},
+      {id:"doorFL",label:"좌 프론트 도어",severity:"변형 전손",cost:"₩1,350,000",x:55,y:105,w:55,h:50,phase:4,color:"#dc2626"},
+      {id:"doorRL",label:"좌 리어 도어",severity:"변형 전손",cost:"₩1,200,000",x:55,y:55,w:55,h:50,phase:5,color:"#dc2626"},
+      {id:"sillL",label:"좌 사이드실",severity:"변형",cost:"₩950,000",x:55,y:148,w:55,h:10,phase:6,color:"#dc2626"},
+      {id:"subF",label:"프론트 서브프레임",severity:"손상",cost:"₩2,200,000",x:100,y:200,w:200,h:15,phase:7,color:"#dc2626"},
+      {id:"floor",label:"플로어패널",severity:"변형",cost:"₩1,800,000",x:100,y:130,w:200,h:20,phase:8,color:"#dc2626"},
+    ]},
+  uc7_b: { vehicle:"가드레일(시설물)", badge:"시설물", badgeColor:"#64748b", totalCost:"₩별도 산정",parts:[]},
+  uc8_a: { vehicle:"현대 스타리아 9인승", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩전손 (시가 ₩55,000,000)",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼 ASSY",severity:"완파",cost:"₩1,200,000",x:60,y:215,w:280,h:55,phase:1,color:"#dc2626"},
+      {id:"hood",label:"본넷(후드)",severity:"완파",cost:"₩1,500,000",x:90,y:100,w:220,h:105,phase:2,color:"#dc2626"},
+      {id:"rad",label:"라디에이터",severity:"파괴",cost:"₩1,800,000",x:120,y:170,w:160,h:25,phase:3,color:"#dc2626"},
+      {id:"headL",label:"좌 헤드라이트",severity:"파괴",cost:"₩850,000",x:58,y:158,w:50,h:45,phase:4,color:"#dc2626"},
+      {id:"headR",label:"우 헤드라이트",severity:"파괴",cost:"₩850,000",x:292,y:158,w:50,h:45,phase:5,color:"#dc2626"},
+      {id:"fenderL",label:"좌 프론트 펜더",severity:"완파",cost:"₩950,000",x:55,y:155,w:55,h:50,phase:6,color:"#dc2626"},
+      {id:"doorFL",label:"좌 프론트 도어",severity:"완파",cost:"₩1,500,000",x:55,y:105,w:55,h:50,phase:7,color:"#dc2626"},
+      {id:"pillarA",label:"좌 A필러",severity:"변형 전손",cost:"₩2,200,000",x:55,y:85,w:12,h:70,phase:8,color:"#dc2626"},
+      {id:"windshield",label:"전면 유리",severity:"파괴",cost:"₩680,000",x:100,y:85,w:200,h:15,phase:9,color:"#dc2626"},
+      {id:"cam",label:"전방 카메라/센서",severity:"파괴",cost:"₩450,000",x:188,y:82,w:24,h:10,phase:10,color:"#f97316"},
+    ]},
+  uc8_b: { vehicle:"대형 카고트럭", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩1,850,000",
+    parts:[
+      {id:"bumperR",label:"리어 범퍼(상)",severity:"변형",cost:"₩650,000",x:65,y:0,w:270,h:35,phase:1,color:"#f97316"},
+      {id:"plateLight",label:"번호판등",severity:"교체",cost:"₩80,000",x:180,y:10,w:40,h:15,phase:2,color:"#f59e0b"},
+      {id:"paint",label:"도장 (1면)",severity:"도장",cost:"₩450,000",x:90,y:55,w:220,h:15,phase:3,color:"#8b5cf6"},
+    ]},
+  uc9_a: { vehicle:"BMW 5시리즈", badge:"자사 A차 (사기의심)", badgeColor:"#991b1b", totalCost:"₩4,800,000 (청구) → 적정 ₩1,200,000",
+    parts:[
+      {id:"bumperR",label:"리어 범퍼(상)",severity:"판금 가능→교체 청구",cost:"₩2,200,000",x:65,y:0,w:270,h:35,phase:1,color:"#f97316"},
+      {id:"trunk",label:"트렁크/테일게이트",severity:"경미→교체 청구",cost:"₩1,800,000",x:90,y:0,w:220,h:80,phase:2,color:"#f59e0b"},
+      {id:"lampR",label:"우 리어램프",severity:"크랙→교체 청구",cost:"₩800,000",x:292,y:5,w:50,h:40,phase:3,color:"#f59e0b"},
+    ]},
+  uc9_b: { vehicle:"현대 아반떼", badge:"타사 B차", badgeColor:"#dc2626", totalCost:"₩650,000",
+    parts:[
+      {id:"bumperF",label:"프론트 범퍼(상)",severity:"경미 스크래치",cost:"₩350,000",x:60,y:215,w:280,h:35,phase:1,color:"#f59e0b"},
+      {id:"bumperFL",label:"프론트 범퍼(하/립)",severity:"경미 접촉",cost:"₩180,000",x:60,y:250,w:280,h:18,phase:2,color:"#f59e0b"},
+    ]},
+  uc10_a: { vehicle:"제네시스 G80", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩전손 (시가 ₩72,000,000)",
+    parts:[
+      {id:"floor",label:"플로어패널",severity:"침수 전손",cost:"₩3,500,000",x:90,y:120,w:220,h:30,phase:1,color:"#dc2626"},
+      {id:"undercover",label:"언더커버",severity:"침수 손상",cost:"₩450,000",x:90,y:150,w:220,h:15,phase:2,color:"#dc2626"},
+      {id:"subF",label:"프론트 서브프레임",severity:"침수 부식",cost:"₩2,800,000",x:100,y:195,w:200,h:18,phase:3,color:"#dc2626"},
+      {id:"subR",label:"리어 서브프레임",severity:"침수 부식",cost:"₩2,200,000",x:100,y:55,w:200,h:18,phase:4,color:"#dc2626"},
+      {id:"battery",label:"배터리팩/ECU",severity:"침수 전손",cost:"₩8,500,000",x:120,y:135,w:160,h:25,phase:5,color:"#dc2626"},
+      {id:"cam",label:"전방 카메라/센서",severity:"침수 전손",cost:"₩650,000",x:188,y:82,w:24,h:10,phase:6,color:"#dc2626"},
+      {id:"headL",label:"좌 헤드라이트",severity:"침수 전손",cost:"₩1,200,000",x:58,y:158,w:50,h:45,phase:7,color:"#f97316"},
+      {id:"headR",label:"우 헤드라이트",severity:"침수 전손",cost:"₩1,200,000",x:292,y:158,w:50,h:45,phase:8,color:"#f97316"},
+    ]},
+  uc10_b: { vehicle:"자연재해(태풍)", badge:"자연재해", badgeColor:"#64748b", totalCost:"₩해당없음",parts:[]},
 };
 
 function DamageDiagram({configKey}){
@@ -2451,6 +2560,58 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
       b:{origin:"외산",mk:"BMW",md:"5시리즈",yr:"2024",ml:"12000",
         sp:["프론트 범퍼(상)","좌 프론트 펜더"],
         sv:"중간",ai:{parts:["프론트 범퍼(상)","좌 프론트 펜더"],severity:"중간",confidence:"보통",memo:"AI 분석: 타사 B차 좌측 전면부 경미 접촉 — 직진 중 측면 접촉. 범퍼 판금도장, 펜더 판금도장."}},
+    },
+    uc4:{
+      a:{origin:"국산",mk:"기아",md:"K5",yr:"2021",ml:"45000",
+        sp:["프론트 범퍼(상)","좌 헤드라이트","좌 프론트 펜더","좌 프론트 도어","좌 사이드미러","좌 A필러"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","좌 헤드라이트","좌 프론트 펜더","좌 프론트 도어","좌 사이드미러","좌 A필러"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 좌측 전면부+측면 광범위 파손 — 신호위반 측면 충돌 패턴. 펜더+도어 판금 교체, 헤드라이트 교체, A필러 변형 점검 필요."}},
+      b:{origin:"국산",mk:"현대",md:"투싼",yr:"2022",ml:"28000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","우 프론트 펜더","우 헤드라이트","프론트 그릴","본넷"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","우 프론트 펜더","우 헤드라이트","프론트 그릴","본넷"],severity:"심각",confidence:"높음",memo:"AI 분석: 타사 B차 우측 전면부 광범위 파손 — 교차로 충돌. 범퍼 ASSY 교체, 펜더+본넷 교체, 헤드라이트 교체, 그릴 교체 필요."}},
+    },
+    uc5:{
+      a:{origin:"국산",mk:"현대",md:"쏘나타",yr:"2024",ml:"12000",
+        sp:["리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프","리어 유리"],
+        sv:"중간",ai:{parts:["리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프","리어 유리"],severity:"중간",confidence:"높음",memo:"AI 분석: 자사 A차(렌터카) 후면부 추돌 피해 — 범퍼+트렁크 변형, 리어램프 파손, 리어 유리 크랙. 휴차료 산정 필요."}},
+      b:{origin:"국산",mk:"기아",md:"스포티지",yr:"2023",ml:"32000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터"],
+        sv:"중간",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터"],severity:"중간",confidence:"높음",memo:"AI 분석: 타사 B차 전면부 파손 — 추돌 가해 차량. 범퍼+본넷 판금, 그릴 교체, 라디에이터 누수 점검 필요."}},
+    },
+    uc6:{
+      a:{origin:"국산",mk:"현대",md:"그랜저",yr:"2023",ml:"18000",
+        sp:["프론트 범퍼(상)","본넷","좌 헤드라이트","프론트 그릴","리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","본넷","좌 헤드라이트","프론트 그릴","리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 전면부+후면부 양쪽 파손 — 3중추돌 선두 차량. 전면 범퍼+본넷+헤드라이트 교체, 후면 범퍼+트렁크 판금 필요."}},
+      b:{origin:"국산",mk:"기아",md:"K8",yr:"2024",ml:"8000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프"],severity:"심각",confidence:"높음",memo:"AI 분석: 타사 B차(중간차) 전면부+후면부 양쪽 대파 — 3중추돌 중간 차량으로 앞뒤 모두 충격. 전후면 범퍼 ASSY, 본넷, 트렁크, 리어램프 전량 교체 필요."}},
+    },
+    uc7:{
+      a:{origin:"국산",mk:"기아",md:"모하비",yr:"2022",ml:"42000",
+        sp:["루프패널","좌 A필러","좌 B필러","좌 C필러","좌 프론트 도어","좌 리어 도어","좌 사이드실(로커패널)","프론트 서브프레임","플로어패널","좌 전륜 휠/타이어","좌 후륜 휠/타이어"],
+        sv:"심각",ai:{parts:["루프패널","좌 A필러","좌 B필러","좌 C필러","좌 프론트 도어","좌 리어 도어","좌 사이드실(로커패널)","프론트 서브프레임","플로어패널","좌 전륜 휠/타이어","좌 후륜 휠/타이어"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 전복 사고 — 루프+좌측면+하부 구조 전손. 루프패널 붕괴, 필러 전수 변형, 서브프레임 손상. 전손 처리 판단 필요."}},
+      b:{origin:"",mk:"",md:"가드레일(시설물)",yr:"",ml:"",sp:[],sv:"경미",ai:{parts:[],severity:"",confidence:"",memo:""}},
+    },
+    uc8:{
+      a:{origin:"국산",mk:"현대",md:"스타리아",yr:"2024",ml:"15000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","좌 헤드라이트","우 헤드라이트","좌 프론트 펜더","좌 프론트 도어","좌 A필러","전면 유리","전방 카메라/센서"],
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","좌 헤드라이트","우 헤드라이트","좌 프론트 펜더","좌 프론트 도어","좌 A필러","전면 유리","전방 카메라/센서"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차(9인승) 전면부+좌측면 대파 — 고속도로 다중충돌. 전면 완전 파괴, A필러 변형, 전면 유리 파손. 탑승자 사망 사고."}},
+      b:{origin:"국산",mk:"대형트럭",md:"카고트럭",yr:"2020",ml:"150000",
+        sp:["리어 범퍼(상)","리어 범퍼(하/디퓨저)","번호판등"],
+        sv:"중간",ai:{parts:["리어 범퍼(상)","리어 범퍼(하/디퓨저)","번호판등"],severity:"중간",confidence:"높음",memo:"AI 분석: 타사 B차(대형 트럭) 후면부 경미 — 트럭 후미 범퍼 변형, 번호판등 파손."}},
+    },
+    uc9:{
+      a:{origin:"외산",mk:"BMW",md:"5시리즈",yr:"2023",ml:"22000",
+        sp:["리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],
+        sv:"중간",ai:{parts:["리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],severity:"중간",confidence:"보통",memo:"AI 분석: 자사 A차 후면부 파손 — 손상 패턴이 저속 충돌 대비 과도한 교체 청구 의심. 범퍼 판금 가능 수준이나 ASSY 교체 청구. 사기 패턴 탐지 필요."}},
+      b:{origin:"국산",mk:"현대",md:"아반떼",yr:"2022",ml:"38000",
+        sp:["프론트 범퍼(상)","프론트 범퍼(하/립)"],
+        sv:"중간",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)"],severity:"중간",confidence:"보통",memo:"AI 분석: 타사 B차 전면부 경미 파손 — 범퍼 하단 접촉 수준. A차 손상 대비 충격량 불일치 의심."}},
+    },
+    uc10:{
+      a:{origin:"국산",mk:"제네시스",md:"G80",yr:"2023",ml:"20000",
+        sp:["플로어패널","언더커버","프론트 서브프레임","리어 서브프레임","연료탱크/배터리팩","전방 카메라/센서","좌 헤드라이트","우 헤드라이트"],
+        sv:"심각",ai:{parts:["플로어패널","언더커버","프론트 서브프레임","리어 서브프레임","연료탱크/배터리팩","전방 카메라/센서","좌 헤드라이트","우 헤드라이트"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 태풍 침수 — 하부+엔진룸 침수로 전자장비 전손. 플로어패널 침수흔적, ECU/배선 전손, 서브프레임 부식 개시. 전손 처리 검토 필요."}},
+      b:{origin:"",mk:"",md:"자연재해(태풍)",yr:"",ml:"",sp:[],sv:"경미",ai:{parts:[],severity:"",confidence:"",memo:""}},
     },
   };
   const applyCarInfo=(uc,side)=>{
@@ -5377,7 +5538,7 @@ function TabData(){
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <div style={{width:48,height:48,borderRadius:14,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,color:"#fff",boxShadow:"0 4px 12px rgba(99,102,241,.3)"}}>🧠</div>
           <div><div style={{fontSize:17,fontWeight:800,color:"#0f172a"}}>온톨로지 추론 센터</div>
-            <div style={{fontSize:11,color:"#64748b"}}>엔티티 관계 기반 IF-THEN 추론 체인 · 사고 데이터 입력 시 25개 규칙 자동 평가</div></div>
+            <div style={{fontSize:11,color:"#64748b"}}>엔티티 관계 기반 IF-THEN 추론 체인 · 사고 데이터 입력 시 49개 규칙 자동 평가</div></div>
         </div>
         <div style={{display:"flex",gap:8}}>
           {[{v:"10",l:"엔티티",c:"#2563eb"},{v:"12",l:"관계",c:"#7c3aed"},{v:"25",l:"규칙",c:"#059669"},{v:"10",l:"Case",c:"#f59e0b"}].map((s,i)=>(
@@ -5563,7 +5724,7 @@ function TabData(){
         return <div style={{background:"#fff",borderRadius:14,border:"1px solid #e2e8f0",padding:"16px 20px",marginBottom:14}}>
           <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
             <span style={{fontSize:14}}>⚙️</span>
-            <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 25개</span>
+            <span style={{fontSize:13,fontWeight:800,color:"#0f172a"}}>추론 규칙 49개</span>
             <span style={{fontSize:10,color:"#94a3b8"}}>— 클릭하면 IF→THEN 조건과 적용 예시를 볼 수 있습니다</span>
           </div>
           <div style={{display:"flex",gap:4,marginBottom:12}}>
