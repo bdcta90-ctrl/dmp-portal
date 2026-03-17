@@ -803,14 +803,14 @@ const ONTOLOGY = {
       condition:(ctx)=>ctx.injuryGrade>=12&&ctx.injuryGrade<=14&&ctx.treatDays>28,
       then:(ctx)=>({flag:"진단서_필수",msg:`상해 ${ctx.injuryGrade}급 경상환자 — 4주(28일) 초과 치료 시 진단서 제출 의무 (2023.1.1 시행)`,clause:"보통약관 별표1, 경상환자 제도",severity:"warning"})},
     {id:"R02",name:"전부손해 판정",cat:"견적",priority:1,
-      condition:(ctx)=>ctx.repairCost>=ctx.vehicleValue*0.8,
-      then:(ctx)=>({flag:"전부손해_의심",msg:`수리비(₩${ctx.repairCost?.toLocaleString()})가 차량가액(₩${ctx.vehicleValue?.toLocaleString()})의 ${Math.round(ctx.repairCost/ctx.vehicleValue*100)}% → 전부손해 검토 필요. 전부손해 시 자기부담금 면제.`,clause:"보통약관 제24조",severity:"critical"})},
+      condition:(ctx)=>{const rc=ctx.repairCost||ctx.repairCostA||0;return rc>0&&ctx.vehicleValue>0&&rc>=ctx.vehicleValue*0.8;},
+      then:(ctx)=>{const rc=ctx.repairCost||ctx.repairCostA||0;return{flag:"전부손해_의심",msg:`수리비(₩${rc.toLocaleString()})가 차량가액(₩${ctx.vehicleValue?.toLocaleString()})의 ${Math.round(rc/ctx.vehicleValue*100)}% → 전부손해 검토 필요. 전부손해 시 자기부담금 면제.`,clause:"보통약관 제24조",severity:"critical"};}},
     {id:"R03",name:"품질인증부품 인센티브",cat:"견적",priority:2,
       condition:(ctx)=>ctx.certifiedParts===true&&!ctx.minorDamage,
       then:(ctx)=>({flag:"OEM_25%_인센티브",msg:`품질인증부품 수리 시 OEM 공시가격의 25% 피보험자 지급. 예상 인센티브: ₩${Math.round((ctx.partsCost||0)*0.25).toLocaleString()}`,clause:"2025.08.16 개정 약관",severity:"positive"})},
     {id:"R04",name:"과실비율 자동 산정",cat:"과실",priority:1,
       condition:(ctx)=>!!ctx.accidentType,
-      then:(ctx)=>{const map={"교차로":"50:50","차선변경":"70:30(변경차)","후미추돌":"0:100(후방차)","좌회전":"70:30(좌회전차)","유턴":"70:30(유턴차)","주차장":"상황별","골목길":"50:50"};
+      then:(ctx)=>{const map={"교차로":"50:50","차선변경":"70:30(변경차)","후미추돌":"0:100(후방차)","추돌":"0:100(후방차)","좌회전":"70:30(좌회전차)","유턴":"70:30(유턴차)","주차장":"상황별","골목길":"50:50","신호위반":"0:100(위반차)","중앙선":"100:0(침범차)","역주행":"100:0(역주행차)","음주":"100:0(음주차)","고속도로":"상황별(고속도로)","전복":"단독 100%","침수":"과실 없음(자연재해)","사기":"과실 보류(조사 필요)","3중":"개별 배분 필요"};
         const key=Object.keys(map).find(k=>ctx.accidentType.includes(k));
         return{flag:"기본과실_산정",msg:`사고유형 [${ctx.accidentType}] → 기본 과실: ${key?map[key]:"개별 판단 필요"}. 손해보험협회 과실비율 인정기준 적용.`,clause:"별표3 과실상계",severity:"info"};}},
     {id:"R05",name:"음주운전 면책",cat:"보험",priority:0,
@@ -844,8 +844,13 @@ const ONTOLOGY = {
       condition:(ctx)=>ctx.faultA>0&&ctx.faultB>0&&ctx.totalCostB>0,
       then:(ctx)=>{const burden=Math.round(ctx.totalCostB*ctx.faultA/100);return{flag:"과실상계_결과",msg:`자사 과실 ${ctx.faultA}% 적용 → 타사 손해(₩${ctx.totalCostB.toLocaleString()}) × ${ctx.faultA}% = 자사 부담 ₩${burden.toLocaleString()}`,clause:"별표3 과실상계",severity:"info"};}},
     {id:"R14",name:"동승자 감액 적용",cat:"대인",priority:3,
-      condition:(ctx)=>ctx.passengerType&&ctx.passengerType!=="업무",
-      then:(ctx)=>{const rates={"무단":100,"음주동승":40,"요청":30,"호의":20,"업무":0};const rate=rates[ctx.passengerType]||0;
+      condition:(ctx)=>{if(ctx.passengerType&&ctx.passengerType!=="업무")return true;
+        if(ctx.claimantDetails)return ctx.claimantDetails.some(c=>c.passengerType&&c.passengerType!=="업무");return false;},
+      then:(ctx)=>{const rates={"무단":100,"음주동승":40,"요청":30,"호의":20,"업무":0};
+        if(ctx.claimantDetails){const passengers=ctx.claimantDetails.filter(c=>c.passengerType&&c.passengerType!=="업무");
+          if(passengers.length>0){const details=passengers.map(c=>`${c.name}(${c.passengerType},${rates[c.passengerType]||0}%감액)`).join(", ");
+            return{flag:"동승자_감액",msg:`동승자 감액 대상 ${passengers.length}명: ${details}`,clause:"별표5 동승자 감액비율표",severity:"warning"};}}
+        const rate=rates[ctx.passengerType]||0;
         return{flag:"동승자_감액",msg:`동승 유형 [${ctx.passengerType}] → ${rate}% 감액 적용.${rate===100?" 전액 감액(보상 없음)":""}`,clause:"별표5 동승자 감액비율표",severity:rate>=40?"warning":"info"};}},
     {id:"R15",name:"보험금 지급 기한",cat:"처리",priority:3,
       condition:(ctx)=>ctx.claimFiled===true,
@@ -883,6 +888,124 @@ const ONTOLOGY = {
     {id:"R25",name:"유족 보상 분배",cat:"대인",priority:0,
       condition:(ctx)=>ctx.hasFatality===true,
       then:(ctx)=>{const heirs=ctx.heirCount||1;return{flag:"유족_분배",msg:`사망 사고 → 유족 ${heirs}명에게 보상금 분배. 대인Ⅰ 사망한도 ₩200,000,000. 유족 순위: 배우자 > 자녀 > 부모.`,clause:"자배법 시행령 별표1 1급",severity:"critical"};}},
+    // ═══ 즉시 추가 규칙 R26~R42 ═══
+    {id:"R26",name:"ADAS 캘리브레이션 필수",cat:"견적",priority:2,
+      condition:(ctx)=>{const adas=["프론트 범퍼","전면 유리","사이드미러","헤드라이트","리어 범퍼","전방 카메라","전방 레이더","후방 카메라"];
+        const parts=ctx.damagedParts||ctx.sp||[];return parts.some(p=>adas.some(a=>p.includes(a)));},
+      then:(ctx)=>{const isLux=ctx.isImport||ctx.isSupercar;const cost=isLux?450000:150000;
+        return{flag:"ADAS_캘리브레이션",msg:`ADAS 장착 부위 수리/교환 감지 → 센서 캘리브레이션 필수. 예상비용 ₩${cost.toLocaleString()}${isLux?" (수입/고급차 전용장비)":""}. 미보정 시 자율주행·충돌방지 기능 오작동 위험.`,clause:"제조사 정비 매뉴얼",severity:"warning"};}},
+    {id:"R32",name:"위자료 자동 산정",cat:"대인",priority:1,
+      condition:(ctx)=>ctx.injuryGrade>=1&&ctx.injuryGrade<=14,
+      then:(ctx)=>{const consol=[0,15000000,13000000,11000000,9000000,7000000,5000000,4000000,3000000,2500000,2000000,1500000,1000000,800000,500000];
+        const amt=consol[ctx.injuryGrade]||0;const death=ctx.hasFatality?80000000:0;
+        return{flag:"위자료_산정",msg:`${ctx.hasFatality?"사망 위자료 ₩"+death.toLocaleString()+" + ":""}상해 ${ctx.injuryGrade}급 위자료: ₩${amt.toLocaleString()}${ctx.claimants>1?" × "+ctx.claimants+"명 = ₩"+(amt*ctx.claimants).toLocaleString():""}.`,clause:"대법원 판례 위자료 기준",severity:ctx.injuryGrade<=5?"warning":"info"};}},
+    {id:"R36",name:"개별 피해자 대인한도 조회",cat:"대인",priority:1,
+      condition:(ctx)=>ctx.claimantDetails&&ctx.claimantDetails.length>=2,
+      then:(ctx)=>{const limits=[0,200000000,176000000,152000000,128000000,75000000,50000000,40000000,30000000,25000000,20000000,20000000,15000000,15000000,12000000];
+        const details=ctx.claimantDetails.map(c=>{const lim=limits[c.grade]||0;return`${c.name}(${c.grade}급→₩${lim.toLocaleString()})`;}).join(", ");
+        const total=ctx.claimantDetails.reduce((s,c)=>s+(limits[c.grade]||0),0);
+        return{flag:"개별_대인한도",msg:`피해자 ${ctx.claimantDetails.length}명 개별 한도: ${details}. 합계 한도 ₩${total.toLocaleString()}.`,clause:"자배법 시행령 별표1",severity:"warning"};}},
+    {id:"R38",name:"현저한 과실 가산",cat:"과실",priority:2,
+      condition:(ctx)=>{const flags=ctx.grossNegligence||[];return Array.isArray(flags)&&flags.length>0;},
+      then:(ctx)=>{const items=(ctx.grossNegligence||[]).join(", ");
+        return{flag:"현저한과실_가산",msg:`현저한 과실 요소 감지: [${items}] → 기본 과실에 +5~10% 가산. 손해보험협회 수정요소 적용.`,clause:"과실비율 인정기준 수정요소",severity:"warning"};}},
+    {id:"R39",name:"중대한 과실 가산",cat:"과실",priority:1,
+      condition:(ctx)=>ctx.dui||ctx.unlicensed||(ctx.BAC&&ctx.BAC>=0.03)||ctx.drowsy||ctx.drugged||(ctx.overSpeed&&ctx.overSpeed>=20),
+      then:(ctx)=>{const items=[];if(ctx.dui||ctx.BAC>=0.03)items.push(`음주(BAC ${ctx.BAC||"?"}%)`);if(ctx.unlicensed)items.push("무면허");
+        if(ctx.drowsy)items.push("졸음운전");if(ctx.drugged)items.push("약물운전");if(ctx.overSpeed>=20)items.push(`과속 ${ctx.overSpeed}km/h 초과`);
+        return{flag:"중대한과실_가산",msg:`중대한 과실: [${items.join(", ")}] → 기본 과실에 +10~20% 가산. 형사처벌·면허취소 가능.`,clause:"과실비율 인정기준 수정요소, 도로교통법",severity:"critical"};}},
+    {id:"R42",name:"미수선 현금정산",cat:"처리",priority:2,
+      condition:(ctx)=>ctx.cashSettlement===true||(ctx.severity==="경미"&&ctx.damageAmount>0&&ctx.damageAmount<=3000000),
+      then:(ctx)=>{const est=ctx.damageAmount||ctx.repairCostA||0;const cash70=Math.round(est*0.7);const cash80=Math.round(est*0.8);
+        return{flag:"미수선_현금정산",msg:`미수선(현금정산) 가능 — 견적 ₩${est.toLocaleString()}의 70~80% = ₩${cash70.toLocaleString()}~₩${cash80.toLocaleString()} 지급. 향후 동일 건 수리비 재청구 불가.`,clause:"보통약관 미수선 처리 관행",severity:"info"};}},
+    // ═══ 차순 추가 규칙 R27~R47 ═══
+    {id:"R27",name:"수리방법 자동 선택",cat:"견적",priority:2,
+      condition:(ctx)=>ctx.severity&&ctx.damagedParts&&ctx.damagedParts.length>0,
+      then:(ctx)=>{const sv=ctx.severity;const methods=sv==="경미"?"복원수리 우선 (교환 불필요)":sv==="중간"?"판금+도장 권장 (교환 시 30~60% 비용 증가)":"교환+도장 필수 (판금 복원 불가 수준)";
+        return{flag:"수리방법_선택",msg:`심각도 [${sv}] → ${methods}. 부위 소재(금속/플라스틱/유리)별 적용 방법 상이.`,clause:"보험개발원 수리기준",severity:"info"};}},
+    {id:"R29",name:"연쇄 손상 자동 추가",cat:"견적",priority:2,
+      condition:(ctx)=>ctx.severity&&["중간","심각","전손 추정"].includes(ctx.severity)&&(ctx.damagedParts||ctx.sp||[]).length>0,
+      then:(ctx)=>{const chains={"프론트 범퍼":["프론트 그릴","라디에이터","전방 카메라/센서"],"리어 범퍼":["트렁크/테일게이트","후방 카메라","후방 주차센서"],
+        "본넷":["프론트 그릴","와이퍼","전면 유리"],"전면 유리":["전방 카메라/센서","와이퍼"],"사이드미러":["후측방 레이더"]};
+        const parts=ctx.damagedParts||ctx.sp||[];const secondary=[];
+        parts.forEach(p=>{Object.keys(chains).forEach(k=>{if(p.includes(k))chains[k].forEach(c=>{if(!parts.some(pp=>pp.includes(c))&&!secondary.includes(c))secondary.push(c);});});});
+        if(secondary.length===0)return{flag:"연쇄손상_없음",msg:"추가 연쇄 손상 부위 없음.",clause:"",severity:"info"};
+        return{flag:"연쇄손상_추가",msg:`1차 파손에 따른 연쇄 손상 가능 부위 ${secondary.length}개: ${secondary.join(", ")}. 현장 확인 권고.`,clause:"정비 실무 기준",severity:"warning"};}},
+    {id:"R33",name:"휴업손해 산정",cat:"대인",priority:1,
+      condition:(ctx)=>{if(ctx.claimantDetails)return ctx.claimantDetails.some(c=>c.treatDays>0&&c.dailyIncome>0);return ctx.treatDays>0&&ctx.dailyIncome>0;},
+      then:(ctx)=>{if(ctx.claimantDetails){const items=ctx.claimantDetails.filter(c=>c.treatDays>0&&c.dailyIncome>0)
+        .map(c=>`${c.name}: ₩${c.dailyIncome.toLocaleString()}×${c.treatDays}일=₩${(c.dailyIncome*c.treatDays).toLocaleString()}`);
+        if(items.length>0)return{flag:"휴업손해",msg:`휴업손해 산정: ${items.join(", ")}`,clause:"대법원 판례",severity:"warning"};}
+        const loss=(ctx.dailyIncome||0)*ctx.treatDays;
+        return{flag:"휴업손해",msg:`휴업손해: 일수입 ₩${(ctx.dailyIncome||0).toLocaleString()} × ${ctx.treatDays}일 = ₩${loss.toLocaleString()}`,clause:"대법원 판례",severity:"warning"};}},
+    {id:"R43",name:"분쟁심의 회부 기준",cat:"처리",priority:1,
+      condition:(ctx)=>{const fDiff=Math.abs((ctx.faultA||0)-(ctx.claimedFaultA||ctx.faultA||0));
+        const cDiff=ctx.claimedCost&&ctx.repairCostB?Math.abs(ctx.claimedCost-ctx.repairCostB)/ctx.repairCostB:0;
+        return fDiff>=15||cDiff>=0.3;},
+      then:(ctx)=>{const fDiff=Math.abs((ctx.faultA||0)-(ctx.claimedFaultA||ctx.faultA||0));
+        const reasons=[];if(fDiff>=15)reasons.push(`과실 차이 ${fDiff}%p`);
+        if(ctx.claimedCost&&ctx.repairCostB){const pct=Math.round(Math.abs(ctx.claimedCost-ctx.repairCostB)/ctx.repairCostB*100);if(pct>=30)reasons.push(`견적 차이 ${pct}%`);}
+        return{flag:"분쟁심의_권고",msg:`분쟁 회부 기준 충족: ${reasons.join(", ")}. 과실심의위원회(KNIA) 또는 금융분쟁조정위원회 신청 권고. 소요기간 약 1~3개월.`,clause:"보험업법 제29조, 손해보험협회 분쟁심의규정",severity:"warning"};}},
+    {id:"R44",name:"구상권 행사 판단",cat:"처리",priority:2,
+      condition:(ctx)=>ctx.faultB>0&&ctx.paidAmount>0,
+      then:(ctx)=>{const subrogation=Math.round((ctx.paidAmount||0)*ctx.faultB/100);
+        return{flag:"구상권_행사",msg:`자사 지급보험금 ₩${(ctx.paidAmount||0).toLocaleString()} × 타사 과실 ${ctx.faultB}% = 구상 청구 가능액 ₩${subrogation.toLocaleString()}. 타사 보험사에 구상 청구 진행.`,clause:"상법 제682조 (보험자대위)",severity:"info"};}},
+    {id:"R47",name:"대인Ⅱ 초과 적용",cat:"보험",priority:1,
+      condition:(ctx)=>{if(!ctx.injuryGrade||ctx.injuryGrade>5)return false;
+        const limits=[0,200000000,176000000,152000000,128000000,75000000];const lim=limits[ctx.injuryGrade]||0;
+        return ctx.estimatedCompensation>lim;},
+      then:(ctx)=>{const limits=[0,200000000,176000000,152000000,128000000,75000000];const lim=limits[ctx.injuryGrade]||0;
+        const excess=(ctx.estimatedCompensation||0)-lim;
+        return{flag:"대인Ⅱ_초과",msg:`대인Ⅰ 한도 ₩${lim.toLocaleString()} 초과 — 초과분 ₩${excess.toLocaleString()}은 대인배상Ⅱ에서 보상. 대인Ⅱ 가입 여부 확인 필요.`,clause:"자배법, 보통약관 대인Ⅱ",severity:"critical"};}},
+    // ═══ 향후 추가 규칙 R28~R49 ═══
+    {id:"R28",name:"경미손상 복원수리",cat:"견적",priority:2,
+      condition:(ctx)=>ctx.severity==="경미"&&(ctx.damagedParts||ctx.sp||[]).length>0,
+      then:(ctx)=>{const parts=(ctx.damagedParts||ctx.sp||[]).length;const savings=parts*120000;
+        return{flag:"경미손상_복원",msg:`경미 손상 ${parts}개 부위 → 복원수리(3유형) 적용 가능. 교환 대비 약 ₩${savings.toLocaleString()} 절감. 1유형(클리어): ₩60K~80K, 2유형(베이스): ₩120K~150K, 3유형(소재): ₩200K~280K.`,clause:"보험개발원 경미손상 수리기준",severity:"positive"};}},
+    {id:"R30",name:"수입차 부품 수급 지연",cat:"견적",priority:3,
+      condition:(ctx)=>ctx.isImport===true&&ctx.severity!=="경미",
+      then:(ctx)=>{const weeks=ctx.isSupercar?"3~6주":"2~4주";const extraRental=ctx.isSupercar?14:7;
+        return{flag:"부품수급_지연",msg:`외산 차량 부품 해외 발주 필요 — 예상 ${weeks} 소요. 렌트 기간 ${extraRental}일 추가 발생 가능.`,clause:"업계 실무",severity:"info"};}},
+    {id:"R31",name:"주행거리 감가 반영",cat:"견적",priority:3,
+      condition:(ctx)=>ctx.mileage>0&&ctx.vehicleAge>0,
+      then:(ctx)=>{const avgKm=15000;const actualKm=ctx.mileage;const expected=ctx.vehicleAge*avgKm;
+        const ratio=actualKm/expected;const adj=ratio>1.5?"고주행 — 추가 감가 5~10%":ratio<0.5?"저주행 — 감가 경감 3~5%":"평균 주행 — 표준 감가";
+        return{flag:"주행거리_감가",msg:`주행거리 ${actualKm.toLocaleString()}km (연평균 ${avgKm.toLocaleString()}km 기준 ${Math.round(ratio*100)}%). ${adj}.`,clause:"보험개발원 차량기준가액",severity:"info"};}},
+    {id:"R34",name:"후유장해 보상 산정",cat:"대인",priority:1,
+      condition:(ctx)=>ctx.injuryGrade>=1&&ctx.injuryGrade<=5&&ctx.disabilityRate>0,
+      then:(ctx)=>{const base=45000000;const comp=Math.round(base*ctx.disabilityRate/100*0.85);
+        return{flag:"후유장해_보상",msg:`후유장해 ${ctx.disabilityRate}% → ₩${base.toLocaleString()} × ${ctx.disabilityRate}% × 85% = ₩${comp.toLocaleString()}. 노동능력상실률 기반 산정.`,clause:"대법원 판례, 맥브라이드 장해평가",severity:"critical"};}},
+    {id:"R35",name:"과잉진료 의심",cat:"대인",priority:2,
+      condition:(ctx)=>{const stdDays={14:14,13:21,12:28,11:42,10:56};const std=stdDays[ctx.injuryGrade]||999;return ctx.injuryGrade>=10&&ctx.treatDays>std*2;},
+      then:(ctx)=>{const stdDays={14:14,13:21,12:28,11:42,10:56};const std=stdDays[ctx.injuryGrade]||0;
+        return{flag:"과잉진료_의심",msg:`${ctx.injuryGrade}급 기준 치료일수 ${std}일 대비 실제 ${ctx.treatDays}일 (${Math.round(ctx.treatDays/std*100)}%) — 과잉진료 의심. 자문의 의뢰 또는 SIU 연계 권고.`,clause:"보통약관 제35조, 의료자문",severity:"warning"};}},
+    {id:"R37",name:"향후치료비 예측",cat:"대인",priority:2,
+      condition:(ctx)=>ctx.injuryGrade>=1&&ctx.injuryGrade<=7&&ctx.surgeryRequired===true,
+      then:(ctx)=>{const futureCost=ctx.injuryGrade<=3?15000000:ctx.injuryGrade<=5?8000000:3000000;
+        return{flag:"향후치료비",msg:`${ctx.injuryGrade}급 중상해 + 수술 이력 → 향후 치료비 ₩${futureCost.toLocaleString()} 선산정 권고 (재수술·재활치료 포함).`,clause:"대법원 판례 향후치료비",severity:"warning"};}},
+    {id:"R40",name:"보행자/자전거 특례",cat:"과실",priority:1,
+      condition:(ctx)=>ctx.accidentType&&(ctx.accidentType.includes("보행자")||ctx.accidentType.includes("자전거")||ctx.accidentType.includes("횡단보도")),
+      then:(ctx)=>{const isPed=ctx.accidentType.includes("보행자")||ctx.accidentType.includes("횡단보도");
+        return{flag:"교통약자_특례",msg:`${isPed?"보행자":"자전거"} 사고 → 차량 과실 가중 원칙 적용. ${isPed?"보행자 보호의무(도로교통법 제27조)":"자전거 보호의무"} 위반 시 과실 80~100%. 대인Ⅰ 무조건 적용.`,clause:"도로교통법 제27조, 자배법",severity:"critical"};}},
+    {id:"R41",name:"증거 기반 과실 정밀 보정",cat:"과실",priority:3,
+      condition:(ctx)=>ctx.evidenceBlackbox===true||ctx.evidenceCCTV===true,
+      then:(ctx)=>{const sources=[];if(ctx.evidenceBlackbox)sources.push("블랙박스");if(ctx.evidenceCCTV)sources.push("CCTV");
+        return{flag:"증거_정밀보정",msg:`객관적 증거 확보: ${sources.join(", ")} → 진술 의존도 ↓, 과실 판정 신뢰도 "매우 높음". 증거 내용 기반 ±3~10% 정밀 보정 적용 가능.`,clause:"대법원 증거법칙",severity:"positive"};}},
+    {id:"R45",name:"합의서 자동 생성",cat:"처리",priority:3,
+      condition:(ctx)=>ctx.settlementAgreed===true&&ctx.finalAmount>0,
+      then:(ctx)=>({flag:"합의서_생성",msg:`합의 금액 ₩${ctx.finalAmount.toLocaleString()} 확정 → 합의서 자동 생성 가능. 포함 항목: 당사자 정보, 합의금액, 지급 방법, 면책 조항, 향후 청구권 포기.`,clause:"민법 제731조 화해",severity:"positive"})},
+    {id:"R46",name:"소송 전환 비용 예측",cat:"처리",priority:3,
+      condition:(ctx)=>ctx.litigationConsidered===true,
+      then:(ctx)=>{const disputeAmt=ctx.totalCostB||ctx.damageAmount||0;const lawyerFee=disputeAmt>50000000?5000000:disputeAmt>10000000?3000000:2000000;
+        return{flag:"소송_비용예측",msg:`소송 전환 시 예상: 변호사비 ₩${lawyerFee.toLocaleString()}, 소요기간 12~24개월, 인지대·송달료 별도. 분쟁금액 ₩${disputeAmt.toLocaleString()} 기준 경제성 분석 필요.`,clause:"민사소송법",severity:"warning"};}},
+    {id:"R48",name:"자기신체/무보험차상해 특약",cat:"보험",priority:2,
+      condition:(ctx)=>(ctx.selfInjury===true||ctx.uninsuredOpponent===true)&&ctx.injuryGrade>0,
+      then:(ctx)=>{const path=ctx.uninsuredOpponent?"무보험차상해 특약 → 자사 보험에서 보상 (대인Ⅰ 한도 준용)":"자기신체사고 특약 → 과실 무관 보상 (가입 한도 내)";
+        return{flag:"자사피해자_보상경로",msg:`자사 운전자/동승자 상해 → ${path}. 특약 가입 여부 확인 필수.`,clause:"보통약관 자기신체사고/무보험차상해",severity:"warning"};}},
+    {id:"R49",name:"긴급출동/견인비용",cat:"보험",priority:3,
+      condition:(ctx)=>ctx.towingRequired===true||ctx.severity==="심각"||ctx.totalLoss===true,
+      then:(ctx)=>{const cost=ctx.totalLoss?200000:ctx.severity==="심각"?150000:80000;
+        return{flag:"견인비용",msg:`사고 현장 견인 필요 → 예상 견인비 ₩${cost.toLocaleString()}. 긴급출동 서비스 가입 시 무료 (연 3~5회).`,clause:"보통약관 긴급출동 특약",severity:"info"};}},
   ],
 };
 
@@ -935,20 +1058,36 @@ function buildContextFromCase(useCase,extraData={}){
       vehicleValue:28000000,vehicleAge:4,injuryGrade:8,treatDays:56,
       claimants:3,selfDamage:true,damageAmount:8500000,
       totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:4200000,
-      dui:true,unlicensed:false,majorFault:true,claimFiled:true,uninsuredOpponent:true},
+      dui:true,BAC:0.08,unlicensed:false,majorFault:true,majorFaultType:"신호위반",
+      claimFiled:true,uninsuredOpponent:true,
+      claimantDetails:[
+        {name:"타사 운전자",grade:8,treatDays:56,type:"중상",passengerType:null},
+        {name:"타사 동승자1",grade:10,treatDays:21,type:"경상",passengerType:"호의"},
+        {name:"타사 동승자2",grade:12,treatDays:14,type:"경상",passengerType:"호의"}
+      ]},
     uc5:{accidentType:"렌터카 영업차량 추돌",vehicleA:"현대 쏘나타(렌터카)",vehicleB:"기아 스포티지",
       isImport:false,isSupercar:false,severity:"중간",faultA:0,faultB:100,
       repairCostA:3200000,repairCostB:1800000,totalCostB:1800000,
       vehicleValue:32000000,vehicleAge:1,injuryGrade:0,treatDays:0,
       claimants:0,selfDamage:true,damageAmount:3200000,isCommercial:true,
-      dailyRevenue:180000,repairDays:12,
+      dailyRevenue:180000,repairDays:12,operationalRate:0.85,
+      monthlyFixedCost:2800000,
       totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:3200000,
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
     uc6:{accidentType:"3중 추돌 (A→B→C)",vehicleA:"현대 그랜저",vehicleB:"기아 K8",
-      isImport:false,isSupercar:false,severity:"심각",faultA:70,faultB:20,
-      repairCostA:3500000,repairCostB:6800000,totalCostB:15000000,
+      vehicleC:"현대 스포티지",
+      isImport:false,isSupercar:false,severity:"심각",faultA:70,faultB:20,faultC:10,
+      repairCostA:3500000,repairCostB:6800000,repairCostC:4500000,totalCostB:15000000,
       vehicleValue:45000000,vehicleAge:2,injuryGrade:10,treatDays:28,
       claimants:4,selfDamage:true,damageAmount:3500000,multiVehicle:true,vehicleCount:3,
+      multipleInjuryGrades:true,
+      claimantDetails:[
+        {name:"B차 운전자",grade:10,treatDays:28,type:"경상",vehicle:"B"},
+        {name:"B차 동승자",grade:12,treatDays:14,type:"경상",vehicle:"B"},
+        {name:"C차 운전자",grade:12,treatDays:10,type:"경상",vehicle:"C"},
+        {name:"C차 동승자",grade:14,treatDays:7,type:"경미",vehicle:"C"}
+      ],
+      costFlows:{AtoB:4760000,AtoC:3150000,BtoA:700000,BtoC:900000,CtoA:350000,CtoB:680000},
       totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:6800000,
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
     uc7:{accidentType:"고속도로 전복 전손",vehicleA:"기아 모하비",vehicleB:"가드레일(시설물)",
@@ -957,14 +1096,33 @@ function buildContextFromCase(useCase,extraData={}){
       vehicleValue:48000000,vehicleAge:3,injuryGrade:5,treatDays:90,
       claimants:2,selfDamage:true,damageAmount:42000000,
       totalLoss:true,certifiedParts:false,minorDamage:false,partsCost:0,
-      hasLoan:true,loanBalance:18000000,
+      hasLoan:true,loanBalance:18000000,loanHolderName:"현대캐피탈",loanMonthlyPayment:850000,
+      claimantDetails:[
+        {name:"자사 운전자",grade:5,treatDays:90,type:"중상",passengerType:null},
+        {name:"자사 동승자",grade:8,treatDays:42,type:"중간",passengerType:"호의"}
+      ],
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
     uc8:{accidentType:"고속도로 다중 충돌 사망사고",vehicleA:"현대 스타리아(9인승)",vehicleB:"대형 트럭",
       isImport:false,isSupercar:false,severity:"심각",faultA:30,faultB:70,
       repairCostA:35000000,repairCostB:5000000,totalCostB:5000000,
       vehicleValue:55000000,vehicleAge:1,injuryGrade:1,treatDays:0,
       claimants:6,selfDamage:true,damageAmount:35000000,
-      hasFatality:true,heirCount:4,multipleInjuryGrades:true,
+      hasFatality:true,heirCount:4,
+      heirDetails:[
+        {relation:"배우자",age:45,dependent:true},
+        {relation:"자녀",age:20,dependent:true},
+        {relation:"자녀",age:17,dependent:true},
+        {relation:"자녀",age:14,dependent:true}
+      ],
+      multipleInjuryGrades:true,
+      claimantDetails:[
+        {name:"자사 운전자",grade:1,treatDays:0,type:"사망",passengerType:null},
+        {name:"자사 동승자1",grade:5,treatDays:90,type:"중상",passengerType:"업무"},
+        {name:"자사 동승자2",grade:5,treatDays:120,type:"중상",passengerType:"업무"},
+        {name:"타사 운전자",grade:12,treatDays:14,type:"경상",passengerType:null},
+        {name:"타사 동승자1",grade:12,treatDays:21,type:"경상",passengerType:"호의"},
+        {name:"타사 동승자2",grade:14,treatDays:7,type:"경미",passengerType:"호의"}
+      ],
       totalLoss:true,certifiedParts:false,minorDamage:false,partsCost:0,
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
     uc9:{accidentType:"반복 접수 사기 의심",vehicleA:"BMW 5시리즈",vehicleB:"현대 아반떼",
@@ -972,7 +1130,19 @@ function buildContextFromCase(useCase,extraData={}){
       repairCostA:4500000,repairCostB:2800000,totalCostB:2800000,
       vehicleValue:52000000,vehicleAge:2,injuryGrade:14,treatDays:35,
       claimants:2,selfDamage:true,damageAmount:4500000,
-      fraudScore:78,fraudPatterns:"6개월 내 3회 접수 · 동일 정비소 반복 · 접수 후 72시간 병원",
+      fraudScore:78,
+      fraudEvidence:{
+        claimHistoryCount:3,claimHistoryDays:180,
+        sameRepairShop:true,repairShopName:"XX모터스 강남점",repairShopClaimCount:3,
+        firstHospitalDelayDays:3,
+        diagnosisOverClaim:true,
+        previousClaimAmounts:[3200000,4800000,4500000],
+        patterns:["6개월 내 3회 접수","동일 정비소 반복 이용","접수 후 72시간 뒤 최초 병원 방문","경미 사고 대비 과잉 진단(14급)"]
+      },
+      claimantDetails:[
+        {name:"A차 운전자",grade:14,treatDays:35,type:"경상",passengerType:null},
+        {name:"A차 동승자",grade:14,treatDays:28,type:"경상",passengerType:"호의"}
+      ],
       totalLoss:false,certifiedParts:false,minorDamage:false,partsCost:4500000,
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
     uc10:{accidentType:"태풍 침수 (자연재해)",vehicleA:"제네시스 G80",vehicleB:"자연재해(태풍)",
@@ -980,6 +1150,8 @@ function buildContextFromCase(useCase,extraData={}){
       repairCostA:15000000,repairCostB:0,totalCostB:0,
       vehicleValue:72000000,vehicleAge:2,injuryGrade:0,treatDays:0,
       claimants:0,selfDamage:true,damageAmount:15000000,isFlood:true,floodLevel:"엔진룸 이상",
+      floodType:"해수(태풍)",floodInsuranceActive:true,
+      accidentDate:"2025-01-10",claimDate:"2026-02-15",
       daysSinceAccident:400,
       totalLoss:true,certifiedParts:false,minorDamage:false,partsCost:0,
       dui:false,unlicensed:false,majorFault:false,claimFiled:true},
