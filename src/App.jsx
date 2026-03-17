@@ -124,6 +124,20 @@ const MVPS = [
     gradient: "linear-gradient(135deg,rgba(249,115,22,0.08),rgba(234,88,12,0.06))",
     border: "rgba(249,115,22,0.2)",
   },
+  {
+    id: "koreaJobs",
+    category: "DATA",
+    catColor: "#06b6d4",
+    icon: "💼",
+    iconBg: "linear-gradient(135deg,#06b6d4,#0891b2)",
+    title: "대한민국 취업시장",
+    desc: "2,880만 취업자를 175개 직업으로 시각화 · 고용전망 · 중위임금 · 학력요건 · AI 대체 위험도를 트리맵으로 분석하는 대시보드",
+    tags: ["데이터시각화", "고용분석", "AI대체위험"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(6,182,212,0.08),rgba(8,145,178,0.06))",
+    border: "rgba(6,182,212,0.2)",
+  },
 ];
 
 export default function App() {
@@ -147,6 +161,12 @@ export default function App() {
   if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
   if (page === "claimsNew") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
   if (page === "stockpilot") return <StockPilot onBack={() => setPage("portal")} />;
+  if (page === "koreaJobs") return (
+    <div style={{width:"100%",height:"100vh",position:"relative"}}>
+      <button onClick={() => setPage("portal")} style={{position:"fixed",top:16,left:16,zIndex:100,padding:"8px 16px",borderRadius:10,border:"none",background:"rgba(0,0,0,.7)",backdropFilter:"blur(8px)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>← 포털로 돌아가기</button>
+      <iframe src="/korea-jobs.html" style={{width:"100%",height:"100%",border:"none"}} title="대한민국 취업시장"/>
+    </div>
+  );
 
   const handleRequest = () => {
     if (!reqForm.name.trim() || !reqForm.team.trim() || !reqForm.email.trim() || !reqForm.title.trim() || !reqForm.desc.trim()) return;

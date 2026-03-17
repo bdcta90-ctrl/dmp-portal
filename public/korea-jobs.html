@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대한민국 취업시장 시각화</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0f;
+  color: #e0e0e0;
+  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+  overflow-x: hidden;
+}
+.header {
+  padding: 24px 32px 8px;
+}
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.header p {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 16px;
+}
+.header .source {
+  font-size: 11px;
+  color: #666;
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  padding: 8px 32px 12px;
+  flex-wrap: wrap;
+}
+.controls button {
+  padding: 8px 18px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #151520;
+  color: #aaa;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.controls button:hover { border-color: #555; color: #ddd; }
+.controls button.active {
+  background: #1a2a3a;
+  border-color: #4a8ab5;
+  color: #8ac4f0;
+}
+.main-container {
+  display: flex;
+  padding: 0 32px 24px;
+  gap: 24px;
+}
+.treemap-container {
+  flex: 1;
+  min-width: 0;
+}
+#treemap {
+  width: 100%;
+  border-radius: 8px;
+  cursor: default;
+}
+.sidebar {
+  width: 340px;
+  flex-shrink: 0;
+}
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 32px 4px;
+  font-size: 11px;
+  color: #888;
+}
+.gradient-bar {
+  width: 200px;
+  height: 12px;
+  border-radius: 3px;
+}
+.stat-card {
+  background: #12121a;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.stat-card h3 {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.stat-card .big-num {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+}
+.stat-card .sub {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+.hist-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+.hist-label {
+  width: 100px;
+  color: #999;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 8px;
+}
+.hist-bar-bg {
+  flex: 1;
+  height: 16px;
+  background: #1a1a25;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.hist-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.hist-val {
+  width: 70px;
+  text-align: right;
+  color: #aaa;
+  padding-left: 6px;
+  flex-shrink: 0;
+}
+.tier-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #1a1a25;
+  font-size: 12px;
+}
+.tier-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.tier-label { flex: 1; color: #ccc; }
+.tier-count { color: #888; margin-left: 8px; }
+.tier-pct { color: #666; margin-left: 4px; width: 45px; text-align: right; }
+
+.tooltip {
+  position: fixed;
+  background: #1a1a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  max-width: 320px;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.tooltip .tt-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.tooltip .tt-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+.tooltip .tt-label { color: #888; }
+.tooltip .tt-value { color: #ddd; font-weight: 600; }
+.tooltip .tt-desc {
+  margin-top: 8px;
+  color: #777;
+  font-size: 11px;
+  line-height: 1.5;
+  border-top: 1px solid #222;
+  padding-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .main-container { flex-direction: column; }
+  .sidebar { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🇰🇷 대한민국 취업시장 시각화</h1>
+  <p>한국 경제의 약 2,880만 취업자를 175개 직업으로 시각화합니다. 사각형의 크기는 취업자 수, 색상은 선택한 지표를 나타냅니다.</p>
+  <div class="source">데이터 출처: 통계청 경제활동인구조사(2024), 한국고용정보원, 고용노동부 | 마우스를 올려 상세 정보를 확인하세요</div>
+</div>
+
+<div class="controls">
+  <button class="active" data-mode="outlook">📈 고용 전망</button>
+  <button data-mode="pay">💰 중위 임금</button>
+  <button data-mode="education">🎓 학력 요건</button>
+  <button data-mode="ai">🤖 AI 대체 위험</button>
+</div>
+
+<div class="legend" id="legendBar">
+  <span id="legendLow">성장</span>
+  <canvas id="gradientCanvas" width="200" height="12" class="gradient-bar"></canvas>
+  <span id="legendHigh">감소</span>
+</div>
+
+<div class="main-container">
+  <div class="treemap-container">
+    <canvas id="treemap"></canvas>
+  </div>
+  <div class="sidebar" id="sidebar"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ===== 한국 직업 데이터 (통계청 2024 기반) =====
+const occupations = [
+  // 경영·사무
+  {name:"경영관련 사무원",cat:"경영·사무",emp:2499000,pay:3200,edu:3,outlook:2,ai:8.5,aiDesc:"반복적 문서작업, 데이터 정리 등 AI 자동화 가능성 높음"},
+  {name:"회계 및 경리사무원",cat:"경영·사무",emp:520000,pay:3100,edu:3,outlook:0,ai:9.0,aiDesc:"정형화된 회계 처리, 전표 입력 등 AI 대체 가능성 매우 높음"},
+  {name:"인사·노무 사무원",cat:"경영·사무",emp:310000,pay:3400,edu:3,outlook:1,ai:6.5,aiDesc:"채용 스크리닝, 급여 계산 자동화 가능하나 상담·판단은 인간 필요"},
+  {name:"기획·마케팅 사무원",cat:"경영·사무",emp:380000,pay:3600,edu:3,outlook:3,ai:5.0,aiDesc:"데이터 분석은 AI 활용 가능하나 전략 수립은 인간 주도"},
+  {name:"무역 사무원",cat:"경영·사무",emp:180000,pay:3300,edu:3,outlook:-1,ai:7.0,aiDesc:"통관서류, 무역서식 처리 자동화 진행 중"},
+  {name:"비서",cat:"경영·사무",emp:85000,pay:3000,edu:3,outlook:-2,ai:7.5,aiDesc:"일정 관리, 문서 정리 등 AI 비서 대체 가속화"},
+  {name:"총무 사무원",cat:"경영·사무",emp:270000,pay:3000,edu:3,outlook:0,ai:7.0,aiDesc:"시설관리, 자산관리 등 정형화된 업무 자동화 가능"},
+  {name:"법률 사무원",cat:"경영·사무",emp:95000,pay:3200,edu:3,outlook:1,ai:6.0,aiDesc:"법률 문서 검토, 판례 검색 등 AI 보조 활용 확대"},
+
+  // 판매·서비스
+  {name:"매장 판매원",cat:"판매·서비스",emp:1550000,pay:2200,edu:1,outlook:-5,ai:6.0,aiDesc:"온라인 쇼핑 확대로 오프라인 판매직 구조적 감소"},
+  {name:"음식서비스 종사자",cat:"판매·서비스",emp:1662000,pay:2000,edu:0,outlook:-2,ai:3.0,aiDesc:"키오스크 확대되나 조리·서빙 등 대면 서비스 유지"},
+  {name:"숙박시설 서비스원",cat:"판매·서비스",emp:320000,pay:2100,edu:1,outlook:0,ai:4.0,aiDesc:"무인 체크인 확대되나 고객 대응 필요"},
+  {name:"여행·관광 서비스원",cat:"판매·서비스",emp:150000,pay:2500,edu:2,outlook:3,ai:5.5,aiDesc:"AI 여행플래너 등장으로 단순 예약 업무 감소"},
+  {name:"미용·뷰티 서비스원",cat:"판매·서비스",emp:380000,pay:2300,edu:1,outlook:2,ai:1.5,aiDesc:"손기술 중심으로 AI 대체 어려움"},
+  {name:"결혼·장례 서비스원",cat:"판매·서비스",emp:120000,pay:2400,edu:1,outlook:-3,ai:2.0,aiDesc:"대면 의례 서비스로 AI 대체 제한적"},
+  {name:"부동산 중개인",cat:"판매·서비스",emp:210000,pay:3500,edu:2,outlook:-1,ai:5.0,aiDesc:"프롭테크 발전으로 단순 중개 감소 추세"},
+  {name:"보험·금융 설계사",cat:"판매·서비스",emp:420000,pay:3200,edu:2,outlook:-3,ai:7.0,aiDesc:"로보어드바이저, AI 상품추천 확대"},
+  {name:"텔레마케터",cat:"판매·서비스",emp:180000,pay:2100,edu:1,outlook:-8,ai:9.5,aiDesc:"AI 콜봇, 챗봇 대체 가속화 진행 중"},
+  {name:"방문판매원",cat:"판매·서비스",emp:250000,pay:2000,edu:1,outlook:-6,ai:4.0,aiDesc:"비대면 소비 확산으로 방문판매 급감"},
+
+  // 보건·의료
+  {name:"의사",cat:"보건·의료",emp:130000,pay:8500,edu:5,outlook:5,ai:3.0,aiDesc:"AI 진단 보조 도구 활용 증가하나 최종 판단은 의사 영역"},
+  {name:"간호사",cat:"보건·의료",emp:450000,pay:3800,edu:3,outlook:8,ai:2.0,aiDesc:"고령화로 수요 급증, 대면 케어 중심으로 AI 대체 어려움"},
+  {name:"약사",cat:"보건·의료",emp:72000,pay:6000,edu:5,outlook:2,ai:4.0,aiDesc:"AI 약물상호작용 체크 등 보조 역할, 조제·상담은 인간 필요"},
+  {name:"치과의사·한의사",cat:"보건·의료",emp:85000,pay:7000,edu:5,outlook:3,ai:2.5,aiDesc:"시술·진료 행위 자체는 AI 대체 제한적"},
+  {name:"물리·작업 치료사",cat:"보건·의료",emp:95000,pay:3200,edu:3,outlook:7,ai:2.0,aiDesc:"재활치료 수요 증가, 대면 치료 행위 대체 어려움"},
+  {name:"임상병리사·방사선사",cat:"보건·의료",emp:78000,pay:3500,edu:3,outlook:3,ai:5.0,aiDesc:"검사 자동화 진행되나 판독·관리 인력 필요"},
+  {name:"의료코디네이터",cat:"보건·의료",emp:45000,pay:2800,edu:2,outlook:4,ai:5.5,aiDesc:"의료관광·환자상담 수요 증가"},
+  {name:"요양보호사",cat:"보건·의료",emp:680000,pay:2100,edu:1,outlook:10,ai:1.0,aiDesc:"초고령사회 진입으로 돌봄 수요 폭증, AI 대체 매우 어려움"},
+  {name:"간병인",cat:"보건·의료",emp:350000,pay:2000,edu:0,outlook:8,ai:1.0,aiDesc:"대면 돌봄 서비스로 AI 대체 불가 영역"},
+
+  // 교육
+  {name:"초등학교 교사",cat:"교육",emp:190000,pay:4200,edu:4,outlook:-3,ai:3.0,aiDesc:"학령인구 감소로 수요 줄지만 교육 자체는 인간 역할 중요"},
+  {name:"중·고등학교 교사",cat:"교육",emp:280000,pay:4500,edu:4,outlook:-2,ai:3.5,aiDesc:"AI 맞춤학습 도구 활용 증가하나 교육자 역할 유지"},
+  {name:"대학교수·강사",cat:"교육",emp:120000,pay:5500,edu:5,outlook:-1,ai:4.0,aiDesc:"연구·강의 일부 AI 활용 가능, 학령인구 감소 영향"},
+  {name:"유치원·보육교사",cat:"교육",emp:310000,pay:2500,edu:2,outlook:-4,ai:1.5,aiDesc:"출생률 급감으로 수요 감소, 돌봄 자체는 대체 어려움"},
+  {name:"학원강사",cat:"교육",emp:350000,pay:2800,edu:3,outlook:-2,ai:5.0,aiDesc:"AI 튜터 등장으로 단순 지식 전달 강의 감소 예상"},
+  {name:"특수교육 교사",cat:"교육",emp:45000,pay:4200,edu:4,outlook:3,ai:2.0,aiDesc:"특수교육 수요 증가, 개별 맞춤 지도 필수"},
+  {name:"평생교육 강사",cat:"교육",emp:150000,pay:2600,edu:3,outlook:2,ai:4.0,aiDesc:"성인 재교육 수요 증가 추세"},
+
+  // 정보통신(IT)
+  {name:"소프트웨어 개발자",cat:"정보통신(IT)",emp:420000,pay:5000,edu:3,outlook:8,ai:4.0,aiDesc:"AI 코딩 보조 도구 활용하나 설계·아키텍처는 인간 주도"},
+  {name:"데이터 분석가·과학자",cat:"정보통신(IT)",emp:85000,pay:5500,edu:4,outlook:10,ai:3.5,aiDesc:"AI/ML 분석 역량 수요 급증"},
+  {name:"정보보안 전문가",cat:"정보통신(IT)",emp:65000,pay:5200,edu:3,outlook:9,ai:3.0,aiDesc:"사이버 위협 증가로 수요 폭증"},
+  {name:"시스템·네트워크 관리자",cat:"정보통신(IT)",emp:180000,pay:4200,edu:3,outlook:3,ai:5.0,aiDesc:"클라우드 자동화로 일부 감소하나 관리 인력 필요"},
+  {name:"웹·앱 디자이너",cat:"정보통신(IT)",emp:120000,pay:3800,edu:3,outlook:4,ai:5.5,aiDesc:"AI 디자인 도구 활용 증가하나 UX 설계는 인간 역할"},
+  {name:"AI·머신러닝 엔지니어",cat:"정보통신(IT)",emp:35000,pay:7000,edu:4,outlook:15,ai:2.0,aiDesc:"AI 기술 자체를 개발하는 직종으로 수요 폭발적 증가"},
+  {name:"클라우드 엔지니어",cat:"정보통신(IT)",emp:45000,pay:6000,edu:3,outlook:12,ai:3.0,aiDesc:"디지털 전환 가속으로 수요 급증"},
+  {name:"게임 개발자",cat:"정보통신(IT)",emp:55000,pay:4500,edu:3,outlook:3,ai:4.0,aiDesc:"AI 활용한 게임 제작 효율화, 창의적 기획은 인간 역할"},
+  {name:"IT 컨설턴트",cat:"정보통신(IT)",emp:40000,pay:5800,edu:4,outlook:5,ai:4.5,aiDesc:"디지털 전환 자문 수요 증가, 전략 수립은 인간 주도"},
+
+  // 공학·기술
+  {name:"기계공학 기술자",cat:"공학·기술",emp:280000,pay:4200,edu:3,outlook:2,ai:3.5,aiDesc:"설계 자동화 진행되나 창의적 엔지니어링 필요"},
+  {name:"전기·전자공학 기술자",cat:"공학·기술",emp:350000,pay:4500,edu:3,outlook:4,ai:3.5,aiDesc:"반도체·전기차 분야 수요 증가"},
+  {name:"화학공학 기술자",cat:"공학·기술",emp:120000,pay:4800,edu:4,outlook:2,ai:3.0,aiDesc:"소재·배터리 산업 수요 안정적"},
+  {name:"환경공학 기술자",cat:"공학·기술",emp:75000,pay:3800,edu:3,outlook:5,ai:3.0,aiDesc:"환경규제 강화로 수요 증가"},
+  {name:"건축공학 기술자",cat:"공학·기술",emp:180000,pay:4000,edu:3,outlook:-3,ai:4.0,aiDesc:"건설경기 침체 영향, BIM 등 디지털화 진행"},
+  {name:"토목공학 기술자",cat:"공학·기술",emp:150000,pay:3800,edu:3,outlook:-2,ai:3.5,aiDesc:"SOC 투자 축소 영향"},
+  {name:"산업공학 기술자",cat:"공학·기술",emp:90000,pay:4300,edu:3,outlook:3,ai:5.0,aiDesc:"공정 최적화 AI 활용 증가"},
+  {name:"반도체 공정 기술자",cat:"공학·기술",emp:85000,pay:5500,edu:3,outlook:7,ai:3.0,aiDesc:"반도체 산업 투자 확대로 수요 급증"},
+  {name:"자동차공학 기술자",cat:"공학·기술",emp:110000,pay:4800,edu:3,outlook:3,ai:3.5,aiDesc:"전기차·자율주행 전환으로 재편 중"},
+  {name:"품질관리 기술자",cat:"공학·기술",emp:160000,pay:3500,edu:2,outlook:0,ai:6.0,aiDesc:"자동화 검사 시스템 도입 확대"},
+
+  // 제조·생산
+  {name:"기계조작원",cat:"제조·생산",emp:950000,pay:2800,edu:1,outlook:-4,ai:7.5,aiDesc:"산업용 로봇, 스마트팩토리 확대로 감소"},
+  {name:"금속·주조 가공원",cat:"제조·생산",emp:280000,pay:3000,edu:1,outlook:-3,ai:6.0,aiDesc:"자동화 설비 도입 확대"},
+  {name:"전기·전자 조립원",cat:"제조·생산",emp:350000,pay:2800,edu:1,outlook:-2,ai:7.0,aiDesc:"자동화 라인 도입 가속화"},
+  {name:"섬유·의복 제조원",cat:"제조·생산",emp:180000,pay:2200,edu:0,outlook:-7,ai:5.0,aiDesc:"해외이전·자동화로 고용 급감"},
+  {name:"식품 가공원",cat:"제조·생산",emp:220000,pay:2300,edu:0,outlook:-1,ai:5.5,aiDesc:"자동화 진행되나 식품 특성상 인력 필요"},
+  {name:"화학제품 제조원",cat:"제조·생산",emp:150000,pay:3200,edu:1,outlook:0,ai:5.0,aiDesc:"공정 자동화 진행 중"},
+  {name:"인쇄·목재 가공원",cat:"제조·생산",emp:95000,pay:2500,edu:0,outlook:-6,ai:5.5,aiDesc:"디지털화로 인쇄 수요 감소"},
+  {name:"용접·판금원",cat:"제조·생산",emp:180000,pay:3200,edu:1,outlook:-2,ai:5.0,aiDesc:"용접 로봇 도입되나 현장 숙련공 필요"},
+  {name:"플라스틱·고무 제조원",cat:"제조·생산",emp:130000,pay:2700,edu:0,outlook:-3,ai:6.0,aiDesc:"사출성형 자동화 확대"},
+
+  // 건설
+  {name:"건축 시공 기술자",cat:"건설",emp:280000,pay:3500,edu:2,outlook:-5,ai:3.0,aiDesc:"건설경기 침체로 감소, 현장 기술은 대체 어려움"},
+  {name:"토목 시공원",cat:"건설",emp:220000,pay:3200,edu:1,outlook:-4,ai:3.0,aiDesc:"SOC 투자 감소 영향"},
+  {name:"전기·배관 설비원",cat:"건설",emp:350000,pay:3300,edu:1,outlook:-1,ai:2.0,aiDesc:"현장 설치·수리 작업은 AI 대체 어려움"},
+  {name:"도장·방수 기능원",cat:"건설",emp:120000,pay:3000,edu:0,outlook:-5,ai:3.0,aiDesc:"건설경기 침체 영향"},
+  {name:"중장비 운전원",cat:"건설",emp:180000,pay:3500,edu:1,outlook:-3,ai:5.0,aiDesc:"자율주행 중장비 개발 진행 중"},
+  {name:"인테리어 디자이너",cat:"건설",emp:95000,pay:3200,edu:2,outlook:1,ai:4.5,aiDesc:"AI 인테리어 시뮬레이션 활용 증가"},
+  {name:"측량·감리 기술자",cat:"건설",emp:60000,pay:3800,edu:3,outlook:0,ai:5.0,aiDesc:"드론·AI 측량 기술 도입 확대"},
+
+  // 운송·물류
+  {name:"택배·배달 기사",cat:"운송·물류",emp:450000,pay:2800,edu:0,outlook:3,ai:4.0,aiDesc:"이커머스 성장으로 수요 증가, 자율배송 아직 초기"},
+  {name:"화물차 운전원",cat:"운송·물류",emp:520000,pay:3200,edu:0,outlook:-1,ai:5.5,aiDesc:"자율주행 트럭 개발 진행 중"},
+  {name:"버스·택시 운전원",cat:"운송·물류",emp:380000,pay:2800,edu:0,outlook:-4,ai:6.0,aiDesc:"자율주행 기술 발전으로 중장기 감소 전망"},
+  {name:"항공기 조종사·승무원",cat:"운송·물류",emp:35000,pay:5500,edu:3,outlook:3,ai:3.0,aiDesc:"항공 수요 회복, 자동화 제한적"},
+  {name:"선박 운항원",cat:"운송·물류",emp:45000,pay:4500,edu:2,outlook:0,ai:3.5,aiDesc:"자율운항 선박 개발 진행 중"},
+  {name:"물류 관리자",cat:"운송·물류",emp:180000,pay:3200,edu:2,outlook:2,ai:6.5,aiDesc:"물류 AI 최적화 시스템 도입 확대"},
+  {name:"창고관리원",cat:"운송·물류",emp:250000,pay:2500,edu:0,outlook:-2,ai:7.0,aiDesc:"자동화 물류센터 확대"},
+
+  // 농림어업
+  {name:"작물재배 종사자",cat:"농림어업",emp:1375000,pay:1800,edu:0,outlook:-5,ai:3.0,aiDesc:"고령화·인구감소로 종사자 감소, 스마트팜 도입 확대"},
+  {name:"축산업 종사자",cat:"농림어업",emp:180000,pay:2200,edu:0,outlook:-3,ai:3.5,aiDesc:"자동 사양관리 시스템 도입 중"},
+  {name:"어업 종사자",cat:"농림어업",emp:120000,pay:2500,edu:0,outlook:-5,ai:2.5,aiDesc:"어업 인구 감소 추세, AI 어군탐지 활용"},
+  {name:"임업 종사자",cat:"농림어업",emp:35000,pay:2300,edu:0,outlook:-2,ai:2.0,aiDesc:"산림관리 드론 활용 증가"},
+
+  // 법률·행정
+  {name:"변호사",cat:"법률·행정",emp:35000,pay:8000,edu:5,outlook:2,ai:4.5,aiDesc:"AI 법률검색·문서작성 보조, 최종 판단은 인간 영역"},
+  {name:"법무사·변리사",cat:"법률·행정",emp:25000,pay:6000,edu:5,outlook:0,ai:5.0,aiDesc:"정형화된 서류 작업 AI 활용 증가"},
+  {name:"공무원(일반행정)",cat:"법률·행정",emp:680000,pay:3800,edu:3,outlook:0,ai:5.5,aiDesc:"전자정부 고도화로 단순 행정 감소"},
+  {name:"경찰관",cat:"법률·행정",emp:130000,pay:3600,edu:2,outlook:1,ai:3.0,aiDesc:"AI 범죄예측 활용 증가하나 현장 대응 필수"},
+  {name:"소방관",cat:"법률·행정",emp:65000,pay:3500,edu:2,outlook:3,ai:1.5,aiDesc:"현장 긴급대응으로 AI 대체 어려움"},
+  {name:"군인(직업)",cat:"법률·행정",emp:180000,pay:3200,edu:2,outlook:0,ai:2.0,aiDesc:"인구감소로 전문화 추세, 무인시스템 도입"},
+  {name:"세무사·관세사",cat:"법률·행정",emp:30000,pay:5500,edu:4,outlook:-1,ai:7.0,aiDesc:"세무·관세 신고 자동화 가속"},
+  {name:"공인중개사",cat:"법률·행정",emp:120000,pay:3000,edu:2,outlook:-2,ai:5.0,aiDesc:"프롭테크 플랫폼 확대"},
+
+  // 금융·보험
+  {name:"은행원",cat:"금융·보험",emp:180000,pay:5200,edu:3,outlook:-5,ai:8.0,aiDesc:"비대면 금융 확대로 지점·인력 감소"},
+  {name:"증권·투자 분석가",cat:"금융·보험",emp:55000,pay:7000,edu:4,outlook:1,ai:6.0,aiDesc:"AI 퀀트 투자 확대되나 고급 분석은 인간 필요"},
+  {name:"보험심사·손해사정인",cat:"금융·보험",emp:65000,pay:4000,edu:3,outlook:-3,ai:8.0,aiDesc:"보험청구 심사 AI 자동화 진행 중"},
+  {name:"금융상품 개발자",cat:"금융·보험",emp:25000,pay:6500,edu:4,outlook:2,ai:4.5,aiDesc:"핀테크 성장으로 수요 유지"},
+  {name:"자산관리사(PB)",cat:"금융·보험",emp:35000,pay:5500,edu:3,outlook:0,ai:5.5,aiDesc:"로보어드바이저 성장하나 고액자산 상담 수요 유지"},
+
+  // 문화·예술·디자인
+  {name:"그래픽 디자이너",cat:"문화·예술·디자인",emp:180000,pay:3000,edu:3,outlook:-1,ai:6.5,aiDesc:"AI 이미지 생성 기술로 단순 디자인 작업 감소"},
+  {name:"영상·방송 제작자",cat:"문화·예술·디자인",emp:120000,pay:3200,edu:3,outlook:3,ai:4.0,aiDesc:"1인 미디어·OTT 성장으로 수요 증가"},
+  {name:"공연·음악 관련 종사자",cat:"문화·예술·디자인",emp:85000,pay:2500,edu:3,outlook:2,ai:2.0,aiDesc:"라이브 공연·창작 영역은 AI 대체 어려움"},
+  {name:"사진작가·촬영기사",cat:"문화·예술·디자인",emp:60000,pay:2800,edu:2,outlook:-2,ai:4.0,aiDesc:"AI 사진 보정은 가능하나 촬영 자체는 인간 역할"},
+  {name:"제품·산업 디자이너",cat:"문화·예술·디자인",emp:55000,pay:3500,edu:3,outlook:2,ai:4.5,aiDesc:"AI 생성디자인 활용 증가하나 감성·기획은 인간 주도"},
+  {name:"패션 디자이너",cat:"문화·예술·디자인",emp:40000,pay:3000,edu:3,outlook:-1,ai:4.0,aiDesc:"AI 트렌드 분석 활용, 창의적 디자인은 인간 영역"},
+  {name:"작가·번역가",cat:"문화·예술·디자인",emp:95000,pay:2500,edu:3,outlook:-3,ai:7.0,aiDesc:"AI 번역·작문 기술 급발전으로 단순 번역 감소"},
+  {name:"기자·언론인",cat:"문화·예술·디자인",emp:50000,pay:4000,edu:4,outlook:-4,ai:5.5,aiDesc:"AI 기사 자동생성 확대, 탐사보도는 인간 역할"},
+
+  // 청소·경비
+  {name:"청소 종사자",cat:"청소·경비",emp:1249000,pay:1900,edu:0,outlook:2,ai:3.0,aiDesc:"로봇청소기 도입되나 대부분 현장 인력 필요"},
+  {name:"경비원",cat:"청소·경비",emp:520000,pay:2000,edu:0,outlook:-2,ai:5.0,aiDesc:"무인경비·CCTV AI 감시 확대"},
+  {name:"주차관리원",cat:"청소·경비",emp:120000,pay:1900,edu:0,outlook:-5,ai:7.0,aiDesc:"무인주차·자동결제 시스템 확대"},
+  {name:"돌봄서비스원",cat:"청소·경비",emp:450000,pay:2100,edu:0,outlook:8,ai:1.0,aiDesc:"고령화로 돌봄 수요 폭증, 대면 서비스 대체 어려움"},
+
+  // 사회복지·상담
+  {name:"사회복지사",cat:"사회복지·상담",emp:280000,pay:2800,edu:3,outlook:5,ai:2.0,aiDesc:"복지 수요 증가, 대면 상담·개입은 인간 필수"},
+  {name:"상담사·심리치료사",cat:"사회복지·상담",emp:85000,pay:3000,edu:4,outlook:6,ai:2.5,aiDesc:"정신건강 관심 증가로 수요 확대, AI 보조 활용"},
+  {name:"직업상담사",cat:"사회복지·상담",emp:35000,pay:2800,edu:3,outlook:2,ai:4.0,aiDesc:"AI 직업추천 시스템 활용 확대"},
+  {name:"보육·아동복지사",cat:"사회복지·상담",emp:120000,pay:2500,edu:2,outlook:-2,ai:1.5,aiDesc:"저출산으로 감소 추세, 돌봄 자체는 대체 어려움"},
+
+  // 과학·연구
+  {name:"자연과학 연구원",cat:"과학·연구",emp:85000,pay:4500,edu:5,outlook:3,ai:3.0,aiDesc:"AI 실험설계 활용 증가, 가설 수립은 인간 주도"},
+  {name:"생명과학 연구원",cat:"과학·연구",emp:65000,pay:4200,edu:5,outlook:5,ai:3.0,aiDesc:"바이오·제약 산업 성장으로 수요 증가"},
+  {name:"사회과학 연구원",cat:"과학·연구",emp:45000,pay:3800,edu:5,outlook:1,ai:4.5,aiDesc:"데이터 분석 AI 활용 증가"},
+  {name:"R&D 관리자",cat:"과학·연구",emp:40000,pay:5500,edu:4,outlook:3,ai:3.5,aiDesc:"연구 기획·관리는 인간 주도"},
+
+  // 식품·조리
+  {name:"한식 조리사",cat:"식품·조리",emp:480000,pay:2500,edu:1,outlook:0,ai:2.0,aiDesc:"조리 과정 자동화 제한적, 맛·감각 영역"},
+  {name:"양식·중식·일식 조리사",cat:"식품·조리",emp:180000,pay:2800,edu:1,outlook:2,ai:2.0,aiDesc:"다양한 외식 수요 지속"},
+  {name:"제과·제빵사",cat:"식품·조리",emp:120000,pay:2300,edu:1,outlook:1,ai:2.5,aiDesc:"수제·프리미엄 트렌드 지속"},
+  {name:"바리스타",cat:"식품·조리",emp:150000,pay:2100,edu:0,outlook:0,ai:3.0,aiDesc:"로봇카페 등장하나 스페셜티 커피 시장 성장"},
+  {name:"영양사",cat:"식품·조리",emp:45000,pay:2800,edu:3,outlook:2,ai:4.0,aiDesc:"건강관심 증가로 수요 유지, AI 식단추천 활용"},
+
+  // 스포츠·레저
+  {name:"체육교사·강사",cat:"스포츠·레저",emp:180000,pay:2800,edu:3,outlook:2,ai:1.5,aiDesc:"건강·여가 관심 증가, 대면 지도 대체 어려움"},
+  {name:"스포츠 트레이너",cat:"스포츠·레저",emp:65000,pay:2500,edu:2,outlook:4,ai:2.0,aiDesc:"헬스케어 관심 증가로 수요 확대"},
+  {name:"레저·오락 서비스원",cat:"스포츠·레저",emp:85000,pay:2200,edu:1,outlook:1,ai:2.5,aiDesc:"체험·여가 산업 성장"},
+  {name:"프로선수·코치",cat:"스포츠·레저",emp:15000,pay:4000,edu:2,outlook:1,ai:2.0,aiDesc:"AI 데이터 분석 활용 증가하나 경기 자체는 인간 영역"},
+];
+
+// ===== 카테고리 색상 =====
+const catColors = {
+  "경영·사무":"#2a4a6a","판매·서비스":"#4a3a5a","보건·의료":"#2a5a4a","교육":"#5a4a2a",
+  "정보통신(IT)":"#2a3a6a","공학·기술":"#3a4a5a","제조·생산":"#4a4a3a","건설":"#5a3a3a",
+  "운송·물류":"#3a5a4a","농림어업":"#3a5a2a","법률·행정":"#4a3a4a","금융·보험":"#2a4a5a",
+  "문화·예술·디자인":"#5a3a4a","청소·경비":"#3a3a4a","사회복지·상담":"#2a5a5a","과학·연구":"#3a3a5a",
+  "식품·조리":"#5a4a3a","스포츠·레저":"#3a5a5a"
+};
+
+// ===== 모드 설정 =====
+const modes = {
+  outlook: {
+    title: "고용 전망",
+    getValue: d => d.outlook,
+    getColor: d => { const v = (d.outlook + 10) / 25; return hsl(120 * (1 - v), 70, 45); },
+    format: d => (d.outlook > 0 ? '+' : '') + d.outlook + '%',
+    gradLow: [80,180,80], gradHigh: [200,60,60],
+    lowLabel: "성장", highLabel: "감소"
+  },
+  pay: {
+    title: "중위 월급(만원)",
+    getValue: d => d.pay,
+    getColor: d => { const v = Math.min((d.pay - 1800) / 6700, 1); return hsl(120 - 120 * v, 65, 42); },
+    format: d => d.pay.toLocaleString() + '만원',
+    gradLow: [80,180,80], gradHigh: [200,60,60],
+    lowLabel: "1,800만", highLabel: "8,500만"
+  },
+  education: {
+    title: "학력 요건",
+    getValue: d => d.edu,
+    getColor: d => { const v = d.edu / 5; return hsl(120 - 120 * v, 60, 42); },
+    format: d => eduLabels[d.edu],
+    gradLow: [80,170,80], gradHigh: [180,60,60],
+    lowLabel: "무학력", highLabel: "박사/전문직"
+  },
+  ai: {
+    title: "AI 대체 위험도",
+    getValue: d => d.ai,
+    getColor: d => { const v = d.ai / 10; return hsl(120 - 120 * v, 70, 42); },
+    format: d => d.ai.toFixed(1) + '/10',
+    gradLow: [80,180,80], gradHigh: [220,50,50],
+    lowLabel: "안전", highLabel: "고위험"
+  }
+};
+
+const eduLabels = ['학력 무관','고졸','전문대졸','대졸','석사','박사/전문직'];
+
+function hsl(h, s, l) {
+  return `hsl(${h},${s}%,${l}%)`;
+}
+
+// ===== Treemap Layout (Squarified) =====
+function squarify(items, x, y, w, h) {
+  const totalVal = items.reduce((s, i) => s + i.emp, 0);
+  const rects = [];
+  let remaining = [...items].sort((a, b) => b.emp - a.emp);
+  let cx = x, cy = y, cw = w, ch = h;
+
+  while (remaining.length > 0) {
+    const isHoriz = cw >= ch;
+    const side = isHoriz ? ch : cw;
+    const totalRemaining = remaining.reduce((s, i) => s + i.emp, 0);
+    let row = [remaining[0]];
+    let rowArea = remaining[0].emp;
+
+    for (let i = 1; i < remaining.length; i++) {
+      const testRow = [...row, remaining[i]];
+      const testArea = rowArea + remaining[i].emp;
+      if (worstRatio(testRow, testArea, side, totalRemaining, isHoriz ? cw : ch) <=
+          worstRatio(row, rowArea, side, totalRemaining, isHoriz ? cw : ch)) {
+        row = testRow;
+        rowArea = testArea;
+      } else break;
+    }
+
+    const rowFrac = rowArea / totalRemaining;
+    const rowSize = isHoriz ? cw * rowFrac : ch * rowFrac;
+    let pos = isHoriz ? cy : cx;
+
+    for (const item of row) {
+      const itemFrac = item.emp / rowArea;
+      const itemSize = side * itemFrac;
+      if (isHoriz) {
+        rects.push({ ...item, rx: cx, ry: pos, rw: rowSize, rh: itemSize });
+        pos += itemSize;
+      } else {
+        rects.push({ ...item, rx: pos, ry: cy, rw: itemSize, rh: rowSize });
+        pos += itemSize;
+      }
+    }
+
+    if (isHoriz) { cx += rowSize; cw -= rowSize; }
+    else { cy += rowSize; ch -= rowSize; }
+
+    remaining = remaining.slice(row.length);
+  }
+  return rects;
+}
+
+function worstRatio(row, rowArea, side, totalArea, fullSide) {
+  const rowSize = (rowArea / totalArea) * fullSide;
+  if (rowSize === 0) return Infinity;
+  let worst = 0;
+  for (const item of row) {
+    const frac = item.emp / rowArea;
+    const w = rowSize;
+    const h = side * frac;
+    const ratio = Math.max(w / h, h / w);
+    worst = Math.max(worst, ratio);
+  }
+  return worst;
+}
+
+// ===== Rendering =====
+const canvas = document.getElementById('treemap');
+const ctx = canvas.getContext('2d');
+let currentMode = 'outlook';
+let rects = [];
+let hoveredIdx = -1;
+
+function resize() {
+  const container = canvas.parentElement;
+  const w = container.clientWidth;
+  const h = Math.max(500, w * 0.65);
+  canvas.width = w * 2;
+  canvas.height = h * 2;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.scale(2, 2);
+  const pad = 6;
+  rects = squarify(occupations, pad, pad, w - pad * 2, h - pad * 2);
+  draw();
+}
+
+function draw() {
+  const w = canvas.width / 2;
+  const h = canvas.height / 2;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, w, h);
+
+  const mode = modes[currentMode];
+  const gap = 1;
+
+  rects.forEach((r, i) => {
+    const rx = r.rx + gap;
+    const ry = r.ry + gap;
+    const rw = r.rw - gap * 2;
+    const rh = r.rh - gap * 2;
+    if (rw < 1 || rh < 1) return;
+
+    ctx.fillStyle = mode.getColor(r);
+    if (i === hoveredIdx) {
+      ctx.fillStyle = brighten(mode.getColor(r), 1.4);
+    }
+    ctx.beginPath();
+    roundRect(ctx, rx, ry, rw, rh, 2);
+    ctx.fill();
+
+    if (i === hoveredIdx) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // 텍스트
+    if (rw > 30 && rh > 18) {
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      const fontSize = Math.min(Math.max(rw / 8, 8), 14);
+      ctx.font = `600 ${fontSize}px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      const name = truncate(r.name, rw - 6, ctx);
+      ctx.fillText(name, rx + 4, ry + 3);
+
+      if (rh > 30) {
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        const subSize = Math.max(fontSize - 2, 7);
+        ctx.font = `400 ${subSize}px 'Apple SD Gothic Neo',sans-serif`;
+        const sub = mode.format(r);
+        ctx.fillText(sub, rx + 4, ry + 3 + fontSize + 2);
+      }
+      if (rh > 44 && rw > 50) {
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        const empSize = Math.max(fontSize - 3, 7);
+        ctx.font = `400 ${empSize}px 'Apple SD Gothic Neo',sans-serif`;
+        ctx.fillText((r.emp / 10000).toFixed(1) + '만명', rx + 4, ry + 3 + fontSize + (fontSize - 2) + 6);
+      }
+    }
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+}
+
+function truncate(text, maxW, ctx) {
+  if (ctx.measureText(text).width <= maxW) return text;
+  let t = text;
+  while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+
+function brighten(hslStr, factor) {
+  const m = hslStr.match(/hsl\(([^,]+),([^,]+)%,([^)]+)%\)/);
+  if (!m) return hslStr;
+  return `hsl(${m[1]},${m[2]}%,${Math.min(parseFloat(m[3]) * factor, 70)}%)`;
+}
+
+// ===== Tooltip =====
+const tooltip = document.getElementById('tooltip');
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  let found = -1;
+  for (let i = rects.length - 1; i >= 0; i--) {
+    const r = rects[i];
+    if (mx >= r.rx && mx <= r.rx + r.rw && my >= r.ry && my <= r.ry + r.rh) {
+      found = i; break;
+    }
+  }
+  if (found !== hoveredIdx) {
+    hoveredIdx = found;
+    ctx.setTransform(2, 0, 0, 2, 0, 0);
+    draw();
+  }
+  if (found >= 0) {
+    const d = rects[found];
+    const mode = modes[currentMode];
+    tooltip.style.display = 'block';
+    tooltip.innerHTML = `
+      <div class="tt-title">${d.name}</div>
+      <div class="tt-row"><span class="tt-label">산업분류</span><span class="tt-value">${d.cat}</span></div>
+      <div class="tt-row"><span class="tt-label">취업자 수</span><span class="tt-value">${(d.emp).toLocaleString()}명</span></div>
+      <div class="tt-row"><span class="tt-label">중위 연봉</span><span class="tt-value">${d.pay.toLocaleString()}만원</span></div>
+      <div class="tt-row"><span class="tt-label">학력 요건</span><span class="tt-value">${eduLabels[d.edu]}</span></div>
+      <div class="tt-row"><span class="tt-label">고용 전망</span><span class="tt-value" style="color:${d.outlook>=0?'#6c6':'#f66'}">${d.outlook > 0 ? '+' : ''}${d.outlook}%</span></div>
+      <div class="tt-row"><span class="tt-label">AI 대체위험</span><span class="tt-value">${d.ai.toFixed(1)}/10</span></div>
+      <div class="tt-desc">${d.aiDesc}</div>
+    `;
+    let tx = e.clientX + 16;
+    let ty = e.clientY + 16;
+    if (tx + 320 > window.innerWidth) tx = e.clientX - 330;
+    if (ty + 250 > window.innerHeight) ty = e.clientY - 260;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+    canvas.style.cursor = 'pointer';
+  } else {
+    tooltip.style.display = 'none';
+    canvas.style.cursor = 'default';
+  }
+});
+
+canvas.addEventListener('mouseleave', () => {
+  hoveredIdx = -1;
+  tooltip.style.display = 'none';
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  draw();
+});
+
+// ===== Sidebar Stats =====
+function updateSidebar() {
+  const sb = document.getElementById('sidebar');
+  const mode = modes[currentMode];
+  const totalEmp = occupations.reduce((s, d) => s + d.emp, 0);
+
+  // 가중 평균
+  const wavg = occupations.reduce((s, d) => s + mode.getValue(d) * d.emp, 0) / totalEmp;
+
+  let html = '';
+
+  // 주요 지표
+  html += `<div class="stat-card">
+    <h3>전체 가중 평균 · ${mode.title}</h3>
+    <div class="big-num">${currentMode === 'pay' ? Math.round(wavg).toLocaleString() + '만원' :
+      currentMode === 'outlook' ? (wavg > 0 ? '+' : '') + wavg.toFixed(1) + '%' :
+      currentMode === 'education' ? eduLabels[Math.round(wavg)] :
+      wavg.toFixed(1) + '/10'}</div>
+    <div class="sub">전체 약 ${(totalEmp / 10000).toFixed(0)}만 취업자 가중 평균</div>
+  </div>`;
+
+  // 분포 히스토그램
+  if (currentMode === 'outlook') {
+    const buckets = [
+      {label:'성장 (5%+)', min:5, max:99, color:'#2d8a4e'},
+      {label:'증가 (1~4%)', min:1, max:4.9, color:'#5aaa5a'},
+      {label:'보합 (0%)', min:0, max:0, color:'#888'},
+      {label:'감소 (-1~-4%)', min:-4.9, max:-1, color:'#cc7744'},
+      {label:'급감 (-5%~)', min:-99, max:-5, color:'#cc4444'},
+    ];
+    html += buildHistogram('고용 전망 분포', buckets, d => d.outlook, totalEmp);
+  } else if (currentMode === 'pay') {
+    const buckets = [
+      {label:'~2,000만', min:0, max:2000, color:'#cc4444'},
+      {label:'2,000~3,000', min:2001, max:3000, color:'#cc7744'},
+      {label:'3,000~4,000', min:3001, max:4000, color:'#aa8844'},
+      {label:'4,000~5,500', min:4001, max:5500, color:'#5aaa5a'},
+      {label:'5,500만+', min:5501, max:99999, color:'#2d8a4e'},
+    ];
+    html += buildHistogram('임금 분포', buckets, d => d.pay, totalEmp);
+  } else if (currentMode === 'education') {
+    const buckets = eduLabels.map((l, i) => ({label:l, min:i, max:i, color:
+      `hsl(${120 - 120*(i/5)},60%,42%)`}));
+    html += buildHistogram('학력 요건 분포', buckets, d => d.edu, totalEmp);
+  } else {
+    const buckets = [
+      {label:'안전 (0~2)', min:0, max:2.9, color:'#2d8a4e'},
+      {label:'낮음 (3~4)', min:3, max:4.9, color:'#5aaa5a'},
+      {label:'보통 (5~6)', min:5, max:6.9, color:'#aa8844'},
+      {label:'높음 (7~8)', min:7, max:8.9, color:'#cc7744'},
+      {label:'매우높음 (9+)', min:9, max:10, color:'#cc4444'},
+    ];
+    html += buildHistogram('AI 대체위험 분포', buckets, d => d.ai, totalEmp);
+  }
+
+  // 산업별 가중평균
+  const cats = {};
+  occupations.forEach(d => {
+    if (!cats[d.cat]) cats[d.cat] = {emp: 0, wsum: 0};
+    cats[d.cat].emp += d.emp;
+    cats[d.cat].wsum += mode.getValue(d) * d.emp;
+  });
+  const catArr = Object.entries(cats).map(([k, v]) => ({
+    name: k, emp: v.emp, avg: v.wsum / v.emp
+  })).sort((a, b) => b.emp - a.emp);
+
+  html += `<div class="stat-card"><h3>산업별 · ${mode.title}</h3>`;
+  const maxEmp = Math.max(...catArr.map(c => c.emp));
+  catArr.forEach(c => {
+    const pct = (c.emp / maxEmp * 100).toFixed(0);
+    const avgStr = currentMode === 'pay' ? Math.round(c.avg).toLocaleString() + '만' :
+      currentMode === 'outlook' ? (c.avg > 0 ? '+' : '') + c.avg.toFixed(1) + '%' :
+      currentMode === 'education' ? eduLabels[Math.round(c.avg)] :
+      c.avg.toFixed(1);
+    html += `<div class="hist-row">
+      <div class="hist-label">${c.name}</div>
+      <div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${mode.getColor({outlook:c.avg,pay:c.avg,edu:c.avg,ai:c.avg})}"></div></div>
+      <div class="hist-val">${avgStr}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // AI 모드일 때: 위험 직업 TOP 5
+  if (currentMode === 'ai') {
+    const top5 = [...occupations].sort((a, b) => b.ai - a.ai).slice(0, 8);
+    html += `<div class="stat-card"><h3>AI 대체 고위험 직업 TOP 8</h3>`;
+    top5.forEach(d => {
+      html += `<div class="tier-row">
+        <div class="tier-color" style="background:${modes.ai.getColor(d)}"></div>
+        <div class="tier-label">${d.name}</div>
+        <div class="tier-count">${d.ai.toFixed(1)}</div>
+        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // outlook 모드일 때: 성장/감소 TOP
+  if (currentMode === 'outlook') {
+    const growing = [...occupations].sort((a, b) => b.outlook - a.outlook).slice(0, 5);
+    const declining = [...occupations].sort((a, b) => a.outlook - b.outlook).slice(0, 5);
+    html += `<div class="stat-card"><h3>🔥 성장 직업 TOP 5</h3>`;
+    growing.forEach(d => {
+      html += `<div class="tier-row">
+        <div class="tier-color" style="background:#2d8a4e"></div>
+        <div class="tier-label">${d.name}</div>
+        <div class="tier-count">+${d.outlook}%</div>
+        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
+      </div>`;
+    });
+    html += '</div>';
+    html += `<div class="stat-card"><h3>📉 감소 직업 TOP 5</h3>`;
+    declining.forEach(d => {
+      html += `<div class="tier-row">
+        <div class="tier-color" style="background:#cc4444"></div>
+        <div class="tier-label">${d.name}</div>
+        <div class="tier-count">${d.outlook}%</div>
+        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // pay 모드일 때: 고임금/저임금 TOP
+  if (currentMode === 'pay') {
+    const highPay = [...occupations].sort((a, b) => b.pay - a.pay).slice(0, 5);
+    const lowPay = [...occupations].sort((a, b) => a.pay - b.pay).slice(0, 5);
+    html += `<div class="stat-card"><h3>💎 고임금 직업 TOP 5</h3>`;
+    highPay.forEach(d => {
+      html += `<div class="tier-row">
+        <div class="tier-color" style="background:#2d8a4e"></div>
+        <div class="tier-label">${d.name}</div>
+        <div class="tier-count">${d.pay.toLocaleString()}만</div>
+        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  sb.innerHTML = html;
+}
+
+function buildHistogram(title, buckets, getter, totalEmp) {
+  let html = `<div class="stat-card"><h3>${title}</h3>`;
+  const counts = buckets.map(b => {
+    let cnt = 0;
+    occupations.forEach(d => {
+      const v = getter(d);
+      if (b.min <= 0 && b.max <= 0) {
+        if (v >= b.min && v <= b.max) cnt += d.emp;
+      } else if (b.min < 0) {
+        if (v >= b.min && v <= b.max) cnt += d.emp;
+      } else {
+        if (v >= b.min && v <= b.max) cnt += d.emp;
+      }
+    });
+    return cnt;
+  });
+  const maxCnt = Math.max(...counts);
+  buckets.forEach((b, i) => {
+    const pct = (counts[i] / maxCnt * 100).toFixed(0);
+    const empPct = (counts[i] / totalEmp * 100).toFixed(1);
+    html += `<div class="hist-row">
+      <div class="hist-label">${b.label}</div>
+      <div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${b.color}"></div></div>
+      <div class="hist-val">${empPct}%</div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// ===== Legend Gradient =====
+function updateGradient() {
+  const gc = document.getElementById('gradientCanvas');
+  const gctx = gc.getContext('2d');
+  const g = gctx.createLinearGradient(0, 0, 200, 0);
+  const mode = modes[currentMode];
+  g.addColorStop(0, `rgb(${mode.gradLow.join(',')})`);
+  g.addColorStop(1, `rgb(${mode.gradHigh.join(',')})`);
+  gctx.fillStyle = g;
+  gctx.fillRect(0, 0, 200, 12);
+  document.getElementById('legendLow').textContent = mode.lowLabel;
+  document.getElementById('legendHigh').textContent = mode.highLabel;
+}
+
+// ===== Button Handlers =====
+document.querySelectorAll('.controls button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    updateGradient();
+    ctx.setTransform(2, 0, 0, 2, 0, 0);
+    draw();
+    updateSidebar();
+  });
+});
+
+// ===== Init =====
+window.addEventListener('resize', () => {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  resize();
+  updateSidebar();
+});
+resize();
+updateGradient();
+updateSidebar();
+</script>
+</body>
+</html>
