@@ -1161,7 +1161,7 @@ function buildContextFromCase(useCase,extraData={}){
 
 // ═══ 자동차보험 약관 참조 데이터 (삼성화재 2025.08.16 + 현대해상 2026.08.16 기준) ═══
 const INSURANCE_REF = {
-  meta: { sources: ["삼성화재 개인용 자동차보험약관 (2025.08.16 개정)","현대해상 Hicar 업무용자동차보험약관 (2026.08.16 개정)"], updated: "2025.08.16" },
+  meta: { sources: ["삼성화재 개인용 자동차보험약관 (2025.08.16 개정)","현대해상 Hicar 업무용자동차보험약관 (2025.08.16 개정)"], updated: "2025.08.16" },
   // 1. 보장종목 구조
   coverage: {
     mandatory: [
@@ -2732,8 +2732,56 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
     const ontoRes=runOntologyInference(ontoCtx);
     setOntoResult(ontoRes);
     const ontoSummary=ontoRes.results.map(r=>`[${r.flag}] ${r.msg}`).join("\n");
-    const a=useCase==="uc2"?UC_ESTIMATE_RESPONSE:await callAI("당신은 자동차 손해사정 전문 AI입니다. 견적 분석을 간결하게 해주세요.\n[참조 기준] 삼성화재·현대해상 약관(2025.08.16 개정), 자배법 시행령 별표1 상해등급, 품질인증부품 OEM 25% 인센티브, 대차 동종동급 원칙 적용.\n[온톨로지 추론 결과]\n"+ontoSummary,
-      `차량:${mk} ${md} ${yr||"미상"}년식 (${isImport?"외산":"국산"}${isSuper?" 슈퍼카":""})\n파손:${sp.join(",")}(${sv})\n사진:${ph.length}장\n견적:부품${F(tp)},공임${F(tl)},도장${F(pt)},합계${F(tp+tl+pt)}\n\n견적 적정성, 수리vs교환, 미수선처리, ADAS캘리브레이션, 부품수급 등을 분석해주세요.`);
+    // ═══ 부위별 수리/교환 판단 + ADAS 체크 + 미수선 산출 ═══
+    const adasParts=["프론트 범퍼","전면 유리","사이드미러","헤드라이트","리어 범퍼","전방 카메라","전방 레이더","후방 카메라","후측방 레이더"];
+    const metalParts=["본넷","펜더","도어","루프패널","트렁크","쿼터패널","A필러","B필러","C필러","사이드실"];
+    const glassParts=["전면 유리","리어 유리","선루프 유리","도어유리"];
+    const partAnalysis=bd.map(b=>{
+      const isAdas=adasParts.some(a=>b.pt.includes(a));
+      const isMetal=metalParts.some(m=>b.pt.includes(m));
+      const isGlass=glassParts.some(g=>b.pt.includes(g));
+      let method="교환",reason="";
+      if(sv==="경미"&&!isGlass){method=isMetal?"판금+도장":"복원수리";reason="경미 손상 — 교환 불필요, "+method+"으로 비용 40~60% 절감";}
+      else if(sv==="중간"&&isMetal){method="판금+도장";reason="중간 손상 — 판금 복원 가능 수준, 교환 대비 약 ₩"+(Math.round(b.t*0.4/1000)*1000).toLocaleString()+" 절감";}
+      else if(sv==="중간"&&!isMetal&&!isGlass){method="교환 권장";reason="플라스틱/전자부품 — 중간 이상 손상 시 교환이 품질 보장";}
+      else{method="교환 필수";reason=(sv==="심각"||sv==="전손 추정")?"심각/전손 수준 — 복원 불가, 신품 교환 필수":"손상 정도에 따라 교환 필요";}
+      if(isGlass){method="교환 필수";reason="유리류 — 수리 불가, 교환만 가능";}
+      return`- **${b.pt}**: 부품비 ₩${b.pc.toLocaleString()} + 공임 ₩${b.lc.toLocaleString()} = ₩${b.t.toLocaleString()} → **${method}** (${reason})${isAdas?" ⚠️ ADAS 캘리브레이션 필요":""}`;
+    }).join("\n");
+    const adasHits=sp.filter(p=>adasParts.some(a=>p.includes(a)));
+    const adasSection=adasHits.length>0?`\n### ⚠️ ADAS 캘리브레이션 필수 (${adasHits.length}건)\n${adasHits.map(p=>`- ${p} 수리/교환 → 관련 센서 재보정 필요`).join("\n")}\n- 예상 캘리브레이션 비용: ₩${(isImport||isSuper?"450,000":"150,000")} (${isImport?"수입차 전용장비":"국산 표준장비"})\n- **미보정 시 자율주행·충돌방지 기능 오작동 위험**`:"";
+    const cashSettle70=Math.round((tp+tl+pt)*0.7),cashSettle80=Math.round((tp+tl+pt)*0.8);
+    const cashSection=`\n### 💵 미수선(현금정산) 제안\n- 전체 견적 ₩${(tp+tl+pt).toLocaleString()}의 70~80%\n- **현금정산 범위: ₩${cashSettle70.toLocaleString()} ~ ₩${cashSettle80.toLocaleString()}**\n- ${sv==="경미"?"경미 손상으로 미수선 처리 적합":""}${sv==="중간"?"중간 손상 — 고객 희망 시 미수선 가능, 안전 관련 부위는 수리 권고":""}${sv==="심각"||sv==="전손 추정"?"심각/전손 수준 — 미수선 비권장, 안전성 문제 가능":""}`;
+    const caseCtx=useCase?buildContextFromCase(useCase):{};
+    const caseDesc=caseCtx.accidentType?`\n**사고유형**: ${caseCtx.accidentType}\n**과실비율**: A(자사) ${caseCtx.faultA||"미정"}% : B(타사) ${caseCtx.faultB||"미정"}%`:"";
+    const detailedPrompt=`당신은 자동차 손해사정 전문 AI입니다. 아래 데이터를 기반으로 **이 사건에 특화된** 견적 분석 리포트를 작성하세요. 일반 가이드가 아닌, 실제 데이터 기반 판단을 해주세요.
+[참조 기준] 삼성화재·현대해상 약관(2025.08.16 개정), 자배법 시행령 별표1, 품질인증부품 OEM 25% 인센티브, 대차 동종동급 원칙.
+[온톨로지 추론 결과 (${ontoRes.rulesFired}개 규칙 발동)]
+${ontoSummary}`;
+    const detailedMsg=`## 사건 정보
+차량: ${mk} ${md} ${yr||"미상"}년식 (${isImport?"외산":"국산"}${isSuper?" 슈퍼카":""})${caseDesc}
+파손 부위 ${sp.length}개 (${sv}): ${sp.join(", ")}
+사진: ${ph.length}장
+
+## 견적 산출 결과
+| 항목 | 금액 |
+|------|------|
+| 부품비 | ₩${tp.toLocaleString()} |
+| 공임비 | ₩${tl.toLocaleString()} |
+| 도장비 | ₩${pt.toLocaleString()} |
+| **합계** | **₩${(tp+tl+pt).toLocaleString()}** |
+
+## 부위별 수리/교환 판단 (AI 분석)
+${partAnalysis}
+${adasSection}
+${cashSection}
+
+위 데이터를 바탕으로:
+1. **견적 적정성 판단** — 각 부위별 금액이 시장 기준 대비 적정한지, 과다/과소 항목은 없는지
+2. **수리 vs 교환 최종 의견** — 위 판단을 검증하고 비용 절감 가능한 부위 제시
+3. **종합 의견** — 이 사건의 핵심 쟁점과 손해사정사가 주의할 점
+을 간결하게 작성하세요.`;
+    const a=useCase==="uc2"?UC_ESTIMATE_RESPONSE:await callAI(detailedPrompt,detailedMsg);
     sAt(a);sLd(false);
   };
 
@@ -5327,7 +5375,7 @@ function TabData(){
         {icon:"🔗",name:"연쇄 손상 체인",key:"DAMAGE_CHAINS",size:"38개 출발부위",detail:"부위 간 인과 관계. 범퍼→그릴→라디에이터, 도어→필러→사이드실 등 1차 파손에 따른 2차/3차 손상 확률 및 심각도 전이 데이터.",tab:"견적 산정"},
         {icon:"💹",name:"차종 배율 체계",key:"VEHICLE_CLASS_MULTIPLIERS",size:"8단계",detail:"국산일반(×1.0)→국산고급(×1.3)→수입일반(×1.6)→수입중급(×2.0)→수입고급(×2.5)→슈퍼카엔트리(×3.5)→슈퍼카일반(×5.0)→슈퍼카최고급(×8.0). 모델별 오버라이드 30+건.",tab:"견적 산정"},
       ]},
-    {cat:"📜 보험 약관 참조",color:"#b45309",desc:"삼성화재(2025.08.16 개정) + 현대해상(2026.08.16 개정) 자동차보험 약관에서 추출한 핵심 보상 기준입니다. AI 분석 시 자동으로 참조됩니다.",
+    {cat:"📜 보험 약관 참조",color:"#b45309",desc:"삼성화재(2025.08.16 개정) + 현대해상(2025.08.16 개정) 자동차보험 약관에서 추출한 핵심 보상 기준입니다. AI 분석 시 자동으로 참조됩니다.",
       items:[
         {icon:"🛡️",name:"보장종목 구조",key:"coverage",size:"7종목",detail:"대인배상Ⅰ(의무, 1.5억 한도), 대물배상(의무, 2천만), 대인배상Ⅱ(임의, 무한), 자기신체사고, 자기차량손해, 무보험차상해 등 의무/임의 보장종목 전체 구조.",tab:"전체"},
         {icon:"🏥",name:"상해등급별 보험금",key:"injuryGrades",size:"14등급",detail:"자배법 시행령 별표1 기준. 1급(₩2억) ~ 14급(₩1,200만)까지 14개 등급별 책임보험금 한도와 대표 상해 내용.",tab:"대인 피해"},
@@ -5558,7 +5606,7 @@ function TabData(){
       <div style={{padding:"14px 18px",borderRadius:12,background:"#f8fafc",border:"1px solid #e2e8f0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{fontSize:10.5,color:"#64748b",lineHeight:1.6}}>
           <strong style={{color:"#0f172a"}}>총 규모:</strong> 5,200줄 · 890KB · 22개 컴포넌트 · {totalItems}개 데이터 항목 · 118,902건 참조 데이터 · 6개 외부 연동<br/>
-          <strong style={{color:"#0f172a"}}>약관 출처:</strong> 삼성화재 개인용 자동차보험약관 (2025.08.16) + 현대해상 Hicar 업무용 약관 (2026.08.16)<br/>
+          <strong style={{color:"#0f172a"}}>약관 출처:</strong> 삼성화재 개인용 자동차보험약관 (2025.08.16) + 현대해상 Hicar 업무용 약관 (2025.08.16)<br/>
           <strong style={{color:"#0f172a"}}>외부 연동:</strong> 보험개발원 BIGIN · 공공데이터포털 · 국토교통부 · 손해보험협회 · KAPA · 현대모비스
         </div>
         <button onClick={downloadDataMap} style={{padding:"8px 16px",borderRadius:8,background:"#6366f1",color:"#fff",border:"none",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,flexShrink:0}}>📥 전체 데이터맵 다운로드</button>
