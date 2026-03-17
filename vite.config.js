@@ -17,6 +17,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/upbit/, ''),
       },
+      '/openapi': {
+        target: 'https://apis.data.go.kr',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/openapi/, ''),
+      },
     },
   },
 })
