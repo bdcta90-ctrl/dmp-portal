@@ -86,515 +86,1172 @@ const REPAIR_METHODS = [
 // 2. DAMAGE_CHAINS - 인과 손상 전파 맵 (70+ 부품)
 // ============================================================================
 const DAMAGE_CHAINS = {
-  // ── 전면 (Front) ──────────────────────────────────────────────────────
+  // ── 전면부 (Front) ─────────────────────────────────────────────────────
   "프론트 범퍼(상)": {
     chain: [
-      { target: "프론트 범퍼(하)", probability: 0.8, minSeverity: "경미" },
+      { target: "프론트 범퍼(하/립)", probability: 0.8, minSeverity: "경미" },
       { target: "프론트 그릴", probability: 0.7, minSeverity: "중간" },
       { target: "라디에이터", probability: 0.4, minSeverity: "심각" },
+      { target: "인터쿨러", probability: 0.3, minSeverity: "심각" },
       { target: "전방 카메라/센서", probability: 0.5, minSeverity: "중간" },
-      { target: "헤드라이트(좌)", probability: 0.35, minSeverity: "중간" },
-      { target: "헤드라이트(우)", probability: 0.35, minSeverity: "중간" },
+      { target: "어라운드뷰 전면", probability: 0.35, minSeverity: "중간" },
+      { target: "좌 헤드라이트", probability: 0.35, minSeverity: "중간" },
+      { target: "우 헤드라이트", probability: 0.35, minSeverity: "중간" },
       { target: "본넷", probability: 0.25, minSeverity: "심각" },
-      { target: "범퍼 리인포스먼트(전)", probability: 0.6, minSeverity: "중간" },
-      { target: "프론트 범퍼 브라켓(좌)", probability: 0.5, minSeverity: "경미" },
-      { target: "프론트 범퍼 브라켓(우)", probability: 0.5, minSeverity: "경미" }
+      { target: "프론트 엠블럼", probability: 0.6, minSeverity: "경미" },
+      { target: "전방 레이더", probability: 0.4, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.5, minSeverity: "중간" },
+      { target: "좌 프론트 펜더", probability: 0.2, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.2, minSeverity: "심각" }
     ]
   },
-  "프론트 범퍼(하)": {
+  "프론트 범퍼(하/립)": {
     chain: [
-      { target: "안개등(좌)", probability: 0.5, minSeverity: "중간" },
-      { target: "안개등(우)", probability: 0.5, minSeverity: "중간" },
-      { target: "언더커버(전)", probability: 0.6, minSeverity: "경미" },
-      { target: "프론트 립 스포일러", probability: 0.7, minSeverity: "경미" },
-      { target: "에어 덕트", probability: 0.4, minSeverity: "중간" }
+      { target: "좌 안개등", probability: 0.5, minSeverity: "중간" },
+      { target: "우 안개등", probability: 0.5, minSeverity: "중간" },
+      { target: "언더커버", probability: 0.6, minSeverity: "경미" },
+      { target: "프론트 범퍼(상)", probability: 0.3, minSeverity: "중간" },
+      { target: "프론트 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "어라운드뷰 전면", probability: 0.25, minSeverity: "중간" },
+      { target: "좌 전륜 휠/타이어", probability: 0.15, minSeverity: "심각" },
+      { target: "우 전륜 휠/타이어", probability: 0.15, minSeverity: "심각" },
+      { target: "전방 레이더", probability: 0.3, minSeverity: "중간" }
     ]
   },
   "본넷": {
     chain: [
-      { target: "본넷 힌지(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "본넷 힌지(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "본넷 래치", probability: 0.3, minSeverity: "심각" },
-      { target: "프론트 펜더(좌)", probability: 0.3, minSeverity: "중간" },
-      { target: "프론트 펜더(우)", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 프론트 펜더", probability: 0.3, minSeverity: "중간" },
+      { target: "우 프론트 펜더", probability: 0.3, minSeverity: "중간" },
       { target: "전면 유리", probability: 0.2, minSeverity: "심각" },
-      { target: "카울 탑 커버", probability: 0.25, minSeverity: "심각" }
+      { target: "와이퍼", probability: 0.35, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.25, minSeverity: "중간" },
+      { target: "좌 헤드라이트", probability: 0.2, minSeverity: "중간" },
+      { target: "우 헤드라이트", probability: 0.2, minSeverity: "중간" },
+      { target: "프론트 엠블럼", probability: 0.4, minSeverity: "경미" },
+      { target: "전방 카메라/센서", probability: 0.15, minSeverity: "심각" },
+      { target: "라디에이터", probability: 0.2, minSeverity: "심각" }
     ]
   },
   "프론트 그릴": {
     chain: [
       { target: "라디에이터", probability: 0.3, minSeverity: "중간" },
-      { target: "콘덴서", probability: 0.25, minSeverity: "중간" },
+      { target: "인터쿨러", probability: 0.25, minSeverity: "중간" },
       { target: "전방 카메라/센서", probability: 0.4, minSeverity: "중간" },
       { target: "전방 레이더", probability: 0.35, minSeverity: "중간" },
-      { target: "프론트 범퍼(상)", probability: 0.2, minSeverity: "경미" }
-    ]
-  },
-  "헤드라이트(좌)": {
-    chain: [
-      { target: "프론트 펜더(좌)", probability: 0.3, minSeverity: "중간" },
-      { target: "프론트 범퍼(상)", probability: 0.25, minSeverity: "경미" },
-      { target: "프론트 턴시그널(좌)", probability: 0.5, minSeverity: "경미" },
-      { target: "헤드라이트 브라켓(좌)", probability: 0.6, minSeverity: "중간" },
-      { target: "프론트 사이드 마커(좌)", probability: 0.3, minSeverity: "경미" }
-    ]
-  },
-  "헤드라이트(우)": {
-    chain: [
-      { target: "프론트 펜더(우)", probability: 0.3, minSeverity: "중간" },
-      { target: "프론트 범퍼(상)", probability: 0.25, minSeverity: "경미" },
-      { target: "프론트 턴시그널(우)", probability: 0.5, minSeverity: "경미" },
-      { target: "헤드라이트 브라켓(우)", probability: 0.6, minSeverity: "중간" },
-      { target: "프론트 사이드 마커(우)", probability: 0.3, minSeverity: "경미" }
-    ]
-  },
-  "안개등(좌)": {
-    chain: [
-      { target: "프론트 범퍼(하)", probability: 0.3, minSeverity: "경미" },
-      { target: "안개등 베젤(좌)", probability: 0.7, minSeverity: "경미" }
-    ]
-  },
-  "안개등(우)": {
-    chain: [
-      { target: "프론트 범퍼(하)", probability: 0.3, minSeverity: "경미" },
-      { target: "안개등 베젤(우)", probability: 0.7, minSeverity: "경미" }
+      { target: "프론트 범퍼(상)", probability: 0.2, minSeverity: "경미" },
+      { target: "프론트 엠블럼", probability: 0.5, minSeverity: "경미" },
+      { target: "에어컨/냉방", probability: 0.2, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.4, minSeverity: "중간" }
     ]
   },
   "라디에이터": {
     chain: [
-      { target: "콘덴서", probability: 0.6, minSeverity: "중간" },
-      { target: "라디에이터 서포트(상)", probability: 0.5, minSeverity: "중간" },
-      { target: "라디에이터 서포트(하)", probability: 0.5, minSeverity: "중간" },
-      { target: "라디에이터 호스", probability: 0.4, minSeverity: "중간" },
-      { target: "냉각 팬", probability: 0.35, minSeverity: "심각" },
-      { target: "인터쿨러", probability: 0.3, minSeverity: "심각" }
+      { target: "인터쿨러", probability: 0.5, minSeverity: "중간" },
+      { target: "에어컨/냉방", probability: 0.4, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.2, minSeverity: "경미" },
+      { target: "프론트 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "본넷", probability: 0.1, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 전 서스펜션", probability: 0.2, minSeverity: "심각" },
+      { target: "우 전 서스펜션", probability: 0.2, minSeverity: "심각" }
     ]
   },
-  "범퍼 리인포스먼트(전)": {
+  "인터쿨러": {
     chain: [
-      { target: "라디에이터 서포트(상)", probability: 0.5, minSeverity: "심각" },
-      { target: "라디에이터 서포트(하)", probability: 0.5, minSeverity: "심각" },
-      { target: "프론트 사이드 멤버(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "프론트 사이드 멤버(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "크래쉬 박스(좌)", probability: 0.7, minSeverity: "중간" },
-      { target: "크래쉬 박스(우)", probability: 0.7, minSeverity: "중간" }
+      { target: "라디에이터", probability: 0.5, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.2, minSeverity: "경미" },
+      { target: "프론트 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "에어컨/냉방", probability: 0.3, minSeverity: "중간" },
+      { target: "프론트 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.25, minSeverity: "중간" }
+    ]
+  },
+  "좌 헤드라이트": {
+    chain: [
+      { target: "좌 프론트 펜더", probability: 0.3, minSeverity: "중간" },
+      { target: "프론트 범퍼(상)", probability: 0.25, minSeverity: "경미" },
+      { target: "좌 안개등", probability: 0.3, minSeverity: "중간" },
+      { target: "본넷", probability: 0.15, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.2, minSeverity: "경미" },
+      { target: "전방 카메라/센서", probability: 0.2, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.3, minSeverity: "경미" },
+      { target: "좌 전륜 휠/타이어", probability: 0.15, minSeverity: "심각" },
+      { target: "어라운드뷰 전면", probability: 0.2, minSeverity: "중간" }
+    ]
+  },
+  "우 헤드라이트": {
+    chain: [
+      { target: "우 프론트 펜더", probability: 0.3, minSeverity: "중간" },
+      { target: "프론트 범퍼(상)", probability: 0.25, minSeverity: "경미" },
+      { target: "우 안개등", probability: 0.3, minSeverity: "중간" },
+      { target: "본넷", probability: 0.15, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.2, minSeverity: "경미" },
+      { target: "전방 카메라/센서", probability: 0.2, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.3, minSeverity: "경미" },
+      { target: "우 전륜 휠/타이어", probability: 0.15, minSeverity: "심각" },
+      { target: "어라운드뷰 전면", probability: 0.2, minSeverity: "중간" }
+    ]
+  },
+  "좌 안개등": {
+    chain: [
+      { target: "프론트 범퍼(하/립)", probability: 0.3, minSeverity: "경미" },
+      { target: "프론트 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 헤드라이트", probability: 0.2, minSeverity: "중간" },
+      { target: "좌 프론트 펜더", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 전륜 휠/타이어", probability: 0.1, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.15, minSeverity: "경미" },
+      { target: "어라운드뷰 전면", probability: 0.1, minSeverity: "중간" }
+    ]
+  },
+  "우 안개등": {
+    chain: [
+      { target: "프론트 범퍼(하/립)", probability: 0.3, minSeverity: "경미" },
+      { target: "프론트 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "우 헤드라이트", probability: 0.2, minSeverity: "중간" },
+      { target: "우 프론트 펜더", probability: 0.15, minSeverity: "중간" },
+      { target: "우 전륜 휠/타이어", probability: 0.1, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.15, minSeverity: "경미" },
+      { target: "어라운드뷰 전면", probability: 0.1, minSeverity: "중간" }
     ]
   },
   "전면 유리": {
     chain: [
       { target: "전방 카메라/센서", probability: 0.6, minSeverity: "중간" },
-      { target: "룸 미러", probability: 0.2, minSeverity: "심각" },
-      { target: "카울 탑 커버", probability: 0.3, minSeverity: "중간" },
-      { target: "레인 센서", probability: 0.4, minSeverity: "중간" },
-      { target: "A필러 몰딩(좌)", probability: 0.15, minSeverity: "심각" },
-      { target: "A필러 몰딩(우)", probability: 0.15, minSeverity: "심각" }
+      { target: "와이퍼", probability: 0.4, minSeverity: "중간" },
+      { target: "좌 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.1, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.7, minSeverity: "경미" },
+      { target: "라이다", probability: 0.3, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "심각" },
+      { target: "본넷", probability: 0.15, minSeverity: "심각" },
+      { target: "어라운드뷰 전면", probability: 0.25, minSeverity: "중간" }
+    ]
+  },
+  "와이퍼": {
+    chain: [
+      { target: "전면 유리", probability: 0.15, minSeverity: "중간" },
+      { target: "본넷", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 A필러", probability: 0.05, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.05, minSeverity: "심각" },
+      { target: "전방 카메라/센서", probability: 0.1, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.15, minSeverity: "중간" },
+      { target: "라이다", probability: 0.05, minSeverity: "중간" }
+    ]
+  },
+  "프론트 엠블럼": {
+    chain: [
+      { target: "프론트 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "본넷", probability: 0.1, minSeverity: "경미" },
+      { target: "프론트 그릴", probability: 0.15, minSeverity: "경미" },
+      { target: "전방 레이더", probability: 0.2, minSeverity: "중간" },
+      { target: "전방 카메라/센서", probability: 0.15, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.2, minSeverity: "경미" },
+      { target: "라디에이터", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "전방 카메라/센서": {
+    chain: [
+      { target: "전면 유리", probability: 0.1, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.9, minSeverity: "경미" },
+      { target: "전방 레이더", probability: 0.2, minSeverity: "중간" },
+      { target: "라이다", probability: 0.15, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "중간" },
+      { target: "계기판/클러스터", probability: 0.1, minSeverity: "중간" },
+      { target: "어라운드뷰 전면", probability: 0.3, minSeverity: "경미" }
+    ]
+  },
+  "어라운드뷰 전면": {
+    chain: [
+      { target: "프론트 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "프론트 범퍼(하/립)", probability: 0.1, minSeverity: "경미" },
+      { target: "전방 카메라/센서", probability: 0.3, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.8, minSeverity: "경미" },
+      { target: "AVN/인포테인먼트", probability: 0.15, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.1, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.2, minSeverity: "경미" },
+      { target: "좌 사이드미러", probability: 0.1, minSeverity: "경미" },
+      { target: "우 사이드미러", probability: 0.1, minSeverity: "경미" }
     ]
   },
 
-  // ── 전면 구조물 ───────────────────────────────────────────────────────
-  "프론트 사이드 멤버(좌)": {
+  // ── 후면부 (Rear) ──────────────────────────────────────────────────────
+  "리어 범퍼(상)": {
     chain: [
-      { target: "서브 프레임(전)", probability: 0.5, minSeverity: "심각" },
-      { target: "프론트 펜더(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "에이프런 패널(좌)", probability: 0.6, minSeverity: "심각" },
-      { target: "프론트 휠하우스(좌)", probability: 0.5, minSeverity: "심각" },
-      { target: "대쉬 패널", probability: 0.3, minSeverity: "전손" }
-    ]
-  },
-  "프론트 사이드 멤버(우)": {
-    chain: [
-      { target: "서브 프레임(전)", probability: 0.5, minSeverity: "심각" },
-      { target: "프론트 펜더(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "에이프런 패널(우)", probability: 0.6, minSeverity: "심각" },
-      { target: "프론트 휠하우스(우)", probability: 0.5, minSeverity: "심각" },
-      { target: "대쉬 패널", probability: 0.3, minSeverity: "전손" }
-    ]
-  },
-  "서브 프레임(전)": {
-    chain: [
-      { target: "로어 암(좌)", probability: 0.5, minSeverity: "심각" },
-      { target: "로어 암(우)", probability: 0.5, minSeverity: "심각" },
-      { target: "스티어링 기어박스", probability: 0.4, minSeverity: "심각" },
-      { target: "엔진 마운트", probability: 0.35, minSeverity: "심각" },
-      { target: "스태빌라이저 바(전)", probability: 0.3, minSeverity: "심각" }
-    ]
-  },
-
-  // ── 측면 좌 (Left Side) ──────────────────────────────────────────────
-  "프론트 펜더(좌)": {
-    chain: [
-      { target: "프론트 도어(좌)", probability: 0.4, minSeverity: "중간" },
-      { target: "헤드라이트(좌)", probability: 0.3, minSeverity: "중간" },
-      { target: "사이드 미러(좌)", probability: 0.25, minSeverity: "중간" },
-      { target: "펜더 라이너(좌)", probability: 0.7, minSeverity: "경미" },
-      { target: "A필러(좌)", probability: 0.2, minSeverity: "심각" },
-      { target: "에이프런 패널(좌)", probability: 0.3, minSeverity: "심각" }
-    ]
-  },
-  "프론트 도어(좌)": {
-    chain: [
-      { target: "사이드 미러(좌)", probability: 0.5, minSeverity: "중간" },
-      { target: "도어 핸들(좌전)", probability: 0.4, minSeverity: "중간" },
-      { target: "도어 유리(좌전)", probability: 0.35, minSeverity: "중간" },
-      { target: "B필러(좌)", probability: 0.3, minSeverity: "심각" },
-      { target: "리어 도어(좌)", probability: 0.25, minSeverity: "심각" },
-      { target: "프론트 펜더(좌)", probability: 0.2, minSeverity: "중간" },
-      { target: "도어 몰딩(좌전)", probability: 0.6, minSeverity: "경미" },
-      { target: "사이드 에어백(좌전)", probability: 0.15, minSeverity: "심각" }
-    ]
-  },
-  "리어 도어(좌)": {
-    chain: [
-      { target: "B필러(좌)", probability: 0.3, minSeverity: "심각" },
-      { target: "C필러(좌)", probability: 0.25, minSeverity: "심각" },
-      { target: "프론트 도어(좌)", probability: 0.2, minSeverity: "심각" },
-      { target: "도어 핸들(좌후)", probability: 0.4, minSeverity: "중간" },
-      { target: "도어 유리(좌후)", probability: 0.35, minSeverity: "중간" },
-      { target: "도어 몰딩(좌후)", probability: 0.6, minSeverity: "경미" },
-      { target: "사이드 실(좌)", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-  "사이드 미러(좌)": {
-    chain: [
-      { target: "프론트 도어(좌)", probability: 0.15, minSeverity: "경미" },
-      { target: "사이드 턴시그널(좌)", probability: 0.6, minSeverity: "경미" },
-      { target: "블라인드 스팟 미러(좌)", probability: 0.5, minSeverity: "경미" }
-    ]
-  },
-  "쿼터 패널(좌)": {
-    chain: [
-      { target: "리어 범퍼(좌)", probability: 0.35, minSeverity: "중간" },
-      { target: "리어 램프(좌)", probability: 0.4, minSeverity: "중간" },
-      { target: "C필러(좌)", probability: 0.3, minSeverity: "심각" },
-      { target: "리어 휠하우스(좌)", probability: 0.5, minSeverity: "중간" },
-      { target: "트렁크 리드", probability: 0.2, minSeverity: "심각" },
-      { target: "연료 주입구", probability: 0.15, minSeverity: "심각" },
-      { target: "리어 도어(좌)", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-
-  // ── 측면 우 (Right Side) ─────────────────────────────────────────────
-  "프론트 펜더(우)": {
-    chain: [
-      { target: "프론트 도어(우)", probability: 0.4, minSeverity: "중간" },
-      { target: "헤드라이트(우)", probability: 0.3, minSeverity: "중간" },
-      { target: "사이드 미러(우)", probability: 0.25, minSeverity: "중간" },
-      { target: "펜더 라이너(우)", probability: 0.7, minSeverity: "경미" },
-      { target: "A필러(우)", probability: 0.2, minSeverity: "심각" },
-      { target: "에이프런 패널(우)", probability: 0.3, minSeverity: "심각" }
-    ]
-  },
-  "프론트 도어(우)": {
-    chain: [
-      { target: "사이드 미러(우)", probability: 0.5, minSeverity: "중간" },
-      { target: "도어 핸들(우전)", probability: 0.4, minSeverity: "중간" },
-      { target: "도어 유리(우전)", probability: 0.35, minSeverity: "중간" },
-      { target: "B필러(우)", probability: 0.3, minSeverity: "심각" },
-      { target: "리어 도어(우)", probability: 0.25, minSeverity: "심각" },
-      { target: "프론트 펜더(우)", probability: 0.2, minSeverity: "중간" },
-      { target: "도어 몰딩(우전)", probability: 0.6, minSeverity: "경미" },
-      { target: "사이드 에어백(우전)", probability: 0.15, minSeverity: "심각" }
-    ]
-  },
-  "리어 도어(우)": {
-    chain: [
-      { target: "B필러(우)", probability: 0.3, minSeverity: "심각" },
-      { target: "C필러(우)", probability: 0.25, minSeverity: "심각" },
-      { target: "프론트 도어(우)", probability: 0.2, minSeverity: "심각" },
-      { target: "도어 핸들(우후)", probability: 0.4, minSeverity: "중간" },
-      { target: "도어 유리(우후)", probability: 0.35, minSeverity: "중간" },
-      { target: "도어 몰딩(우후)", probability: 0.6, minSeverity: "경미" },
-      { target: "사이드 실(우)", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-  "사이드 미러(우)": {
-    chain: [
-      { target: "프론트 도어(우)", probability: 0.15, minSeverity: "경미" },
-      { target: "사이드 턴시그널(우)", probability: 0.6, minSeverity: "경미" },
-      { target: "블라인드 스팟 미러(우)", probability: 0.5, minSeverity: "경미" }
-    ]
-  },
-  "쿼터 패널(우)": {
-    chain: [
-      { target: "리어 범퍼(우)", probability: 0.35, minSeverity: "중간" },
-      { target: "리어 램프(우)", probability: 0.4, minSeverity: "중간" },
-      { target: "C필러(우)", probability: 0.3, minSeverity: "심각" },
-      { target: "리어 휠하우스(우)", probability: 0.5, minSeverity: "중간" },
-      { target: "트렁크 리드", probability: 0.2, minSeverity: "심각" },
-      { target: "리어 도어(우)", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-
-  // ── 필러 (Pillars) ───────────────────────────────────────────────────
-  "A필러(좌)": {
-    chain: [
-      { target: "전면 유리", probability: 0.5, minSeverity: "심각" },
-      { target: "프론트 펜더(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "프론트 도어(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "루프 패널", probability: 0.3, minSeverity: "심각" },
-      { target: "대쉬 패널", probability: 0.2, minSeverity: "전손" }
-    ]
-  },
-  "A필러(우)": {
-    chain: [
-      { target: "전면 유리", probability: 0.5, minSeverity: "심각" },
-      { target: "프론트 펜더(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "프론트 도어(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "루프 패널", probability: 0.3, minSeverity: "심각" },
-      { target: "대쉬 패널", probability: 0.2, minSeverity: "전손" }
-    ]
-  },
-  "B필러(좌)": {
-    chain: [
-      { target: "프론트 도어(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "리어 도어(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "루프 패널", probability: 0.3, minSeverity: "심각" },
-      { target: "사이드 실(좌)", probability: 0.5, minSeverity: "심각" },
-      { target: "센터 필러 가니쉬(좌)", probability: 0.6, minSeverity: "중간" }
-    ]
-  },
-  "B필러(우)": {
-    chain: [
-      { target: "프론트 도어(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "리어 도어(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "루프 패널", probability: 0.3, minSeverity: "심각" },
-      { target: "사이드 실(우)", probability: 0.5, minSeverity: "심각" },
-      { target: "센터 필러 가니쉬(우)", probability: 0.6, minSeverity: "중간" }
-    ]
-  },
-  "C필러(좌)": {
-    chain: [
-      { target: "리어 도어(좌)", probability: 0.3, minSeverity: "심각" },
-      { target: "쿼터 패널(좌)", probability: 0.5, minSeverity: "심각" },
-      { target: "루프 패널", probability: 0.25, minSeverity: "심각" },
-      { target: "후면 유리", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-  "C필러(우)": {
-    chain: [
-      { target: "리어 도어(우)", probability: 0.3, minSeverity: "심각" },
-      { target: "쿼터 패널(우)", probability: 0.5, minSeverity: "심각" },
-      { target: "루프 패널", probability: 0.25, minSeverity: "심각" },
-      { target: "후면 유리", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-
-  // ── 사이드 실 (Rocker Panels) ────────────────────────────────────────
-  "사이드 실(좌)": {
-    chain: [
-      { target: "프론트 도어(좌)", probability: 0.2, minSeverity: "심각" },
-      { target: "리어 도어(좌)", probability: 0.2, minSeverity: "심각" },
-      { target: "B필러(좌)", probability: 0.3, minSeverity: "심각" },
-      { target: "플로어 패널", probability: 0.4, minSeverity: "심각" },
-      { target: "사이드 실 몰딩(좌)", probability: 0.7, minSeverity: "경미" }
-    ]
-  },
-  "사이드 실(우)": {
-    chain: [
-      { target: "프론트 도어(우)", probability: 0.2, minSeverity: "심각" },
-      { target: "리어 도어(우)", probability: 0.2, minSeverity: "심각" },
-      { target: "B필러(우)", probability: 0.3, minSeverity: "심각" },
-      { target: "플로어 패널", probability: 0.4, minSeverity: "심각" },
-      { target: "사이드 실 몰딩(우)", probability: 0.7, minSeverity: "경미" }
-    ]
-  },
-
-  // ── 후면 (Rear) ──────────────────────────────────────────────────────
-  "리어 범퍼": {
-    chain: [
-      { target: "리어 범퍼 리인포스먼트", probability: 0.6, minSeverity: "중간" },
-      { target: "트렁크 리드", probability: 0.3, minSeverity: "심각" },
-      { target: "리어 램프(좌)", probability: 0.35, minSeverity: "중간" },
-      { target: "리어 램프(우)", probability: 0.35, minSeverity: "중간" },
+      { target: "리어 범퍼(하/디퓨저)", probability: 0.7, minSeverity: "경미" },
+      { target: "트렁크/테일게이트", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 리어램프", probability: 0.35, minSeverity: "중간" },
+      { target: "우 리어램프", probability: 0.35, minSeverity: "중간" },
       { target: "후방 카메라", probability: 0.4, minSeverity: "중간" },
-      { target: "후방 센서(주차)", probability: 0.5, minSeverity: "경미" },
-      { target: "후방 레이더", probability: 0.35, minSeverity: "중간" },
-      { target: "배기구 팁", probability: 0.3, minSeverity: "경미" },
-      { target: "리어 범퍼 브라켓(좌)", probability: 0.5, minSeverity: "경미" },
-      { target: "리어 범퍼 브라켓(우)", probability: 0.5, minSeverity: "경미" }
+      { target: "후방 주차센서", probability: 0.5, minSeverity: "경미" },
+      { target: "리어 엠블럼", probability: 0.5, minSeverity: "경미" },
+      { target: "머플러/배기팁", probability: 0.3, minSeverity: "경미" },
+      { target: "좌 리어쿼터패널", probability: 0.2, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.2, minSeverity: "심각" },
+      { target: "번호판등", probability: 0.3, minSeverity: "경미" },
+      { target: "후측방 레이더(좌)", probability: 0.2, minSeverity: "중간" },
+      { target: "후측방 레이더(우)", probability: 0.2, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.4, minSeverity: "중간" }
     ]
   },
-  "트렁크 리드": {
+  "리어 범퍼(하/디퓨저)": {
+    chain: [
+      { target: "리어 범퍼(상)", probability: 0.3, minSeverity: "중간" },
+      { target: "머플러/배기팁", probability: 0.5, minSeverity: "경미" },
+      { target: "후방 주차센서", probability: 0.35, minSeverity: "경미" },
+      { target: "언더커버", probability: 0.4, minSeverity: "경미" },
+      { target: "리어 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 후륜 휠/타이어", probability: 0.1, minSeverity: "심각" },
+      { target: "우 후륜 휠/타이어", probability: 0.1, minSeverity: "심각" },
+      { target: "후방 카메라", probability: 0.3, minSeverity: "중간" },
+      { target: "번호판등", probability: 0.25, minSeverity: "경미" }
+    ]
+  },
+  "트렁크/테일게이트": {
     chain: [
       { target: "리어 스포일러", probability: 0.5, minSeverity: "중간" },
-      { target: "트렁크 힌지(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "트렁크 힌지(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "트렁크 래치", probability: 0.3, minSeverity: "심각" },
-      { target: "하이마운트 스탑램프", probability: 0.4, minSeverity: "중간" },
-      { target: "후면 유리", probability: 0.25, minSeverity: "심각" },
-      { target: "트렁크 웨더스트립", probability: 0.5, minSeverity: "중간" },
-      { target: "리어 범퍼", probability: 0.2, minSeverity: "중간" }
+      { target: "리어 유리", probability: 0.3, minSeverity: "심각" },
+      { target: "후방 카메라", probability: 0.4, minSeverity: "중간" },
+      { target: "리어 엠블럼", probability: 0.5, minSeverity: "경미" },
+      { target: "좌 리어램프", probability: 0.25, minSeverity: "중간" },
+      { target: "우 리어램프", probability: 0.25, minSeverity: "중간" },
+      { target: "리어 범퍼(상)", probability: 0.2, minSeverity: "중간" },
+      { target: "번호판등", probability: 0.35, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.4, minSeverity: "중간" },
+      { target: "좌 C필러", probability: 0.15, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.15, minSeverity: "심각" }
     ]
   },
-  "리어 램프(좌)": {
+  "좌 리어램프": {
     chain: [
-      { target: "쿼터 패널(좌)", probability: 0.2, minSeverity: "중간" },
-      { target: "트렁크 리드", probability: 0.15, minSeverity: "중간" },
-      { target: "리어 범퍼", probability: 0.15, minSeverity: "경미" },
-      { target: "리어 램프 가니쉬(좌)", probability: 0.5, minSeverity: "경미" }
+      { target: "좌 리어쿼터패널", probability: 0.25, minSeverity: "중간" },
+      { target: "트렁크/테일게이트", probability: 0.15, minSeverity: "중간" },
+      { target: "리어 범퍼(상)", probability: 0.15, minSeverity: "경미" },
+      { target: "좌 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "번호판등", probability: 0.2, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.1, minSeverity: "중간" },
+      { target: "리어 엠블럼", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 스포일러", probability: 0.05, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.1, minSeverity: "경미" }
     ]
   },
-  "리어 램프(우)": {
+  "우 리어램프": {
     chain: [
-      { target: "쿼터 패널(우)", probability: 0.2, minSeverity: "중간" },
-      { target: "트렁크 리드", probability: 0.15, minSeverity: "중간" },
-      { target: "리어 범퍼", probability: 0.15, minSeverity: "경미" },
-      { target: "리어 램프 가니쉬(우)", probability: 0.5, minSeverity: "경미" }
+      { target: "우 리어쿼터패널", probability: 0.25, minSeverity: "중간" },
+      { target: "트렁크/테일게이트", probability: 0.15, minSeverity: "중간" },
+      { target: "리어 범퍼(상)", probability: 0.15, minSeverity: "경미" },
+      { target: "우 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "번호판등", probability: 0.2, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.1, minSeverity: "중간" },
+      { target: "리어 엠블럼", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 스포일러", probability: 0.05, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.1, minSeverity: "경미" }
     ]
   },
-  "후면 유리": {
+  "리어 유리": {
     chain: [
       { target: "리어 스포일러", probability: 0.2, minSeverity: "심각" },
-      { target: "하이마운트 스탑램프", probability: 0.3, minSeverity: "중간" },
-      { target: "후면 유리 몰딩", probability: 0.6, minSeverity: "경미" },
-      { target: "C필러(좌)", probability: 0.1, minSeverity: "심각" },
-      { target: "C필러(우)", probability: 0.1, minSeverity: "심각" }
+      { target: "트렁크/테일게이트", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 C필러", probability: 0.15, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.15, minSeverity: "심각" },
+      { target: "후방 카메라", probability: 0.2, minSeverity: "중간" },
+      { target: "루프패널", probability: 0.1, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.3, minSeverity: "중간" },
+      { target: "안테나/샤크핀", probability: 0.1, minSeverity: "중간" },
+      { target: "리어 엠블럼", probability: 0.05, minSeverity: "경미" },
+      { target: "좌 리어쿼터패널", probability: 0.05, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.05, minSeverity: "심각" }
     ]
   },
-  "리어 범퍼 리인포스먼트": {
+  "리어 스포일러": {
     chain: [
-      { target: "리어 사이드 멤버(좌)", probability: 0.5, minSeverity: "심각" },
-      { target: "리어 사이드 멤버(우)", probability: 0.5, minSeverity: "심각" },
-      { target: "리어 플로어 패널", probability: 0.4, minSeverity: "심각" },
-      { target: "트렁크 플로어", probability: 0.35, minSeverity: "심각" },
-      { target: "머플러", probability: 0.3, minSeverity: "심각" }
+      { target: "트렁크/테일게이트", probability: 0.2, minSeverity: "중간" },
+      { target: "리어 유리", probability: 0.25, minSeverity: "중간" },
+      { target: "좌 리어램프", probability: 0.1, minSeverity: "중간" },
+      { target: "우 리어램프", probability: 0.1, minSeverity: "중간" },
+      { target: "루프패널", probability: 0.1, minSeverity: "심각" },
+      { target: "후방 카메라", probability: 0.15, minSeverity: "중간" },
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "중간" },
+      { target: "좌 C필러", probability: 0.05, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.05, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.15, minSeverity: "중간" }
+    ]
+  },
+  "리어 엠블럼": {
+    chain: [
+      { target: "트렁크/테일게이트", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.1, minSeverity: "중간" },
+      { target: "번호판등", probability: 0.15, minSeverity: "경미" },
+      { target: "리어 유리", probability: 0.05, minSeverity: "중간" },
+      { target: "좌 리어램프", probability: 0.05, minSeverity: "경미" },
+      { target: "우 리어램프", probability: 0.05, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.1, minSeverity: "경미" }
+    ]
+  },
+  "후방 카메라": {
+    chain: [
+      { target: "트렁크/테일게이트", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.9, minSeverity: "경미" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "중간" },
+      { target: "리어 유리", probability: 0.05, minSeverity: "심각" },
+      { target: "어라운드뷰 전면", probability: 0.15, minSeverity: "경미" }
+    ]
+  },
+  "후방 주차센서": {
+    chain: [
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 범퍼(하/디퓨저)", probability: 0.1, minSeverity: "경미" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "중간" },
+      { target: "계기판/클러스터", probability: 0.05, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.3, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.15, minSeverity: "경미" },
+      { target: "머플러/배기팁", probability: 0.05, minSeverity: "경미" }
+    ]
+  },
+  "번호판등": {
+    chain: [
+      { target: "리어 범퍼(상)", probability: 0.05, minSeverity: "경미" },
+      { target: "트렁크/테일게이트", probability: 0.05, minSeverity: "경미" },
+      { target: "리어 엠블럼", probability: 0.1, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.05, minSeverity: "중간" },
+      { target: "리어 범퍼(하/디퓨저)", probability: 0.05, minSeverity: "경미" },
+      { target: "좌 리어램프", probability: 0.05, minSeverity: "경미" },
+      { target: "우 리어램프", probability: 0.05, minSeverity: "경미" }
+    ]
+  },
+  "머플러/배기팁": {
+    chain: [
+      { target: "리어 범퍼(하/디퓨저)", probability: 0.3, minSeverity: "경미" },
+      { target: "리어 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "언더커버", probability: 0.2, minSeverity: "경미" },
+      { target: "리어 서브프레임", probability: 0.1, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.05, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 후륜 휠/타이어", probability: 0.05, minSeverity: "심각" },
+      { target: "우 후륜 휠/타이어", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+
+  // ── 좌측면 (Left Side) ────────────────────────────────────────────────
+  "좌 프론트 펜더": {
+    chain: [
+      { target: "좌 프론트 도어", probability: 0.4, minSeverity: "중간" },
+      { target: "좌 헤드라이트", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 사이드미러", probability: 0.25, minSeverity: "중간" },
+      { target: "좌 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "본넷", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 전륜 휠/타이어", probability: 0.2, minSeverity: "중간" },
+      { target: "좌 사이드몰딩", probability: 0.4, minSeverity: "경미" },
+      { target: "좌 안개등", probability: 0.2, minSeverity: "중간" },
+      { target: "프론트 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 전 서스펜션", probability: 0.15, minSeverity: "심각" }
+    ]
+  },
+  "좌 A필러": {
+    chain: [
+      { target: "전면 유리", probability: 0.5, minSeverity: "심각" },
+      { target: "좌 프론트 펜더", probability: 0.4, minSeverity: "심각" },
+      { target: "좌 프론트 도어", probability: 0.4, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 도어유리(전)", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.2, minSeverity: "심각" },
+      { target: "에어백(운전석)", probability: 0.15, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.2, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.2, minSeverity: "심각" }
+    ]
+  },
+  "좌 프론트 도어": {
+    chain: [
+      { target: "좌 사이드미러", probability: 0.5, minSeverity: "중간" },
+      { target: "좌 도어핸들", probability: 0.4, minSeverity: "중간" },
+      { target: "좌 도어유리(전)", probability: 0.35, minSeverity: "중간" },
+      { target: "좌 B필러", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 리어 도어", probability: 0.25, minSeverity: "심각" },
+      { target: "좌 프론트 펜더", probability: 0.2, minSeverity: "중간" },
+      { target: "좌 사이드몰딩", probability: 0.6, minSeverity: "경미" },
+      { target: "좌 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.15, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.15, minSeverity: "심각" },
+      { target: "에어백(운전석)", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "좌 B필러": {
+    chain: [
+      { target: "좌 프론트 도어", probability: 0.4, minSeverity: "심각" },
+      { target: "좌 리어 도어", probability: 0.4, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.5, minSeverity: "심각" },
+      { target: "좌 도어유리(전)", probability: 0.25, minSeverity: "심각" },
+      { target: "좌 도어유리(후)", probability: 0.25, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.3, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 사이드몰딩", probability: 0.4, minSeverity: "경미" }
+    ]
+  },
+  "좌 리어 도어": {
+    chain: [
+      { target: "좌 B필러", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 C필러", probability: 0.25, minSeverity: "심각" },
+      { target: "좌 프론트 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 도어핸들", probability: 0.4, minSeverity: "중간" },
+      { target: "좌 도어유리(후)", probability: 0.35, minSeverity: "중간" },
+      { target: "좌 사이드몰딩", probability: 0.6, minSeverity: "경미" },
+      { target: "좌 사이드실(로커패널)", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.15, minSeverity: "심각" }
+    ]
+  },
+  "좌 C필러": {
+    chain: [
+      { target: "좌 리어 도어", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.5, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.25, minSeverity: "심각" },
+      { target: "리어 유리", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 도어유리(후)", probability: 0.2, minSeverity: "심각" },
+      { target: "트렁크/테일게이트", probability: 0.1, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.2, minSeverity: "심각" }
+    ]
+  },
+  "좌 리어쿼터패널": {
+    chain: [
+      { target: "리어 범퍼(상)", probability: 0.35, minSeverity: "중간" },
+      { target: "좌 리어램프", probability: 0.4, minSeverity: "중간" },
+      { target: "좌 C필러", probability: 0.3, minSeverity: "심각" },
+      { target: "트렁크/테일게이트", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 리어 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 후륜 휠/타이어", probability: 0.2, minSeverity: "중간" },
+      { target: "좌 사이드실(로커패널)", probability: 0.15, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 후 서스펜션", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 사이드몰딩", probability: 0.4, minSeverity: "경미" }
+    ]
+  },
+  "좌 사이드미러": {
+    chain: [
+      { target: "좌 프론트 도어", probability: 0.15, minSeverity: "경미" },
+      { target: "좌 도어유리(전)", probability: 0.2, minSeverity: "중간" },
+      { target: "좌 프론트 펜더", probability: 0.1, minSeverity: "중간" },
+      { target: "후측방 레이더(좌)", probability: 0.3, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.4, minSeverity: "경미" },
+      { target: "좌 A필러", probability: 0.05, minSeverity: "심각" },
+      { target: "좌 사이드몰딩", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 도어핸들", probability: 0.05, minSeverity: "경미" }
+    ]
+  },
+  "좌 도어핸들": {
+    chain: [
+      { target: "좌 프론트 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 리어 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 사이드몰딩", probability: 0.15, minSeverity: "경미" },
+      { target: "좌 도어유리(전)", probability: 0.05, minSeverity: "중간" },
+      { target: "좌 도어유리(후)", probability: 0.05, minSeverity: "중간" },
+      { target: "좌 사이드미러", probability: 0.05, minSeverity: "경미" },
+      { target: "좌 B필러", probability: 0.03, minSeverity: "심각" }
+    ]
+  },
+  "좌 사이드몰딩": {
+    chain: [
+      { target: "좌 프론트 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 리어 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 프론트 펜더", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 리어쿼터패널", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 도어핸들", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 사이드실(로커패널)", probability: 0.05, minSeverity: "중간" },
+      { target: "좌 B필러", probability: 0.03, minSeverity: "중간" },
+      { target: "좌 사이드미러", probability: 0.05, minSeverity: "경미" }
+    ]
+  },
+  "좌 도어유리(전)": {
+    chain: [
+      { target: "좌 프론트 도어", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 사이드미러", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 B필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 도어핸들", probability: 0.1, minSeverity: "경미" },
+      { target: "사이드/커튼 에어백", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 사이드몰딩", probability: 0.1, minSeverity: "경미" },
+      { target: "에어백(운전석)", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "좌 도어유리(후)": {
+    chain: [
+      { target: "좌 리어 도어", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 B필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 도어핸들", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 리어쿼터패널", probability: 0.05, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 사이드몰딩", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 유리", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+
+  // ── 우측면 (Right Side) ───────────────────────────────────────────────
+  "우 프론트 펜더": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.4, minSeverity: "중간" },
+      { target: "우 헤드라이트", probability: 0.3, minSeverity: "중간" },
+      { target: "우 사이드미러", probability: 0.25, minSeverity: "중간" },
+      { target: "우 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "본넷", probability: 0.15, minSeverity: "중간" },
+      { target: "우 전륜 휠/타이어", probability: 0.2, minSeverity: "중간" },
+      { target: "우 사이드몰딩", probability: 0.4, minSeverity: "경미" },
+      { target: "우 안개등", probability: 0.2, minSeverity: "중간" },
+      { target: "프론트 범퍼(상)", probability: 0.15, minSeverity: "중간" },
+      { target: "우 전 서스펜션", probability: 0.15, minSeverity: "심각" }
+    ]
+  },
+  "우 A필러": {
+    chain: [
+      { target: "전면 유리", probability: 0.5, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.4, minSeverity: "심각" },
+      { target: "우 프론트 도어", probability: 0.4, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.3, minSeverity: "심각" },
+      { target: "우 도어유리(전)", probability: 0.3, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.2, minSeverity: "심각" },
+      { target: "에어백(조수석)", probability: 0.15, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.2, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.2, minSeverity: "심각" }
+    ]
+  },
+  "우 프론트 도어": {
+    chain: [
+      { target: "우 사이드미러", probability: 0.5, minSeverity: "중간" },
+      { target: "우 도어핸들", probability: 0.4, minSeverity: "중간" },
+      { target: "우 도어유리(전)", probability: 0.35, minSeverity: "중간" },
+      { target: "우 B필러", probability: 0.3, minSeverity: "심각" },
+      { target: "우 리어 도어", probability: 0.25, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.2, minSeverity: "중간" },
+      { target: "우 사이드몰딩", probability: 0.6, minSeverity: "경미" },
+      { target: "우 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.15, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.15, minSeverity: "심각" },
+      { target: "에어백(조수석)", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "우 B필러": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.4, minSeverity: "심각" },
+      { target: "우 리어 도어", probability: 0.4, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.3, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.5, minSeverity: "심각" },
+      { target: "우 도어유리(전)", probability: 0.25, minSeverity: "심각" },
+      { target: "우 도어유리(후)", probability: 0.25, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.3, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.2, minSeverity: "심각" },
+      { target: "우 사이드몰딩", probability: 0.4, minSeverity: "경미" }
+    ]
+  },
+  "우 리어 도어": {
+    chain: [
+      { target: "우 B필러", probability: 0.3, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.25, minSeverity: "심각" },
+      { target: "우 프론트 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "우 도어핸들", probability: 0.4, minSeverity: "중간" },
+      { target: "우 도어유리(후)", probability: 0.35, minSeverity: "중간" },
+      { target: "우 사이드몰딩", probability: 0.6, minSeverity: "경미" },
+      { target: "우 사이드실(로커패널)", probability: 0.2, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.15, minSeverity: "심각" }
+    ]
+  },
+  "우 C필러": {
+    chain: [
+      { target: "우 리어 도어", probability: 0.3, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.5, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.25, minSeverity: "심각" },
+      { target: "리어 유리", probability: 0.2, minSeverity: "심각" },
+      { target: "우 도어유리(후)", probability: 0.2, minSeverity: "심각" },
+      { target: "트렁크/테일게이트", probability: 0.1, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.2, minSeverity: "심각" }
+    ]
+  },
+  "우 리어쿼터패널": {
+    chain: [
+      { target: "리어 범퍼(상)", probability: 0.35, minSeverity: "중간" },
+      { target: "우 리어램프", probability: 0.4, minSeverity: "중간" },
+      { target: "우 C필러", probability: 0.3, minSeverity: "심각" },
+      { target: "트렁크/테일게이트", probability: 0.2, minSeverity: "심각" },
+      { target: "우 리어 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "우 후륜 휠/타이어", probability: 0.2, minSeverity: "중간" },
+      { target: "우 사이드실(로커패널)", probability: 0.15, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" },
+      { target: "우 후 서스펜션", probability: 0.15, minSeverity: "심각" },
+      { target: "우 사이드몰딩", probability: 0.4, minSeverity: "경미" }
+    ]
+  },
+  "우 사이드미러": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.15, minSeverity: "경미" },
+      { target: "우 도어유리(전)", probability: 0.2, minSeverity: "중간" },
+      { target: "우 프론트 펜더", probability: 0.1, minSeverity: "중간" },
+      { target: "후측방 레이더(우)", probability: 0.3, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.4, minSeverity: "경미" },
+      { target: "우 A필러", probability: 0.05, minSeverity: "심각" },
+      { target: "우 사이드몰딩", probability: 0.1, minSeverity: "경미" },
+      { target: "우 도어핸들", probability: 0.05, minSeverity: "경미" }
+    ]
+  },
+  "우 도어핸들": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "우 리어 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "우 사이드몰딩", probability: 0.15, minSeverity: "경미" },
+      { target: "우 도어유리(전)", probability: 0.05, minSeverity: "중간" },
+      { target: "우 도어유리(후)", probability: 0.05, minSeverity: "중간" },
+      { target: "우 사이드미러", probability: 0.05, minSeverity: "경미" },
+      { target: "우 B필러", probability: 0.03, minSeverity: "심각" }
+    ]
+  },
+  "우 사이드몰딩": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "우 리어 도어", probability: 0.1, minSeverity: "경미" },
+      { target: "우 프론트 펜더", probability: 0.1, minSeverity: "경미" },
+      { target: "우 리어쿼터패널", probability: 0.1, minSeverity: "경미" },
+      { target: "우 도어핸들", probability: 0.1, minSeverity: "경미" },
+      { target: "우 사이드실(로커패널)", probability: 0.05, minSeverity: "중간" },
+      { target: "우 B필러", probability: 0.03, minSeverity: "중간" },
+      { target: "우 사이드미러", probability: 0.05, minSeverity: "경미" }
+    ]
+  },
+  "우 도어유리(전)": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.15, minSeverity: "중간" },
+      { target: "우 사이드미러", probability: 0.15, minSeverity: "중간" },
+      { target: "우 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 도어핸들", probability: 0.1, minSeverity: "경미" },
+      { target: "사이드/커튼 에어백", probability: 0.1, minSeverity: "심각" },
+      { target: "우 사이드몰딩", probability: 0.1, minSeverity: "경미" },
+      { target: "에어백(조수석)", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "우 도어유리(후)": {
+    chain: [
+      { target: "우 리어 도어", probability: 0.15, minSeverity: "중간" },
+      { target: "우 B필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 도어핸들", probability: 0.1, minSeverity: "경미" },
+      { target: "우 리어쿼터패널", probability: 0.05, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.1, minSeverity: "심각" },
+      { target: "우 사이드몰딩", probability: 0.1, minSeverity: "경미" },
+      { target: "리어 유리", probability: 0.05, minSeverity: "심각" }
     ]
   },
 
   // ── 상부 (Top / Roof) ────────────────────────────────────────────────
-  "루프 패널": {
+  "루프패널": {
     chain: [
-      { target: "A필러(좌)", probability: 0.2, minSeverity: "심각" },
-      { target: "A필러(우)", probability: 0.2, minSeverity: "심각" },
-      { target: "B필러(좌)", probability: 0.15, minSeverity: "심각" },
-      { target: "B필러(우)", probability: 0.15, minSeverity: "심각" },
-      { target: "루프 몰딩", probability: 0.6, minSeverity: "경미" },
-      { target: "루프 랙", probability: 0.4, minSeverity: "중간" },
-      { target: "헤드라이닝", probability: 0.3, minSeverity: "심각" },
-      { target: "선루프 어셈블리", probability: 0.4, minSeverity: "중간" },
-      { target: "샤크 안테나", probability: 0.3, minSeverity: "경미" }
+      { target: "좌 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 B필러", probability: 0.15, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "루프랙/레일", probability: 0.5, minSeverity: "경미" },
+      { target: "안테나/샤크핀", probability: 0.3, minSeverity: "경미" },
+      { target: "선루프 유리", probability: 0.4, minSeverity: "중간" },
+      { target: "선루프 프레임", probability: 0.35, minSeverity: "중간" },
+      { target: "전면 유리", probability: 0.15, minSeverity: "심각" },
+      { target: "리어 유리", probability: 0.15, minSeverity: "심각" }
     ]
   },
-  "선루프 어셈블리": {
+  "선루프 유리": {
     chain: [
-      { target: "루프 패널", probability: 0.3, minSeverity: "심각" },
-      { target: "선루프 유리", probability: 0.8, minSeverity: "경미" },
-      { target: "선루프 모터", probability: 0.3, minSeverity: "심각" },
-      { target: "선루프 레일", probability: 0.4, minSeverity: "중간" },
-      { target: "헤드라이닝", probability: 0.35, minSeverity: "중간" }
+      { target: "루프패널", probability: 0.2, minSeverity: "심각" },
+      { target: "선루프 프레임", probability: 0.6, minSeverity: "중간" },
+      { target: "안테나/샤크핀", probability: 0.15, minSeverity: "중간" },
+      { target: "루프랙/레일", probability: 0.1, minSeverity: "중간" },
+      { target: "좌 B필러", probability: 0.05, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.05, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.03, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.03, minSeverity: "심각" },
+      { target: "전면 유리", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "선루프 프레임": {
+    chain: [
+      { target: "선루프 유리", probability: 0.7, minSeverity: "경미" },
+      { target: "루프패널", probability: 0.4, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 B필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.1, minSeverity: "심각" },
+      { target: "안테나/샤크핀", probability: 0.15, minSeverity: "중간" },
+      { target: "루프랙/레일", probability: 0.2, minSeverity: "중간" },
+      { target: "전면 유리", probability: 0.05, minSeverity: "심각" },
+      { target: "리어 유리", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "루프랙/레일": {
+    chain: [
+      { target: "루프패널", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.1, minSeverity: "심각" },
+      { target: "선루프 유리", probability: 0.1, minSeverity: "중간" },
+      { target: "안테나/샤크핀", probability: 0.15, minSeverity: "경미" },
+      { target: "선루프 프레임", probability: 0.1, minSeverity: "중간" },
+      { target: "좌 B필러", probability: 0.05, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "안테나/샤크핀": {
+    chain: [
+      { target: "루프패널", probability: 0.15, minSeverity: "경미" },
+      { target: "리어 유리", probability: 0.05, minSeverity: "심각" },
+      { target: "선루프 유리", probability: 0.05, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "중간" },
+      { target: "루프랙/레일", probability: 0.1, minSeverity: "경미" },
+      { target: "선루프 프레임", probability: 0.05, minSeverity: "중간" },
+      { target: "좌 C필러", probability: 0.03, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.03, minSeverity: "심각" }
     ]
   },
 
-  // ── 하부 (Under / Floor) ─────────────────────────────────────────────
-  "플로어 패널": {
+  // ── 하부/구조 (Under / Floor / Structure) ─────────────────────────────
+  "프론트 서브프레임": {
     chain: [
-      { target: "사이드 실(좌)", probability: 0.3, minSeverity: "심각" },
-      { target: "사이드 실(우)", probability: 0.3, minSeverity: "심각" },
-      { target: "크로스 멤버", probability: 0.4, minSeverity: "심각" },
-      { target: "연료 탱크", probability: 0.2, minSeverity: "심각" },
-      { target: "배기 파이프", probability: 0.25, minSeverity: "심각" },
-      { target: "고전압 배터리(EV)", probability: 0.3, minSeverity: "심각" }
+      { target: "좌 전 서스펜션", probability: 0.6, minSeverity: "심각" },
+      { target: "우 전 서스펜션", probability: 0.6, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.5, minSeverity: "심각" },
+      { target: "좌 전륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "우 전륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 프론트 펜더", probability: 0.2, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.2, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.4, minSeverity: "중간" },
+      { target: "플로어패널", probability: 0.3, minSeverity: "심각" },
+      { target: "브레이크(전)", probability: 0.25, minSeverity: "심각" },
+      { target: "라디에이터", probability: 0.2, minSeverity: "심각" }
     ]
   },
-  "언더커버(전)": {
+  "리어 서브프레임": {
     chain: [
-      { target: "오일 팬", probability: 0.2, minSeverity: "심각" },
-      { target: "서브 프레임(전)", probability: 0.1, minSeverity: "심각" },
-      { target: "스태빌라이저 바(전)", probability: 0.15, minSeverity: "중간" }
+      { target: "좌 후 서스펜션", probability: 0.6, minSeverity: "심각" },
+      { target: "우 후 서스펜션", probability: 0.6, minSeverity: "심각" },
+      { target: "좌 후륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "우 후륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.3, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.25, minSeverity: "심각" },
+      { target: "머플러/배기팁", probability: 0.2, minSeverity: "심각" },
+      { target: "브레이크(후)", probability: 0.25, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.15, minSeverity: "심각" }
     ]
   },
-  "언더커버(후)": {
+  "좌 사이드실(로커패널)": {
     chain: [
-      { target: "머플러", probability: 0.2, minSeverity: "중간" },
-      { target: "연료 탱크", probability: 0.15, minSeverity: "심각" },
-      { target: "리어 디퓨저", probability: 0.3, minSeverity: "경미" }
+      { target: "좌 프론트 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 리어 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 B필러", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.4, minSeverity: "심각" },
+      { target: "좌 사이드몰딩", probability: 0.6, minSeverity: "경미" },
+      { target: "좌 프론트 펜더", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "고전압 배터리(EV)", probability: 0.2, minSeverity: "심각" }
+    ]
+  },
+  "우 사이드실(로커패널)": {
+    chain: [
+      { target: "우 프론트 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "우 리어 도어", probability: 0.2, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.3, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.4, minSeverity: "심각" },
+      { target: "우 사이드몰딩", probability: 0.6, minSeverity: "경미" },
+      { target: "우 프론트 펜더", probability: 0.15, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "고전압 배터리(EV)", probability: 0.2, minSeverity: "심각" }
+    ]
+  },
+  "플로어패널": {
+    chain: [
+      { target: "좌 사이드실(로커패널)", probability: 0.3, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.3, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "리어 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.25, minSeverity: "심각" },
+      { target: "고전압 배터리(EV)", probability: 0.3, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 B필러", probability: 0.15, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.15, minSeverity: "심각" },
+      { target: "머플러/배기팁", probability: 0.15, minSeverity: "심각" }
+    ]
+  },
+  "언더커버": {
+    chain: [
+      { target: "프론트 서브프레임", probability: 0.15, minSeverity: "심각" },
+      { target: "리어 서브프레임", probability: 0.1, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.1, minSeverity: "심각" },
+      { target: "머플러/배기팁", probability: 0.2, minSeverity: "중간" },
+      { target: "연료탱크/배터리팩", probability: 0.15, minSeverity: "심각" },
+      { target: "고전압 배터리(EV)", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 전 서스펜션", probability: 0.1, minSeverity: "중간" },
+      { target: "우 전 서스펜션", probability: 0.1, minSeverity: "중간" }
+    ]
+  },
+  "연료탱크/배터리팩": {
+    chain: [
+      { target: "플로어패널", probability: 0.3, minSeverity: "심각" },
+      { target: "리어 서브프레임", probability: 0.25, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.3, minSeverity: "중간" },
+      { target: "머플러/배기팁", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.15, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.1, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.1, minSeverity: "심각" },
+      { target: "고전압 배터리(EV)", probability: 0.4, minSeverity: "중간" },
+      { target: "12V 배터리", probability: 0.2, minSeverity: "심각" },
+      { target: "충전포트(EV)", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 후 서스펜션", probability: 0.1, minSeverity: "심각" },
+      { target: "우 후 서스펜션", probability: 0.1, minSeverity: "심각" }
     ]
   },
 
-  // ── ADAS / 전자장비 ──────────────────────────────────────────────────
-  "전방 카메라/센서": {
+  // ── 휠/서스펜션 (Wheels / Suspension) ──────────────────────────────────
+  "좌 전륜 휠/타이어": {
     chain: [
+      { target: "좌 프론트 펜더", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 전 서스펜션", probability: 0.5, minSeverity: "심각" },
+      { target: "브레이크(전)", probability: 0.35, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.25, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 안개등", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "프론트 범퍼(하/립)", probability: 0.2, minSeverity: "중간" },
+      { target: "언더커버", probability: 0.2, minSeverity: "경미" }
+    ]
+  },
+  "우 전륜 휠/타이어": {
+    chain: [
+      { target: "우 프론트 펜더", probability: 0.3, minSeverity: "중간" },
+      { target: "우 전 서스펜션", probability: 0.5, minSeverity: "심각" },
+      { target: "브레이크(전)", probability: 0.35, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.25, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "우 안개등", probability: 0.15, minSeverity: "중간" },
+      { target: "우 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "프론트 범퍼(하/립)", probability: 0.2, minSeverity: "중간" },
+      { target: "언더커버", probability: 0.2, minSeverity: "경미" }
+    ]
+  },
+  "좌 후륜 휠/타이어": {
+    chain: [
+      { target: "좌 리어쿼터패널", probability: 0.3, minSeverity: "중간" },
+      { target: "좌 후 서스펜션", probability: 0.5, minSeverity: "심각" },
+      { target: "브레이크(후)", probability: 0.35, minSeverity: "심각" },
+      { target: "리어 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "리어 범퍼(하/디퓨저)", probability: 0.15, minSeverity: "중간" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "우 후륜 휠/타이어": {
+    chain: [
+      { target: "우 리어쿼터패널", probability: 0.3, minSeverity: "중간" },
+      { target: "우 후 서스펜션", probability: 0.5, minSeverity: "심각" },
+      { target: "브레이크(후)", probability: 0.35, minSeverity: "심각" },
+      { target: "리어 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "리어 범퍼(하/디퓨저)", probability: 0.15, minSeverity: "중간" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "좌 전 서스펜션": {
+    chain: [
+      { target: "좌 전륜 휠/타이어", probability: 0.6, minSeverity: "중간" },
+      { target: "프론트 서브프레임", probability: 0.4, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.35, minSeverity: "심각" },
+      { target: "브레이크(전)", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 프론트 펜더", probability: 0.15, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.2, minSeverity: "중간" },
+      { target: "좌 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.05, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "우 전 서스펜션": {
+    chain: [
+      { target: "우 전륜 휠/타이어", probability: 0.6, minSeverity: "중간" },
+      { target: "프론트 서브프레임", probability: 0.4, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.35, minSeverity: "심각" },
+      { target: "브레이크(전)", probability: 0.3, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.15, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.2, minSeverity: "중간" },
+      { target: "우 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.05, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "좌 후 서스펜션": {
+    chain: [
+      { target: "좌 후륜 휠/타이어", probability: 0.6, minSeverity: "중간" },
+      { target: "리어 서브프레임", probability: 0.4, minSeverity: "심각" },
+      { target: "브레이크(후)", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.1, minSeverity: "심각" },
+      { target: "머플러/배기팁", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "우 후 서스펜션": {
+    chain: [
+      { target: "우 후륜 휠/타이어", probability: 0.6, minSeverity: "중간" },
+      { target: "리어 서브프레임", probability: 0.4, minSeverity: "심각" },
+      { target: "브레이크(후)", probability: 0.3, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.15, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.1, minSeverity: "심각" },
+      { target: "플로어패널", probability: 0.1, minSeverity: "심각" },
+      { target: "머플러/배기팁", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "스티어링 링키지": {
+    chain: [
+      { target: "좌 전 서스펜션", probability: 0.4, minSeverity: "심각" },
+      { target: "우 전 서스펜션", probability: 0.4, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.35, minSeverity: "심각" },
+      { target: "좌 전륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "우 전륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "브레이크(전)", probability: 0.2, minSeverity: "심각" },
+      { target: "에어백(운전석)", probability: 0.1, minSeverity: "심각" },
+      { target: "계기판/클러스터", probability: 0.05, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.15, minSeverity: "중간" },
+      { target: "좌 프론트 펜더", probability: 0.1, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.1, minSeverity: "심각" }
+    ]
+  },
+  "브레이크(전)": {
+    chain: [
+      { target: "좌 전륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "우 전륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 전 서스펜션", probability: 0.2, minSeverity: "심각" },
+      { target: "우 전 서스펜션", probability: 0.2, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.1, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 프론트 펜더", probability: 0.05, minSeverity: "심각" },
+      { target: "우 프론트 펜더", probability: 0.05, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.1, minSeverity: "중간" }
+    ]
+  },
+  "브레이크(후)": {
+    chain: [
+      { target: "좌 후륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "우 후륜 휠/타이어", probability: 0.3, minSeverity: "심각" },
+      { target: "좌 후 서스펜션", probability: 0.2, minSeverity: "심각" },
+      { target: "우 후 서스펜션", probability: 0.2, minSeverity: "심각" },
+      { target: "리어 서브프레임", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.05, minSeverity: "심각" },
+      { target: "우 리어쿼터패널", probability: 0.05, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+
+  // ── 기타/ADAS (ADAS / Electronics / Safety) ───────────────────────────
+  "에어백(운전석)": {
+    chain: [
+      { target: "계기판/클러스터", probability: 0.3, minSeverity: "심각" },
+      { target: "AVN/인포테인먼트", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 프론트 도어", probability: 0.1, minSeverity: "심각" },
       { target: "전면 유리", probability: 0.1, minSeverity: "심각" },
-      { target: "ADAS ECU", probability: 0.3, minSeverity: "중간" }
+      { target: "사이드/커튼 에어백", probability: 0.4, minSeverity: "심각" },
+      { target: "에어백(조수석)", probability: 0.3, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 도어유리(전)", probability: 0.05, minSeverity: "심각" },
+      { target: "본넷", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "에어백(조수석)": {
+    chain: [
+      { target: "계기판/클러스터", probability: 0.25, minSeverity: "심각" },
+      { target: "AVN/인포테인먼트", probability: 0.2, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.2, minSeverity: "심각" },
+      { target: "우 프론트 도어", probability: 0.1, minSeverity: "심각" },
+      { target: "전면 유리", probability: 0.1, minSeverity: "심각" },
+      { target: "사이드/커튼 에어백", probability: 0.4, minSeverity: "심각" },
+      { target: "에어백(운전석)", probability: 0.3, minSeverity: "심각" },
+      { target: "우 도어유리(전)", probability: 0.05, minSeverity: "심각" },
+      { target: "본넷", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "사이드/커튼 에어백": {
+    chain: [
+      { target: "에어백(운전석)", probability: 0.3, minSeverity: "심각" },
+      { target: "에어백(조수석)", probability: 0.3, minSeverity: "심각" },
+      { target: "루프패널", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 B필러", probability: 0.2, minSeverity: "심각" },
+      { target: "우 B필러", probability: 0.2, minSeverity: "심각" },
+      { target: "좌 C필러", probability: 0.15, minSeverity: "심각" },
+      { target: "우 C필러", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 도어유리(전)", probability: 0.1, minSeverity: "심각" },
+      { target: "우 도어유리(전)", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 도어유리(후)", probability: 0.1, minSeverity: "심각" },
+      { target: "우 도어유리(후)", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "우 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.05, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "계기판/클러스터": {
+    chain: [
+      { target: "에어백(운전석)", probability: 0.2, minSeverity: "심각" },
+      { target: "AVN/인포테인먼트", probability: 0.3, minSeverity: "중간" },
+      { target: "전면 유리", probability: 0.05, minSeverity: "심각" },
+      { target: "좌 A필러", probability: 0.1, minSeverity: "심각" },
+      { target: "에어컨/냉방", probability: 0.1, minSeverity: "중간" },
+      { target: "전방 카메라/센서", probability: 0.1, minSeverity: "중간" },
+      { target: "에어백(조수석)", probability: 0.15, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.1, minSeverity: "중간" },
+      { target: "12V 배터리", probability: 0.1, minSeverity: "심각" },
+      { target: "스티어링 링키지", probability: 0.05, minSeverity: "심각" }
+    ]
+  },
+  "AVN/인포테인먼트": {
+    chain: [
+      { target: "계기판/클러스터", probability: 0.25, minSeverity: "중간" },
+      { target: "에어컨/냉방", probability: 0.15, minSeverity: "중간" },
+      { target: "전방 카메라/센서", probability: 0.1, minSeverity: "중간" },
+      { target: "후방 카메라", probability: 0.1, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.2, minSeverity: "경미" },
+      { target: "어라운드뷰 전면", probability: 0.15, minSeverity: "중간" },
+      { target: "후방 주차센서", probability: 0.1, minSeverity: "중간" },
+      { target: "12V 배터리", probability: 0.1, minSeverity: "심각" },
+      { target: "안테나/샤크핀", probability: 0.05, minSeverity: "경미" },
+      { target: "라이다", probability: 0.05, minSeverity: "중간" },
+      { target: "전방 레이더", probability: 0.05, minSeverity: "중간" }
+    ]
+  },
+  "에어컨/냉방": {
+    chain: [
+      { target: "라디에이터", probability: 0.3, minSeverity: "중간" },
+      { target: "프론트 범퍼(상)", probability: 0.05, minSeverity: "심각" },
+      { target: "계기판/클러스터", probability: 0.1, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.05, minSeverity: "중간" },
+      { target: "인터쿨러", probability: 0.2, minSeverity: "중간" },
+      { target: "프론트 그릴", probability: 0.1, minSeverity: "심각" },
+      { target: "12V 배터리", probability: 0.1, minSeverity: "심각" },
+      { target: "전면 유리", probability: 0.02, minSeverity: "심각" }
     ]
   },
   "전방 레이더": {
     chain: [
       { target: "프론트 그릴", probability: 0.1, minSeverity: "경미" },
       { target: "프론트 범퍼(상)", probability: 0.1, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.3, minSeverity: "중간" }
+      { target: "프론트 엠블럼", probability: 0.15, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.8, minSeverity: "경미" },
+      { target: "전방 카메라/센서", probability: 0.2, minSeverity: "중간" },
+      { target: "라이다", probability: 0.15, minSeverity: "중간" },
+      { target: "계기판/클러스터", probability: 0.05, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.05, minSeverity: "중간" },
+      { target: "어라운드뷰 전면", probability: 0.1, minSeverity: "경미" }
     ]
   },
-  "후방 카메라": {
+  "후측방 레이더(좌)": {
     chain: [
-      { target: "트렁크 리드", probability: 0.1, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.2, minSeverity: "중간" }
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "좌 리어쿼터패널", probability: 0.1, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.7, minSeverity: "경미" },
+      { target: "좌 사이드미러", probability: 0.1, minSeverity: "경미" },
+      { target: "후측방 레이더(우)", probability: 0.05, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.05, minSeverity: "중간" },
+      { target: "라이다", probability: 0.05, minSeverity: "중간" },
+      { target: "후방 카메라", probability: 0.05, minSeverity: "경미" }
     ]
   },
-  "후방 레이더": {
+  "후측방 레이더(우)": {
     chain: [
-      { target: "리어 범퍼", probability: 0.1, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.2, minSeverity: "중간" }
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "경미" },
+      { target: "우 리어쿼터패널", probability: 0.1, minSeverity: "경미" },
+      { target: "카메라 캘리브레이션", probability: 0.7, minSeverity: "경미" },
+      { target: "우 사이드미러", probability: 0.1, minSeverity: "경미" },
+      { target: "후측방 레이더(좌)", probability: 0.05, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.05, minSeverity: "중간" },
+      { target: "라이다", probability: 0.05, minSeverity: "중간" },
+      { target: "후방 카메라", probability: 0.05, minSeverity: "경미" }
     ]
   },
-  "코너 레이더(좌전)": {
+  "라이다": {
     chain: [
-      { target: "프론트 범퍼(하)", probability: 0.15, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.2, minSeverity: "중간" }
+      { target: "전방 카메라/센서", probability: 0.2, minSeverity: "중간" },
+      { target: "전방 레이더", probability: 0.15, minSeverity: "중간" },
+      { target: "카메라 캘리브레이션", probability: 0.85, minSeverity: "경미" },
+      { target: "루프패널", probability: 0.1, minSeverity: "중간" },
+      { target: "전면 유리", probability: 0.1, minSeverity: "중간" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "중간" },
+      { target: "계기판/클러스터", probability: 0.05, minSeverity: "중간" },
+      { target: "후측방 레이더(좌)", probability: 0.1, minSeverity: "중간" },
+      { target: "후측방 레이더(우)", probability: 0.1, minSeverity: "중간" },
+      { target: "어라운드뷰 전면", probability: 0.15, minSeverity: "경미" }
     ]
   },
-  "코너 레이더(우전)": {
+  "카메라 캘리브레이션": {
     chain: [
-      { target: "프론트 범퍼(하)", probability: 0.15, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.2, minSeverity: "중간" }
+      { target: "전방 카메라/센서", probability: 0.3, minSeverity: "경미" },
+      { target: "후방 카메라", probability: 0.3, minSeverity: "경미" },
+      { target: "전방 레이더", probability: 0.25, minSeverity: "경미" },
+      { target: "후측방 레이더(좌)", probability: 0.2, minSeverity: "경미" },
+      { target: "후측방 레이더(우)", probability: 0.2, minSeverity: "경미" },
+      { target: "라이다", probability: 0.2, minSeverity: "경미" },
+      { target: "어라운드뷰 전면", probability: 0.25, minSeverity: "경미" },
+      { target: "AVN/인포테인먼트", probability: 0.15, minSeverity: "경미" },
+      { target: "계기판/클러스터", probability: 0.1, minSeverity: "경미" },
+      { target: "후방 주차센서", probability: 0.15, minSeverity: "경미" },
+      { target: "전면 유리", probability: 0.05, minSeverity: "중간" }
     ]
   },
-  "코너 레이더(좌후)": {
+  "12V 배터리": {
     chain: [
-      { target: "리어 범퍼", probability: 0.15, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.2, minSeverity: "중간" }
+      { target: "계기판/클러스터", probability: 0.1, minSeverity: "심각" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 헤드라이트", probability: 0.05, minSeverity: "심각" },
+      { target: "우 헤드라이트", probability: 0.05, minSeverity: "심각" },
+      { target: "에어컨/냉방", probability: 0.05, minSeverity: "심각" },
+      { target: "고전압 배터리(EV)", probability: 0.15, minSeverity: "심각" },
+      { target: "전방 카메라/센서", probability: 0.05, minSeverity: "심각" },
+      { target: "후방 카메라", probability: 0.05, minSeverity: "심각" },
+      { target: "카메라 캘리브레이션", probability: 0.1, minSeverity: "심각" },
+      { target: "충전포트(EV)", probability: 0.1, minSeverity: "심각" },
+      { target: "에어백(운전석)", probability: 0.05, minSeverity: "심각" },
+      { target: "에어백(조수석)", probability: 0.05, minSeverity: "심각" }
     ]
   },
-  "코너 레이더(우후)": {
+  "고전압 배터리(EV)": {
     chain: [
-      { target: "리어 범퍼", probability: 0.15, minSeverity: "경미" },
-      { target: "ADAS ECU", probability: 0.2, minSeverity: "중간" }
+      { target: "플로어패널", probability: 0.4, minSeverity: "심각" },
+      { target: "좌 사이드실(로커패널)", probability: 0.25, minSeverity: "심각" },
+      { target: "우 사이드실(로커패널)", probability: 0.25, minSeverity: "심각" },
+      { target: "언더커버", probability: 0.3, minSeverity: "중간" },
+      { target: "12V 배터리", probability: 0.2, minSeverity: "심각" },
+      { target: "충전포트(EV)", probability: 0.15, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.5, minSeverity: "중간" },
+      { target: "리어 서브프레임", probability: 0.2, minSeverity: "심각" },
+      { target: "AVN/인포테인먼트", probability: 0.1, minSeverity: "심각" },
+      { target: "계기판/클러스터", probability: 0.1, minSeverity: "심각" },
+      { target: "프론트 서브프레임", probability: 0.15, minSeverity: "심각" },
+      { target: "에어컨/냉방", probability: 0.1, minSeverity: "심각" }
     ]
   },
-
-  // ── 서스펜션 / 하체 ──────────────────────────────────────────────────
-  "프론트 휠(좌)": {
+  "충전포트(EV)": {
     chain: [
-      { target: "타이어(좌전)", probability: 0.7, minSeverity: "중간" },
-      { target: "프론트 너클(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "프론트 펜더(좌)", probability: 0.3, minSeverity: "중간" },
-      { target: "브레이크 디스크(좌전)", probability: 0.25, minSeverity: "심각" },
-      { target: "브레이크 캘리퍼(좌전)", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-  "프론트 휠(우)": {
-    chain: [
-      { target: "타이어(우전)", probability: 0.7, minSeverity: "중간" },
-      { target: "프론트 너클(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "프론트 펜더(우)", probability: 0.3, minSeverity: "중간" },
-      { target: "브레이크 디스크(우전)", probability: 0.25, minSeverity: "심각" },
-      { target: "브레이크 캘리퍼(우전)", probability: 0.2, minSeverity: "심각" }
-    ]
-  },
-  "리어 휠(좌)": {
-    chain: [
-      { target: "타이어(좌후)", probability: 0.7, minSeverity: "중간" },
-      { target: "리어 너클(좌)", probability: 0.4, minSeverity: "심각" },
-      { target: "쿼터 패널(좌)", probability: 0.25, minSeverity: "중간" },
-      { target: "브레이크 디스크(좌후)", probability: 0.25, minSeverity: "심각" }
-    ]
-  },
-  "리어 휠(우)": {
-    chain: [
-      { target: "타이어(우후)", probability: 0.7, minSeverity: "중간" },
-      { target: "리어 너클(우)", probability: 0.4, minSeverity: "심각" },
-      { target: "쿼터 패널(우)", probability: 0.25, minSeverity: "중간" },
-      { target: "브레이크 디스크(우후)", probability: 0.25, minSeverity: "심각" }
+      { target: "고전압 배터리(EV)", probability: 0.15, minSeverity: "심각" },
+      { target: "좌 리어쿼터패널", probability: 0.15, minSeverity: "중간" },
+      { target: "우 리어쿼터패널", probability: 0.15, minSeverity: "중간" },
+      { target: "리어 범퍼(상)", probability: 0.1, minSeverity: "중간" },
+      { target: "12V 배터리", probability: 0.1, minSeverity: "심각" },
+      { target: "AVN/인포테인먼트", probability: 0.05, minSeverity: "심각" },
+      { target: "계기판/클러스터", probability: 0.05, minSeverity: "심각" },
+      { target: "연료탱크/배터리팩", probability: 0.1, minSeverity: "심각" },
+      { target: "좌 리어램프", probability: 0.05, minSeverity: "중간" },
+      { target: "우 리어램프", probability: 0.05, minSeverity: "중간" }
     ]
   }
 };
