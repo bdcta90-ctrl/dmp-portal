@@ -28,6 +28,14 @@ function generateAllEmployees() {
       employmentType: pick(EMPLOYMENT_TYPES),
       clearanceLevel: pick(CLEARANCE_LEVELS),
       managerId: mgr,
+      profile: {
+        hireDate: new Date(2015 + Math.floor(Math.random() * 11), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
+        resignPlanned: Math.random() < 0.05,
+        recentTransfer: Math.random() < 0.08,
+        warningCount: Math.floor(Math.random() * 3),
+        performanceRating: ["S","A","B","C","D"][Math.floor(Math.random()*5)],
+        avgDailyEvents: Math.floor(Math.random() * 15) + 3,
+      },
     });
   }
   return emps;
@@ -151,15 +159,102 @@ var ACTION_GUIDES = {
   }
 };
 
-function generateEvent(employees) {
-  var emp = pick(employees), evt = pick(EVENT_TYPES), asset = pick(ASSETS);
+var DEPT_ASSETS = {
+  "재무팀": ["고객계좌DB","급여명세_전체.xlsx","재무제표_Q1.xlsx"],
+  "연구개발1팀": ["기술설계도_v3.dwg","연구개발_소스코드"],
+  "연구개발2팀": ["기술설계도_v3.dwg","연구개발_소스코드"],
+  "인사팀": ["급여명세_전체.xlsx","인사평가_시트.xlsx"],
+  "마케팅팀": ["2026_전략보고서.pdf","거래처_리스트.csv"],
+  "IT운영팀": ["연구개발_소스코드"],
+  "법무팀": ["M_A_계약서_draft.pdf"],
+  "보안팀": [],
+  "전략기획팀": ["2026_전략보고서.pdf"],
+  "영업1팀": ["거래처_리스트.csv"],
+  "영업2팀": ["거래처_리스트.csv"],
+  "고객지원팀": ["고객개인정보_DB"],
+  "리스크관리팀": [],
+  "컴플라이언스팀": [],
+  "데이터분석팀": ["고객개인정보_DB","고객계좌DB"],
+  "인프라팀": [],
+  "경영지원팀": [],
+  "해외사업팀": [],
+  "신사업개발팀": [],
+  "디자인팀": [],
+};
+
+var EVENT_WEIGHTS = [30,25,15,8,5,2,6,3,6]; // File Open 30%, Permission Escalation 2%, etc.
+
+function weightedPickEvent() {
+  var total = EVENT_WEIGHTS.reduce(function(a,b){return a+b},0);
+  var r = Math.random() * total;
+  var cum = 0;
+  for (var i = 0; i < EVENT_WEIGHTS.length; i++) {
+    cum += EVENT_WEIGHTS[i];
+    if (r < cum) return EVENT_TYPES[i];
+  }
+  return EVENT_TYPES[0];
+}
+
+function generateEvent(employees, existingEvents) {
+  var emp = pick(employees), evt = weightedPickEvent(), asset = pick(ASSETS);
+  var evts = existingEvents || [];
+
+  // Base score from severity + asset sensitivity
   var s = ({low:15,medium:30,high:55,critical:75})[evt.severity]||20;
   s += asset.sensitivity*5;
   if(emp.employmentType==="외주"||emp.employmentType==="협력사") s+=15;
   if(emp.clearanceLevel==="일반"&&asset.classification==="기밀") s+=20;
+
+  // Time-based bonus
+  var hourNow = new Date().getHours();
+  var isOffHours = hourNow < 7 || hourNow >= 22;
+  var isWeekend = [0,6].includes(new Date().getDay());
+  var timeBonus = isOffHours ? 20 : isWeekend ? 10 : 0;
+
+  // Frequency bonus
+  var userRecentCount = evts.filter(function(e){return e.employee.id === emp.id}).length;
+  var freqBonus = userRecentCount >= 5 ? 20 : userRecentCount >= 3 ? 10 : 0;
+
+  // Role-asset mismatch
+  var deptAssets = DEPT_ASSETS[emp.department] || [];
+  var roleMismatch = !deptAssets.includes(asset.name) ? 20 : 0;
+
+  // Profile-based adjustments
+  var profileBonus = 0;
+  if (emp.profile) {
+    if (emp.profile.resignPlanned) profileBonus += 25;
+    if (emp.profile.recentTransfer) profileBonus += 10;
+    profileBonus += emp.profile.warningCount * 8;
+    if (emp.profile.performanceRating === "D") profileBonus += 15;
+  }
+
+  s += timeBonus + freqBonus + roleMismatch + profileBonus;
+
   var riskScore = Math.min(100,Math.max(0,s+randInt(-5,10)));
-  var sh=[].concat(CONTEXT_REASONS).sort(function(){return Math.random()-0.5});
-  var contexts=[0,1,2].map(function(i){return{reason:sh[i],probability:Math.max(10,95-i*randInt(15,30))}}).sort(function(a,b){return b.probability-a.probability});
+
+  // Deterministic AI contexts based on actual factors
+  var contexts = [];
+  if (isOffHours) contexts.push({reason: "비업무시간(" + hourNow + "시) 접근 — 야간 유출 위험", probability: 85});
+  if (isWeekend) contexts.push({reason: "주말 접근 — 비정상 업무 패턴", probability: 80});
+  if (emp.profile && emp.profile.resignPlanned) contexts.push({reason: "퇴사 예정자 — 데이터 반출 위험 높음", probability: 92});
+  if (emp.profile && emp.profile.recentTransfer) contexts.push({reason: "최근 부서 이동 — 이전 부서 자산 접근 주의", probability: 72});
+  if (roleMismatch > 0) contexts.push({reason: emp.department + "에서 " + asset.name + " 접근 — 업무 범위 외 자산", probability: 78});
+  if (freqBonus > 0) contexts.push({reason: "최근 " + userRecentCount + "건 연속 이벤트 — 이상 빈도 탐지", probability: 75});
+  if (emp.profile && emp.profile.warningCount > 0) contexts.push({reason: "과거 경고 " + emp.profile.warningCount + "회 — 주의 대상자", probability: 70});
+  if (emp.profile && emp.profile.performanceRating === "D") contexts.push({reason: "저성과자(D등급) — 불만 동기 가능성", probability: 65});
+  if (emp.employmentType==="외주"||emp.employmentType==="협력사") contexts.push({reason: "외부 인력(" + emp.employmentType + ") — 내부 자산 접근 주의", probability: 73});
+  if (emp.clearanceLevel==="일반"&&asset.classification==="기밀") contexts.push({reason: "보안등급 불일치(일반→기밀) — 권한 위반 의심", probability: 88});
+
+  // Fill up to 3 contexts, add generic ones if needed
+  var genericReasons = CONTEXT_REASONS.slice();
+  while (contexts.length < 3) {
+    var gr = genericReasons.splice(Math.floor(Math.random()*genericReasons.length), 1)[0];
+    if (gr) contexts.push({reason: gr, probability: Math.max(10, 60 - contexts.length * 15 + randInt(-10, 10))});
+    else break;
+  }
+  contexts.sort(function(a,b){return b.probability - a.probability});
+  contexts = contexts.slice(0, 3);
+
   var urgMap={"계정 잠금":"critical","접근 일시 제한":"high","HR 연계 조사 요청":"high","추가 MFA 인증":"medium","감사 로그 자동 생성":"medium","관리자 확인 요청":"low"};
   var avail=Object.keys(ACTION_GUIDES).sort(function(){return Math.random()-0.5});
   var recs=[];
@@ -168,7 +263,20 @@ function generateEvent(employees) {
   recs.push(avail.find(function(a){return urgMap[a]==="medium"})||avail[2]);
   var unique=[]; recs.forEach(function(r){if(unique.indexOf(r)===-1)unique.push(r)});
   var actions=unique.slice(0,3).map(function(n){return{action:n,desc:ACTION_GUIDES[n].summary.slice(0,40)+"...",urgency:urgMap[n]||"medium"}});
-  return { id:"EVT-"+Date.now()+"-"+randInt(100,999),timestamp:new Date(),employee:emp,eventType:evt,asset:asset,riskScore:riskScore,contexts:contexts,actions:actions,status:"new",isNew:true };
+
+  var event = { id:"EVT-"+Date.now()+"-"+randInt(100,999),timestamp:new Date(),employee:emp,eventType:evt,asset:asset,riskScore:riskScore,contexts:contexts,actions:actions,status:"new",isNew:true,roleMismatch:roleMismatch>0,isOffHours:isOffHours,isWeekend:isWeekend,compoundThreat:false,compoundDetail:"" };
+
+  // Compound threat detection
+  var recentHighRisk = evts.filter(function(e){
+    return e.employee.id === emp.id && e.riskScore >= 70 && (Date.now() - e.timestamp.getTime()) < 600000;
+  });
+  if (recentHighRisk.length >= 2) {
+    event.compoundThreat = true;
+    event.compoundDetail = "동일 사용자 10분 내 고위험 " + (recentHighRisk.length+1) + "건 — 복합 위협 알림";
+    event.riskScore = Math.min(100, event.riskScore + 15);
+  }
+
+  return event;
 }
 
 // Small Components
@@ -623,7 +731,10 @@ function EventCard(props) {
   }, [isExpanded]);
 
   return (
-    <div onClick={onClick} style={{background:event.isNew?"linear-gradient(135deg,"+color+"08,transparent 70%)":"rgba(255,255,255,0.02)",border:"1px solid "+(event.isNew?color+"30":"rgba(255,255,255,0.05)"),borderLeft:"3px solid "+color,borderRadius:10,padding:"12px 14px",cursor:"pointer",transition:"all 0.3s",animation:event.isNew?"slideIn 0.5s cubic-bezier(0.22,1,0.36,1)":"none",marginBottom:6}}>
+    <div onClick={onClick} style={{background:event.compoundThreat?"linear-gradient(135deg,rgba(255,45,85,0.12),transparent 70%)":event.isNew?"linear-gradient(135deg,"+color+"08,transparent 70%)":"rgba(255,255,255,0.02)",border:event.compoundThreat?"2px solid rgba(255,45,85,0.5)":"1px solid "+(event.isNew?color+"30":"rgba(255,255,255,0.05)"),borderLeft:event.compoundThreat?"4px solid #ff2d55":"3px solid "+color,borderRadius:10,padding:"12px 14px",cursor:"pointer",transition:"all 0.3s",animation:event.compoundThreat?"pulse 2s infinite":event.isNew?"slideIn 0.5s cubic-bezier(0.22,1,0.36,1)":"none",marginBottom:6}}>
+      {event.compoundThreat && <div style={{fontSize:10,color:"#ff2d55",fontWeight:700,marginBottom:6,display:"flex",alignItems:"center",gap:5,background:"rgba(255,45,85,0.08)",padding:"4px 8px",borderRadius:6}}>
+        <span style={{animation:"pulse 1s infinite"}}>{"⚠️"}</span> {event.compoundDetail}
+      </div>}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:18}}>{event.eventType.icon}</span>
@@ -632,6 +743,9 @@ function EventCard(props) {
               <span style={{fontSize:12,fontWeight:600}}>{event.employee.name}</span>
               <span style={{fontSize:9,color:"rgba(255,255,255,0.4)",background:"rgba(255,255,255,0.05)",padding:"1px 5px",borderRadius:3}}>{event.employee.department}</span>
               {event.isNew && <PulsingDot color={color}/>}
+              {event.roleMismatch && <span style={{fontSize:8,color:"#ff2d55",background:"rgba(255,45,85,0.15)",padding:"1px 5px",borderRadius:3,fontWeight:700}}>{"❌"} 권한외 접근</span>}
+              {event.isOffHours && <span style={{fontSize:8,color:"#5e5ce6",background:"rgba(94,92,230,0.15)",padding:"1px 5px",borderRadius:3,fontWeight:600}}>{"🌙"} 야간</span>}
+              {event.isWeekend && !event.isOffHours && <span style={{fontSize:8,color:"#ff9f0a",background:"rgba(255,159,10,0.15)",padding:"1px 5px",borderRadius:3,fontWeight:600}}>{"📅"} 주말</span>}
             </div>
             <div style={{fontSize:11,color:"rgba(255,255,255,0.45)",marginTop:1}}>{event.eventType.label} - <span style={{color:"rgba(255,255,255,0.25)"}}>{event.asset.name}</span></div>
           </div>
@@ -673,6 +787,24 @@ function EventCard(props) {
               )})}
             </div>
           </div>
+
+          {/* HR 프로필 */}
+          {event.employee.profile && (
+            <div style={{background:"rgba(94,92,230,0.06)",border:"1px solid rgba(94,92,230,0.15)",borderRadius:10,padding:"8px 12px",marginBottom:10,animation:"fadeIn 0.3s"}}>
+              <div style={{fontSize:9,color:"#5e5ce6",fontWeight:600,letterSpacing:1,marginBottom:6}}>HR 프로필</div>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap",fontSize:10,color:"rgba(255,255,255,0.6)"}}>
+                <span>입사일: {event.employee.profile.hireDate.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"})}</span>
+                <span style={{color:"rgba(255,255,255,0.15)"}}>|</span>
+                <span style={{color:event.employee.profile.resignPlanned?"#ff2d55":"rgba(255,255,255,0.6)"}}>퇴사예정: {event.employee.profile.resignPlanned?"예 ⚠️":"아니오"}</span>
+                <span style={{color:"rgba(255,255,255,0.15)"}}>|</span>
+                <span style={{color:event.employee.profile.recentTransfer?"#ff9f0a":"rgba(255,255,255,0.6)"}}>최근이동: {event.employee.profile.recentTransfer?"있음":"없음"}</span>
+                <span style={{color:"rgba(255,255,255,0.15)"}}>|</span>
+                <span style={{color:event.employee.profile.warningCount>0?"#ff9500":"rgba(255,255,255,0.6)"}}>경고: {event.employee.profile.warningCount}회</span>
+                <span style={{color:"rgba(255,255,255,0.15)"}}>|</span>
+                <span style={{color:event.employee.profile.performanceRating==="D"?"#ff2d55":event.employee.profile.performanceRating==="S"?"#30d158":"rgba(255,255,255,0.6)"}}>평가: {event.employee.profile.performanceRating}</span>
+              </div>
+            </div>
+          )}
 
           {/* AI 분석 진행 표시 (phase 1~3) */}
           {phase >= 1 && phase < 4 && (
@@ -781,6 +913,8 @@ function RiskGauge(props) {
 
 function TopRiskUsers(props) {
   var events=props.events, onMsg=props.onMsg;
+  var stTimeline = useState(null);
+  var timelineUser = stTimeline[0], setTimelineUser = stTimeline[1];
   var m={};
   events.forEach(function(e){
     var k=e.employee.name;
@@ -788,6 +922,9 @@ function TopRiskUsers(props) {
     m[k].scores.push(e.riskScore); m[k].count++;
   });
   var users=Object.values(m).map(function(u){return Object.assign({},u,{maxScore:Math.max.apply(null,u.scores)})}).sort(function(a,b){return b.maxScore-a.maxScore}).slice(0,5);
+
+  var timelineEvents = timelineUser ? events.filter(function(e){return e.employee.name === timelineUser}).sort(function(a,b){return a.timestamp - b.timestamp}) : [];
+
   return(
     <div>{users.map(function(u,i){
       var c=u.maxScore>=80?"#ff2d55":u.maxScore>=60?"#ff9500":u.maxScore>=40?"#ffcc00":"#30d158";
@@ -801,10 +938,35 @@ function TopRiskUsers(props) {
           <div style={{display:"flex",gap:5,marginTop:6,marginLeft:32}}>
             <button onClick={function(){onMsg(u,"user")}} style={{background:"rgba(10,132,255,0.1)",border:"1px solid rgba(10,132,255,0.2)",color:"#0a84ff",padding:"3px 8px",borderRadius:5,fontSize:9,fontWeight:600,cursor:"pointer"}}>본인 메시지</button>
             <button onClick={function(){onMsg(u,"manager")}} style={{background:"rgba(255,159,10,0.1)",border:"1px solid rgba(255,159,10,0.2)",color:"#ff9f0a",padding:"3px 8px",borderRadius:5,fontSize:9,fontWeight:600,cursor:"pointer"}}>팀장 메시지</button>
+            <button onClick={function(){setTimelineUser(timelineUser===u.name?null:u.name)}} style={{background:"rgba(94,92,230,0.1)",border:"1px solid rgba(94,92,230,0.2)",color:"#5e5ce6",padding:"3px 8px",borderRadius:5,fontSize:9,fontWeight:600,cursor:"pointer"}}>{timelineUser===u.name?"닫기":"타임라인"}</button>
           </div>
         </div>
       );
-    })}</div>
+    })}
+    {timelineUser && timelineEvents.length > 0 && (
+      <div style={{marginTop:10,background:"rgba(94,92,230,0.06)",border:"1px solid rgba(94,92,230,0.15)",borderRadius:8,padding:10,animation:"fadeIn 0.3s"}}>
+        <div style={{fontSize:10,fontWeight:600,color:"#5e5ce6",marginBottom:8}}>{timelineUser} 이벤트 타임라인 ({timelineEvents.length}건)</div>
+        <div style={{maxHeight:200,overflowY:"auto"}}>
+          {timelineEvents.map(function(ev,idx){
+            var tc = ev.riskScore>=80?"#ff2d55":ev.riskScore>=60?"#ff9500":ev.riskScore>=40?"#ffcc00":"#30d158";
+            return(
+              <div key={idx} style={{display:"flex",gap:8,position:"relative",paddingBottom:8}}>
+                {idx < timelineEvents.length-1 && <div style={{position:"absolute",left:5,top:14,width:1,height:"calc(100% - 6px)",background:"rgba(255,255,255,0.08)"}}/>}
+                <div style={{width:11,height:11,borderRadius:"50%",background:tc,flexShrink:0,marginTop:2,zIndex:1,boxShadow:"0 0 6px "+tc+"66"}}/>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:10,color:"rgba(255,255,255,0.7)"}}>{ev.eventType.icon} {ev.eventType.label}</span>
+                    <span style={{fontSize:9,color:tc,fontWeight:700,fontFamily:"monospace"}}>{ev.riskScore}</span>
+                  </div>
+                  <div style={{fontSize:9,color:"rgba(255,255,255,0.3)"}}>{ev.timestamp.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})} · {ev.asset.name}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+    </div>
   );
 }
 
@@ -1169,14 +1331,14 @@ export default function SecurityDashboard(props) {
   var feedRef = useRef(null);
 
   var addEvent = useCallback(function() {
-    setEvents(function(p) { return [generateEvent(employees)].concat(p).slice(0, 500); });
+    setEvents(function(p) { return [generateEvent(employees, p)].concat(p).slice(0, 500); });
     setTotalToday(function(p) { return p + 1; });
   }, [employees]);
 
   useEffect(function() {
     var init = [];
     for (var i = 0; i < 15; i++) {
-      var e = generateEvent(employees);
+      var e = generateEvent(employees, init);
       e.isNew = false;
       e.timestamp = new Date(Date.now() - randInt(1000, 120000));
       init.push(e);
@@ -1369,6 +1531,44 @@ export default function SecurityDashboard(props) {
                       <span style={{ fontSize: 10, color: sc[et.severity], fontFamily: "monospace", fontWeight: 600 }}>{cnt}</span>
                     </div>
                     <MiniBar value={cnt} max={Math.max(1, Math.max.apply(null, EVENT_TYPES.map(function(t) { return events.filter(function(e) { return e.eventType.type === t.type; }).length; })))} color={sc[et.severity]} />
+                  </div>
+                );
+              })}
+            </div>
+            <div style={panelStyle}>
+              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10 }}>{"📋"} 법규 준수 현황</div>
+              {[
+                {icon:"✅",label:"접근 로그 기록",status:"활성",color:"#30d158"},
+                {icon:"✅",label:"이벤트 모니터링",status:"실시간",color:"#30d158"},
+                {icon:"⚠️",label:"데이터 보유기한",status:"500건 제한 (장기보관 미설정)",color:"#ff9f0a"},
+                {icon:"⚠️",label:"직원 동의 절차",status:"미구현",color:"#ff9f0a"},
+                {icon:"❌",label:"감사 추적 시스템",status:"미연동",color:"#ff2d55"},
+                {icon:"❌",label:"개인정보 영향평가",status:"미실시",color:"#ff2d55"},
+              ].map(function(item,idx){
+                return(
+                  <div key={idx} style={{display:"flex",alignItems:"center",gap:7,padding:"4px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
+                    <span style={{fontSize:12,flexShrink:0}}>{item.icon}</span>
+                    <span style={{fontSize:10,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
+                    <span style={{fontSize:9,color:item.color,fontWeight:600}}>{item.status}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={panelStyle}>
+              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10 }}>{"🔗"} 시스템 연동 현황</div>
+              {[
+                {icon:"🟢",label:"이벤트 로그",status:"연동 (시뮬레이션)",color:"#30d158"},
+                {icon:"🟡",label:"SIEM (Splunk/ELK)",status:"준비중",color:"#ff9f0a"},
+                {icon:"🟡",label:"IAM (Okta/Azure AD)",status:"준비중",color:"#ff9f0a"},
+                {icon:"🟡",label:"DLP (Symantec)",status:"준비중",color:"#ff9f0a"},
+                {icon:"🟡",label:"HR Portal (SAP)",status:"준비중",color:"#ff9f0a"},
+                {icon:"🟡",label:"메일/메신저 자동화",status:"준비중",color:"#ff9f0a"},
+              ].map(function(item,idx){
+                return(
+                  <div key={idx} style={{display:"flex",alignItems:"center",gap:7,padding:"4px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
+                    <span style={{fontSize:10,flexShrink:0}}>{item.icon}</span>
+                    <span style={{fontSize:10,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
+                    <span style={{fontSize:9,color:item.color,fontWeight:600}}>{item.status}</span>
                   </div>
                 );
               })}
