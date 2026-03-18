@@ -3,8 +3,8 @@ import * as XLSX from "xlsx";
 
 // Large-Scale Employee Generator (1800)
 
-const SURNAMES = ["김","이","박","최","정","강","조","윤","장","임","한","오","서","신","권","황","안","송","류","전","홍","고","문","양","손","배","백","허","유","남","심","노","하","곽","성","차","주","우","민","탁","진","지","편","도","마","원","표"];
-const GIVEN_NAMES = ["지훈","서연","민수","윤정","태현","소영","준혁","미래","성진","하늘","재원","은비","동욱","지민","석현","예진","현우","수빈","태민","서윤","도윤","하은","시우","지아","예준","서현","건우","다은","승현","유진","민재","소희","정우","채원","현준","은서","도현","나은","지호","하린","우진","연우","시윤","가은","준서","아린","민호","수아","재민","지유"];
+const SURNAMES = ["김","이","박","최","정","강","조","윤","장","임","한","오","서","신","권","황","안","송","류","전","홍","고","문","양","손","배","백","허","유","남","심","노","하","곽","성","차","주","우","민","탁","진","지","편","도","마","원","표","구","라","방","변","봉","빈","설","섭","승","엄","여","염"];
+const GIVEN_NAMES = ["지훈","서연","민수","윤정","태현","소영","준혁","미래","성진","하늘","재원","은비","동욱","지민","석현","예진","현우","수빈","태민","서윤","도윤","하은","시우","지아","예준","서현","건우","다은","승현","유진","민재","소희","정우","채원","현준","은서","도현","나은","지호","하린","우진","연우","시윤","가은","준서","아린","민호","수아","재민","지유","지후","서준","주원","하준","민서","지안","수현","시은","소율","예서","태준","유나","세진","한결","보람","새봄","이슬","푸름","나래","한솔"];
 const DEPARTMENTS = ["재무팀","연구개발1팀","연구개발2팀","인사팀","마케팅팀","IT운영팀","법무팀","전략기획팀","영업1팀","영업2팀","고객지원팀","리스크관리팀","컴플라이언스팀","데이터분석팀","인프라팀","보안팀","경영지원팀","해외사업팀","신사업개발팀","디자인팀"];
 const ROLES = ["선임연구원","과장","대리","부장","차장","사원","팀장","매니저","주임","파트장","센터장","실장"];
 const EMPLOYMENT_TYPES = ["정규직","정규직","정규직","정규직","계약직","외주","협력사"];
@@ -240,20 +240,20 @@ var DEPT_ASSETS = {
   "연구개발2팀": ["기술설계도_v3.dwg","연구개발_소스코드"],
   "인사팀": ["급여명세_전체.xlsx","인사평가_시트.xlsx"],
   "마케팅팀": ["2026_전략보고서.pdf","거래처_리스트.csv"],
-  "IT운영팀": ["연구개발_소스코드"],
+  "IT운영팀": ["연구개발_소스코드", "소스코드 Git 저장소", "VPN 접속 로그", "비밀번호 해시 DB", "클라우드 스토리지(AWS S3)"],
   "법무팀": ["M_A_계약서_draft.pdf"],
-  "보안팀": [],
+  "보안팀": ["VPN 접속 로그", "CCTV 영상 저장소", "감사 보고서", "비밀번호 해시 DB"],
   "전략기획팀": ["2026_전략보고서.pdf"],
   "영업1팀": ["거래처_리스트.csv"],
   "영업2팀": ["거래처_리스트.csv"],
   "고객지원팀": ["고객개인정보_DB"],
-  "리스크관리팀": [],
-  "컴플라이언스팀": [],
+  "리스크관리팀": ["고객계좌DB", "감사 보고서", "M&A 검토 자료"],
+  "컴플라이언스팀": ["고객개인정보_DB", "감사 보고서", "고객계좌DB"],
   "데이터분석팀": ["고객개인정보_DB","고객계좌DB"],
-  "인프라팀": [],
-  "경영지원팀": [],
-  "해외사업팀": [],
-  "신사업개발팀": [],
+  "인프라팀": ["연구개발_소스코드", "VPN 접속 로그", "비밀번호 해시 DB", "클라우드 스토리지(AWS S3)", "소스코드 Git 저장소"],
+  "경영지원팀": ["급여명세_전체.xlsx", "인사 평가 기록", "이사회 의사록", "파트너사 계약서"],
+  "해외사업팀": ["2026_전략보고서.pdf", "파트너사 계약서", "M&A 검토 자료"],
+  "신사업개발팀": ["2026_전략보고서.pdf", "기술설계도_v3.dwg", "AI 학습 데이터셋", "M&A 검토 자료"],
   "디자인팀": [],
 };
 
@@ -276,9 +276,14 @@ function generateEvent(employees, existingEvents) {
 
   // Base score from severity + asset sensitivity
   var s = ({low:15,medium:30,high:55,critical:75})[evt.severity]||20;
-  s += asset.sensitivity*5;
+  // Role-asset mismatch (computed early for sensitivity bonus)
+  var deptAssets = DEPT_ASSETS[emp.department] || [];
+  var roleMismatch = !deptAssets.includes(asset.name) ? 20 : 0;
+  var sensitivityBonus = roleMismatch > 0 ? asset.sensitivity * 5 : asset.sensitivity * 2; // legitimate access = lower weight
+  s += sensitivityBonus;
   if(emp.employmentType==="외주"||emp.employmentType==="협력사") s+=15;
-  if(emp.clearanceLevel==="일반"&&asset.classification==="기밀") s+=20;
+  var clearanceMismatch = (emp.clearanceLevel === "일반" && (asset.classification === "기밀" || asset.classification === "최고기밀") && roleMismatch > 0) ? 20 : 0;
+  s += clearanceMismatch;
 
   // Time-based bonus
   var hourNow = new Date().getHours();
@@ -289,10 +294,6 @@ function generateEvent(employees, existingEvents) {
   // Frequency bonus
   var userRecentCount = evts.filter(function(e){return e.employee.id === emp.id}).length;
   var freqBonus = userRecentCount >= 5 ? 20 : userRecentCount >= 3 ? 10 : 0;
-
-  // Role-asset mismatch
-  var deptAssets = DEPT_ASSETS[emp.department] || [];
-  var roleMismatch = !deptAssets.includes(asset.name) ? 20 : 0;
 
   // Profile-based adjustments
   var profileBonus = 0;
@@ -305,7 +306,7 @@ function generateEvent(employees, existingEvents) {
 
   s += timeBonus + freqBonus + roleMismatch + profileBonus;
 
-  var riskScore = Math.min(100,Math.max(0,s+randInt(-5,10)));
+  var riskScore = Math.max(0, Math.min(100, s));
 
   // Deterministic AI contexts based on actual factors
   var contexts = [];
@@ -318,7 +319,7 @@ function generateEvent(employees, existingEvents) {
   if (emp.profile && emp.profile.warningCount > 0) contexts.push({reason: "과거 경고 " + emp.profile.warningCount + "회 — 주의 대상자", probability: 70});
   if (emp.profile && emp.profile.performanceRating === "D") contexts.push({reason: "저성과자(D등급) — 불만 동기 가능성", probability: 65});
   if (emp.employmentType==="외주"||emp.employmentType==="협력사") contexts.push({reason: "외부 인력(" + emp.employmentType + ") — 내부 자산 접근 주의", probability: 73});
-  if (emp.clearanceLevel==="일반"&&asset.classification==="기밀") contexts.push({reason: "보안등급 불일치(일반→기밀) — 권한 위반 의심", probability: 88});
+  if (clearanceMismatch > 0) contexts.push({reason: "보안등급 불일치(일반→" + asset.classification + ") — 권한 위반 의심", probability: 88});
 
   // Fill up to 3 contexts, add generic ones if needed
   var genericReasons = CONTEXT_REASONS.slice();
@@ -335,9 +336,11 @@ function generateEvent(employees, existingEvents) {
   var recs=[];
   if(riskScore>=80) recs.push(avail.find(function(a){return urgMap[a]==="critical"})||avail[0]);
   if(riskScore>=50) recs.push(avail.find(function(a){return urgMap[a]==="high"})||avail[1]);
-  recs.push(avail.find(function(a){return urgMap[a]==="medium"})||avail[2]);
-  var unique=[]; recs.forEach(function(r){if(unique.indexOf(r)===-1)unique.push(r)});
-  var actions=unique.slice(0,3).map(function(n){return{action:n,desc:ACTION_GUIDES[n].summary.slice(0,40)+"...",urgency:urgMap[n]||"medium"}});
+  if(riskScore>=50) recs.push(avail.find(function(a){return urgMap[a]==="medium"})||avail[2]);
+  if(riskScore<50) recs.push(avail.find(function(a){return urgMap[a]==="medium"})||avail[0]);
+  var unique=[]; recs.forEach(function(r){if(r && unique.indexOf(r)===-1)unique.push(r)});
+  var maxActions = riskScore >= 80 ? 3 : riskScore >= 50 ? 2 : 1;
+  var actions=unique.slice(0,maxActions).map(function(n){return{action:n,desc:ACTION_GUIDES[n].summary.slice(0,40)+"...",urgency:urgMap[n]||"medium"}});
 
   var event = { id:"EVT-"+Date.now()+"-"+randInt(100,999),timestamp:new Date(),employee:emp,eventType:evt,asset:asset,riskScore:riskScore,contexts:contexts,actions:actions,status:"new",isNew:true,roleMismatch:roleMismatch>0,isOffHours:isOffHours,isWeekend:isWeekend,compoundThreat:false,compoundDetail:"" };
 
