@@ -1411,6 +1411,12 @@ export default function SecurityDashboard(props) {
   var dashTab = stDashTab[0], setDashTab = stDashTab[1];
   var stDataSubTab = useState("employees");
   var dataSubTab = stDataSubTab[0], setDataSubTab = stDataSubTab[1];
+  var stSecDataView = useState("explorer");
+  var secDataView = stSecDataView[0], setSecDataView = stSecDataView[1];
+  var stMapExpanded = useState({});
+  var mapExpanded = stMapExpanded[0], setMapExpanded = stMapExpanded[1];
+  var stMapDetail = useState(null);
+  var mapDetail = stMapDetail[0], setMapDetail = stMapDetail[1];
   var stDataSearch = useState("");
   var dataSearch = stDataSearch[0], setDataSearch = stDataSearch[1];
   var stDataPage = useState(0);
@@ -1741,7 +1747,6 @@ export default function SecurityDashboard(props) {
         };
 
         var complianceData = [
-          // 개인정보보호법
           ["개인정보보호법","제15조","개인정보 수집·이용 동의","⚠️ 미구현","직원 모니터링 사전 동의 필요"],
           ["개인정보보호법","제17조","개인정보 제3자 제공 동의","⚠️ 미구현","외부 기관 공유 시 동의"],
           ["개인정보보호법","제21조","개인정보 파기","⚠️ 일부 적용","이벤트 500건 제한, 장기보관 미설정"],
@@ -1751,35 +1756,60 @@ export default function SecurityDashboard(props) {
           ["개인정보보호법","제35조","개인정보 열람 요구권","❌ 미구현","직원의 자기정보 열람 기능 없음"],
           ["개인정보보호법","제36조","개인정보 정정·삭제 요구권","❌ 미구현",""],
           ["개인정보보호법","제37조","개인정보 처리정지 요구권","❌ 미구현",""],
-          // 정보통신망법
           ["정보통신망법","제28조","개인정보 보호조치","✅ 적용","접근로그 기록 중"],
           ["정보통신망법","제28조의2","접속기록 보관","⚠️ 일부 적용","6개월 보관 의무, 현재 메모리만"],
           ["정보통신망법","제49조","비밀침해 금지","⚠️ 주의필요","모니터링 범위 법적 검토 필요"],
-          // 신용정보법
           ["신용정보법","제19조","신용정보 관리 의무","✅ 적용","고객계좌DB 접근 통제"],
           ["신용정보법","제32조","개인신용정보 제공·이용","⚠️ 일부 적용","내부 이용 기준 명확화 필요"],
-          // 전자금융거래법
           ["전자금융거래법","제21조","안전성 확보 의무","✅ 적용","접근통제 + 모니터링"],
           ["전자금융거래법","제21조의3","전자금융사고 보고","❌ 미구현","금융위 보고 자동화 없음"],
-          // 산업기술보호법
           ["산업기술보호법","제11조","산업기술 유출 방지","✅ 적용","기술설계도·소스코드 모니터링"],
           ["산업기술보호법","제14조","산업기술 유출 신고","⚠️ 일부 적용","신고 프로세스 수동"],
           ["산업기술보호법","제34조","벌칙 (유출 시)","✅ 참조","벌금/징역 기준 안내 가능"],
-          // 근로기준법
           ["근로기준법","제93조","취업규칙 (감시 고지)","⚠️ 미구현","취업규칙에 모니터링 명시 필요"],
           ["근로기준법","제94조","취업규칙 불이익 변경","⚠️ 주의필요","과반수 동의 필요"],
-          // ISMS-P
           ["ISMS-P","2.5.1","사용자 인증","✅ 적용","IAM 연계 (준비중)"],
           ["ISMS-P","2.5.4","접근권한 관리","✅ 적용","역할-자산 매트릭스 구현"],
           ["ISMS-P","2.6.1","접근통제 정책","✅ 적용","DEPT_ASSETS 기반"],
           ["ISMS-P","2.9.1","보안사고 대응","⚠️ 일부 적용","조치가이드 11종, 자동화 미완"],
           ["ISMS-P","2.11.1","개인정보 보호대책","⚠️ 일부 적용","영향평가 미실시"],
-          // ISO 27001
           ["ISO 27001","A.7.2","고용 중 보안","⚠️ 일부 적용","HR 연계 준비중"],
           ["ISO 27001","A.8.1","자산 관리","✅ 적용","25개 자산 분류·등급 관리"],
           ["ISO 27001","A.9.2","사용자 접근 관리","✅ 적용","보안등급 4단계"],
           ["ISO 27001","A.12.4","로그 및 모니터링","✅ 적용","실시간 이벤트 감시"],
           ["ISO 27001","A.16.1","보안사고 관리","⚠️ 일부 적용","조치가이드 있으나 실행 미연동"],
+        ];
+
+        var DATA_MAP = [
+          {cat:"\uD83D\uDC65 직원/조직 데이터", color:"#0a84ff", desc:"1,800명 임직원 정보와 HR 프로파일", linkTab:"employees",
+            items:[
+              {icon:"\uD83D\uDC64",name:"직원 마스터",size:"1,800명 / 12컬럼",detail:"사번, 이름, 부서, 직급, 고용형태, 보안등급, 상급자, 입사일, 퇴사예정, 부서이동, 경고횟수, 성과등급"},
+              {icon:"\uD83C\uDFE2",name:"부서 구조",size:"20개 부서",detail:"재무팀, R&D1/2, 인사, 마케팅, IT운영, 법무, 전략기획, 영업1/2, 고객지원, 리스크관리, 컴플라이언스, 데이터분석, 인프라, 보안, 경영지원, 해외사업, 신사업, 디자인"},
+              {icon:"\uD83D\uDCCA",name:"HR 프로파일",size:"5개 필드",detail:"입사일, 퇴사예정(5%), 최근부서이동(8%), 경고횟수(0~2), 성과등급(S/A/B/C/D). 위험점수 가중: 퇴사+25, 이동+10, 경고\u00D78, D등급+15"},
+            ]},
+          {cat:"\uD83D\uDD12 자산/보안 데이터", color:"#ff9500", desc:"25개 민감 자산과 보안등급 체계", linkTab:"assets",
+            items:[
+              {icon:"\uD83D\uDCC1",name:"자산 목록",size:"25건 / 7컬럼",detail:"자산명, 유형(시스템/문서/데이터/코드/영상/음성), 보안등급(일반/대외비/기밀/최고기밀), 민감도(1~5), 관리시작, 최근감사"},
+              {icon:"\uD83D\uDD10",name:"역할-자산 매트릭스",size:"20부서 \u00D7 25자산",detail:"DEPT_ASSETS: 각 부서별 합법 접근 가능 자산 목록. 매칭 안 되면 '권한외 접근' 플래그"},
+              {icon:"\uD83C\uDFF7\uFE0F",name:"보안등급 체계",size:"4단계",detail:"일반 \u2192 대외비 \u2192 기밀 \u2192 최고기밀. 일반 등급이 기밀+ 접근 시 +20 가중 (단, 합법부서는 면제)"},
+            ]},
+          {cat:"\u26A1 이벤트/위협 데이터", color:"#ff2d55", desc:"9종 이벤트 유형과 위험도 산정 체계", linkTab:"events",
+            items:[
+              {icon:"\uD83D\uDCCB",name:"이벤트 유형",size:"9종",detail:"File Open(30%), Download(25%), Print(15%), USB Copy(8%), Bulk Query(5%), Permission Escalation(2%), Share Link(6%), Delete(3%), AI Upload(6%)"},
+              {icon:"\uD83D\uDCCA",name:"위험도 산정",size:"8요소",detail:"기본점수(15~75) + 민감도(\u00D72~5) + 시간(야간+20/주말+10) + 빈도(3건+10/5건+20) + 역할위반(+20) + 등급위반(+20) + HR프로파일(퇴사+25 등)"},
+              {icon:"\uD83D\uDD17",name:"복합 위협 탐지",size:"10분 윈도우",detail:"동일 사용자 10분 내 고위험(70+) 3건 이상 \u2192 복합 위협 플래그 + 점수 +15"},
+            ]},
+          {cat:"\uD83D\uDEE1\uFE0F 조치/대응 데이터", color:"#30d158", desc:"11종 조치 가이드와 실행 프로세스", linkTab:"actions",
+            items:[
+              {icon:"\uD83D\uDCD6",name:"조치 가이드",size:"11종",detail:"관리자 확인, MFA 인증, 접근 제한, 계정 잠금, 감사 로그, HR 조사, 데이터 백업, 포렌식 의뢰, 보안교육, CISO 보고, 외부 신고"},
+              {icon:"\u26A1",name:"자동/수동 구분",size:"단계별",detail:"각 조치의 5~6단계에서 auto=true(자동 실행) / auto=false(수동 승인) 구분. 일괄 자동 실행 기능"},
+            ]},
+          {cat:"\uD83D\uDCDC 법규/규제 데이터", color:"#5ac8fa", desc:"31건 법규 준수 항목 (7개 법률/기준)", linkTab:"compliance",
+            items:[
+              {icon:"\u2696\uFE0F",name:"법규 준수",size:"31건",detail:"개인정보보호법(9), 정보통신망법(3), 신용정보법(2), 전자금융거래법(2), 산업기술보호법(3), 근로기준법(2), ISMS-P(5), ISO 27001(5)"},
+              {icon:"\uD83D\uDD17",name:"시스템 연동",size:"6건",detail:"이벤트로그(연동), SIEM(준비중), IAM(준비중), DLP(준비중), HR Portal(준비중), 메일/메신저(준비중)"},
+              {icon:"\uD83D\uDCE1",name:"7 Layer 상태",size:"7계층",detail:"사용자/조직, 권한/IAM, 자산메타, 행동로그(LIVE), 기준선, 업무Context, 대응Playbook"},
+            ]},
         ];
 
         var getRows = function() {
@@ -1829,64 +1859,257 @@ export default function SecurityDashboard(props) {
           XLSX.writeFile(wb, dataSubTab + "_" + new Date().toISOString().slice(0, 10) + ".xlsx");
         };
 
+        var ONTOLOGY_ENTITIES = [
+          {name:"직원 (Employee)", icon:"\uD83D\uDC64", color:"#0a84ff", fields:"사번, 이름, 부서, 직급, 보안등급, HR프로파일"},
+          {name:"부서 (Department)", icon:"\uD83C\uDFE2", color:"#5856d6", fields:"부서명, 소속 직원, 접근가능 자산"},
+          {name:"자산 (Asset)", icon:"\uD83D\uDCC1", color:"#ff9500", fields:"자산명, 유형, 보안등급, 민감도"},
+          {name:"이벤트 (Event)", icon:"\u26A1", color:"#ff2d55", fields:"유형, 심각도, 기본점수, 타임스탬프"},
+          {name:"조치 (Action)", icon:"\uD83D\uDEE1\uFE0F", color:"#30d158", fields:"조치명, 긴급도, 단계, 자동/수동"},
+          {name:"규칙 (Rule)", icon:"\uD83D\uDCDC", color:"#5ac8fa", fields:"법규명, 조항, 준수상태"},
+        ];
+
+        var ONTOLOGY_RELATIONS = [
+          {from:"직원", rel:"\u2192 소속 \u2192", to:"부서", color:"#0a84ff"},
+          {from:"직원", rel:"\u2192 접근 \u2192", to:"자산", color:"#ff9500"},
+          {from:"직원", rel:"\u2192 발생 \u2192", to:"이벤트", color:"#ff2d55"},
+          {from:"이벤트", rel:"\u2192 트리거 \u2192", to:"조치", color:"#30d158"},
+          {from:"이벤트", rel:"\u2192 위반 \u2192", to:"규칙", color:"#5ac8fa"},
+          {from:"부서", rel:"\u2192 관할 \u2192", to:"자산", color:"#5856d6"},
+        ];
+
+        var RISK_FACTORS = [
+          {cat:"기본 점수", color:"#0a84ff", items:["low: 15점","medium: 30점","high: 55점","critical: 75점"]},
+          {cat:"민감도 보너스", color:"#ff9500", items:["민감도 1: +0","민감도 2: +5","민감도 3: +10","민감도 4: +15","민감도 5: +20"]},
+          {cat:"시간 가중", color:"#ff2d55", items:["야간(22~06시): +20","주말: +10","공휴일: +10"]},
+          {cat:"빈도 가중", color:"#5856d6", items:["동일인 3건+: +10","동일인 5건+: +20","동일인 10건+: +30"]},
+          {cat:"역할 위반", color:"#ff375f", items:["권한외 자산 접근: +20","DEPT_ASSETS 미매칭"]},
+          {cat:"등급 위반", color:"#ff9f0a", items:["보안등급 초과 접근: +20","일반\u2192기밀+ 접근 시"]},
+          {cat:"HR 프로파일", color:"#30d158", items:["퇴사예정: +25","최근이동: +10","경고\u00D78 (최대16)","D등급: +15"]},
+          {cat:"복합 위협", color:"#bf5af2", items:["10분내 70+ 3건: +15","복합 플래그 활성화"]},
+        ];
+
+        var EVENT_SCORE_TABLE = [
+          {event:"File Open", severity:"low", base:15, weight:"30%"},
+          {event:"File Download", severity:"medium", base:30, weight:"25%"},
+          {event:"Print", severity:"medium", base:30, weight:"15%"},
+          {event:"Copy to USB", severity:"high", base:55, weight:"8%"},
+          {event:"Bulk Query", severity:"high", base:55, weight:"5%"},
+          {event:"Permission Escalation", severity:"critical", base:75, weight:"2%"},
+          {event:"Share Link", severity:"medium", base:30, weight:"6%"},
+          {event:"Delete", severity:"high", base:55, weight:"3%"},
+          {event:"AI Upload", severity:"high", base:55, weight:"6%"},
+        ];
+
         return (
           <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
-            {/* Sub tabs */}
-            <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-              {subTabs.map(function(st) {
-                var active = dataSubTab === st.key;
-                return <button key={st.key} onClick={function() { setDataSubTab(st.key); setDataPage(0); setDataSearch(""); }} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.5)", background: active ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
-                  {st.label} <span style={{ fontSize: 10, color: active ? "#5ac8fa" : "rgba(255,255,255,0.3)", marginLeft: 4 }}>({st.count})</span>
+            {/* 3-View Toggle Bar */}
+            <div style={{display:"flex",background:"rgba(255,255,255,0.04)",borderRadius:10,padding:3,marginBottom:16}}>
+              {[{id:"explorer",l:"\uD83D\uDCCA DB 탐색기"},{id:"map",l:"\uD83D\uDDFA\uFE0F 데이터 구조 맵"},{id:"ontology",l:"\uD83E\uDDE0 온톨로지 센터"}].map(function(v) {
+                return <button key={v.id} onClick={function(){setSecDataView(v.id);}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",fontSize:12,fontWeight:secDataView===v.id?700:500,background:secDataView===v.id?"rgba(10,132,255,0.15)":"transparent",color:secDataView===v.id?"#0a84ff":"rgba(255,255,255,0.4)",cursor:"pointer"}}>
+                  {v.l}
                 </button>;
               })}
             </div>
 
-            {/* Search + Download */}
-            <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
-              <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"검색..."} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
-              <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(48,209,88,0.12)", border: "1px solid rgba(48,209,88,0.25)", color: "#30d158", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>XLSX 다운로드 ({filteredRows.length}건)</button>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{filteredRows.length}건 중 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
-            </div>
-
-            {/* Table */}
-            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden" }}>
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
-                  <thead>
-                    <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                      {headers[dataSubTab].map(function(h) {
-                        return <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: 10, borderBottom: "1px solid rgba(255,255,255,0.06)", whiteSpace: "nowrap" }}>{h}</th>;
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pagedRows.map(function(row, ri) {
-                      return (
-                        <tr key={ri} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}
-                          onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.04)"; }}
-                          onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}>
-                          {row.map(function(cell, ci) {
-                            return <td key={ci} style={{ padding: "8px 12px", color: "rgba(255,255,255,0.7)", fontSize: 11, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cell}</td>;
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 14, alignItems: "center" }}>
-                <button onClick={function() { setDataPage(Math.max(0, dataPage - 1)); }} disabled={dataPage === 0} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage === 0 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage === 0 ? "default" : "pointer" }}>&lt;</button>
-                {Array.from({ length: Math.min(totalPages, 10) }, function(_, i) {
-                  var page = totalPages <= 10 ? i : Math.max(0, Math.min(dataPage - 4, totalPages - 10)) + i;
-                  return <button key={page} onClick={function() { setDataPage(page); }} style={{ padding: "6px 10px", borderRadius: 6, background: page === dataPage ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: page === dataPage ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", color: page === dataPage ? "#0a84ff" : "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: page === dataPage ? 700 : 400, cursor: "pointer" }}>{page + 1}</button>;
+            {/* Sub-view 1: DB Explorer */}
+            {secDataView === "explorer" && <div>
+              {/* Sub tabs */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+                {subTabs.map(function(st) {
+                  var active = dataSubTab === st.key;
+                  return <button key={st.key} onClick={function() { setDataSubTab(st.key); setDataPage(0); setDataSearch(""); }} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.5)", background: active ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
+                    {st.label} <span style={{ fontSize: 10, color: active ? "#5ac8fa" : "rgba(255,255,255,0.3)", marginLeft: 4 }}>({st.count})</span>
+                  </button>;
                 })}
-                <button onClick={function() { setDataPage(Math.min(totalPages - 1, dataPage + 1)); }} disabled={dataPage >= totalPages - 1} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage >= totalPages - 1 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage >= totalPages - 1 ? "default" : "pointer" }}>&gt;</button>
               </div>
-            )}
+
+              {/* Search + Download */}
+              <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
+                <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"검색..."} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+                <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(48,209,88,0.12)", border: "1px solid rgba(48,209,88,0.25)", color: "#30d158", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>XLSX 다운로드 ({filteredRows.length}건)</button>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{filteredRows.length}건 중 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
+              </div>
+
+              {/* Table */}
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden" }}>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                    <thead>
+                      <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                        {headers[dataSubTab].map(function(h) {
+                          return <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: 10, borderBottom: "1px solid rgba(255,255,255,0.06)", whiteSpace: "nowrap" }}>{h}</th>;
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pagedRows.map(function(row, ri) {
+                        return (
+                          <tr key={ri} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}
+                            onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.04)"; }}
+                            onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}>
+                            {row.map(function(cell, ci) {
+                              return <td key={ci} style={{ padding: "8px 12px", color: "rgba(255,255,255,0.7)", fontSize: 11, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cell}</td>;
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 14, alignItems: "center" }}>
+                  <button onClick={function() { setDataPage(Math.max(0, dataPage - 1)); }} disabled={dataPage === 0} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage === 0 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage === 0 ? "default" : "pointer" }}>&lt;</button>
+                  {Array.from({ length: Math.min(totalPages, 10) }, function(_, i) {
+                    var page = totalPages <= 10 ? i : Math.max(0, Math.min(dataPage - 4, totalPages - 10)) + i;
+                    return <button key={page} onClick={function() { setDataPage(page); }} style={{ padding: "6px 10px", borderRadius: 6, background: page === dataPage ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: page === dataPage ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", color: page === dataPage ? "#0a84ff" : "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: page === dataPage ? 700 : 400, cursor: "pointer" }}>{page + 1}</button>;
+                  })}
+                  <button onClick={function() { setDataPage(Math.min(totalPages - 1, dataPage + 1)); }} disabled={dataPage >= totalPages - 1} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage >= totalPages - 1 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage >= totalPages - 1 ? "default" : "pointer" }}>&gt;</button>
+                </div>
+              )}
+            </div>}
+
+            {/* Sub-view 2: Data Structure Map */}
+            {secDataView === "map" && <div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16}}>5개 데이터 카테고리의 구조와 세부 항목을 탐색합니다. 카드를 클릭하여 상세 정보를 확인하세요.</div>
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                {DATA_MAP.map(function(cat, ci) {
+                  var isExpanded = mapExpanded[ci];
+                  return <div key={ci} style={{background:"rgba(255,255,255,0.03)",border:"1px solid " + (isExpanded ? cat.color + "40" : "rgba(255,255,255,0.06)"),borderRadius:14,overflow:"hidden",transition:"all 0.2s"}}>
+                    {/* Category Header */}
+                    <div onClick={function(){setMapExpanded(function(p){var n=Object.assign({},p);n[ci]=!n[ci];return n;});setMapDetail(null);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px",cursor:"pointer",background:isExpanded?"rgba(255,255,255,0.02)":"transparent"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:12}}>
+                        <div style={{width:4,height:32,borderRadius:2,background:cat.color}} />
+                        <div>
+                          <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{cat.cat}</div>
+                          <div style={{fontSize:11,color:"rgba(255,255,255,0.4)",marginTop:2}}>{cat.desc}</div>
+                        </div>
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <span style={{fontSize:11,color:cat.color,fontWeight:600}}>{cat.items.length}개 항목</span>
+                        <span style={{fontSize:14,color:"rgba(255,255,255,0.3)",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>{"\u25BC"}</span>
+                      </div>
+                    </div>
+                    {/* Expanded Items */}
+                    {isExpanded && <div style={{padding:"0 18px 14px",display:"flex",flexDirection:"column",gap:8}}>
+                      {cat.items.map(function(item, ii) {
+                        var isDetailOpen = mapDetail && mapDetail.ci === ci && mapDetail.ii === ii;
+                        return <div key={ii}>
+                          <div onClick={function(){setMapDetail(isDetailOpen?null:{ci:ci,ii:ii});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:isDetailOpen?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.02)",border:"1px solid "+(isDetailOpen?cat.color+"30":"rgba(255,255,255,0.04)"),borderRadius:10,cursor:"pointer",transition:"all 0.15s"}}>
+                            <div style={{display:"flex",alignItems:"center",gap:10}}>
+                              <span style={{fontSize:18}}>{item.icon}</span>
+                              <div>
+                                <div style={{fontSize:12,fontWeight:600,color:"#fff"}}>{item.name}</div>
+                                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)"}}>{item.size}</div>
+                              </div>
+                            </div>
+                            <span style={{fontSize:10,color:isDetailOpen?cat.color:"rgba(255,255,255,0.3)"}}>{isDetailOpen?"접기":"상세"}</span>
+                          </div>
+                          {isDetailOpen && <div style={{margin:"6px 0 0 38px",padding:"10px 14px",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:8}}>
+                            <div style={{fontSize:11,color:"rgba(255,255,255,0.6)",lineHeight:1.6}}>{item.detail}</div>
+                            <button onClick={function(){setSecDataView("explorer");setDataSubTab(cat.linkTab);setDataPage(0);setDataSearch("");}} style={{marginTop:10,padding:"6px 14px",borderRadius:6,background:cat.color+"20",border:"1px solid "+cat.color+"40",color:cat.color,fontSize:10,fontWeight:700,cursor:"pointer"}}>DB 탐색기에서 보기 \u2192</button>
+                          </div>}
+                        </div>;
+                      })}
+                    </div>}
+                  </div>;
+                })}
+              </div>
+              {/* Summary stats */}
+              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8,marginTop:16}}>
+                {[{l:"직원",v:"1,800명",c:"#0a84ff"},{l:"자산",v:"25건",c:"#ff9500"},{l:"이벤트 유형",v:"9종",c:"#ff2d55"},{l:"조치",v:"11종",c:"#30d158"},{l:"법규",v:"31건",c:"#5ac8fa"}].map(function(s) {
+                  return <div key={s.l} style={{textAlign:"center",padding:"12px 8px",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10}}>
+                    <div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}</div>
+                    <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:2}}>{s.l}</div>
+                  </div>;
+                })}
+              </div>
+            </div>}
+
+            {/* Sub-view 3: Ontology Center */}
+            {secDataView === "ontology" && <div>
+              <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16}}>보안 온톨로지 구조, 엔티티 관계, 위험도 산정 공식을 시각화합니다.</div>
+
+              {/* Risk Score Formula */}
+              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18,marginBottom:16}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Risk Score Formula</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",marginBottom:14}}>
+                  {[{l:"baseScore",sub:"(severity)",c:"#0a84ff"},{l:"+",c:"transparent"},{l:"sensitivityBonus",sub:"(\u00D72~5)",c:"#ff9500"},{l:"+",c:"transparent"},{l:"timeBonus",sub:"(야간/주말)",c:"#ff2d55"},{l:"+",c:"transparent"},{l:"freqBonus",sub:"(빈도)",c:"#5856d6"},{l:"+",c:"transparent"},{l:"roleMismatch",sub:"(역할위반)",c:"#ff375f"},{l:"+",c:"transparent"},{l:"clearanceMismatch",sub:"(등급위반)",c:"#ff9f0a"},{l:"+",c:"transparent"},{l:"profileBonus",sub:"(HR)",c:"#30d158"},{l:"=",c:"transparent"},{l:"riskScore",sub:"(0~200+)",c:"#bf5af2"}].map(function(f,i) {
+                    if (f.l === "+" || f.l === "=") return <span key={i} style={{fontSize:14,fontWeight:700,color:"rgba(255,255,255,0.3)"}}>{f.l}</span>;
+                    return <div key={i} style={{padding:"6px 10px",background:f.c+"18",border:"1px solid "+f.c+"35",borderRadius:8,textAlign:"center"}}>
+                      <div style={{fontSize:11,fontWeight:700,color:f.c,fontFamily:"'JetBrains Mono',monospace"}}>{f.l}</div>
+                      {f.sub && <div style={{fontSize:9,color:"rgba(255,255,255,0.35)",marginTop:1}}>{f.sub}</div>}
+                    </div>;
+                  })}
+                </div>
+                {/* Risk Factor Categories */}
+                <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+                  {RISK_FACTORS.map(function(rf) {
+                    return <div key={rf.cat} style={{padding:"10px 12px",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10}}>
+                      <div style={{fontSize:11,fontWeight:700,color:rf.color,marginBottom:6}}>{rf.cat}</div>
+                      {rf.items.map(function(item,i) {
+                        return <div key={i} style={{fontSize:10,color:"rgba(255,255,255,0.5)",lineHeight:1.7,fontFamily:"'JetBrains Mono',monospace"}}>{item}</div>;
+                      })}
+                    </div>;
+                  })}
+                </div>
+              </div>
+
+              {/* Entity Relationship Map */}
+              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18,marginBottom:16}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Entity Relationships</div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14}}>
+                  {ONTOLOGY_ENTITIES.map(function(ent) {
+                    return <div key={ent.name} style={{padding:"12px 14px",background:ent.color+"10",border:"1px solid "+ent.color+"25",borderRadius:10}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                        <span style={{fontSize:18}}>{ent.icon}</span>
+                        <span style={{fontSize:12,fontWeight:700,color:ent.color}}>{ent.name}</span>
+                      </div>
+                      <div style={{fontSize:10,color:"rgba(255,255,255,0.45)",lineHeight:1.5}}>{ent.fields}</div>
+                    </div>;
+                  })}
+                </div>
+                {/* Relationship arrows */}
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {ONTOLOGY_RELATIONS.map(function(r,i) {
+                    return <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 12px",background:"rgba(255,255,255,0.02)",borderRadius:8}}>
+                      <span style={{fontSize:12,fontWeight:600,color:r.color,minWidth:40}}>{r.from}</span>
+                      <span style={{fontSize:11,color:"rgba(255,255,255,0.3)",fontFamily:"'JetBrains Mono',monospace",flex:1,textAlign:"center"}}>{r.rel}</span>
+                      <span style={{fontSize:12,fontWeight:600,color:r.color,minWidth:40,textAlign:"right"}}>{r.to}</span>
+                    </div>;
+                  })}
+                </div>
+              </div>
+
+              {/* Event Type -> Severity -> Base Score Table */}
+              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Event Type Mapping</div>
+                <div style={{overflowX:"auto"}}>
+                  <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+                    <thead>
+                      <tr style={{background:"rgba(255,255,255,0.04)"}}>
+                        {["이벤트","심각도","기본점수","발생비율"].map(function(h) {
+                          return <th key={h} style={{textAlign:"left",padding:"8px 12px",color:"rgba(255,255,255,0.5)",fontWeight:600,fontSize:10,borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{h}</th>;
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {EVENT_SCORE_TABLE.map(function(row) {
+                        var sevColor = {low:"#30d158",medium:"#ff9500",high:"#ff2d55",critical:"#bf5af2"}[row.severity] || "#fff";
+                        return <tr key={row.event} style={{borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
+                          <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.7)",fontWeight:600}}>{row.event}</td>
+                          <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:sevColor+"18",color:sevColor,fontSize:10,fontWeight:600}}>{row.severity}</span></td>
+                          <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.7)",fontFamily:"'JetBrains Mono',monospace"}}>{row.base}</td>
+                          <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.5)"}}>{row.weight}</td>
+                        </tr>;
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>}
           </div>
         );
       })()}
