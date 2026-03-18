@@ -1975,23 +1975,32 @@ export default function SecurityDashboard(props) {
 
             {/* Sub-view 2: Data Structure Map */}
             {secDataView === "map" && <div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16}}>5개 데이터 카테고리의 구조와 세부 항목을 탐색합니다. 카드를 클릭하여 상세 정보를 확인하세요.</div>
+              <div style={{fontSize:13,color:"#64748b",marginBottom:16}}>5개 데이터 카테고리의 구조와 세부 항목을 탐색합니다. 카드를 클릭하여 상세 정보를 확인하세요.</div>
+              {/* Summary stats - moved to top */}
+              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8,marginBottom:16}}>
+                {[{l:"직원",v:"1,800명",c:"#2563eb"},{l:"자산",v:"25건",c:"#ea580c"},{l:"이벤트 유형",v:"9종",c:"#dc2626"},{l:"조치",v:"11종",c:"#16a34a"},{l:"법규",v:"31건",c:"#0284c7"}].map(function(s) {
+                  return <div key={s.l} style={{textAlign:"center",padding:"12px 8px",background:"#fff",border:"1px solid #e2e8f0",borderRadius:10}}>
+                    <div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}</div>
+                    <div style={{fontSize:10,color:"#64748b",marginTop:2}}>{s.l}</div>
+                  </div>;
+                })}
+              </div>
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
                 {DATA_MAP.map(function(cat, ci) {
                   var isExpanded = mapExpanded[ci];
-                  return <div key={ci} style={{background:"rgba(255,255,255,0.03)",border:"1px solid " + (isExpanded ? cat.color + "40" : "rgba(255,255,255,0.06)"),borderRadius:14,overflow:"hidden",transition:"all 0.2s"}}>
+                  return <div key={ci} style={{background:"#fff",border:"1px solid " + (isExpanded ? cat.color + "40" : "#e2e8f0"),borderRadius:14,overflow:"hidden",transition:"all 0.2s"}}>
                     {/* Category Header */}
-                    <div onClick={function(){setMapExpanded(function(p){var n=Object.assign({},p);n[ci]=!n[ci];return n;});setMapDetail(null);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px",cursor:"pointer",background:isExpanded?"rgba(255,255,255,0.02)":"transparent"}}>
+                    <div onClick={function(){setMapExpanded(function(p){var n=Object.assign({},p);n[ci]=!n[ci];return n;});setMapDetail(null);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px",cursor:"pointer",background:isExpanded?"#f8fafc":"transparent"}}>
                       <div style={{display:"flex",alignItems:"center",gap:12}}>
                         <div style={{width:4,height:32,borderRadius:2,background:cat.color}} />
                         <div>
-                          <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{cat.cat}</div>
-                          <div style={{fontSize:11,color:"rgba(255,255,255,0.4)",marginTop:2}}>{cat.desc}</div>
+                          <div style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{cat.cat}</div>
+                          <div style={{fontSize:11,color:"#64748b",marginTop:2}}>{cat.desc}</div>
                         </div>
                       </div>
                       <div style={{display:"flex",alignItems:"center",gap:10}}>
                         <span style={{fontSize:11,color:cat.color,fontWeight:600}}>{cat.items.length}개 항목</span>
-                        <span style={{fontSize:14,color:"rgba(255,255,255,0.3)",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>{"\u25BC"}</span>
+                        <span style={{fontSize:14,color:"#94a3b8",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>{"\u25BC"}</span>
                       </div>
                     </div>
                     {/* Expanded Items */}
@@ -1999,18 +2008,18 @@ export default function SecurityDashboard(props) {
                       {cat.items.map(function(item, ii) {
                         var isDetailOpen = mapDetail && mapDetail.ci === ci && mapDetail.ii === ii;
                         return <div key={ii}>
-                          <div onClick={function(){setMapDetail(isDetailOpen?null:{ci:ci,ii:ii});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:isDetailOpen?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.02)",border:"1px solid "+(isDetailOpen?cat.color+"30":"rgba(255,255,255,0.04)"),borderRadius:10,cursor:"pointer",transition:"all 0.15s"}}>
+                          <div onClick={function(){setMapDetail(isDetailOpen?null:{ci:ci,ii:ii});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:isDetailOpen?"#f1f5f9":"#f8fafc",border:"1px solid "+(isDetailOpen?cat.color+"30":"#e2e8f0"),borderRadius:10,cursor:"pointer",transition:"all 0.15s"}}>
                             <div style={{display:"flex",alignItems:"center",gap:10}}>
                               <span style={{fontSize:18}}>{item.icon}</span>
                               <div>
-                                <div style={{fontSize:12,fontWeight:600,color:"#fff"}}>{item.name}</div>
-                                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)"}}>{item.size}</div>
+                                <div style={{fontSize:12,fontWeight:600,color:"#1e293b"}}>{item.name}</div>
+                                <div style={{fontSize:10,color:"#64748b"}}>{item.size}</div>
                               </div>
                             </div>
-                            <span style={{fontSize:10,color:isDetailOpen?cat.color:"rgba(255,255,255,0.3)"}}>{isDetailOpen?"접기":"상세"}</span>
+                            <span style={{fontSize:10,color:isDetailOpen?cat.color:"#94a3b8"}}>{isDetailOpen?"접기":"상세"}</span>
                           </div>
-                          {isDetailOpen && <div style={{margin:"6px 0 0 38px",padding:"10px 14px",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:8}}>
-                            <div style={{fontSize:11,color:"rgba(255,255,255,0.6)",lineHeight:1.6}}>{item.detail}</div>
+                          {isDetailOpen && <div style={{margin:"6px 0 0 38px",padding:"10px 14px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:8}}>
+                            <div style={{fontSize:11,color:"#334155",lineHeight:1.6}}>{item.detail}</div>
                             <button onClick={function(){setSecDataView("explorer");setDataSubTab(cat.linkTab);setDataPage(0);setDataSearch("");}} style={{marginTop:10,padding:"6px 14px",borderRadius:6,background:cat.color+"20",border:"1px solid "+cat.color+"40",color:cat.color,fontSize:10,fontWeight:700,cursor:"pointer"}}>DB 탐색기에서 보기 \u2192</button>
                           </div>}
                         </div>;
@@ -2019,26 +2028,17 @@ export default function SecurityDashboard(props) {
                   </div>;
                 })}
               </div>
-              {/* Summary stats */}
-              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8,marginTop:16}}>
-                {[{l:"직원",v:"1,800명",c:"#0a84ff"},{l:"자산",v:"25건",c:"#ff9500"},{l:"이벤트 유형",v:"9종",c:"#ff2d55"},{l:"조치",v:"11종",c:"#30d158"},{l:"법규",v:"31건",c:"#5ac8fa"}].map(function(s) {
-                  return <div key={s.l} style={{textAlign:"center",padding:"12px 8px",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:10}}>
-                    <div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}</div>
-                    <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:2}}>{s.l}</div>
-                  </div>;
-                })}
-              </div>
             </div>}
 
             {/* Sub-view 3: Ontology Center */}
             {secDataView === "ontology" && <div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16}}>보안 온톨로지 구조, 엔티티 관계, 위험도 산정 공식을 시각화합니다.</div>
+              <div style={{fontSize:13,color:"#64748b",marginBottom:16}}>보안 온톨로지 구조, 엔티티 관계, 위험도 산정 공식을 시각화합니다.</div>
 
               {/* Ontology Sub-Navigation */}
               <div style={{display:"flex",gap:6,marginBottom:16}}>
                 {[{id:"graph",l:"🔗 지식 그래프"},{id:"rules",l:"⚙️ 추론 규칙"},{id:"formula",l:"📊 위험도 공식"}].map(function(v) {
                   var active = ontoSubView === v.id;
-                  return <button key={v.id} onClick={function(){setOntoSubView(v.id);}} style={{padding:"7px 16px",fontSize:12,fontWeight:active?700:500,color:active?"#fff":"rgba(255,255,255,0.5)",background:active?"rgba(10,132,255,0.18)":"rgba(255,255,255,0.04)",border:active?"1px solid rgba(10,132,255,0.4)":"1px solid rgba(255,255,255,0.08)",borderRadius:8,cursor:"pointer",transition:"all 0.2s"}}>{v.l}</button>;
+                  return <button key={v.id} onClick={function(){setOntoSubView(v.id);}} style={{padding:"7px 16px",fontSize:12,fontWeight:active?700:500,color:active?"#2563eb":"#64748b",background:active?"#fff":"transparent",border:active?"1px solid #2563eb":"1px solid #e2e8f0",borderRadius:8,cursor:"pointer",transition:"all 0.2s",boxShadow:active?"0 1px 3px rgba(0,0,0,0.1)":"none"}}>{v.l}</button>;
                 })}
               </div>
 
@@ -2132,12 +2132,12 @@ export default function SecurityDashboard(props) {
                       {Object.keys(typeColors).map(function(t) {
                         return <div key={t} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                           <div style={{ width: 10, height: 10, borderRadius: t === "employee" ? "50%" : t === "eventType" ? 0 : 3, background: typeColors[t], transform: t === "eventType" ? "rotate(45deg) scale(0.7)" : "none" }} />
-                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{typeLabels[t]}</span>
+                          <span style={{ fontSize: 10, color: "#64748b" }}>{typeLabels[t]}</span>
                         </div>;
                       })}
                     </div>
                   </div>
-                  <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", position: "relative" }}>
+                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden", position: "relative" }}>
                     <svg width="100%" viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
                       onMouseMove={function(evt) {
                         var rect = evt.currentTarget.getBoundingClientRect();
@@ -2218,33 +2218,33 @@ export default function SecurityDashboard(props) {
                       })}
                     </svg>
                     {graphSelected && nodeMap[graphSelected] && (
-                      <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(18,18,26,0.95)", border: "1px solid " + typeColors[nodeMap[graphSelected].type] + "40", borderRadius: 12, padding: 16, maxWidth: 240, animation: "fadeIn 0.3s", zIndex: 5 }}>
+                      <div style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "1px solid " + typeColors[nodeMap[graphSelected].type] + "40", borderRadius: 12, padding: 16, maxWidth: 240, animation: "fadeIn 0.3s", zIndex: 5, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: typeColors[nodeMap[graphSelected].type], marginBottom: 6 }}>{nodeMap[graphSelected].label}</div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>유형: {typeLabels[nodeMap[graphSelected].type]}</div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
+                        <div style={{ fontSize: 10, color: "#64748b", marginBottom: 8 }}>유형: {typeLabels[nodeMap[graphSelected].type]}</div>
+                        <div style={{ fontSize: 10, color: "#475569" }}>
                           연결된 노드: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}건
                         </div>
                         {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
                       </div>
                     )}
                   </div>
-                  <div style={{background:"rgba(255,255,255,0.03)", borderRadius:12, padding:16, border:"1px solid rgba(255,255,255,0.06)", marginTop:12}}>
-                    <div style={{fontSize:13, fontWeight:700, color:"#e2e8f0", marginBottom:8}}>{"📖"} 지식 그래프 활용 가이드</div>
-                    <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, fontSize:11.5, color:"#94a3b8", lineHeight:1.7}}>
+                  <div style={{background:"#fff", borderRadius:12, padding:16, border:"1px solid #e2e8f0", marginTop:12}}>
+                    <div style={{fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:8}}>{"📖"} 지식 그래프 활용 가이드</div>
+                    <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, fontSize:11.5, color:"#475569", lineHeight:1.7}}>
                       <div>
-                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"🔍"} 위협 경로 분석</div>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"🔍"} 위협 경로 분석</div>
                         직원→자산 연결선을 통해 누가 어떤 민감 자산에 접근했는지 한눈에 파악할 수 있습니다. 비정상적인 접근 경로(부서 권한 외 자산 접근)를 시각적으로 탐지합니다.
                       </div>
                       <div>
-                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"👥"} 조직 리스크 맵</div>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"👥"} 조직 리스크 맵</div>
                         부서→자산 권한 관계와 실제 접근 패턴을 비교하여 권한 외 접근을 식별합니다. 특정 부서에 위험 이벤트가 집중되는지 확인할 수 있습니다.
                       </div>
                       <div>
-                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"⚡"} 이벤트-조치 연계</div>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"⚡"} 이벤트-조치 연계</div>
                         이벤트 유형별로 어떤 조치가 트리거되는지 확인하고, 조치 실행의 우선순위를 판단할 수 있습니다.
                       </div>
                       <div>
-                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"🎯"} 노드 클릭 활용법</div>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"🎯"} 노드 클릭 활용법</div>
                         노드를 클릭하면 해당 노드와 연결된 관계만 강조됩니다. 특정 직원의 접근 자산, 특정 자산에 접근한 직원, 특정 부서의 권한 범위를 빠르게 파악할 수 있습니다.
                       </div>
                     </div>
@@ -2291,7 +2291,7 @@ export default function SecurityDashboard(props) {
                       {Object.keys(sevColors).map(function(s) {
                         return <div key={s} style={{display:"flex",alignItems:"center",gap:4}}>
                           <div style={{width:8,height:8,borderRadius:"50%",background:sevColors[s]}} />
-                          <span style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>{sevLabels[s]}</span>
+                          <span style={{fontSize:10,color:"#64748b"}}>{sevLabels[s]}</span>
                         </div>;
                       })}
                     </div>
@@ -2303,14 +2303,14 @@ export default function SecurityDashboard(props) {
                       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                         <div style={{width:4,height:16,borderRadius:2,background:catColors[cat]}} />
                         <span style={{fontSize:13,fontWeight:700,color:catColors[cat]}}>{cat}</span>
-                        <span style={{fontSize:10,color:"rgba(255,255,255,0.35)"}}>{rules.length}개 규칙</span>
+                        <span style={{fontSize:10,color:"#94a3b8"}}>{rules.length}개 규칙</span>
                       </div>
-                      <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,overflow:"hidden"}}>
+                      <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:12,overflow:"hidden"}}>
                         <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
                           <thead>
-                            <tr style={{background:"rgba(255,255,255,0.04)"}}>
+                            <tr style={{background:"#f1f5f9"}}>
                               {["ID","규칙명","우선순위","조건 (IF)","결과 (THEN)","심각도"].map(function(h) {
-                                return <th key={h} style={{textAlign:"left",padding:"8px 12px",color:"rgba(255,255,255,0.5)",fontWeight:600,fontSize:10,borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{h}</th>;
+                                return <th key={h} style={{textAlign:"left",padding:"8px 12px",color:"#475569",fontWeight:600,fontSize:10,borderBottom:"2px solid #e2e8f0"}}>{h}</th>;
                               })}
                             </tr>
                           </thead>
@@ -2319,12 +2319,12 @@ export default function SecurityDashboard(props) {
                               var sc = sevColors[r.severity] || "#fff";
                               var prioLabel = r.priority === 0 ? "P0 (최고)" : r.priority === 1 ? "P1 (높음)" : "P2 (보통)";
                               var prioColor = r.priority === 0 ? "#ff2d55" : r.priority === 1 ? "#ff9500" : "#0a84ff";
-                              return <tr key={r.id} style={{borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
-                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.6)",fontFamily:"'JetBrains Mono',monospace",fontWeight:600}}>{r.id}</td>
-                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.8)",fontWeight:600}}>{r.name}</td>
+                              return <tr key={r.id} style={{borderBottom:"1px solid #f1f5f9"}}>
+                                <td style={{padding:"8px 12px",color:"#64748b",fontFamily:"'JetBrains Mono',monospace",fontWeight:600}}>{r.id}</td>
+                                <td style={{padding:"8px 12px",color:"#1e293b",fontWeight:600}}>{r.name}</td>
                                 <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:prioColor+"18",color:prioColor,fontSize:10,fontWeight:600}}>{prioLabel}</span></td>
-                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.55)",fontFamily:"'JetBrains Mono',monospace",fontSize:10,maxWidth:200}}>{r.condition}</td>
-                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.7)",fontFamily:"'JetBrains Mono',monospace",fontSize:10}}>{r.then}</td>
+                                <td style={{padding:"8px 12px",color:"#334155",fontFamily:"'JetBrains Mono',monospace",fontSize:10,maxWidth:200}}>{r.condition}</td>
+                                <td style={{padding:"8px 12px",color:"#1e293b",fontFamily:"'JetBrains Mono',monospace",fontSize:10}}>{r.then}</td>
                                 <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:sc+"18",color:sc,fontSize:10,fontWeight:600}}>{sevLabels[r.severity]}</span></td>
                               </tr>;
                             })}
@@ -2339,24 +2339,24 @@ export default function SecurityDashboard(props) {
               {/* Sub-view: Risk Formula & Ontology Details */}
               {ontoSubView === "formula" && <div>
               {/* Risk Score Formula */}
-              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18,marginBottom:16}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Risk Score Formula</div>
+              <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:14,padding:18,marginBottom:16}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Risk Score Formula</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",marginBottom:14}}>
                   {[{l:"baseScore",sub:"(severity)",c:"#0a84ff"},{l:"+",c:"transparent"},{l:"sensitivityBonus",sub:"(\u00D72~5)",c:"#ff9500"},{l:"+",c:"transparent"},{l:"timeBonus",sub:"(야간/주말)",c:"#ff2d55"},{l:"+",c:"transparent"},{l:"freqBonus",sub:"(빈도)",c:"#5856d6"},{l:"+",c:"transparent"},{l:"roleMismatch",sub:"(역할위반)",c:"#ff375f"},{l:"+",c:"transparent"},{l:"clearanceMismatch",sub:"(등급위반)",c:"#ff9f0a"},{l:"+",c:"transparent"},{l:"profileBonus",sub:"(HR)",c:"#30d158"},{l:"=",c:"transparent"},{l:"riskScore",sub:"(0~200+)",c:"#bf5af2"}].map(function(f,i) {
-                    if (f.l === "+" || f.l === "=") return <span key={i} style={{fontSize:14,fontWeight:700,color:"rgba(255,255,255,0.3)"}}>{f.l}</span>;
+                    if (f.l === "+" || f.l === "=") return <span key={i} style={{fontSize:14,fontWeight:700,color:"#94a3b8"}}>{f.l}</span>;
                     return <div key={i} style={{padding:"6px 10px",background:f.c+"18",border:"1px solid "+f.c+"35",borderRadius:8,textAlign:"center"}}>
                       <div style={{fontSize:11,fontWeight:700,color:f.c,fontFamily:"'JetBrains Mono',monospace"}}>{f.l}</div>
-                      {f.sub && <div style={{fontSize:9,color:"rgba(255,255,255,0.35)",marginTop:1}}>{f.sub}</div>}
+                      {f.sub && <div style={{fontSize:9,color:"#94a3b8",marginTop:1}}>{f.sub}</div>}
                     </div>;
                   })}
                 </div>
                 {/* Risk Factor Categories */}
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
                   {RISK_FACTORS.map(function(rf) {
-                    return <div key={rf.cat} style={{padding:"10px 12px",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:10}}>
+                    return <div key={rf.cat} style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
                       <div style={{fontSize:11,fontWeight:700,color:rf.color,marginBottom:6}}>{rf.cat}</div>
                       {rf.items.map(function(item,i) {
-                        return <div key={i} style={{fontSize:10,color:"rgba(255,255,255,0.5)",lineHeight:1.7,fontFamily:"'JetBrains Mono',monospace"}}>{item}</div>;
+                        return <div key={i} style={{fontSize:10,color:"#475569",lineHeight:1.7,fontFamily:"'JetBrains Mono',monospace"}}>{item}</div>;
                       })}
                     </div>;
                   })}
@@ -2364,8 +2364,8 @@ export default function SecurityDashboard(props) {
               </div>
 
               {/* Entity Relationship Map */}
-              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18,marginBottom:16}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Entity Relationships</div>
+              <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:14,padding:18,marginBottom:16}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Entity Relationships</div>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14}}>
                   {ONTOLOGY_ENTITIES.map(function(ent) {
                     return <div key={ent.name} style={{padding:"12px 14px",background:ent.color+"10",border:"1px solid "+ent.color+"25",borderRadius:10}}>
@@ -2373,16 +2373,16 @@ export default function SecurityDashboard(props) {
                         <span style={{fontSize:18}}>{ent.icon}</span>
                         <span style={{fontSize:12,fontWeight:700,color:ent.color}}>{ent.name}</span>
                       </div>
-                      <div style={{fontSize:10,color:"rgba(255,255,255,0.45)",lineHeight:1.5}}>{ent.fields}</div>
+                      <div style={{fontSize:10,color:"#475569",lineHeight:1.5}}>{ent.fields}</div>
                     </div>;
                   })}
                 </div>
                 {/* Relationship arrows */}
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   {ONTOLOGY_RELATIONS.map(function(r,i) {
-                    return <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 12px",background:"rgba(255,255,255,0.02)",borderRadius:8}}>
+                    return <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 12px",background:"#f8fafc",borderRadius:8}}>
                       <span style={{fontSize:12,fontWeight:600,color:r.color,minWidth:40}}>{r.from}</span>
-                      <span style={{fontSize:11,color:"rgba(255,255,255,0.3)",fontFamily:"'JetBrains Mono',monospace",flex:1,textAlign:"center"}}>{r.rel}</span>
+                      <span style={{fontSize:11,color:"#94a3b8",fontFamily:"'JetBrains Mono',monospace",flex:1,textAlign:"center"}}>{r.rel}</span>
                       <span style={{fontSize:12,fontWeight:600,color:r.color,minWidth:40,textAlign:"right"}}>{r.to}</span>
                     </div>;
                   })}
@@ -2390,25 +2390,25 @@ export default function SecurityDashboard(props) {
               </div>
 
               {/* Event Type -> Severity -> Base Score Table */}
-              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Event Type Mapping</div>
+              <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:14,padding:18}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Event Type Mapping</div>
                 <div style={{overflowX:"auto"}}>
                   <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
                     <thead>
-                      <tr style={{background:"rgba(255,255,255,0.04)"}}>
+                      <tr style={{background:"#f1f5f9"}}>
                         {["이벤트","심각도","기본점수","발생비율"].map(function(h) {
-                          return <th key={h} style={{textAlign:"left",padding:"8px 12px",color:"rgba(255,255,255,0.5)",fontWeight:600,fontSize:10,borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{h}</th>;
+                          return <th key={h} style={{textAlign:"left",padding:"8px 12px",color:"#475569",fontWeight:600,fontSize:10,borderBottom:"2px solid #e2e8f0"}}>{h}</th>;
                         })}
                       </tr>
                     </thead>
                     <tbody>
                       {EVENT_SCORE_TABLE.map(function(row) {
                         var sevColor = {low:"#30d158",medium:"#ff9500",high:"#ff2d55",critical:"#bf5af2"}[row.severity] || "#fff";
-                        return <tr key={row.event} style={{borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
-                          <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.7)",fontWeight:600}}>{row.event}</td>
+                        return <tr key={row.event} style={{borderBottom:"1px solid #f1f5f9"}}>
+                          <td style={{padding:"8px 12px",color:"#1e293b",fontWeight:600}}>{row.event}</td>
                           <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:sevColor+"18",color:sevColor,fontSize:10,fontWeight:600}}>{row.severity}</span></td>
-                          <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.7)",fontFamily:"'JetBrains Mono',monospace"}}>{row.base}</td>
-                          <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.5)"}}>{row.weight}</td>
+                          <td style={{padding:"8px 12px",color:"#1e293b",fontFamily:"'JetBrains Mono',monospace"}}>{row.base}</td>
+                          <td style={{padding:"8px 12px",color:"#64748b"}}>{row.weight}</td>
                         </tr>;
                       })}
                     </tbody>
