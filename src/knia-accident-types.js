@@ -2453,6 +2453,3897 @@ const KNIA_ACCIDENT_TYPES = [
       { type: "현저한과실", target: "B", adj: 10 },
       { type: "중대한과실", target: "B", adj: 20 }
     ]
+  },
+
+  // ========================================================================
+  // VII. 추가 차대차 - 교차로 신호 세분화
+  // ========================================================================
+
+  // --- 차1 추가: 신호기 있는 교차로 추가 신호조합 ---
+  {
+    id: "차1-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "황색직진 대 황색직진",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차1-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "적색직진 대 적색직진",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "명확한선진입", target: "A", adj: -10 },
+      { type: "명확한선진입", target: "B", adj: -10 }
+    ]
+  },
+  {
+    id: "차1-5",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "황색직진 대 적색직진",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차1-6",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색점멸직진 대 적색직진",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차1-7",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색직진 대 황색직진",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차2 추가: 직진 대 좌회전 추가조합 ---
+  {
+    id: "차2-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "적색좌회전 대 녹색직진",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차2-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색비보호좌회전 대 녹색직진",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "급좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "좌회전완료직후", target: "A", adj: -10 }
+    ]
+  },
+  {
+    id: "차2-5",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "황색좌회전 대 녹색직진",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차2-6",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "황색좌회전 대 황색직진",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차2-7",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색좌회전화살표 대 적색우회전",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차3 추가: 직진 대 좌회전 (적색) 추가조합 ---
+  {
+    id: "차3-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "황색직진 대 적색좌회전",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소좌회전·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차3-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색직진 대 적색좌회전 (직진우선)",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차4 추가: 좌회전 대 우회전 추가조합 ---
+  {
+    id: "차4-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색좌회전화살표 대 녹색우회전",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "대좌회전·대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "대우회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차4-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "적색좌회전 대 적색우회전",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "명확한선진입", target: "A", adj: -10 },
+      { type: "명확한선진입", target: "B", adj: -10 }
+    ]
+  },
+
+  // --- 차5 추가: 한쪽신호 교차로 추가변형 ---
+  {
+    id: "차5-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 좌회전 대 녹색직진",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차5-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 좌회전 대 황색직진",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차5-5",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 좌회전 대 적색직진",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차6 추가: 한쪽신호 좌회전 추가변형 ---
+  {
+    id: "차6-2(가)",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 좌회전 대 녹색직진 (좌회전차)",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "급좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차6-2(나)",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 좌회전 대 황색직진 (좌회전차)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차6-2(다)",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 좌회전 대 적색직진 (좌회전차)",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차6-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 우회전 대 녹색좌회전화살표",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차6-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽신호",
+    label: "신호없는도로 직진 대 녹색좌회전화살표",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차7 추가: 일시정지 표지판 교차로 추가변형 ---
+  {
+    id: "차7-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "직진 대 양보표지위반 직진",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "명확한선진입", target: "B", adj: -10 }
+    ]
+  },
+  {
+    id: "차7-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "일시정지위반 직진 대 좌측도로 직진 (광로/협로)",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "일시정지후출발", target: "A", adj: -10 }
+    ]
+  },
+  {
+    id: "차7-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "일시정지위반 직진 대 우측도로 직진 (광로/협로)",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "일시정지후출발", target: "A", adj: -10 }
+    ]
+  },
+
+  // --- 차8 추가: 일시정지위반 직진 대 좌회전 추가 ---
+  {
+    id: "차8-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "좌회전 대 일시정지위반 직진",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "일시정지후출발", target: "B", adj: -10 }
+    ]
+  },
+  {
+    id: "차8-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "양보표지위반 좌회전 대 직진",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차9 추가: 우회전 대 직진 추가 ---
+  {
+    id: "차9-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "양보표지위반 우회전 대 직진",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차9-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "일시정지위반 우회전 대 좌회전",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소좌회전·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차10 추가: 좌회전 대 좌회전 추가 ---
+  {
+    id: "차10-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "한쪽지시표지",
+    label: "양보표지위반 좌회전 대 좌회전",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "좌회전방법위반", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "좌회전방법위반", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차12 추가: 신호없는 교차로 직진 대 직진 추가변형 ---
+  {
+    id: "차12-3(가)",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "삼거리 동일폭 직진 대 합류차량",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "명확한선진입", target: "A", adj: -10 },
+      { type: "명확한선진입", target: "B", adj: -10 }
+    ]
+  },
+  {
+    id: "차12-3(나)",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "삼거리 광로직진 대 협로합류",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차12-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "이면도로 동일폭 직진 대 직진 (동시진입)",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "서행불이행", target: "A", adj: 10 },
+      { type: "서행불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차12-5",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "이면도로 광로직진 대 협로직진",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "서행불이행", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차13 추가: 신호없는 교차로 우회전 추가변형 ---
+  {
+    id: "차13-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "광로 우회전 대 협로 좌측도로 직진",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차13-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "협로 우회전 대 광로 좌측도로 직진",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "서행불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차14 추가: 우회전 대 우측도로 직진 추가 ---
+  {
+    id: "차14-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "광로 우회전 대 협로 우측도로 직진",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "서행불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차14-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "협로 우회전 대 광로 우측도로 직진",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차15 추가: 대향 좌회전 추가 ---
+  {
+    id: "차15-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "광로 직진 대 협로 대향 좌회전",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소좌회전·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차15-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "협로 직진 대 광로 대향 좌회전",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차16 추가: 측면 좌회전 대 직진 추가 ---
+  {
+    id: "차16-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "광로 좌측도로 직진 대 협로 우측도로 좌회전",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차16-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "협로 좌측도로 직진 대 광로 우측도로 좌회전",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차17 추가: 양측 좌회전 추가 ---
+  {
+    id: "차17-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "광로 좌회전 대 협로 좌회전",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차17-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "대향 좌회전 대 좌회전 (동일방향 진행)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소좌회전·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차18 추가 ---
+  {
+    id: "차18-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "광로 우회전 대 협로 우측도로 좌회전",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차18-3",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "협로 우회전 대 광로 우측도로 좌회전",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차19~21 추가: 교차로 동시회전 추가 ---
+  {
+    id: "차19-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "동시회전",
+    label: "선행 좌(우)회전 미리 안 붙임 대 후행 좌회전 추월",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차20-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "동시회전",
+    label: "동시 우회전 (A좌측 대 B오른쪽 바깥차로)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차21-2",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "동시회전",
+    label: "동시 좌회전 대향 충돌 (대좌회전 대 소좌회전)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // VIII. 추가 차대차 - 대향차 세분화
+  // ========================================================================
+
+  {
+    id: "차31-3",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 중앙선 침범 추월",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차31-4",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 커브길 중앙선 침범",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차31-5",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 좌회전 중앙선 침범 (교차로 외)",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차31-6",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "양측 중앙선 침범 정면 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차31-7",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 역주행 (일방통행로)",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차31-8",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 고속도로 역주행",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차32 추가: 중앙선 없는 도로 추가 ---
+  {
+    id: "차32-2",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선없음",
+    label: "중앙선 없는 좁은 도로 일방 정차 중 교행 충돌",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차32-3",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선없음",
+    label: "중앙선 없는 커브길 정면 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "서행불이행", target: "A", adj: 10 },
+      { type: "서행불이행", target: "B", adj: 10 }
+    ]
+  },
+
+  // --- 차33 추가: 유턴 추가 ---
+  {
+    id: "차33-2",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "유턴",
+    label: "녹색직진 대 적색시 유턴",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차33-3",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "유턴",
+    label: "직진 대 유턴금지구역 유턴",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차33-4",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "유턴",
+    label: "직진 대 유턴허용구역 유턴 (비보호유턴)",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차33-5",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "유턴",
+    label: "유턴 대 대향 좌회전",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // IX. 추가 차대차 - 동일방향 세분화
+  // ========================================================================
+
+  // --- 차41 추가: 추돌 세분화 ---
+  {
+    id: "차41-2",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "후행차 추돌 (선행차 급정거 - 불가피한 사유)",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차41-3",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "후행차 추돌 (선행차 급정거 - 불가피하지 않은 사유)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "급제동", target: "B", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차41-4",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "정체중 후행차 추돌 (저속 정체)",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "제동등고장", target: "B", adj: 10 }
+    ]
+  },
+  {
+    id: "차41-5",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "고속도로 후행차 추돌 (선행차 정상주행)",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "제동등고장", target: "B", adj: 10 },
+      { type: "급제동", target: "B", adj: 15 }
+    ]
+  },
+  {
+    id: "차41-6",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "고속도로 정체중 후행차 추돌",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "제동등고장", target: "B", adj: 10 }
+    ]
+  },
+  {
+    id: "차41-7",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "터널 내 후행차 추돌",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "제동등고장", target: "B", adj: 10 },
+      { type: "급제동", target: "B", adj: 15 }
+    ]
+  },
+  {
+    id: "차41-8",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "다중추돌 중간차량 (3대 이상 연쇄 추돌)",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차41-9",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "다중추돌 최후미차량 (3대 이상 연쇄 추돌)",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 차42 추가: 선행사고 정차 추돌 추가 ---
+  {
+    id: "차42-2",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "고속도로 갓길 정차 차량 추돌",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "비상등미작동", target: "B", adj: 10 },
+      { type: "삼각대미설치", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차42-3",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "터널 내 정차 차량 추돌",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "비상등미작동", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차42-4",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "사고처리 중 차량 추돌 (사고현장 정차)",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "삼각대미설치", target: "B", adj: 10 },
+      { type: "비상등미작동", target: "B", adj: 10 }
+    ]
+  },
+
+  // --- 차43 추가: 진로변경·합류 추가 ---
+  {
+    id: "차43-4",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "고속도로 본선 직진 대 합류차선 진입",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차43-5",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "고속도로 나들목 진출 차량 대 본선 직진",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차43-6",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "선행 직진 대 후행 1차로→2차로 진로변경",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차43-7",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "후행 직진 대 선행 2차로→1차로 진로변경",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차43-8",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "끼어들기 후 급정거 대 후행차 추돌",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "급제동", target: "B", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차44 추가: 도로진입 추가 ---
+  {
+    id: "차44-2",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "도로진입",
+    label: "직진 대 도로외 장소에서 좌회전 진입",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차44-3",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "도로진입",
+    label: "직진 대 갓길에서 진입 (합류)",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차45 추가: 추월 추가 ---
+  {
+    id: "차45-2",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추월",
+    label: "편도 1차로 추월금지구역 추월 대 대향차",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차45-3",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추월",
+    label: "정상 추월 대 피추월차 속도증가",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차46 추가: 유턴 추가 ---
+  {
+    id: "차46-2",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "유턴",
+    label: "직진 대 갑작스러운 유턴 (유턴금지구역)",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차46-3",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "유턴",
+    label: "직진 대 유턴 허용구역 정상 유턴",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차47 추가: 정차 후 출발 추가 ---
+  {
+    id: "차47-2",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "기타",
+    label: "버스 정류장 출발 대 후행 직진",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차47-3",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "기타",
+    label: "정차 후 후진 대 후행차 추돌",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // X. 추가 차대차 - 기타 세분화
+  // ========================================================================
+
+  // --- 차51 추가: 주차장 추가 ---
+  {
+    id: "차51-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "주차장",
+    label: "주차장 통행로 주행 대 입차",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차51-3",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "주차장",
+    label: "주차장 내 양측 출차 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차51-4",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "주차장",
+    label: "주차장 통행로 교차 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차51-5",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "주차장",
+    label: "주차장 입구 진입 대 출구 진출",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차51-6",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "주차장",
+    label: "주차장 내 후진 충돌 (양측 후진)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차51-7",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "주차장",
+    label: "주차장 내 통행로 직진 대 후진 출차",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "후방미확인", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차52 추가: 문열림 추가 ---
+  {
+    id: "차52-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "문열림",
+    label: "자전거·이륜차 대 주·정차 중 문 열림",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차52-3",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "문열림",
+    label: "택시 하차 문 열림 대 후행 직진",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차54 추가: 회전교차로 추가 ---
+  {
+    id: "차54-3",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "회전교차로",
+    label: "회전교차로 진출 차량 대 진입 차량",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차54-4",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "회전교차로",
+    label: "회전교차로 내 역주행 대 정상 회전",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차54-5",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "회전교차로",
+    label: "회전교차로 2차로 회전 대 1차로 회전 (진로변경)",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차55 추가: 긴급자동차 추가 ---
+  {
+    id: "차55-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "긴급자동차",
+    label: "적색직진 긴급자동차 대 녹색직진 일반차",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차55-3",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "긴급자동차",
+    label: "긴급자동차 진로양보 미이행 대 긴급자동차",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차55-4",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "긴급자동차",
+    label: "경광등·사이렌 미작동 긴급자동차 대 일반차",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차56: 견인차 ---
+  {
+    id: "차56-1",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "견인차",
+    label: "견인 중 후방차량 추돌 (견인차 정상표시)",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "차56-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "견인차",
+    label: "견인 중 후방차량 추돌 (견인차 표시불량)",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차57: 고속도로 특수 ---
+  {
+    id: "차57-1",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "고속도로",
+    label: "고속도로 본선 합류 가속차로 충돌",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차57-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "고속도로",
+    label: "고속도로 갓길 주행 대 본선 진입",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차57-3",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "고속도로",
+    label: "졸음쉼터 진출 대 본선 직진",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차57-4",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "고속도로",
+    label: "고속도로 휴게소 진출 대 본선 직진",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차57-5",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "고속도로",
+    label: "고속도로 톨게이트 부근 합류 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차58: 터널 내 사고 ---
+  {
+    id: "차58-1",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "터널",
+    label: "터널 내 진로변경 충돌",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차58-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "터널",
+    label: "터널 입구 역광으로 인한 추돌",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "제동등고장", target: "B", adj: 10 }
+    ]
+  },
+
+  // --- 차59: 후진 ---
+  {
+    id: "차59-1",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "후진",
+    label: "도로상 후진 대 후행차 충돌",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차59-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "후진",
+    label: "양측 후진 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차59-3",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "후진",
+    label: "골목길 후진 대 직진 차량",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "서행불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 차60: 비보호좌회전 ---
+  {
+    id: "차60-1",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "비보호좌회전",
+    label: "비보호좌회전 대 직진 (교차로 외 도로)",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차60-2",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "비보호좌회전",
+    label: "비보호좌회전 대 후행차 추월 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XI. 추가 차대사람 - 세분화
+  // ========================================================================
+
+  // --- 보37~보40: 신호별 횡단보도 세분화 ---
+  {
+    id: "보37",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "우회전 차량 대 녹색횡단보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보38",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "우회전 차량 대 적색횡단보행자",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보39",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "좌회전 차량 대 녹색횡단보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보40",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "좌회전 차량 대 적색횡단보행자",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보41",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "녹색점멸 중 횡단개시 보행자 대 녹색직진 차량",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보42",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "녹색점멸 중 횡단계속 보행자 대 녹색직진 차량",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보43",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "유턴차량 대 횡단보도 녹색보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보44",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "유턴차량 대 횡단보도 적색보행자",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보45~보48: 횡단보도 유무별 세분화 ---
+  {
+    id: "보45",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호없음",
+    label: "횡단보도 부근(5m이내) 횡단 보행자 대 직진 차량",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보46",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호없음",
+    label: "횡단보도 없는 교차로 횡단 보행자 대 직진 차량",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "간선도로", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보47",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호없음",
+    label: "횡단보도 없는 교차로 횡단 보행자 대 좌회전 차량",
+    faultA: 85,
+    faultB: 15,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보48",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호없음",
+    label: "횡단보도 없는 교차로 횡단 보행자 대 우회전 차량",
+    faultA: 85,
+    faultB: 15,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보49~보52: 보도 위 차량 진입 ---
+  {
+    id: "보49",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "보도침범",
+    label: "보도 위 차량 진입(비의도) 대 보도 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보50",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "보도침범",
+    label: "보도 이용 주차장 진입 차량 대 보도 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보51",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "보도침범",
+    label: "보도 위 불법 주행 차량 대 보도 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보53~보56: 주차장 내 보행자 ---
+  {
+    id: "보53",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "주차장",
+    label: "주차장 통행로 직진 차량 대 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "어린이·노인·장애인", target: "B", adj: -5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보54",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "주차장",
+    label: "주차장 출차 대 후방 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보55",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "주차장",
+    label: "주차장 입차 대 전방 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보56",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "주차장",
+    label: "주차장 후진 출차 대 횡단 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "어린이·노인·장애인", target: "B", adj: -5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보57~보60: 어린이보호구역 (스쿨존) ---
+  {
+    id: "보57",
+    cat1: "차대사람",
+    cat2: "어린이보호구역",
+    cat3: "횡단보도",
+    label: "어린이보호구역 횡단보도 직진 차량 대 횡단 어린이",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보58",
+    cat1: "차대사람",
+    cat2: "어린이보호구역",
+    cat3: "횡단보도",
+    label: "어린이보호구역 횡단보도 없는곳 횡단 어린이 대 직진 차량",
+    faultA: 95,
+    faultB: 5,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보59",
+    cat1: "차대사람",
+    cat2: "어린이보호구역",
+    cat3: "도로통행",
+    label: "어린이보호구역 도로변 어린이 대 직진 차량",
+    faultA: 95,
+    faultB: 5,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보60",
+    cat1: "차대사람",
+    cat2: "어린이보호구역",
+    cat3: "후진",
+    label: "어린이보호구역 후진 차량 대 어린이",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보61~보64: 노인보호구역 (실버존) ---
+  {
+    id: "보61",
+    cat1: "차대사람",
+    cat2: "노인보호구역",
+    cat3: "횡단보도",
+    label: "노인보호구역 횡단보도 직진 차량 대 횡단 노인",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보62",
+    cat1: "차대사람",
+    cat2: "노인보호구역",
+    cat3: "횡단보도",
+    label: "노인보호구역 횡단보도 없는곳 횡단 노인 대 직진 차량",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보63",
+    cat1: "차대사람",
+    cat2: "노인보호구역",
+    cat3: "도로통행",
+    label: "노인보호구역 도로변 노인 대 직진 차량",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보64",
+    cat1: "차대사람",
+    cat2: "노인보호구역",
+    cat3: "후진",
+    label: "노인보호구역 후진 차량 대 노인",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보65~보68: 이면도로 보행자 ---
+  {
+    id: "보65",
+    cat1: "차대사람",
+    cat2: "이면도로",
+    cat3: "보행자",
+    label: "이면도로 직진 차량 대 도로변 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보66",
+    cat1: "차대사람",
+    cat2: "이면도로",
+    cat3: "보행자",
+    label: "이면도로 직진 차량 대 횡단 보행자",
+    faultA: 85,
+    faultB: 15,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "어린이·노인·장애인", target: "B", adj: -5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보67",
+    cat1: "차대사람",
+    cat2: "이면도로",
+    cat3: "보행자",
+    label: "이면도로 좌회전 차량 대 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보68",
+    cat1: "차대사람",
+    cat2: "이면도로",
+    cat3: "보행자",
+    label: "이면도로 후진 차량 대 보행자",
+    faultA: 95,
+    faultB: 5,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보69~보72: 고속도로 보행자 세분화 ---
+  {
+    id: "보69",
+    cat1: "차대사람",
+    cat2: "고속도로",
+    cat3: "보행자",
+    label: "고속도로 차량 대 사고처리 작업자",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "야간·악천후", target: "B", adj: 10 },
+      { type: "안전조끼미착용", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보70",
+    cat1: "차대사람",
+    cat2: "고속도로",
+    cat3: "보행자",
+    label: "고속도로 차량 대 도로공사 작업자",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "야간·악천후", target: "B", adj: 10 },
+      { type: "안전표시미설치", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보71",
+    cat1: "차대사람",
+    cat2: "고속도로",
+    cat3: "보행자",
+    label: "고속도로 차량 대 고장차량 운전자 (갓길 보행)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "야간·악천후", target: "B", adj: 10 },
+      { type: "안전조끼미착용", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보72",
+    cat1: "차대사람",
+    cat2: "고속도로",
+    cat3: "보행자",
+    label: "고속도로 차량 대 불법횡단 보행자 (중앙분리대 넘어)",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "야간·악천후", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보73~보76: 차도 위 작업자 ---
+  {
+    id: "보73",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "작업자",
+    label: "도로공사 구간 차량 대 작업자 (안전표지 설치)",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보74",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "작업자",
+    label: "도로공사 구간 차량 대 작업자 (안전표지 미설치)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "안전표시미설치", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보75",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "작업자",
+    label: "사고현장 차량 대 사고처리 작업자 (삼각대 설치)",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보76",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "작업자",
+    label: "사고현장 차량 대 사고처리 작업자 (삼각대 미설치)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "삼각대미설치", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 보77~보80: 무단횡단 세분화 ---
+  {
+    id: "보77",
+    cat1: "차대사람",
+    cat2: "도로횡단",
+    cat3: "무단횡단",
+    label: "간선도로(4차로이상) 무단횡단 보행자 대 직진 차량",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "어린이·노인·장애인", target: "B", adj: -10 }
+    ]
+  },
+  {
+    id: "보78",
+    cat1: "차대사람",
+    cat2: "도로횡단",
+    cat3: "무단횡단",
+    label: "2차로도로 무단횡단 보행자 대 직진 차량",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "어린이·노인·장애인", target: "B", adj: -10 }
+    ]
+  },
+  {
+    id: "보79",
+    cat1: "차대사람",
+    cat2: "도로횡단",
+    cat3: "무단횡단",
+    label: "중앙분리대 있는 도로 무단횡단 보행자 대 차량",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보80",
+    cat1: "차대사람",
+    cat2: "도로횡단",
+    cat3: "무단횡단",
+    label: "정차차량 사이 횡단 보행자 대 직진 차량",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "어린이·노인·장애인", target: "B", adj: -10 }
+    ]
+  },
+
+  // --- 보81~보84: 특수 보행자 ---
+  {
+    id: "보81",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "특수보행자",
+    label: "차량 대 음주보행자 (도로 위 방치)",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 20 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보82",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "특수보행자",
+    label: "차량 대 도로 위 놀이 어린이",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "어린이·노인·장애인", target: "B", adj: -10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보83",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "특수보행자",
+    label: "차량 대 휠체어 통행자 (도로)",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보84",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "특수보행자",
+    label: "차량 대 유모차 통행자 (도로)",
+    faultA: 95,
+    faultB: 5,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XII. 추가 차대자전거 - 세분화
+  // ========================================================================
+
+  // --- 거44~거47: 전동킥보드/PM ---
+  {
+    id: "거44-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드 직진 대 차량 우회전 (교차로)",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "어린이·노인·장애인", target: "A", adj: -10 }
+    ]
+  },
+  {
+    id: "거44-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드 역주행 대 차량 직진",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거44-3",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드 횡단보도 주행 대 차량 직진",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거44-4",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드 보도 주행 대 보도 진입 차량",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거44-5",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드 차도 주행 대 후행차 추돌",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "야간·시야장애", target: "A", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거44-6",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드 무단횡단 대 직진 차량",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "야간·시야장애", target: "A", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거44-7",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "전동킥보드",
+    label: "전동킥보드(무면허) 직진 대 차량",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 거45: 역주행 자전거 ---
+  {
+    id: "거45-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "역주행",
+    label: "역주행 자전거 대 정상 직진 차량 (교차로 외)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 },
+      { type: "어린이·노인·장애인", target: "A", adj: -10 }
+    ]
+  },
+  {
+    id: "거45-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "역주행",
+    label: "역주행 자전거 대 우회전 차량",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거45-3",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "역주행",
+    label: "역주행 자전거 대 도로진입 차량",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 거46: 무등 야간 자전거 ---
+  {
+    id: "거46-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "야간무등",
+    label: "야간 무등화 자전거 대 후행 차량 추돌",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "야간·시야장애", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거46-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "야간무등",
+    label: "야간 무등화 자전거 직진 대 차량 교차로 충돌",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "야간·시야장애", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 거47: 횡단보도 위 자전거 ---
+  {
+    id: "거47-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "횡단보도자전거",
+    label: "횡단보도 자전거 타고 횡단 대 직진 차량 (녹색보행)",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거47-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "횡단보도자전거",
+    label: "횡단보도 자전거 끌고 횡단 대 직진 차량 (녹색보행)",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거47-3",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "횡단보도자전거",
+    label: "횡단보도 자전거 타고 횡단 대 직진 차량 (적색보행)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거47-4",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "횡단보도자전거",
+    label: "횡단보도 자전거 끌고 횡단 대 직진 차량 (적색보행)",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 거48: 배달라이더 ---
+  {
+    id: "거48-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "배달라이더",
+    label: "배달이륜차 신호위반 직진 대 녹색직진 차량",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거48-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "배달라이더",
+    label: "배달이륜차 차선변경 대 후행차",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거48-3",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "배달라이더",
+    label: "배달이륜차 보도 주행 대 보도진입 차량",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XIII. 특수 유형 - 전동킥보드/PM 대 보행자
+  // ========================================================================
+
+  {
+    id: "특1-1",
+    cat1: "특수",
+    cat2: "PM대보행자",
+    cat3: "보도",
+    label: "전동킥보드 보도 주행 대 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "어린이·노인·장애인", target: "B", adj: -5 }
+    ]
+  },
+  {
+    id: "특1-2",
+    cat1: "특수",
+    cat2: "PM대보행자",
+    cat3: "횡단보도",
+    label: "전동킥보드 대 횡단보도 녹색 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특1-3",
+    cat1: "특수",
+    cat2: "PM대보행자",
+    cat3: "횡단보도",
+    label: "전동킥보드 대 횡단보도 적색 보행자",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특1-4",
+    cat1: "특수",
+    cat2: "PM대보행자",
+    cat3: "도로",
+    label: "전동킥보드 차도 주행 대 무단횡단 보행자",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특1-5",
+    cat1: "특수",
+    cat2: "PM대보행자",
+    cat3: "자전거도로",
+    label: "전동킥보드 자전거도로 주행 대 보행자",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XIV. 특수 유형 - 자율주행차
+  // ========================================================================
+
+  {
+    id: "특2-1",
+    cat1: "특수",
+    cat2: "자율주행",
+    cat3: "시스템결함",
+    label: "자율주행모드 차량 대 보행자 (시스템오류)",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특2-2",
+    cat1: "특수",
+    cat2: "자율주행",
+    cat3: "수동전환",
+    label: "자율주행→수동전환 지연 대 선행차 추돌",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "급제동", target: "B", adj: 10 }
+    ]
+  },
+  {
+    id: "특2-3",
+    cat1: "특수",
+    cat2: "자율주행",
+    cat3: "혼합운행",
+    label: "자율주행차 대 일반차 교차로 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XV. 특수 유형 - 기타
+  // ========================================================================
+
+  // --- 특3: 전동킥보드 대 자전거 ---
+  {
+    id: "특3-1",
+    cat1: "특수",
+    cat2: "PM대자전거",
+    cat3: "자전거도로",
+    label: "전동킥보드 대 자전거 정면충돌 (자전거도로)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특3-2",
+    cat1: "특수",
+    cat2: "PM대자전거",
+    cat3: "자전거도로",
+    label: "전동킥보드 추돌 자전거 (동일방향)",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 특4: 다중추돌 특수 ---
+  {
+    id: "특4-1",
+    cat1: "특수",
+    cat2: "다중추돌",
+    cat3: "고속도로",
+    label: "고속도로 다중추돌 선두차량 대 2번째 차량",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "급제동", target: "A", adj: 20 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특4-2",
+    cat1: "특수",
+    cat2: "다중추돌",
+    cat3: "고속도로",
+    label: "고속도로 다중추돌 중간차량 책임 (앞차 추돌 후 밀림)",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특4-3",
+    cat1: "특수",
+    cat2: "다중추돌",
+    cat3: "일반도로",
+    label: "일반도로 3대 연쇄추돌 최후미차량 대 중간차량",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특4-4",
+    cat1: "특수",
+    cat2: "다중추돌",
+    cat3: "터널",
+    label: "터널 내 다중추돌 (시야장애)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 특5: 전동킥보드/PM 대 차량 추가 ---
+  {
+    id: "특5-1",
+    cat1: "특수",
+    cat2: "PM대차량",
+    cat3: "교차로",
+    label: "전동킥보드 녹색직진 대 차량 적색직진",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특5-2",
+    cat1: "특수",
+    cat2: "PM대차량",
+    cat3: "교차로",
+    label: "전동킥보드 적색직진 대 차량 녹색직진",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특5-3",
+    cat1: "특수",
+    cat2: "PM대차량",
+    cat3: "동일방향",
+    label: "전동킥보드 진로변경 대 후행 차량",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특5-4",
+    cat1: "특수",
+    cat2: "PM대차량",
+    cat3: "동일방향",
+    label: "선행 전동킥보드 대 후행 차량 추돌",
+    faultA: 5,
+    faultB: 95,
+    modifiers: [
+      { type: "야간·시야장애", target: "A", adj: 5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 특6: 긴급차량 특수 ---
+  {
+    id: "특6-1",
+    cat1: "특수",
+    cat2: "긴급차량",
+    cat3: "교차로",
+    label: "긴급차량 적색직진 대 일반차 녹색좌회전",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특6-2",
+    cat1: "특수",
+    cat2: "긴급차량",
+    cat3: "동일방향",
+    label: "긴급차량 추월 대 진로미양보 일반차",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특6-3",
+    cat1: "특수",
+    cat2: "긴급차량",
+    cat3: "대향",
+    label: "긴급차량 중앙선넘어 주행 대 대향차",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XVI. 추가 차대차 - 교차로 추가 변형
+  // ========================================================================
+
+  {
+    id: "차1-8",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색직진 대 녹색점멸직진",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차2-8",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "적색직진 대 녹색비보호좌회전",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차2-9",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "황색직진 대 녹색비보호좌회전",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소좌회전·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 신호없는 교차로 추가 ---
+  {
+    id: "차12-6",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "동일폭 삼거리 좌회전 대 직진 (T자형)",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차12-7",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "동일폭 삼거리 우회전 대 직진 (T자형)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "대우회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차15-4",
+    cat1: "차대차",
+    cat2: "교차로",
+    cat3: "신호없음",
+    label: "대향 좌회전 대 대향 좌회전 (교차로 내)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "소좌회전·대좌회전", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "소좌회전·대좌회전", target: "B", adj: 10 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XVII. 추가 대향차/동일방향 변형
+  // ========================================================================
+
+  {
+    id: "차31-9",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 장애물 회피 중앙선 침범",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차31-10",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "중앙선침범",
+    label: "직진 대 빗길·빙판 미끄러짐 중앙선 침범",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차33-6",
+    cat1: "차대차",
+    cat2: "대향차",
+    cat3: "유턴",
+    label: "유턴 완료 직후 대 후행차 충돌",
+    faultA: 60,
+    faultB: 40,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // --- 동일방향 추가 ---
+  {
+    id: "차41-10",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "야간 비조명구간 정차차량 추돌",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "비상등미작동", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차41-11",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "빗길·빙판 미끄러짐 추돌",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차41-12",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "추돌",
+    label: "신호대기 중 후행차 추돌",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "차43-9",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "정체구간 끼어들기 대 직진차량",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차43-10",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "진로변경",
+    label: "2중 진로변경 (2차로 이상 이동) 대 직진차량",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "진로변경신호불이행", target: "B", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XVIII. 추가 차대사람 - 보충
+  // ========================================================================
+
+  {
+    id: "보85",
+    cat1: "차대사람",
+    cat2: "도로횡단",
+    cat3: "무단횡단",
+    label: "야간 어두운 도로 무단횡단 보행자 대 차량",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "야간·시야장애", target: "B", adj: 15 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보86",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "보차도구분없음",
+    label: "보차도 구분없는 도로 차량 대 좌측 보행자",
+    faultA: 85,
+    faultB: 15,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보87",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "보차도구분없음",
+    label: "보차도 구분없는 도로 차량 대 우측 보행자 (같은방향)",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보88",
+    cat1: "차대사람",
+    cat2: "횡단보도",
+    cat3: "신호있음",
+    label: "후진 차량 대 횡단보도 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보89",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "아파트·단지",
+    label: "아파트단지 내 차량 대 놀이 어린이",
+    faultA: 95,
+    faultB: 5,
+    modifiers: [
+      { type: "어린이·노인·장애인", target: "B", adj: -5 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보90",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "아파트·단지",
+    label: "아파트 지하주차장 차량 대 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보91",
+    cat1: "차대사람",
+    cat2: "도로외장소",
+    cat3: "주유소",
+    label: "주유소 내 차량 대 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보92",
+    cat1: "차대사람",
+    cat2: "도로통행",
+    cat3: "차도측단",
+    label: "차도 주행 차량 대 도로변 대기 보행자 (버스정류장)",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보93",
+    cat1: "차대사람",
+    cat2: "후진",
+    cat3: "도로",
+    label: "도로 위 후진 차량 대 보행자",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XIX. 추가 차대자전거 - 보충
+  // ========================================================================
+
+  {
+    id: "거49-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "자전거전용도로",
+    label: "자전거전용도로 횡단 자전거 대 직진 차량",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거49-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "자전거전용도로",
+    label: "자전거전용도로에서 차도 진입 자전거 대 차량",
+    faultA: 40,
+    faultB: 60,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거50-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "문열림",
+    label: "자전거 대 주·정차 차량 문 열림",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거50-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "문열림",
+    label: "전동킥보드 대 주·정차 차량 문 열림",
+    faultA: 15,
+    faultB: 85,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거51-1",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "보도주행",
+    label: "자전거 보도 주행 대 보도 진입 차량",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거51-2",
+    cat1: "차대자전거",
+    cat2: "기타",
+    cat3: "보도주행",
+    label: "자전거 보도 주행 대 보도 진출 차량",
+    faultA: 30,
+    faultB: 70,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+
+  // ========================================================================
+  // XX. 추가 특수 유형 - 보충
+  // ========================================================================
+
+  {
+    id: "특7-1",
+    cat1: "특수",
+    cat2: "PM대PM",
+    cat3: "교차로",
+    label: "전동킥보드 대 전동킥보드 교차로 충돌",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특7-2",
+    cat1: "특수",
+    cat2: "PM대PM",
+    cat3: "동일방향",
+    label: "전동킥보드 대 전동킥보드 추돌",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특8-1",
+    cat1: "특수",
+    cat2: "대형차",
+    cat3: "사각지대",
+    label: "대형차 우회전 사각지대 대 직진 자전거·이륜차",
+    faultA: 90,
+    faultB: 10,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특8-2",
+    cat1: "특수",
+    cat2: "대형차",
+    cat3: "사각지대",
+    label: "대형차 우회전 사각지대 대 횡단 보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특8-3",
+    cat1: "특수",
+    cat2: "대형차",
+    cat3: "후진",
+    label: "대형차 후진 대 후방 보행자·차량",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특9-1",
+    cat1: "특수",
+    cat2: "이륜차대이륜차",
+    cat3: "교차로",
+    label: "이륜차 대 이륜차 교차로 충돌 (신호있음)",
+    faultA: 50,
+    faultB: 50,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특9-2",
+    cat1: "특수",
+    cat2: "이륜차대이륜차",
+    cat3: "동일방향",
+    label: "이륜차 대 이륜차 추돌 (동일방향)",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특10-1",
+    cat1: "특수",
+    cat2: "공사차량",
+    cat3: "도로",
+    label: "도로공사 차량(정차) 대 후행 직진 차량",
+    faultA: 70,
+    faultB: 30,
+    modifiers: [
+      { type: "안전표시미설치", target: "B", adj: 20 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특10-2",
+    cat1: "특수",
+    cat2: "공사차량",
+    cat3: "도로",
+    label: "도로공사 차량 저속주행 대 후행 차량 추돌",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특11-1",
+    cat1: "특수",
+    cat2: "무인차량",
+    cat3: "도로",
+    label: "주·정차 중 무인 움직임(기어미체결) 대 보행자·차량",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "특11-2",
+    cat1: "특수",
+    cat2: "무인차량",
+    cat3: "경사로",
+    label: "경사로 주차 무인 움직임 대 하방 차량·보행자",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+
+  // --- 추가 보충 항목 ---
+  {
+    id: "보94",
+    cat1: "차대사람",
+    cat2: "어린이보호구역",
+    cat3: "주정차",
+    label: "어린이보호구역 불법주정차 차량 문열림 대 어린이",
+    faultA: 100,
+    faultB: 0,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "보95",
+    cat1: "차대사람",
+    cat2: "횡단보도부근",
+    cat3: "신호없음",
+    label: "후진 차량 대 횡단보도 부근 보행자",
+    faultA: 95,
+    faultB: 5,
+    modifiers: [
+      { type: "후방미확인", target: "A", adj: 10 },
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 }
+    ]
+  },
+  {
+    id: "거52-1",
+    cat1: "차대자전거",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "녹색좌회전화살표 자전거 대 적색직진 자동차",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "거52-2",
+    cat1: "차대자전거",
+    cat2: "교차로",
+    cat3: "양쪽신호",
+    label: "적색좌회전 자전거 대 녹색직진 자동차",
+    faultA: 80,
+    faultB: 20,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차44-4",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "도로진입",
+    label: "직진 대 주유소에서 도로 진입",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차44-5",
+    cat1: "차대차",
+    cat2: "동일방향",
+    cat3: "도로진입",
+    label: "직진 대 아파트단지에서 도로 진입",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "차57-6",
+    cat1: "차대차",
+    cat2: "기타",
+    cat3: "고속도로",
+    label: "고속도로 버스전용차로 대 일반차로 진입",
+    faultA: 20,
+    faultB: 80,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특12-1",
+    cat1: "특수",
+    cat2: "화물낙하",
+    cat3: "고속도로",
+    label: "고속도로 화물낙하 대 후행차 충돌",
+    faultA: 0,
+    faultB: 100,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
+  },
+  {
+    id: "특12-2",
+    cat1: "특수",
+    cat2: "화물낙하",
+    cat3: "일반도로",
+    label: "일반도로 화물낙하 대 후행차 충돌",
+    faultA: 10,
+    faultB: 90,
+    modifiers: [
+      { type: "현저한과실", target: "A", adj: 10 },
+      { type: "중대한과실", target: "A", adj: 20 },
+      { type: "현저한과실", target: "B", adj: 10 },
+      { type: "중대한과실", target: "B", adj: 20 }
+    ]
   }
 ];
 
