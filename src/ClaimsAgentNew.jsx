@@ -6038,18 +6038,18 @@ function TabData(){
         {uploading?<span style={{animation:"spin 1s linear infinite",display:"inline-block"}}>⏳</span>:"📤"} {uploading?"처리중...":"전체 업로드"}</button>
       {uploaded&&<button onClick={handleReset} style={{padding:"6px 10px",borderRadius:7,border:"1.5px solid #94a3b840",background:"#f8fafc",color:"#64748b",fontSize:11,fontWeight:500,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>🔄 초기화</button>}
       {/* 페이지네이션 */}
-      <div style={{display:"flex",gap:3,alignItems:"center",marginLeft:"auto"}}>
-        <button onClick={()=>setPage(0)} disabled={page===0} style={{padding:"4px 8px",borderRadius:5,border:"1px solid #e2e8f0",background:page===0?"#f1f5f9":"#fff",color:page===0?"#cbd5e1":"#334155",fontSize:10,cursor:page===0?"default":"pointer",fontFamily:"inherit"}}>⏮</button>
-        <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0} style={{padding:"4px 8px",borderRadius:5,border:"1px solid #e2e8f0",background:page===0?"#f1f5f9":"#fff",color:page===0?"#cbd5e1":"#334155",fontSize:10,cursor:page===0?"default":"pointer",fontFamily:"inherit"}}>◀</button>
-        <input value={jumpInput} onChange={e=>setJumpInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")handleJump();}} placeholder={`${page+1}`} style={{width:40,padding:"4px 4px",borderRadius:5,border:"1px solid #e2e8f0",fontSize:10,textAlign:"center",fontFamily:"inherit"}}/>
-        <span style={{fontSize:10,color:"#94a3b8"}}>/ {totalPages.toLocaleString()}</span>
-        <button onClick={()=>setPage(Math.min(totalPages-1,page+1))} disabled={page>=totalPages-1} style={{padding:"4px 8px",borderRadius:5,border:"1px solid #e2e8f0",background:page>=totalPages-1?"#f1f5f9":"#fff",color:page>=totalPages-1?"#cbd5e1":"#334155",fontSize:10,cursor:page>=totalPages-1?"default":"pointer",fontFamily:"inherit"}}>▶</button>
-        <button onClick={()=>setPage(totalPages-1)} disabled={page>=totalPages-1} style={{padding:"4px 8px",borderRadius:5,border:"1px solid #e2e8f0",background:page>=totalPages-1?"#f1f5f9":"#fff",color:page>=totalPages-1?"#cbd5e1":"#334155",fontSize:10,cursor:page>=totalPages-1?"default":"pointer",fontFamily:"inherit"}}>⏭</button>
+      <div style={{display:"flex",gap:4,alignItems:"center",marginLeft:"auto"}}>
+        <button onClick={()=>setPage(0)} disabled={page===0} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:page===0?"#f1f5f9":"#fff",color:page===0?"#cbd5e1":"#1e293b",fontSize:12,fontWeight:500,cursor:page===0?"default":"pointer",fontFamily:"inherit"}}>⏮</button>
+        <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:page===0?"#f1f5f9":"#fff",color:page===0?"#cbd5e1":"#1e293b",fontSize:12,fontWeight:500,cursor:page===0?"default":"pointer",fontFamily:"inherit"}}>◀</button>
+        <input value={jumpInput} onChange={e=>setJumpInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")handleJump();}} placeholder={`${page+1}`} style={{width:44,padding:"5px 4px",borderRadius:6,border:"1px solid #e2e8f0",fontSize:12,textAlign:"center",fontFamily:"inherit",fontWeight:600}}/>
+        <span style={{fontSize:12,color:"#64748b",fontWeight:500}}>/ {totalPages.toLocaleString()}</span>
+        <button onClick={()=>setPage(Math.min(totalPages-1,page+1))} disabled={page>=totalPages-1} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:page>=totalPages-1?"#f1f5f9":"#fff",color:page>=totalPages-1?"#cbd5e1":"#1e293b",fontSize:12,fontWeight:500,cursor:page>=totalPages-1?"default":"pointer",fontFamily:"inherit"}}>▶</button>
+        <button onClick={()=>setPage(totalPages-1)} disabled={page>=totalPages-1} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:page>=totalPages-1?"#f1f5f9":"#fff",color:page>=totalPages-1?"#cbd5e1":"#1e293b",fontSize:12,fontWeight:500,cursor:page>=totalPages-1?"default":"pointer",fontFamily:"inherit"}}>⏭</button>
       </div></div>
     {/* 상태 바 */}
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 8px",background:`${cd.bg}06`,borderRadius:8,border:`1px solid ${cd.bg}15`}}>
-      <div style={{fontSize:10,color:cd.bg,fontWeight:600}}>
-        {uploaded?`📂 전체 데이터 (${allRows.length.toLocaleString()}건)`:`📊 샘플 데이터 (${ds.sample.length}건 / 전체 ${ds.total.toLocaleString()}건)`}
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px",background:`${cd.bg}06`,borderRadius:8,border:`1px solid ${cd.bg}15`}}>
+      <div style={{fontSize:12,color:cd.bg,fontWeight:600}}>
+        {loadingJson===DK[dk]?"⏳ 전체 데이터 로딩 중...":uploaded||fullData[DK[dk]]?`📂 전체 데이터 (${allRows.length.toLocaleString()}건)`:`📊 샘플 데이터 (${ds.sample.length}건 / 전체 ${ds.total.toLocaleString()}건)`}
         {search&&<span style={{marginLeft:8,color:"#f59e0b"}}>🔍 필터: {filtered.length.toLocaleString()}건</span>}
       </div>
       <div style={{fontSize:9.5,color:"#94a3b8"}}>
@@ -6058,21 +6058,21 @@ function TabData(){
       </div></div>
     {/* 테이블 */}
     <div style={{flex:1,overflow:"auto",borderRadius:10,border:"1px solid #e2e8f0",background:"#fff"}}>
-      <table style={{width:"100%",borderCollapse:"collapse",fontSize:10.5,fontFamily:"'DM Mono',monospace"}}>
+      <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,fontFamily:"'Pretendard','DM Mono',sans-serif"}}>
         <thead><tr style={{position:"sticky",top:0,zIndex:2}}>
-          <th style={{padding:"7px 8px",background:"#64748b",color:"#fff",fontWeight:600,fontSize:9.5,textAlign:"center",borderRight:"1px solid rgba(255,255,255,.15)",minWidth:40}}>#</th>
-          {headers.map((h,i)=><th key={i} style={{padding:"7px 8px",background:cd.bg,color:"#fff",fontWeight:600,fontSize:9.5,textAlign:"left",whiteSpace:"nowrap",borderRight:"1px solid rgba(255,255,255,.15)",maxWidth:200}}>{h}</th>)}
+          <th style={{padding:"9px 10px",background:"#64748b",color:"#fff",fontWeight:700,fontSize:11.5,textAlign:"center",borderRight:"1px solid rgba(255,255,255,.15)",minWidth:44}}>#</th>
+          {headers.map((h,i)=><th key={i} style={{padding:"9px 10px",background:cd.bg,color:"#fff",fontWeight:700,fontSize:11.5,textAlign:"left",whiteSpace:"nowrap",borderRight:"1px solid rgba(255,255,255,.15)",maxWidth:220}}>{h}</th>)}
         </tr></thead>
         <tbody>{paged.length===0?<tr><td colSpan={headers.length+1} style={{padding:40,textAlign:"center",color:"#94a3b8",fontSize:13}}>
             {search?"검색 결과가 없습니다":"데이터가 없습니다"}</td></tr>
           :paged.map((row,ri)=>{const rowNum=page*PER+ri+1;return(
             <tr key={ri} style={{background:ri%2===0?"#fff":"#f8fafc",transition:"background .1s"}} onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"} onMouseLeave={e=>e.currentTarget.style.background=ri%2===0?"#fff":"#f8fafc"}>
-              <td style={{padding:"5px 8px",borderBottom:"1px solid #f1f5f9",color:"#94a3b8",fontSize:9.5,textAlign:"center",borderRight:"1px solid #f1f5f9"}}>{rowNum.toLocaleString()}</td>
-              {row.map((cell,ci)=><td key={ci} style={{padding:"5px 8px",borderBottom:"1px solid #f1f5f9",whiteSpace:"nowrap",maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",color:ci===0?"#94a3b8":"#334155",fontSize:10}} title={cell}>{cell}</td>)}
+              <td style={{padding:"6px 10px",borderBottom:"1px solid #f1f5f9",color:"#64748b",fontSize:11,fontWeight:500,textAlign:"center",borderRight:"1px solid #f1f5f9"}}>{rowNum.toLocaleString()}</td>
+              {row.map((cell,ci)=><td key={ci} style={{padding:"6px 10px",borderBottom:"1px solid #f1f5f9",whiteSpace:"nowrap",maxWidth:220,overflow:"hidden",textOverflow:"ellipsis",color:ci===0?"#64748b":"#1e293b",fontSize:11.5,fontWeight:ci===0?500:400}} title={cell}>{cell}</td>)}
             </tr>)})}</tbody></table></div>
     {/* 하단 */}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0"}}>
-      <div style={{fontSize:9,color:"#94a3b8"}}>💡 엑셀 파일(.xlsx)을 업로드하면 전체 데이터를 조회할 수 있습니다. 🗺️ 데이터 구조 맵에서 전체 구조를 확인하세요.</div>
+      <div style={{fontSize:11,color:"#64748b"}}>💡 탭 전환 시 전체 데이터가 자동 로드됩니다. 엑셀(.xlsx) 업로드로 데이터 교체도 가능합니다.</div>
       <div style={{display:"flex",gap:6}}>
         {DK.map((k,i)=><span key={k} style={{fontSize:8.5,color:cds[i].bg,fontWeight:600,opacity:fullData[k]?1:.5}}>{DATASETS[k].icon}{fullData[k]?"✓":""}</span>)}</div></div>
     </>}
