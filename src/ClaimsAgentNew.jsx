@@ -2754,12 +2754,37 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
     const cashSettle70=Math.round((tp+tl+pt)*0.7),cashSettle80=Math.round((tp+tl+pt)*0.8);
     const cashSection=`\n### 💵 미수선(현금정산) 제안\n- 전체 견적 ₩${(tp+tl+pt).toLocaleString()}의 70~80%\n- **현금정산 범위: ₩${cashSettle70.toLocaleString()} ~ ₩${cashSettle80.toLocaleString()}**\n- ${sv==="경미"?"경미 손상으로 미수선 처리 적합":""}${sv==="중간"?"중간 손상 — 고객 희망 시 미수선 가능, 안전 관련 부위는 수리 권고":""}${sv==="심각"||sv==="전손 추정"?"심각/전손 수준 — 미수선 비권장, 안전성 문제 가능":""}`;
     const caseCtx=useCase?buildContextFromCase(useCase):{};
-    const caseDesc=caseCtx.accidentType?`\n**사고유형**: ${caseCtx.accidentType}\n**과실비율**: A(자사) ${caseCtx.faultA||"미정"}% : B(타사) ${caseCtx.faultB||"미정"}%`:"";
-    const detailedPrompt=`당신은 자동차 손해사정 전문 AI입니다. 아래 데이터를 기반으로 **이 사건에 특화된** 견적 분석 리포트를 작성하세요. 일반 가이드가 아닌, 실제 데이터 기반 판단을 해주세요.
+    // ═══ 케이스별 시나리오 상세 맥락 생성 ═══
+    const CASE_SCENARIOS={
+      uc1:{accident:"교차로 골목길에서 자사 현대 그랜저와 타사 BMW 7시리즈가 측면 충돌",opponent:"BMW 7시리즈 (외산, 2023년식)",issue:"타사 BMW 수리비 ₩25,000,000 과다 청구 (AI 적정 ₩14~18M), 과실 50:50 분쟁, 대인 5명 동시 처리",focus:"외산 차량 부품 가격 ×1.6 배수 적정성, 범퍼 ASSY 교환 vs 판금 판단, 렌트 동종동급(7시리즈→5시리즈 정정) 필요"},
+      uc2:{accident:"주차장 내에서 자사 그랜저가 100% 과실로 타사 제네시스 GV80(출고 3개월 신차)에 충돌",opponent:"제네시스 GV80 3.5T AWD 프레스티지 (국산 고급, 2025년식, 주행 3,000km)",issue:"신차 감가 청구 위험 (₩8.4~12.6M), 품질인증부품 OEM 25% 인센티브 활용 가능",focus:"신차(3개월) 감가 방어 전략, 인증부품 활용 시 ₩1.6M 인센티브, 제휴센터 vs 공식센터 비용 비교"},
+      uc3:{accident:"편도 3차로 도로에서 자사 그랜저가 차선변경 중 타사 BMW 5시리즈와 접촉",opponent:"BMW 5시리즈 (외산, 2024년식)",issue:"과실 분쟁: 타사 0:100 주장 vs AI 85:15 판정 vs 보험사 90:10 협의안",focus:"차선변경 사고 과실 기본 70:30에서 +15% 가산 근거(급차선변경), 외산 부품 배수 적정성"},
+      uc4:{accident:"자사 기아 K5가 음주 상태(BAC 0.08%)로 신호위반하여 교차로에서 타사 현대 투싼과 충돌. 타사 차량이 무보험 상태",opponent:"현대 투싼 (국산, 2022년식, 무보험)",issue:"음주운전 면책(자차 미보상) + 12대 중과실(형사처벌) + 무보험 상대방(정부보장사업)",focus:"자차 수리비 전액 본인부담, 대인Ⅱ·대물 10~20% 사고부담금, 정부보장사업 청구 경로, 타사 3명 중상(8급) 보상"},
+      uc5:{accident:"자사 현대 쏘나타(렌터카 영업차량)가 정차 중 타사 기아 스포티지에 추돌 당함",opponent:"기아 스포티지 (국산, 2023년식, 가해 차량)",issue:"렌터카 영업차량이므로 렌트비가 아닌 휴차료(영업손실) 적용. 일매출 ₩180,000 × 수리 12일 = ₩2,160,000",focus:"영업손실(휴차료) 산출 근거, 가동률 85% 반영, R17 자동 적용, R07(렌트) 배제 확인"},
+      uc6:{accident:"3중 추돌: 자사 현대 그랜저(A)가 기아 K8(B)를 추돌, K8이 밀려 현대 스포티지(C)와 충돌",opponent:"기아 K8 (B차, 중간차, 전후면 양쪽 대파) + 현대 스포티지 (C차)",issue:"3자 과실 배분 A:B:C = 70:20:10, B차가 가해+피해 이중지위, 6방향 비용 흐름 계산",focus:"A→B ₩4.76M, A→C ₩3.15M, B→A ₩70만, B→C ₩90만 등 6방향 정산, B차 중간차 전후면 양쪽 대파로 수리비 ₩14.2M"},
+      uc7:{accident:"고속도로에서 자사 기아 모하비가 전복되어 가드레일 충돌. 단독 100% 과실",opponent:"가드레일(시설물) — 시설물 배상 별도",issue:"수리비 ₩42M이 차량가액 ₩48M의 87.5% → 전부손해(전손) 확정. 할부잔금 ₩18M(현대캐피탈) 우선변제",focus:"전손 보상 = 차량가액 ₩48M - 잔존물 ₩3.84M(8%) - 할부잔금 ₩18M = 고객 실수령 ₩26.16M. 대인 5급 2명 중상"},
+      uc8:{accident:"고속도로에서 자사 현대 스타리아(9인승)가 대형 트럭 후미에 추돌. 탑승자 1명 사망",opponent:"대형 카고트럭 (후면 경미 손상)",issue:"사망사고 → 유족 4명(배우자+자녀3)에게 대인Ⅰ 사망한도 ₩2억 분배. 6명 피해자(사망1+중상2+경상3) 개별 처리",focus:"유족 분배 순위(배우자>자녀), 6명 개별 상해등급 한도 조회, 전손(차량가액 ₩55M) 처리, 사망위자료 ₩8,000만"},
+      uc9:{accident:"자사 BMW 5시리즈가 현대 아반떼에 추돌 당함 — 반복 접수 사기 의심 건",opponent:"현대 아반떼 (국산, 2022년식)",issue:"사기 의심 스코어 78점: 6개월 내 3회 접수, 동일 정비소 반복, 접수 후 72시간 뒤 최초 병원. 범퍼 판금 가능→ASSY 교체 청구",focus:"수리비 과대 청구 검증 (청구 ₩4.8M vs 적정 ₩1.2M), SIU 의뢰 근거, 14급 과잉진료 의심(35일 치료)"},
+      uc10:{accident:"태풍으로 자사 제네시스 G80이 엔진룸 이상 수위까지 침수. 자연재해 단독",opponent:"자연재해(태풍) — 과실 없음",issue:"침수 전손 특례 적용 (수리비와 무관하게 전손). 사고 후 400일 경과 → 청구 시효 3년 내 조속 처리 필요",focus:"침수 전손 보상 = 차량가액 ₩72M - 잔존물, 해수 침수로 전자장비 전량 전손, 하부 구조 부식, 침수 특약 가입 여부 확인"},
+    };
+    const scenario=CASE_SCENARIOS[useCase];
+    const scenarioContext=scenario?`
+## 사고 시나리오 (${useCase.toUpperCase()})
+- **사고 경위**: ${scenario.accident}
+- **상대 차량**: ${scenario.opponent}
+- **핵심 쟁점**: ${scenario.issue}
+- **분석 초점**: ${scenario.focus}
+`:"";
+    const caseDesc=caseCtx.accidentType?`\n**사고유형**: ${caseCtx.accidentType}\n**과실비율**: A(자사) ${caseCtx.faultA||"미정"}% : B(타사) ${caseCtx.faultB||"미정"}%\n**피해자**: ${caseCtx.claimants||0}명${caseCtx.hasFatality?" (사망 포함)":""}${caseCtx.dui?" | 🍺 음주운전":""}${caseCtx.majorFault?" | ⚠️ 12대중과실":""}${caseCtx.uninsuredOpponent?" | 무보험 상대방":""}${caseCtx.isCommercial?" | 🚕 영업차량":""}${caseCtx.totalLoss?" | 🔥 전부손해":""}${caseCtx.isFlood?" | 🌊 침수":""}${caseCtx.hasLoan?" | 💳 할부잔금 ₩"+caseCtx.loanBalance?.toLocaleString():""}${caseCtx.fraudScore>=60?" | 🚨 사기의심("+caseCtx.fraudScore+"점)":""}${caseCtx.multiVehicle?" | 💥 "+caseCtx.vehicleCount+"대 다중추돌":""}`:"\n**사고유형**: 일반 사고";
+    const detailedPrompt=`당신은 자동차 손해사정 전문 AI입니다. 아래 **구체적 사고 시나리오와 차량 데이터**를 기반으로 이 사건에 **완전히 특화된** 견적 분석 리포트를 작성하세요.
+
+⚠️ 중요: 일반적인 가이드가 아니라, 이 사고의 구체적 상황(사고 경위, 차량 모델, 파손 부위, 과실비율, 특수 상황)에 맞는 실질적 분석을 해주세요. 차량명, 금액, 부위명을 구체적으로 언급하세요.
+
 [참조 기준] 삼성화재·현대해상 약관(2025.08.16 개정), 자배법 시행령 별표1, 품질인증부품 OEM 25% 인센티브, 대차 동종동급 원칙.
 [온톨로지 추론 결과 (${ontoRes.rulesFired}개 규칙 발동)]
 ${ontoSummary}`;
-    const detailedMsg=`## 사건 정보
+    const detailedMsg=`${scenarioContext}
+## 분석 대상 차량
 차량: ${mk} ${md} ${yr||"미상"}년식 (${isImport?"외산":"국산"}${isSuper?" 슈퍼카":""})${caseDesc}
 파손 부위 ${sp.length}개 (${sv}): ${sp.join(", ")}
 사진: ${ph.length}장
@@ -2772,16 +2797,19 @@ ${ontoSummary}`;
 | 도장비 | ₩${pt.toLocaleString()} |
 | **합계** | **₩${(tp+tl+pt).toLocaleString()}** |
 
-## 부위별 수리/교환 판단 (AI 분석)
+## 부위별 수리/교환 판단
 ${partAnalysis}
 ${adasSection}
 ${cashSection}
 
-위 데이터를 바탕으로:
-1. **견적 적정성 판단** — 각 부위별 금액이 시장 기준 대비 적정한지, 과다/과소 항목은 없는지
-2. **수리 vs 교환 최종 의견** — 위 판단을 검증하고 비용 절감 가능한 부위 제시
-3. **종합 의견** — 이 사건의 핵심 쟁점과 손해사정사가 주의할 점
-을 간결하게 작성하세요.`;
+위 시나리오와 데이터를 바탕으로 아래 형식으로 리포트를 작성하세요:
+
+### 📋 ${mk} ${md} 견적 분석 리포트
+1. **견적 적정성** — ${mk} ${md}의 각 파손 부위별 금액이 적정한지 구체적으로 판단 (해당 차종 시장 기준 대비)
+2. **수리 vs 교환 판단** — 각 부위별 최종 판단과 비용 절감 가능 금액${scenario?`
+3. **${scenario.issue.split(",")[0]}** — 이 사건의 핵심 쟁점에 대한 구체적 분석`:`
+3. **핵심 쟁점** — 이 사건에서 주의할 점`}
+4. **종합 의견 및 추천** — 최적 처리 방안 (예상 총비용 포함)`;
     const a=useCase==="uc2"?UC_ESTIMATE_RESPONSE:await callAI(detailedPrompt,detailedMsg);
     sAt(a);sLd(false);
   };
