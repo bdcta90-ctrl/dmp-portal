@@ -2063,34 +2063,68 @@ export default function SecurityDashboard(props) {
                 var topEmps = Object.values(empScores).sort(function(a, b) { return b.score - a.score; }).slice(0, 100);
                 topEmps.forEach(function(item) { item.score = item.maxScore; });
                 var deptSet = {};
+                // ═══ 부서 — 상단 고정 바 ═══
+                var deptPositions = {};
                 DEPARTMENTS.forEach(function(d, i) {
-                  var angle = (i / DEPARTMENTS.length) * Math.PI * 2 - Math.PI / 2;
-                  var rx = 420, ry = 280;
-                  nodes.push({ id: "dept-" + d, label: d, type: "dept", x: canvasW / 2 + Math.cos(angle) * rx, y: canvasH / 2 + Math.sin(angle) * ry, w: 70, h: 26 });
+                  var x = 30 + (i % 10) * 108;
+                  var y = i < 10 ? 30 : 60;
+                  nodes.push({ id: "dept-" + d, label: d, type: "dept", x: x, y: y, w: 90, h: 24 });
+                  deptPositions[d] = { x: x, y: y };
                   deptSet[d] = true;
                 });
+                // ═══ 자산 — 중간 띠 ═══
                 ASSETS.forEach(function(a, i) {
-                  var angle = (i / ASSETS.length) * Math.PI * 2 - Math.PI / 2;
-                  nodes.push({ id: "asset-" + a.name, label: a.name.slice(0, 10), type: "asset", x: canvasW / 2 + Math.cos(angle) * 200, y: canvasH / 2 + Math.sin(angle) * 150, w: 72, h: 26 });
+                  var row = Math.floor(i / 9);
+                  var col = i % 9;
+                  var x = 40 + col * 120;
+                  var y = 380 + row * 35;
+                  nodes.push({ id: "asset-" + a.name, label: a.name.length > 12 ? a.name.slice(0,12) + ".." : a.name, type: "asset", x: x, y: y, w: 100, h: 24 });
                 });
+                // ═══ 이벤트 유형 — 하단 좌측 ═══
                 EVENT_TYPES.forEach(function(et, i) {
-                  var angle = (i / EVENT_TYPES.length) * Math.PI * 2 - Math.PI / 4;
-                  nodes.push({ id: "evt-" + et.type, label: et.label.slice(0, 8), type: "eventType", x: canvasW / 2 + Math.cos(angle) * 310, y: canvasH / 2 + Math.sin(angle) * 220, w: 20, h: 20 });
+                  var x = 40 + i * 120;
+                  var y = 480;
+                  nodes.push({ id: "evt-" + et.type, label: et.icon + " " + et.label.slice(0,6), type: "eventType", x: x, y: y, w: 20, h: 20 });
                 });
-                topEmps.forEach(function(item, i) {
-                  var ring = i < 20 ? 0 : i < 50 ? 1 : 2;
-                  var ringCount = ring === 0 ? Math.min(topEmps.length, 20) : ring === 1 ? Math.min(topEmps.length - 20, 30) : topEmps.length - 50;
-                  var ringIdx = ring === 0 ? i : ring === 1 ? i - 20 : i - 50;
-                  var angle = (ringIdx / Math.max(ringCount, 1)) * Math.PI * 2;
-                  var rx = ring === 0 ? 100 : ring === 1 ? 160 : 220;
-                  var ry = ring === 0 ? 70 : ring === 1 ? 110 : 150;
-                  var isCritical = item.score >= 90;
-                  nodes.push({ id: "emp-" + item.emp.id, label: item.emp.name, type: "employee", x: canvasW / 2 + Math.cos(angle) * rx, y: canvasH / 2 + Math.sin(angle) * ry, w: isCritical ? 22 : 16, h: isCritical ? 22 : 16, score: item.score, critical: isCritical });
-                });
+                // ═══ 조치 — 하단 우측 ═══
                 var actionKeys = Object.keys(ACTION_GUIDES);
                 actionKeys.forEach(function(name, i) {
-                  var angle = (i / actionKeys.length) * Math.PI * 2 + Math.PI / 3;
-                  nodes.push({ id: "action-" + name, label: name.slice(0, 6), type: "action", x: canvasW / 2 + Math.cos(angle) * 380, y: canvasH / 2 + Math.sin(angle) * 260, w: 60, h: 24 });
+                  var row = Math.floor(i / 6);
+                  var col = i % 6;
+                  var x = 40 + col * 175;
+                  var y = 540 + row * 30;
+                  nodes.push({ id: "action-" + name, label: name.slice(0,8), type: "action", x: x, y: y, w: 80, h: 24 });
+                });
+                // ═══ 직원 — 부서별 클러스터 (부서 아래 배치) ═══
+                var empsByDept = {};
+                topEmps.forEach(function(item) {
+                  var d = item.emp.department;
+                  if (!empsByDept[d]) empsByDept[d] = [];
+                  empsByDept[d].push(item);
+                });
+                Object.keys(empsByDept).forEach(function(dept) {
+                  var deptPos = deptPositions[dept];
+                  if (!deptPos) return;
+                  var emps = empsByDept[dept];
+                  emps.forEach(function(item, i) {
+                    var col = i % 4;
+                    var row = Math.floor(i / 4);
+                    var x = deptPos.x - 15 + col * 28;
+                    var y = deptPos.y + 35 + row * 28;
+                    var isCritical = item.score >= 90;
+                    nodes.push({
+                      id: "emp-" + item.emp.id,
+                      label: item.emp.name,
+                      type: "employee",
+                      x: x,
+                      y: y,
+                      w: isCritical ? 20 : 14,
+                      h: isCritical ? 20 : 14,
+                      score: item.score,
+                      critical: isCritical,
+                      dept: dept
+                    });
+                  });
                 });
                 topEmps.forEach(function(item) {
                   if (deptSet[item.emp.department]) {
@@ -2173,6 +2207,17 @@ export default function SecurityDashboard(props) {
                         });
                         setGraphSelected(graphSelected === found ? null : found);
                       }}>
+                      {/* Zone separators */}
+                      <line x1={0} y1={95} x2={canvasW} y2={95} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
+                      <line x1={0} y1={365} x2={canvasW} y2={365} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
+                      <line x1={0} y1={465} x2={canvasW} y2={465} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
+                      <line x1={0} y1={530} x2={canvasW} y2={530} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
+                      {/* Section labels */}
+                      <text x={20} y={18} fill="#94a3b8" fontSize="10" fontWeight="600">{"부서 (20)"}</text>
+                      <text x={20} y={115} fill="#94a3b8" fontSize="10" fontWeight="600">{"위험 직원 (부서별 클러스터)"}</text>
+                      <text x={20} y={375} fill="#94a3b8" fontSize="10" fontWeight="600">{"자산 (25)"}</text>
+                      <text x={20} y={475} fill="#94a3b8" fontSize="10" fontWeight="600">{"이벤트 유형 (9)"}</text>
+                      <text x={20} y={535} fill="#94a3b8" fontSize="10" fontWeight="600">{"조치 가이드 (11)"}</text>
                       {edges.map(function(e, i) {
                         var from = nodeMap[e.from], to = nodeMap[e.to];
                         if (!from || !to) return null;
