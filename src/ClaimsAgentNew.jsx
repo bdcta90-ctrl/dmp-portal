@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { buildAccidentTypeRows, ACCIDENT_TYPE_HEADERS, buildRepairMethodRows, REPAIR_METHOD_HEADERS, buildDamageChainRows, DAMAGE_CHAIN_HEADERS, buildVehicleClassRows, VEHICLE_CLASS_HEADERS, buildOntologyRuleRows, ONTOLOGY_RULE_HEADERS } from "./explorer-data.js";
 
