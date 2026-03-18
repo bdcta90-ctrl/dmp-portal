@@ -54,16 +54,31 @@ const EVENT_TYPES = [
 ];
 
 const ASSETS = [
-  { name: "고객계좌DB", type: "DB", sensitivity: 5, classification: "기밀" },
-  { name: "2026_전략보고서.pdf", type: "리포트", sensitivity: 4, classification: "대외비" },
-  { name: "인사평가_시트.xlsx", type: "파일", sensitivity: 4, classification: "기밀" },
-  { name: "기술설계도_v3.dwg", type: "설계도", sensitivity: 5, classification: "최고기밀" },
-  { name: "거래처_리스트.csv", type: "파일", sensitivity: 3, classification: "대외비" },
-  { name: "연구개발_소스코드", type: "코드", sensitivity: 5, classification: "기밀" },
-  { name: "재무제표_Q1.xlsx", type: "리포트", sensitivity: 4, classification: "대외비" },
-  { name: "고객개인정보_DB", type: "DB", sensitivity: 5, classification: "최고기밀" },
-  { name: "급여명세_전체.xlsx", type: "파일", sensitivity: 5, classification: "최고기밀" },
-  { name: "M_A_계약서_draft.pdf", type: "리포트", sensitivity: 5, classification: "최고기밀" },
+  { name: "고객계좌DB", type: "DB", sensitivity: 5, classification: "기밀", since: "2015.03", lastAudit: "2026.02" },
+  { name: "2026_전략보고서.pdf", type: "리포트", sensitivity: 4, classification: "대외비", since: "2025.11", lastAudit: "2026.01" },
+  { name: "인사평가_시트.xlsx", type: "파일", sensitivity: 4, classification: "기밀", since: "2016.01", lastAudit: "2025.12" },
+  { name: "기술설계도_v3.dwg", type: "설계도", sensitivity: 5, classification: "최고기밀", since: "2017.05", lastAudit: "2026.03" },
+  { name: "거래처_리스트.csv", type: "파일", sensitivity: 3, classification: "대외비", since: "2018.02", lastAudit: "2025.10" },
+  { name: "연구개발_소스코드", type: "코드", sensitivity: 5, classification: "기밀", since: "2016.06", lastAudit: "2026.03" },
+  { name: "재무제표_Q1.xlsx", type: "리포트", sensitivity: 4, classification: "대외비", since: "2026.01", lastAudit: "2026.03" },
+  { name: "고객개인정보_DB", type: "DB", sensitivity: 5, classification: "최고기밀", since: "2015.01", lastAudit: "2026.01" },
+  { name: "급여명세_전체.xlsx", type: "파일", sensitivity: 5, classification: "최고기밀", since: "2015.01", lastAudit: "2026.02" },
+  { name: "M_A_계약서_draft.pdf", type: "리포트", sensitivity: 5, classification: "최고기밀", since: "2024.08", lastAudit: "2026.01" },
+  { name: "ERP 재무모듈", type: "시스템", classification: "대외비", sensitivity: 4, since: "2015.01", lastAudit: "2025.12" },
+  { name: "CRM 고객관리", type: "시스템", classification: "기밀", sensitivity: 4, since: "2016.03", lastAudit: "2025.11" },
+  { name: "사내 이메일 시스템", type: "시스템", classification: "대외비", sensitivity: 3, since: "2015.01", lastAudit: "2026.01" },
+  { name: "VPN 접속 로그", type: "로그", classification: "대외비", sensitivity: 3, since: "2018.06", lastAudit: "2026.02" },
+  { name: "CCTV 영상 저장소", type: "영상", classification: "기밀", sensitivity: 4, since: "2017.01", lastAudit: "2025.10" },
+  { name: "클라우드 스토리지(AWS S3)", type: "시스템", classification: "기밀", sensitivity: 5, since: "2020.01", lastAudit: "2026.01" },
+  { name: "소스코드 Git 저장소", type: "코드", classification: "최고기밀", sensitivity: 5, since: "2016.05", lastAudit: "2026.03" },
+  { name: "인사 평가 기록", type: "문서", classification: "기밀", sensitivity: 4, since: "2015.01", lastAudit: "2025.09" },
+  { name: "이사회 의사록", type: "문서", classification: "최고기밀", sensitivity: 5, since: "2015.01", lastAudit: "2026.02" },
+  { name: "파트너사 계약서", type: "문서", classification: "대외비", sensitivity: 3, since: "2015.06", lastAudit: "2025.08" },
+  { name: "AI 학습 데이터셋", type: "데이터", classification: "기밀", sensitivity: 4, since: "2023.01", lastAudit: "2026.03" },
+  { name: "고객 통화 녹취", type: "음성", classification: "최고기밀", sensitivity: 5, since: "2019.01", lastAudit: "2025.12" },
+  { name: "비밀번호 해시 DB", type: "시스템", classification: "최고기밀", sensitivity: 5, since: "2015.01", lastAudit: "2026.03" },
+  { name: "감사 보고서", type: "문서", classification: "기밀", sensitivity: 4, since: "2015.01", lastAudit: "2025.11" },
+  { name: "M&A 검토 자료", type: "문서", classification: "최고기밀", sensitivity: 5, since: "2024.06", lastAudit: "2026.01" },
 ];
 
 const CONTEXT_REASONS = [
@@ -156,6 +171,66 @@ var ACTION_GUIDES = {
       { step:5, title:"공동 보고서 작성", desc:"보안+HR 분석 결합 최종 보고서.", system:"보안관제/HR", auto:false }
     ],
     templates: { title: "HR 연계 조사 요청", body: "[조사요청] {employee_name}님({department}) HR 연계 조사 요청.\n> 행위: {event_type}\n> 자산: {asset_name}\n> 위험도: {risk_score}/100\n> 시각: {timestamp}" }
+  },
+  "데이터 백업 격리": {
+    icon:"💾", urgency:"high", summary:"유출 의심 데이터의 증거 보전을 위한 긴급 백업",
+    estimatedTime:"즉시 (5~10분)", riskIfSkipped:"증거 인멸 위험",
+    steps:[
+      {step:1,title:"대상 파일/DB 식별",desc:"접근 로그에서 대상 자산 확인",system:"보안관제",auto:true},
+      {step:2,title:"스냅샷 생성",desc:"해당 자산의 현재 상태 스냅샷",system:"스토리지",auto:true},
+      {step:3,title:"격리 저장소로 복사",desc:"포렌식용 읽기전용 격리 저장소에 보관",system:"포렌식",auto:true},
+      {step:4,title:"해시값 생성",desc:"SHA-256 해시로 무결성 보장",system:"포렌식",auto:true},
+      {step:5,title:"보관 기록 등록",desc:"증거물 관리대장 등록",system:"보안관제",auto:false},
+    ],
+    templates: null
+  },
+  "포렌식 조사 의뢰": {
+    icon:"🔬", urgency:"critical", summary:"디지털 포렌식 전문팀에 조사 의뢰",
+    estimatedTime:"3~7 영업일", riskIfSkipped:"법적 증거 확보 불가",
+    steps:[
+      {step:1,title:"조사 범위 확정",desc:"대상 직원, 기간, 시스템 범위 확정",system:"보안관제",auto:false},
+      {step:2,title:"포렌식 의뢰서 작성",desc:"사건 개요, 요청사항, 긴급도 명시",system:"결재",auto:false},
+      {step:3,title:"증거물 인계",desc:"백업 격리된 데이터 인계",system:"포렌식",auto:false},
+      {step:4,title:"조사 착수 및 중간보고",desc:"주 1회 진행상황 보고",system:"포렌식",auto:false},
+      {step:5,title:"최종 보고서 수령",desc:"포렌식 결과 보고서 + 증거물 반환",system:"포렌식",auto:false},
+    ],
+    templates: null
+  },
+  "보안교육 지정": {
+    icon:"📚", urgency:"low", summary:"위험 행동 직원 대상 보안교육 이수 지정",
+    estimatedTime:"1~2주 (온라인)", riskIfSkipped:"재발 방지 미흡",
+    steps:[
+      {step:1,title:"교육 대상자 선정",desc:"위험 점수 기반 자동 선정",system:"보안관제",auto:true},
+      {step:2,title:"교육 과정 배정",desc:"정보보호 교육 플랫폼에 등록",system:"HR Portal",auto:true},
+      {step:3,title:"교육 일정 통보",desc:"이메일/사내메신저로 알림",system:"사내 메신저",auto:true},
+      {step:4,title:"이수 현황 모니터링",desc:"미이수자 재알림",system:"HR Portal",auto:true},
+      {step:5,title:"이수 확인 및 기록",desc:"교육 완료 기록 HR 연동",system:"HR Portal",auto:false},
+    ],
+    templates: null
+  },
+  "CISO 긴급 보고": {
+    icon:"🚨", urgency:"critical", summary:"최고정보보호책임자에게 즉시 보고",
+    estimatedTime:"즉시 (10분 이내)", riskIfSkipped:"경영진 대응 지연",
+    steps:[
+      {step:1,title:"사건 요약 작성",desc:"1장 요약 보고서 자동 생성",system:"보안관제",auto:true},
+      {step:2,title:"CISO 연락",desc:"긴급 연락망 자동 발신",system:"사내 메신저",auto:true},
+      {step:3,title:"구두 보고",desc:"전화/대면 보고",system:"대면",auto:false},
+      {step:4,title:"후속 조치 지시 수령",desc:"CISO 판단에 따른 추가 조치",system:"결재",auto:false},
+      {step:5,title:"보고 기록 등록",desc:"보고 일시, 내용, 지시사항 기록",system:"보안관제",auto:true},
+    ],
+    templates: { title: "CISO 긴급 보고", body: "[긴급보고] CISO님, 보안 사고 긴급 보고드립니다.\n> 대상: {employee_name} ({department})\n> 행위: {event_type}\n> 자산: {asset_name}\n> 위험도: {risk_score}/100\n> 시각: {timestamp}\n\n즉시 확인 및 지시 부탁드립니다." }
+  },
+  "외부 신고": {
+    icon:"📢", urgency:"critical", summary:"관계기관(KISA, 금감원, 경찰) 신고",
+    estimatedTime:"즉시~24시간", riskIfSkipped:"법적 의무 위반 (과태료)",
+    steps:[
+      {step:1,title:"신고 대상 기관 확정",desc:"KISA(개인정보), 금감원(금융), 경찰(형사)",system:"보안관제",auto:false},
+      {step:2,title:"신고서 작성",desc:"법정 양식에 맞춰 작성",system:"결재",auto:false},
+      {step:3,title:"증거자료 첨부",desc:"포렌식 보고서, 로그, 스크린샷",system:"포렌식",auto:false},
+      {step:4,title:"신고 제출",desc:"온라인 또는 방문 제출",system:"외부",auto:false},
+      {step:5,title:"접수번호 및 후속 대응",desc:"기관 조사 협조",system:"외부",auto:false},
+    ],
+    templates: null
   }
 };
 
@@ -255,7 +330,7 @@ function generateEvent(employees, existingEvents) {
   contexts.sort(function(a,b){return b.probability - a.probability});
   contexts = contexts.slice(0, 3);
 
-  var urgMap={"계정 잠금":"critical","접근 일시 제한":"high","HR 연계 조사 요청":"high","추가 MFA 인증":"medium","감사 로그 자동 생성":"medium","관리자 확인 요청":"low"};
+  var urgMap={"계정 잠금":"critical","접근 일시 제한":"high","HR 연계 조사 요청":"high","추가 MFA 인증":"medium","감사 로그 자동 생성":"medium","관리자 확인 요청":"low","데이터 백업 격리":"high","포렌식 조사 의뢰":"critical","보안교육 지정":"low","CISO 긴급 보고":"critical","외부 신고":"critical"};
   var avail=Object.keys(ACTION_GUIDES).sort(function(){return Math.random()-0.5});
   var recs=[];
   if(riskScore>=80) recs.push(avail.find(function(a){return urgMap[a]==="critical"})||avail[0]);
@@ -1631,36 +1706,74 @@ export default function SecurityDashboard(props) {
           { key: "assets", label: "\uC790\uC0B0DB", count: ASSETS.length },
           { key: "events", label: "\uC774\uBCA4\uD2B8 \uC720\uD615DB", count: EVENT_TYPES.length },
           { key: "actions", label: "\uC870\uCE58 \uAC00\uC774\uB4DCDB", count: Object.keys(ACTION_GUIDES).length },
-          { key: "compliance", label: "\uBC95\uADDCDB", count: 6 }
+          { key: "compliance", label: "\uBC95\uADDCDB", count: 31 }
         ];
 
         var headers = {
           employees: ["\uC0AC\uBC88","\uC774\uB984","\uBD80\uC11C","\uC9C1\uAE09","\uACE0\uC6A9\uD615\uD0DC","\uBCF4\uC548\uB4F1\uAE09","\uC0C1\uAE09\uC790","\uC785\uC0AC\uC77C","\uD1F4\uC0AC\uC608\uC815","\uBD80\uC11C\uC774\uB3D9","\uACBD\uACE0\uD69F\uC218","\uC131\uACFC\uB4F1\uAE09"],
-          assets: ["\uC790\uC0B0\uBA85","\uC720\uD615","\uBCF4\uC548\uB4F1\uAE09","\uBBFC\uAC10\uB3C4","\uC811\uADFC\uAC00\uB2A5\uBD80\uC11C"],
+          assets: ["\uC790\uC0B0\uBA85","\uC720\uD615","\uBCF4\uC548\uB4F1\uAE09","\uBBFC\uAC10\uB3C4","\uAD00\uB9AC\uC2DC\uC791","\uCD5C\uADFC\uAC10\uC0AC","\uC811\uADFC\uAC00\uB2A5\uBD80\uC11C"],
           events: ["\uC774\uBCA4\uD2B8","\uCF54\uB4DC","\uC2EC\uAC01\uB3C4","\uAE30\uBCF8\uC810\uC218","\uAC00\uC911\uCE58(%)","\uC124\uBA85"],
           actions: ["\uC870\uCE58\uBA85","\uAE34\uAE09\uB3C4","\uC608\uC0C1\uC2DC\uAC04","\uC124\uBA85","\uB2E8\uACC4\uC218"],
-          compliance: ["\uBC95\uADDC","\uC870\uD56D","\uC694\uAD6C\uC0AC\uD56D","\uD604\uC7AC\uC0C1\uD0DC","\uBE44\uACE0"]
+          compliance: ["\uBC95\uADDC/\uAE30\uC900","\uC870\uD56D","\uC694\uAD6C\uC0AC\uD56D","\uC900\uC218\uC0C1\uD0DC","\uBE44\uACE0"]
         };
 
         var complianceData = [
-          ["\uAC1C\uC778\uC815\uBCF4\uBCF4\uD638\uBC95","\uC81C29\uC870","\uC548\uC804\uC131 \uD655\uBCF4\uC870\uCE58","\uBD80\uBD84 \uC900\uC218","\uC554\uD638\uD654 \uC801\uC6A9 \uD544\uC694"],
-          ["\uC815\uBCF4\uD1B5\uC2E0\uB9DD\uBC95","\uC81C28\uC870","\uC811\uADFC\uAE30\uB85D \uBCF4\uAD00","\uC900\uC218","\uB85C\uADF8 \uAE30\uB85D \uD65C\uC131"],
-          ["\uC804\uC790\uAE08\uC735\uAC70\uB798\uBC95","\uC81C21\uC870","\uC774\uC0C1\uAC70\uB798 \uD0D0\uC9C0","\uBD80\uBD84 \uC900\uC218","\uC2E4\uC2DC\uAC04 \uBAA8\uB2C8\uD130\uB9C1 \uAD6C\uCD95\uC911"],
-          ["\uC2E0\uC6A9\uC815\uBCF4\uBC95","\uC81C32\uC870","\uAE30\uC220\uC801 \uBCF4\uD638\uC870\uCE58","\uBBF8\uC900\uC218","DLP \uC5F0\uB3D9 \uD544\uC694"],
-          ["\uC0B0\uC5C5\uAE30\uC220\uBCF4\uD638\uBC95","\uC81C2\uC870","\uC601\uC5C5\uBE44\uBC00 \uBCF4\uD638","\uC900\uC218","\uC811\uADFC\uD1B5\uC81C \uC801\uC6A9"],
-          ["ISO 27001","A.12.4","\uB85C\uAE45 \uBC0F \uBAA8\uB2C8\uD130\uB9C1","\uBD80\uBD84 \uC900\uC218","\uAC10\uC0AC\uCD94\uC801 \uC2DC\uC2A4\uD15C \uBBF8\uC5F0\uB3D9"]
+          // 개인정보보호법
+          ["개인정보보호법","제15조","개인정보 수집·이용 동의","⚠️ 미구현","직원 모니터링 사전 동의 필요"],
+          ["개인정보보호법","제17조","개인정보 제3자 제공 동의","⚠️ 미구현","외부 기관 공유 시 동의"],
+          ["개인정보보호법","제21조","개인정보 파기","⚠️ 일부 적용","이벤트 500건 제한, 장기보관 미설정"],
+          ["개인정보보호법","제24조의2","주민등록번호 처리 제한","✅ 해당없음","주민번호 미수집"],
+          ["개인정보보호법","제29조","안전조치 의무","⚠️ 일부 적용","접근통제 구현, 암호화 미적용"],
+          ["개인정보보호법","제34조","개인정보 유출 통지","❌ 미구현","유출 시 72시간 내 통지 시스템 없음"],
+          ["개인정보보호법","제35조","개인정보 열람 요구권","❌ 미구현","직원의 자기정보 열람 기능 없음"],
+          ["개인정보보호법","제36조","개인정보 정정·삭제 요구권","❌ 미구현",""],
+          ["개인정보보호법","제37조","개인정보 처리정지 요구권","❌ 미구현",""],
+          // 정보통신망법
+          ["정보통신망법","제28조","개인정보 보호조치","✅ 적용","접근로그 기록 중"],
+          ["정보통신망법","제28조의2","접속기록 보관","⚠️ 일부 적용","6개월 보관 의무, 현재 메모리만"],
+          ["정보통신망법","제49조","비밀침해 금지","⚠️ 주의필요","모니터링 범위 법적 검토 필요"],
+          // 신용정보법
+          ["신용정보법","제19조","신용정보 관리 의무","✅ 적용","고객계좌DB 접근 통제"],
+          ["신용정보법","제32조","개인신용정보 제공·이용","⚠️ 일부 적용","내부 이용 기준 명확화 필요"],
+          // 전자금융거래법
+          ["전자금융거래법","제21조","안전성 확보 의무","✅ 적용","접근통제 + 모니터링"],
+          ["전자금융거래법","제21조의3","전자금융사고 보고","❌ 미구현","금융위 보고 자동화 없음"],
+          // 산업기술보호법
+          ["산업기술보호법","제11조","산업기술 유출 방지","✅ 적용","기술설계도·소스코드 모니터링"],
+          ["산업기술보호법","제14조","산업기술 유출 신고","⚠️ 일부 적용","신고 프로세스 수동"],
+          ["산업기술보호법","제34조","벌칙 (유출 시)","✅ 참조","벌금/징역 기준 안내 가능"],
+          // 근로기준법
+          ["근로기준법","제93조","취업규칙 (감시 고지)","⚠️ 미구현","취업규칙에 모니터링 명시 필요"],
+          ["근로기준법","제94조","취업규칙 불이익 변경","⚠️ 주의필요","과반수 동의 필요"],
+          // ISMS-P
+          ["ISMS-P","2.5.1","사용자 인증","✅ 적용","IAM 연계 (준비중)"],
+          ["ISMS-P","2.5.4","접근권한 관리","✅ 적용","역할-자산 매트릭스 구현"],
+          ["ISMS-P","2.6.1","접근통제 정책","✅ 적용","DEPT_ASSETS 기반"],
+          ["ISMS-P","2.9.1","보안사고 대응","⚠️ 일부 적용","조치가이드 11종, 자동화 미완"],
+          ["ISMS-P","2.11.1","개인정보 보호대책","⚠️ 일부 적용","영향평가 미실시"],
+          // ISO 27001
+          ["ISO 27001","A.7.2","고용 중 보안","⚠️ 일부 적용","HR 연계 준비중"],
+          ["ISO 27001","A.8.1","자산 관리","✅ 적용","25개 자산 분류·등급 관리"],
+          ["ISO 27001","A.9.2","사용자 접근 관리","✅ 적용","보안등급 4단계"],
+          ["ISO 27001","A.12.4","로그 및 모니터링","✅ 적용","실시간 이벤트 감시"],
+          ["ISO 27001","A.16.1","보안사고 관리","⚠️ 일부 적용","조치가이드 있으나 실행 미연동"],
         ];
 
         var getRows = function() {
           if (dataSubTab === "employees") {
-            return employees.map(function(emp) {
+            var sortedEmployees = [].concat(employees).sort(function(a,b) {
+              if (a.department !== b.department) return a.department.localeCompare(b.department);
+              if (a.role !== b.role) return a.role.localeCompare(b.role);
+              return a.employmentType.localeCompare(b.employmentType);
+            });
+            return sortedEmployees.map(function(emp) {
               return [emp.id, emp.name, emp.department, emp.role, emp.employmentType, emp.clearanceLevel, emp.managerId, emp.profile.hireDate.toLocaleDateString("ko-KR"), emp.profile.resignPlanned ? "\uC608" : "\uC544\uB2C8\uC624", emp.profile.recentTransfer ? "\uC788\uC74C" : "\uC5C6\uC74C", emp.profile.warningCount, emp.profile.performanceRating];
             });
           } else if (dataSubTab === "assets") {
             return ASSETS.map(function(a) {
               var depts = [];
               Object.keys(DEPT_ASSETS).forEach(function(d) { if (DEPT_ASSETS[d].indexOf(a.name) !== -1) depts.push(d); });
-              return [a.name, a.type, a.classification, a.sensitivity, depts.join(", ") || "-"];
+              return [a.name, a.type, a.classification, a.sensitivity, a.since || "-", a.lastAudit || "-", depts.join(", ") || "-"];
             });
           } else if (dataSubTab === "events") {
             return EVENT_TYPES.map(function(et, i) {
@@ -1668,7 +1781,7 @@ export default function SecurityDashboard(props) {
               return [et.icon + " " + et.label, et.type, et.severity, baseScore, EVENT_WEIGHTS[i] || 0, et.label];
             });
           } else if (dataSubTab === "actions") {
-            var urgMap = {"\uAD00\uB9AC\uC790 \uD655\uC778 \uC694\uCCAD":"low","\uCD94\uAC00 MFA \uC778\uC99D":"medium","\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C":"high","\uACC4\uC815 \uC7A0\uAE08":"critical","\uAC10\uC0AC \uB85C\uADF8 \uC790\uB3D9 \uC0DD\uC131":"medium","HR \uC5F0\uACC4 \uC870\uC0AC \uC694\uCCAD":"high"};
+            var urgMap = {"\uAD00\uB9AC\uC790 \uD655\uC778 \uC694\uCCAD":"low","\uCD94\uAC00 MFA \uC778\uC99D":"medium","\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C":"high","\uACC4\uC815 \uC7A0\uAE08":"critical","\uAC10\uC0AC \uB85C\uADF8 \uC790\uB3D9 \uC0DD\uC131":"medium","HR \uC5F0\uACC4 \uC870\uC0AC \uC694\uCCAD":"high","\uB370\uC774\uD130 \uBC31\uC5C5 \uACA9\uB9AC":"high","\uD3EC\uB80C\uC2DD \uC870\uC0AC \uC758\uB8B0":"critical","\uBCF4\uC548\uAD50\uC721 \uC9C0\uC815":"low","CISO \uAE34\uAE09 \uBCF4\uACE0":"critical","\uC678\uBD80 \uC2E0\uACE0":"critical"};
             return Object.keys(ACTION_GUIDES).map(function(name) {
               var g = ACTION_GUIDES[name];
               return [name, urgMap[name] || "medium", g.estimatedTime, g.summary.slice(0, 50) + "...", g.steps.length];
@@ -1809,7 +1922,7 @@ export default function SecurityDashboard(props) {
         // Edges: employee -> dept (belongs)
         topEmps.forEach(function(item) {
           if (deptSet[item.emp.department]) {
-            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "\uC18C\uC18D", color: "rgba(94,92,230,0.3)" });
+            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "\uC18C\uC18D", color: "rgba(94,92,230,0.5)" });
           }
         });
 
@@ -1819,14 +1932,14 @@ export default function SecurityDashboard(props) {
           var key = e.employee.id + "|" + e.asset.name;
           if (!empAssetEdges[key] && topEmps.some(function(t) { return t.emp.id === e.employee.id; })) {
             empAssetEdges[key] = true;
-            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "\uC811\uADFC", color: "rgba(10,132,255,0.25)" });
+            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "\uC811\uADFC", color: "rgba(10,132,255,0.45)" });
           }
         });
 
         // Edges: dept -> asset (permission)
         Object.keys(DEPT_ASSETS).forEach(function(d) {
           DEPT_ASSETS[d].forEach(function(a) {
-            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "\uAD8C\uD55C", color: "rgba(48,209,88,0.15)" });
+            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "\uAD8C\uD55C", color: "rgba(48,209,88,0.35)" });
           });
         });
 
@@ -1836,7 +1949,7 @@ export default function SecurityDashboard(props) {
           var key = e.eventType.type + "|" + e.asset.name;
           if (!evtAssetEdges[key]) {
             evtAssetEdges[key] = true;
-            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "\uB300\uC0C1", color: "rgba(255,149,0,0.2)" });
+            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "\uB300\uC0C1", color: "rgba(255,149,0,0.4)" });
           }
         });
 
@@ -1844,9 +1957,9 @@ export default function SecurityDashboard(props) {
         EVENT_TYPES.forEach(function(et) {
           var sev = et.severity;
           if (sev === "critical") {
-            edges.push({ from: "evt-" + et.type, to: "action-\uACC4\uC815 \uC7A0\uAE08", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,45,85,0.2)" });
+            edges.push({ from: "evt-" + et.type, to: "action-\uACC4\uC815 \uC7A0\uAE08", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,45,85,0.45)" });
           } else if (sev === "high") {
-            edges.push({ from: "evt-" + et.type, to: "action-\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,149,0,0.2)" });
+            edges.push({ from: "evt-" + et.type, to: "action-\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,149,0,0.4)" });
           }
         });
 
@@ -1914,8 +2027,16 @@ export default function SecurityDashboard(props) {
                   var from = nodeMap[e.from], to = nodeMap[e.to];
                   if (!from || !to) return null;
                   var isHighlighted = graphSelected && (e.from === graphSelected || e.to === graphSelected);
-                  var opacity = graphSelected ? (isHighlighted ? 1 : 0.05) : 0.6;
-                  return <line key={i} x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={isHighlighted ? e.color.replace(/[\d.]+\)/, "0.8)") : e.color} strokeWidth={isHighlighted ? 2 : 1} opacity={opacity} />;
+                  var opacity = graphSelected ? (isHighlighted ? 1 : 0.08) : 0.7;
+                  var midX = (from.x + to.x) / 2;
+                  var midY = (from.y + to.y) / 2;
+                  return <g key={i}>
+                    <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={isHighlighted ? e.color.replace(/[\d.]+\)/, "0.9)") : e.color} strokeWidth={isHighlighted ? 3 : 1.5} opacity={opacity} />
+                    {isHighlighted && <g>
+                      <rect x={midX - 16} y={midY - 8} width={32} height={16} rx={4} fill="rgba(0,0,0,0.75)" />
+                      <text x={midX} y={midY + 4} textAnchor="middle" fill="rgba(255,255,255,0.8)" fontSize="9" fontWeight="600">{e.label}</text>
+                    </g>}
+                  </g>;
                 })}
 
                 {/* Nodes */}
@@ -1929,21 +2050,32 @@ export default function SecurityDashboard(props) {
 
                   if (n.type === "employee") {
                     return <g key={n.id} opacity={nodeOpacity}>
-                      <circle cx={n.x} cy={n.y} r={isHovered || isSelected ? 16 : 12} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 3 : 1.5} />
-                      <text x={n.x} y={n.y + 24} textAnchor="middle" fill={c} fontSize="9" fontWeight="600">{n.label}</text>
-                      {isHovered && <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">{n.label + " (\uC704\uD5D8:" + (n.score || "?") + ")"}</text>}
+                      <circle cx={n.x} cy={n.y} r={isHovered || isSelected ? 18 : 14} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 3 : 2} />
+                      <rect x={n.x - 18} y={n.y + 16} width={36} height={16} rx={4} fill="rgba(0,0,0,0.7)" />
+                      <text x={n.x} y={n.y + 28} textAnchor="middle" fill={c} fontSize="11" fontWeight="700">{n.label}</text>
+                      {isHovered && <g>
+                        <rect x={n.x - 50} y={n.y - 34} width={100} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
+                        <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (" + "\uC704\uD5D8" + ":" + (n.score || "?") + ")"}</text>
+                      </g>}
                     </g>;
                   } else if (n.type === "eventType") {
                     return <g key={n.id} opacity={nodeOpacity}>
-                      <rect x={n.x - 12} y={n.y - 12} width={24} height={24} rx={3} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 2.5 : 1} transform={"rotate(45 " + n.x + " " + n.y + ")"} />
-                      <text x={n.x} y={n.y + 28} textAnchor="middle" fill={c} fontSize="8" fontWeight="500">{n.label}</text>
-                      {isHovered && <text x={n.x} y={n.y - 22} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">{n.label}</text>}
+                      <rect x={n.x - 14} y={n.y - 14} width={28} height={28} rx={3} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 2.5 : 1.5} transform={"rotate(45 " + n.x + " " + n.y + ")"} />
+                      <rect x={n.x - 28} y={n.y + 18} width={56} height={16} rx={4} fill="rgba(0,0,0,0.7)" />
+                      <text x={n.x} y={n.y + 30} textAnchor="middle" fill={c} fontSize="10" fontWeight="600">{n.label}</text>
+                      {isHovered && <g>
+                        <rect x={n.x - 36} y={n.y - 32} width={72} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
+                        <text x={n.x} y={n.y - 18} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label}</text>
+                      </g>}
                     </g>;
                   } else {
                     return <g key={n.id} opacity={nodeOpacity}>
-                      <rect x={n.x - n.w / 2} y={n.y - n.h / 2} width={n.w} height={n.h} rx={6} fill={c + "20"} stroke={c} strokeWidth={isSelected ? 2.5 : 1} />
-                      <text x={n.x} y={n.y + 4} textAnchor="middle" fill={c} fontSize="9" fontWeight="600">{n.label}</text>
-                      {isHovered && <text x={n.x} y={n.y - n.h / 2 - 6} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">{n.label}</text>}
+                      <rect x={n.x - n.w / 2} y={n.y - n.h / 2} width={n.w} height={n.h} rx={6} fill={c + "20"} stroke={c} strokeWidth={isSelected ? 3 : 1.5} />
+                      <text x={n.x} y={n.y + 5} textAnchor="middle" fill={c} fontSize="11" fontWeight="700">{n.label}</text>
+                      {isHovered && <g>
+                        <rect x={n.x - 40} y={n.y - n.h / 2 - 20} width={80} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
+                        <text x={n.x} y={n.y - n.h / 2 - 6} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label}</text>
+                      </g>}
                     </g>;
                   }
                 })}
