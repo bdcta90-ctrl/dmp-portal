@@ -124,6 +124,112 @@ const UC_ESTIMATE_RESPONSE = `## 🤖 AI 견적 검증 리포트 — GV80 3.5T A
 
 ※ 유사 사고 사례 3건 참조: CLM-2024-0891(GV80/전면충돌/₩6,200,000), CLM-2024-1203(팰리세이드/전면/₩5,800,000), CLM-2025-0042(GV80/대향충돌/₩5,200,000)`;
 
+// ═══ Case 1 자사/보험사 분석 (UC2와 동일 구조) ═══
+const UC1_ESTIMATE_SELF = `## 🤖 AI 견적 분석 리포트 — 자사 차량 (현대 그랜저)
+
+### 📋 차량 정보
+| 항목 | 내용 |
+|------|------|
+| 차종 | **현대 그랜저 캘리그래피 3.5 가솔린** |
+| 연식 | 2023년 (약 2년) |
+| 추정 주행거리 | 약 25,000km |
+| 차량가액 | 약 **₩42,000,000** |
+| 보험 처리 | 자차보험 + 상대방 대물배상 (과실 50:50) |
+
+### 📊 자사 차량 파손 분석
+
+> **사고 상황**: 교차로 골목길에서 BMW 7시리즈와 측면 충돌. 자사 그랜저는 **좌측 전면부+측면**이 BMW 우측 전면부와 접촉하며 파손됨.
+
+| 파손 부위 | 손상도 | 수리 방법 | 예상 비용 |
+|----------|--------|----------|----------|
+| 프론트 범퍼(상) 좌측 | 심각 | 교체 필요 | **₩680,000** |
+| 좌 프론트 펜더 | 심각 | 판금 교체 | **₩850,000** |
+| 좌 프론트 도어 | 심각 | 판금 교체 | **₩1,200,000** |
+| 좌 헤드라이트 | 심각 | 교체 필요 | **₩720,000** |
+| 프론트 그릴(좌측) | 중간 | 교체 | **₩350,000** |
+| 도장 (3면) | — | 전체 도장 | **₩1,200,000** |
+| **합계** | | | **₩5,000,000** |
+
+### 🔧 수리 방법 권고
+
+**판금+교체 혼합 수리 권장**
+- 범퍼·헤드라이트: 심각 손상 → **교환 필수**
+- 펜더·도어: 심각 변형이나 판금 가능 수준 → **판금+도장** 권장 (교체 대비 ₩800,000 절감)
+- 제휴 서비스센터 이용 시 추가 **15% 절감** 가능 (₩4,250,000)
+
+### 🚗 자사 고객 렌트(대차)
+| 항목 | 내용 |
+|------|------|
+| 대차 차종 | 그랜저 동급 (적정) |
+| 일 렌트비 | ₩90,000~110,000 |
+| 예상 수리 기간 | 14~21일 |
+| **렌트 총 비용** | **₩1,260,000~2,310,000** |
+
+### 💡 자사 고객 부담 안내
+- 과실 50:50이므로 **상대방 대물배상에서 50% 보상** 가능
+- 자사 수리비 ₩5,000,000 × 50% = ₩2,500,000 (타사에서 회수)
+- 자사 실부담: ₩5,000,000 - ₩2,500,000 = **₩2,500,000** (자차보험 처리)
+- 자기부담금: **₩200,000~500,000**
+- ⚠️ 고객 안내: **"본인 부담은 자기부담금(₩20~50만원)이며, 나머지는 과실상계로 타사 50% 회수 + 자차보험으로 처리됩니다"**`;
+
+const UC1_ESTIMATE_TOTAL = `## 📊 보험사 총 지출 요약 — Case 1 종합
+
+### 💰 자사 보험사 총 예상 지출
+
+| 구분 | 항목 | AI 적정 | 타사 청구 | 차이 |
+|------|------|---------|----------|------|
+| **타사 차량 (BMW 7)** | 수리비 | ₩15,500,000 | ₩25,000,000 | ▼ ₩9,500,000 |
+| | 렌트비 (5시리즈 동급 정정) | ₩3,150,000 | ₩7,875,000 | ▼ ₩4,725,000 |
+| **자사 차량 (그랜저)** | 수리비 | ₩5,000,000 | — | — |
+| | 렌트비 (그랜저 동급) | ₩1,540,000 | — | — |
+| **대인 배상** | 타사 3명 | ₩5,400,000 | ₩10,500,000 | ▼ ₩5,100,000 |
+| | 자사 2명 | ₩2,500,000 | — | — |
+| | | | | |
+| **과실 50% 적용 전** | 소계 | **₩33,090,000** | **₩43,375,000** | |
+| **과실 50% 적용 후** | | | | |
+| 자사 부담 (타사 손해의 50%) | | **₩12,025,000** | **₩21,687,500** | ▼ **₩9,662,500** |
+| 자사 차량 (자차보험) | | **₩5,000,000** | — | — |
+| **총 자사 지출** | | **₩17,025,000** | **₩21,687,500** | |
+
+### 📈 시나리오별 총 비용 비교
+
+| 시나리오 | 타사 손해 부담 | 자사 차량 | 대인 | **총 비용** | **절감액** |
+|---------|--------------|----------|------|-----------|----------|
+| **A. 타사 주장 수용 (70:30)** | ₩23,012,500 | ₩5,000,000 | ₩7,350,000 | ₩35,362,500 | — |
+| **B. 과실 50:50 + 수리비 협상** (AI 권고) | ₩9,325,000 | ₩5,000,000 | ₩3,950,000 | **₩18,275,000** | **▼ ₩17,087,500** |
+| **C. 50:50 + 렌트 정정 + 대인 적정** | ₩7,700,000 | ₩4,250,000 | ₩3,950,000 | **₩15,900,000** | **▼ ₩19,462,500** |
+| **D. 30:70 공격안** | ₩5,550,000 | ₩5,000,000 | ₩2,370,000 | **₩12,920,000** | **▼ ₩22,442,500** |
+
+### ⚠️ 핵심 쟁점 3가지
+
+**1. BMW 수리비 ₩25M → AI 적정 ₩15.5M (₩9.5M 과다)**
+- 범퍼 ASSY 교체 청구(₩3.5M) → 판금 복원 가능 손상 수준 (₩1.2M)
+- 본넷 교체 청구(₩2.8M) → 판금+도장 권장 (₩1.5M)
+- 외산 부품 ×1.6 배수는 적정하나, 교체 불필요 부위까지 교체 청구
+
+**2. 렌트 동종동급 위반 (₩4.7M 과다)**
+- 타사 요구: BMW 7시리즈 동급 렌트 (일 ₩375,000)
+- 적정: BMW 5시리즈 동급 (일 ₩225,000) — 대법원 동종동급 원칙
+- 수리 21일 기준: ₩7,875,000 → **₩4,725,000으로 정정 필요**
+
+**3. 대인 5명 과다 청구 (₩5.1M 과다)**
+- 타사 3명 합계 ₩10,500,000 → AI 적정 ₩5,400,000
+- 14급 위자료 과다 청구 패턴 확인 필요
+
+### ✅ AI 최종 권고
+
+> **B안 (50:50 + 수리비 협상)** 추천 — 총 **₩18,275,000**
+>
+> 타사 주장(70:30) 수용 시 대비 **₩17,087,500 절감**. 교차로 기본 과실 50:50을 관철하고,
+> BMW 수리비 과다 항목(₩9.5M)과 렌트 동종동급 정정(₩4.7M)으로 대폭 절감.
+
+### 🗣️ 자사 고객 안내 스크립트
+
+> "고객님, 상대방 보험사에서 높은 과실을 주장하고 있으나, AI 분석 결과 **50:50이 적정**한 것으로 판단됩니다.
+> 상대방 차량 수리비도 전문 검증하여 **과다 청구 항목을 시정** 요청하고 있습니다.
+> 고객님 차량은 자차보험으로 처리되며, **실제 본인 부담은 자기부담금(₩20~50만원)** 수준입니다.
+> 대인 건도 적정 합의금으로 진행 중이니 안심하셔도 됩니다."`;
+
 const UC_ESTIMATE_SELF = `## 🤖 AI 견적 분석 리포트 — 자사 고객 차량
 
 ### 📋 차량 정보
@@ -3022,16 +3128,24 @@ ${cashSection}
           <div style={{...CD,border:"1px solid #a5f3fc"}}><div style={{display:"flex",alignItems:"center",gap:7,marginBottom:9}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:"#0891b2",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>{IC.ai}</div>
             <span style={{fontSize:13,fontWeight:700}}>AI 분석</span>{!aD&&at&&vehTab===0&&<Sp s/>}</div>
-            {/* Vehicle Tab Selector for Case 2 */}
-            {useCase==="uc2"&&at&&<div style={{display:"flex",gap:0,marginBottom:12,background:"#f1f5f9",borderRadius:10,padding:3}}>
-              {[{l:"🚙 타사 차량 (GV80)",sub:"₩10,000,000 청구 검증"},{l:"🚗 자사 차량 (그랜저)",sub:"수리비 + 렌트 + 자차보험"},{l:"📊 보험사 총 지출 요약",sub:"합산 비용 · 시나리오 비교"}].map((t,i)=>
+            {/* Vehicle Tab Selector for Case 1 & 2 */}
+            {(useCase==="uc1"||useCase==="uc2")&&at&&<div style={{display:"flex",gap:0,marginBottom:12,background:"#f1f5f9",borderRadius:10,padding:3}}>
+              {(useCase==="uc1"?[
+                {l:"🚙 타사 차량 (BMW 7시리즈)",sub:"₩25,000,000 청구 검증"},
+                {l:"🚗 자사 차량 (그랜저)",sub:"수리비 ₩5M + 렌트 + 자차"},
+                {l:"📊 보험사 총 지출 요약",sub:"과실 50:50 시나리오 비교"}
+              ]:[
+                {l:"🚙 타사 차량 (GV80)",sub:"₩10,000,000 청구 검증"},
+                {l:"🚗 자사 차량 (그랜저)",sub:"수리비 + 렌트 + 자차보험"},
+                {l:"📊 보험사 총 지출 요약",sub:"합산 비용 · 시나리오 비교"}
+              ]).map((t,i)=>
                 <button key={i} onClick={()=>setVehTab(i)} style={{flex:1,padding:"8px 6px",borderRadius:8,border:"none",cursor:"pointer",background:vehTab===i?"#fff":"transparent",boxShadow:vehTab===i?"0 1px 4px rgba(0,0,0,0.08)":"none",transition:"all .2s",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
                   <span style={{fontSize:11,fontWeight:vehTab===i?700:500,color:vehTab===i?(i===0?"#0891b2":i===1?"#7c3aed":"#059669"):"#94a3b8"}}>{t.l}</span>
                   <span style={{fontSize:8.5,color:vehTab===i?"#64748b":"#cbd5e1"}}>{t.sub}</span>
                 </button>
               )}
             </div>}
-            <div style={{fontSize:12.5}}>{useCase==="uc2"&&vehTab===1?<RT text={UC_ESTIMATE_SELF}/>:useCase==="uc2"&&vehTab===2?<RT text={UC_ESTIMATE_TOTAL}/>:<RT text={tA}/>}</div>
+            <div style={{fontSize:12.5}}>{(useCase==="uc1"||useCase==="uc2")&&vehTab===1?<RT text={useCase==="uc1"?UC1_ESTIMATE_SELF:UC_ESTIMATE_SELF}/>:(useCase==="uc1"||useCase==="uc2")&&vehTab===2?<RT text={useCase==="uc1"?UC1_ESTIMATE_TOTAL:UC_ESTIMATE_TOTAL}/>:<RT text={tA}/>}</div>
             {/* ═══ 온톨로지 추론 체인 ═══ */}
             {ontoResult&&ontoResult.rulesFired>0&&<div style={{marginTop:12}}>
               <button onClick={()=>setOntoOpen(!ontoOpen)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",borderRadius:10,background:"linear-gradient(135deg,#1e1b4b,#312e81)",color:"#c7d2fe",border:"none",cursor:"pointer",width:"100%",fontSize:11,fontWeight:700}}>
@@ -3064,8 +3178,8 @@ ${cashSection}
                 </div>
               </div>}
             </div>}
-            {/* Action Buttons for Case 2 */}
-            {useCase==="uc2"&&vehTab===2&&<div style={{display:"flex",flex:"column",gap:8,marginTop:14}}>
+            {/* Action Buttons for Case 1 & 2 */}
+            {(useCase==="uc1"||useCase==="uc2")&&vehTab===2&&<div style={{display:"flex",flex:"column",gap:8,marginTop:14}}>
               <div style={{flex:1,padding:"14px 16px",background:"linear-gradient(135deg,#f0fdf4,#ecfdf5)",borderRadius:12,border:"1px solid #86efac",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:18}}>📱</span>
