@@ -3075,6 +3075,16 @@ const DAMAGE_CONFIGS = {
       {id:"lampL",label:"좌 리어램프",severity:"교체 필요",cost:"₩580,000",x:58,y:5,w:50,h:40,phase:6,color:"#dc2626"},
       {id:"lampR",label:"우 리어램프",severity:"교체 필요",cost:"₩580,000",x:292,y:5,w:50,h:40,phase:7,color:"#dc2626"},
     ]},
+  uc6_c: { vehicle:"현대 스포티지 (후미차)", badge:"타사 C차", badgeColor:"#f97316", totalCost:"₩4,500,000",
+    parts:[
+      {id:"bumperR",label:"리어 범퍼(상)",severity:"판금 교체",cost:"₩650,000",x:65,y:0,w:270,h:35,phase:1,color:"#f97316"},
+      {id:"bumperRD",label:"리어 범퍼(하/디퓨저)",severity:"교체",cost:"₩350,000",x:65,y:35,w:270,h:18,phase:2,color:"#f97316"},
+      {id:"trunk",label:"트렁크/테일게이트",severity:"판금 도장",cost:"₩1,200,000",x:90,y:0,w:220,h:80,phase:3,color:"#f97316"},
+      {id:"lampL",label:"좌 리어램프",severity:"교체 필요",cost:"₩420,000",x:58,y:5,w:50,h:40,phase:4,color:"#f97316"},
+      {id:"lampR",label:"우 리어램프",severity:"교체 필요",cost:"₩420,000",x:292,y:5,w:50,h:40,phase:5,color:"#dc2626"},
+      {id:"cam",label:"후방 카메라",severity:"점검/교체",cost:"₩280,000",x:188,y:15,w:24,h:10,phase:6,color:"#f59e0b"},
+      {id:"paint",label:"도장 (2면)",severity:"도장",cost:"₩580,000",x:90,y:55,w:220,h:15,phase:7,color:"#8b5cf6"},
+    ]},
   uc7_a: { vehicle:"기아 모하비", badge:"자사 A차", badgeColor:"#2563eb", totalCost:"₩전손 (시가 ₩48,000,000)",
     parts:[
       {id:"roof",label:"루프패널",severity:"붕괴 전손",cost:"₩2,500,000",x:90,y:40,w:220,h:60,phase:1,color:"#dc2626"},
@@ -3311,10 +3321,13 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
     uc6:{
       a:{origin:"국산",mk:"현대",md:"그랜저",yr:"2023",ml:"18000",
         sp:["프론트 범퍼(상)","본넷","좌 헤드라이트","프론트 그릴","리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],
-        sv:"심각",ai:{parts:["프론트 범퍼(상)","본넷","좌 헤드라이트","프론트 그릴","리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 전면부+후면부 양쪽 파손 — 3중추돌 선두 차량. 전면 범퍼+본넷+헤드라이트 교체, 후면 범퍼+트렁크 판금 필요."}},
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","본넷","좌 헤드라이트","프론트 그릴","리어 범퍼(상)","트렁크/테일게이트","우 리어램프"],severity:"심각",confidence:"높음",memo:"AI 분석: 자사 A차 전면부+후면부 양쪽 파손 — 3중추돌 선두 차량(70% 과실). 전면 범퍼+본넷+헤드라이트 교체, 후면 범퍼+트렁크 판금 필요. 수리비 ₩8,500,000."}},
       b:{origin:"국산",mk:"기아",md:"K8",yr:"2024",ml:"8000",
         sp:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프"],
-        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프"],severity:"심각",confidence:"높음",memo:"AI 분석: 타사 B차(중간차) 전면부+후면부 양쪽 대파 — 3중추돌 중간 차량으로 앞뒤 모두 충격. 전후면 범퍼 ASSY, 본넷, 트렁크, 리어램프 전량 교체 필요."}},
+        sv:"심각",ai:{parts:["프론트 범퍼(상)","프론트 범퍼(하/립)","본넷","프론트 그릴","라디에이터","리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프"],severity:"심각",confidence:"높음",memo:"AI 분석: 타사 B차(중간차, 20% 과실) 전면부+후면부 양쪽 대파 — 가해+피해 이중지위. 전후면 범퍼 ASSY, 본넷, 트렁크, 리어램프 전량 교체 필요. 수리비 ₩14,200,000."}},
+      c:{origin:"국산",mk:"현대",md:"스포티지",yr:"2022",ml:"35000",
+        sp:["리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프","후방 카메라"],
+        sv:"중간",ai:{parts:["리어 범퍼(상)","리어 범퍼(하/디퓨저)","트렁크/테일게이트","좌 리어램프","우 리어램프","후방 카메라"],severity:"중간",confidence:"높음",memo:"AI 분석: 타사 C차(후미차, 10% 과실) 후면부 파손 — B차에 밀려 추돌당함. 리어 범퍼+트렁크 판금/교체, 리어램프 교체. 수리비 ₩4,500,000."}},
     },
     uc7:{
       a:{origin:"국산",mk:"기아",md:"모하비",yr:"2022",ml:"42000",
@@ -3360,7 +3373,7 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
   // dmgTab 전환 시 차량정보+파손부위+파손정도 연동
   useEffect(()=>{
     if(!useCase)return;
-    const side=dmgTab===0?"a":"b";
+    const side=dmgTab===0?"a":dmgTab===1?"b":dmgTab===2?"c":"a";
     applyCarInfo(useCase,side);
   },[dmgTab]);
   useEffect(()=>{
@@ -3572,7 +3585,7 @@ ${cashSection}
           <h3 style={ST}>{IC.car}<span>차량 정보</span></h3>
           {/* 자사/타사 차량 선택 */}
           <div style={{display:"flex",gap:4,marginBottom:8}}>
-            {[{id:0,label:"🚗 자사 차량 (A)",color:"#2563eb"},{id:1,label:"🚙 타사 차량 (B)",color:"#dc2626"}].map(t=>
+            {(useCase==="uc6"?[{id:0,label:"🚗 A차 자사 (그랜저, 70%)",color:"#2563eb"},{id:1,label:"🚙 B차 타사1 (K8, 20%)",color:"#dc2626"},{id:2,label:"🚙 C차 타사2 (스포티지, 10%)",color:"#f97316"}]:[{id:0,label:"🚗 자사 차량 (A)",color:"#2563eb"},{id:1,label:"🚙 타사 차량 (B)",color:"#dc2626"}]).map(t=>
               <button key={t.id} onClick={()=>setDmgTab(t.id)} style={{
                 flex:1,padding:"7px 0",borderRadius:8,fontSize:11.5,cursor:"pointer",fontWeight:dmgTab===t.id?700:400,
                 background:dmgTab===t.id?t.color:"#f8fafc",
@@ -3689,7 +3702,7 @@ ${cashSection}
               })}
             </div>
           </div>
-          <DamageDiagram configKey={useCase+(dmgTab===0?"_a":"_b")}/>
+          <DamageDiagram configKey={useCase+(dmgTab===0?"_a":dmgTab===1?"_b":"_c")}/>
         </div>}
 
         {/* 파손 부위 - 카테고리 */}
