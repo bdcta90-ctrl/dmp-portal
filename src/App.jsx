@@ -130,7 +130,7 @@ const MVPS = [
     catColor: "#10b981",
     icon: "🚗",
     iconBg: "linear-gradient(135deg,#10b981,#059669)",
-    title: "AI 자동차 손해사정 (New)",
+    title: "AI 자동차 손해사정 (시연버전)",
     desc: "20260318 DB자동차손해사정 시연버전",
     tags: ["AI Agent", "손해사정", "시연백업"],
     date: "2026.03",
