@@ -5046,10 +5046,51 @@ function TabKPI(){
       {/* 카드 클릭 시 필터된 목록 */}
       {filterStatus&&<div style={{background:"#fff",borderRadius:14,padding:16,border:"1px solid #e2e8f0",marginBottom:14,animation:"fadeIn .3s"}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-          <button onClick={()=>setFilterStatus(null)} style={{padding:"4px 10px",borderRadius:7,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:10,fontWeight:600,cursor:"pointer"}}>✕ 닫기</button>
+          <button onClick={()=>{setFilterStatus(null);setSelReport(null);}} style={{padding:"4px 10px",borderRadius:7,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:10,fontWeight:600,cursor:"pointer"}}>✕ 닫기</button>
           <span style={{fontSize:12,fontWeight:700,color:filterStatus==="all"?"#3b82f6":filterStatus==="active"?"#f59e0b":"#10b981"}}>{filterStatus==="all"?"전체 배당건":filterStatus==="active"?"진행 중":"종결"} ({(filterStatus==="all"?reports:filterStatus==="active"?reports.filter(r=>r.status!=="종결"):reports.filter(r=>r.status==="종결")).length}건)</span>
         </div>
-        {renderTable(filterStatus==="all"?reports:filterStatus==="active"?reports.filter(r=>r.status!=="종결"):reports.filter(r=>r.status==="종결"),false)}
+        {!selReport&&renderTable(filterStatus==="all"?reports:filterStatus==="active"?reports.filter(r=>r.status!=="종결"):reports.filter(r=>r.status==="종결"),false)}
+        {selReport&&<div>
+          <button onClick={()=>setSelReport(null)} style={{padding:"6px 14px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",marginBottom:12}}>← 목록</button>
+          <div style={{background:"#f8fafc",borderRadius:14,padding:20,border:"1px solid #e2e8f0"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+              <span style={{padding:"5px 10px",borderRadius:7,fontSize:10,fontWeight:700,color:typeColors[selReport.type],background:typeColors[selReport.type]+"12"}}>{selReport.type}</span>
+              <div><div style={{fontSize:14,fontWeight:800}}>{selReport.case}</div><div style={{fontSize:10,color:"#64748b"}}>{selReport.id} · {selReport.date}</div></div>
+              <div style={{marginLeft:"auto",display:"flex",gap:6}}>
+                <span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:statusColors[selReport.status],background:statusColors[selReport.status]+"12"}}>{selReport.status}</span>
+                <span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:priorityColors[selReport.priority],background:priorityColors[selReport.priority]+"12"}}>{selReport.priority}</span>
+                {selReport.complaint&&<span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:"#dc2626",background:"#fef2f2"}}>⚠️ 민원</span>}
+                {selReport.fraudDetected&&<span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:"#991b1b",background:"#fef2f2"}}>🚨 사기의심</span>}
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
+              {[{l:"최초 청구/인지",v:"₩"+selReport.originalClaim.toLocaleString(),c:"#dc2626"},
+                {l:"AI 적정 판정",v:"₩"+selReport.aiResult.toLocaleString(),c:"#2563eb"},
+                {l:"절감액",v:"₩"+selReport.aiSaving.toLocaleString(),c:"#059669"}
+              ].map((k,i)=><div key={i} style={{background:"#fff",borderRadius:10,padding:"12px 14px",border:"1px solid #e2e8f0"}}>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600}}>{k.l}</div>
+                <div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'DM Mono',monospace",marginTop:4}}>{k.v}</div></div>)}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              <div style={{background:"#fff",borderRadius:10,padding:14,border:"1px solid #e2e8f0"}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#0f172a",marginBottom:10}}>📋 기본 정보</div>
+                {[["담당자",selReport.adjuster],["사고유형",selReport.type],["과실비율",selReport.faultRatio],["파손정도",selReport.severity],
+                  ["수리기간",selReport.repairDays>0?selReport.repairDays+"일":"해당없음"],["피해자수",selReport.claimants>0?selReport.claimants+"명":"없음"],
+                  ["미수선처리",selReport.unrepaired?"예 (현금정산)":"아니오"]
+                ].map(([l,v],i)=><div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid #f1f5f9",fontSize:11.5}}>
+                  <span style={{color:"#64748b",fontWeight:500}}>{l}</span><span style={{color:"#0f172a",fontWeight:600}}>{v}</span></div>)}
+              </div>
+              <div style={{background:"#fff",borderRadius:10,padding:14,border:"1px solid #e2e8f0"}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#0f172a",marginBottom:10}}>📝 접수 내용</div>
+                <div style={{fontSize:12,color:"#334155",lineHeight:1.7}}>{selReport.summary}</div>
+                <div style={{marginTop:10,padding:"8px 10px",background:"#eff6ff",borderRadius:8,border:"1px solid #bfdbfe"}}>
+                  <div style={{fontSize:10,color:"#2563eb",fontWeight:700,marginBottom:4}}>💰 절감 근거</div>
+                  <div style={{fontSize:11,color:"#1e40af",lineHeight:1.5}}>{selReport.savingBasis}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>}
       </div>}
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
@@ -5174,7 +5215,49 @@ function TabKPI(){
             return(<div key={p} onClick={()=>setFilterPriority(isA?null:p)} style={{textAlign:"center",padding:"10px 0",borderRadius:10,background:isA?priorityColors[p]+"15":priorityColors[p]+"08",border:`2px solid ${isA?priorityColors[p]:priorityColors[p]+"20"}`,cursor:"pointer",transition:"all .2s"}}>
               <div style={{fontSize:20,fontWeight:800,color:priorityColors[p],fontFamily:"'DM Mono',monospace"}}>{cnt}</div><div style={{fontSize:10,color:"#64748b",fontWeight:600}}>{p}</div></div>);})}
         </div>
-        {filterPriority&&<div style={{marginTop:12,animation:"fadeIn .3s"}}>{renderTable(reports.filter(r=>r.priority===filterPriority),true)}</div>}
+        {filterPriority&&!selReport&&<div style={{marginTop:12,animation:"fadeIn .3s"}}>{renderTable(reports.filter(r=>r.priority===filterPriority),true)}</div>}
+        {filterPriority&&selReport&&<div style={{marginTop:12,animation:"fadeIn .3s"}}>
+          <button onClick={()=>setSelReport(null)} style={{padding:"6px 14px",borderRadius:8,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer",marginBottom:12}}>← 목록</button>
+          <div style={{background:"#fff",borderRadius:14,padding:20,border:"1px solid #e2e8f0"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+              <span style={{padding:"5px 10px",borderRadius:7,fontSize:10,fontWeight:700,color:typeColors[selReport.type],background:typeColors[selReport.type]+"12"}}>{selReport.type}</span>
+              <div><div style={{fontSize:14,fontWeight:800}}>{selReport.case}</div><div style={{fontSize:10,color:"#64748b"}}>{selReport.id} · {selReport.date}</div></div>
+              <div style={{marginLeft:"auto",display:"flex",gap:6}}>
+                <span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:statusColors[selReport.status],background:statusColors[selReport.status]+"12"}}>{selReport.status}</span>
+                <span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:priorityColors[selReport.priority],background:priorityColors[selReport.priority]+"12"}}>{selReport.priority}</span>
+                {selReport.complaint&&<span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:"#dc2626",background:"#fef2f2"}}>⚠️ 민원</span>}
+                {selReport.fraudDetected&&<span style={{padding:"3px 8px",borderRadius:5,fontSize:10,fontWeight:700,color:"#991b1b",background:"#fef2f2"}}>🚨 사기의심</span>}
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
+              {[{l:"최초 청구/인지",v:"₩"+selReport.originalClaim.toLocaleString(),c:"#dc2626"},
+                {l:"AI 적정 판정",v:"₩"+selReport.aiResult.toLocaleString(),c:"#2563eb"},
+                {l:"절감액",v:"₩"+selReport.aiSaving.toLocaleString(),c:"#059669"}
+              ].map((k,i)=><div key={i} style={{background:"#f8fafc",borderRadius:10,padding:"12px 14px",border:"1px solid #e2e8f0"}}>
+                <div style={{fontSize:10,color:"#64748b",fontWeight:600}}>{k.l}</div>
+                <div style={{fontSize:18,fontWeight:800,color:k.c,fontFamily:"'DM Mono',monospace",marginTop:4}}>
+                  {k.v}</div></div>)}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+              <div style={{background:"#f8fafc",borderRadius:10,padding:14,border:"1px solid #e2e8f0"}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#0f172a",marginBottom:10}}>📋 기본 정보</div>
+                {[["담당자",selReport.adjuster],["사고유형",selReport.type],["과실비율",selReport.faultRatio],["파손정도",selReport.severity],
+                  ["수리기간",selReport.repairDays>0?selReport.repairDays+"일":"해당없음"],["피해자수",selReport.claimants>0?selReport.claimants+"명":"없음"],
+                  ["미수선처리",selReport.unrepaired?"예 (현금정산)":"아니오"]
+                ].map(([l,v],i)=><div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid #f1f5f9",fontSize:11.5}}>
+                  <span style={{color:"#64748b",fontWeight:500}}>{l}</span><span style={{color:"#0f172a",fontWeight:600}}>{v}</span></div>)}
+              </div>
+              <div style={{background:"#f8fafc",borderRadius:10,padding:14,border:"1px solid #e2e8f0"}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#0f172a",marginBottom:10}}>📝 접수 내용</div>
+                <div style={{fontSize:12,color:"#334155",lineHeight:1.7}}>{selReport.summary}</div>
+                <div style={{marginTop:10,padding:"8px 10px",background:"#eff6ff",borderRadius:8,border:"1px solid #bfdbfe"}}>
+                  <div style={{fontSize:10,color:"#2563eb",fontWeight:700,marginBottom:4}}>💰 절감 근거</div>
+                  <div style={{fontSize:11,color:"#1e40af",lineHeight:1.5}}>{selReport.savingBasis}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>}
       </div>
     </div>}
 
