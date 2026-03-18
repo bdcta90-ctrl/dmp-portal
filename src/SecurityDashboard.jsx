@@ -2060,7 +2060,7 @@ export default function SecurityDashboard(props) {
                     empScores[e.employee.id].emp = e.employee;
                   }
                 });
-                var topEmps = Object.values(empScores).sort(function(a, b) { return b.score - a.score; }).slice(0, 10);
+                var topEmps = Object.values(empScores).sort(function(a, b) { return b.score - a.score; }).slice(0, 100);
                 topEmps.forEach(function(item) { item.score = item.maxScore; });
                 var deptSet = {};
                 DEPARTMENTS.forEach(function(d, i) {
@@ -2078,8 +2078,14 @@ export default function SecurityDashboard(props) {
                   nodes.push({ id: "evt-" + et.type, label: et.label.slice(0, 8), type: "eventType", x: canvasW / 2 + Math.cos(angle) * 310, y: canvasH / 2 + Math.sin(angle) * 220, w: 20, h: 20 });
                 });
                 topEmps.forEach(function(item, i) {
-                  var angle = (i / topEmps.length) * Math.PI * 2;
-                  nodes.push({ id: "emp-" + item.emp.id, label: item.emp.name, type: "employee", x: canvasW / 2 + Math.cos(angle) * 100, y: canvasH / 2 + Math.sin(angle) * 70, w: 18, h: 18, score: item.score });
+                  var ring = i < 20 ? 0 : i < 50 ? 1 : 2;
+                  var ringCount = ring === 0 ? Math.min(topEmps.length, 20) : ring === 1 ? Math.min(topEmps.length - 20, 30) : topEmps.length - 50;
+                  var ringIdx = ring === 0 ? i : ring === 1 ? i - 20 : i - 50;
+                  var angle = (ringIdx / Math.max(ringCount, 1)) * Math.PI * 2;
+                  var rx = ring === 0 ? 100 : ring === 1 ? 160 : 220;
+                  var ry = ring === 0 ? 70 : ring === 1 ? 110 : 150;
+                  var isCritical = item.score >= 90;
+                  nodes.push({ id: "emp-" + item.emp.id, label: item.emp.name, type: "employee", x: canvasW / 2 + Math.cos(angle) * rx, y: canvasH / 2 + Math.sin(angle) * ry, w: isCritical ? 22 : 16, h: isCritical ? 22 : 16, score: item.score, critical: isCritical });
                 });
                 var actionKeys = Object.keys(ACTION_GUIDES);
                 actionKeys.forEach(function(name, i) {
@@ -2127,7 +2133,7 @@ export default function SecurityDashboard(props) {
 
                 return <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>{"🧠"} 지식 그래프 — 데이터 관계 시각화</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>{"🧠"} 지식 그래프 — 위험 직원 최대 100명 실시간 표시</div>
                     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                       {Object.keys(typeColors).map(function(t) {
                         return <div key={t} style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -2135,6 +2141,10 @@ export default function SecurityDashboard(props) {
                           <span style={{ fontSize: 10, color: "#64748b" }}>{typeLabels[t]}</span>
                         </div>;
                       })}
+                      <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "2px 8px", borderRadius: 6, background: "#fef2f2", border: "1px solid #fecaca" }}>
+                        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff2d55", border: "2px solid #ff2d55" }} />
+                        <span style={{ fontSize: 10, color: "#991b1b", fontWeight: 700 }}>90점+ 위험</span>
+                      </div>
                     </div>
                   </div>
                   <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden", position: "relative" }}>
@@ -2186,13 +2196,17 @@ export default function SecurityDashboard(props) {
                         var dimmed = graphSelected && !isSelected && !isConnected;
                         var nodeOpacity = dimmed ? 0.15 : 1;
                         if (n.type === "employee") {
+                          var empColor = n.critical ? "#ff2d55" : c;
+                          var empR = n.critical ? (isHovered || isSelected ? 22 : 18) : (isHovered || isSelected ? 16 : 12);
                           return <g key={n.id} opacity={nodeOpacity}>
-                            <circle cx={n.x} cy={n.y} r={isHovered || isSelected ? 18 : 14} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 3 : 2} />
-                            <rect x={n.x - 18} y={n.y + 16} width={36} height={16} rx={4} fill="rgba(0,0,0,0.7)" />
-                            <text x={n.x} y={n.y + 28} textAnchor="middle" fill={c} fontSize="11" fontWeight="700">{n.label}</text>
+                            {n.critical && <circle cx={n.x} cy={n.y} r={empR + 6} fill="none" stroke="#ff2d55" strokeWidth={1.5} strokeDasharray="4 2" opacity={0.5}><animate attributeName="r" values={(empR+4)+";"+(empR+8)+";"+(empR+4)} dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite"/></circle>}
+                            <circle cx={n.x} cy={n.y} r={empR} fill={empColor + "30"} stroke={empColor} strokeWidth={n.critical ? 3 : 2} />
+                            {n.critical && <text x={n.x} y={n.y + 4} textAnchor="middle" fill="#ff2d55" fontSize="9" fontWeight="800">{n.score}</text>}
+                            <rect x={n.x - 20} y={n.y + empR + 2} width={40} height={14} rx={4} fill={n.critical ? "rgba(255,45,85,0.85)" : "rgba(0,0,0,0.7)"} />
+                            <text x={n.x} y={n.y + empR + 13} textAnchor="middle" fill="#fff" fontSize={n.critical ? "10" : "9"} fontWeight="700">{n.label}</text>
                             {isHovered && <g>
-                              <rect x={n.x - 50} y={n.y - 34} width={100} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
-                              <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (" + "위험" + ":" + (n.score || "?") + ")"}</text>
+                              <rect x={n.x - 55} y={n.y - empR - 22} width={110} height={18} rx={4} fill={n.critical ? "rgba(255,45,85,0.95)" : "rgba(0,0,0,0.85)"} />
+                              <text x={n.x} y={n.y - empR - 8} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (위험:" + (n.score || "?") + ")" + (n.critical ? " 🚨" : "")}</text>
                             </g>}
                           </g>;
                         } else if (n.type === "eventType") {
