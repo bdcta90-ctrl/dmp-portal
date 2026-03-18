@@ -1528,7 +1528,7 @@ export default function SecurityDashboard(props) {
             </button>}
             <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg,#ff2d55,#ff6b35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, boxShadow: "0 4px 15px rgba(255,45,85,0.3)" }}>S</div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>내부 정보 유출 위험자 식별 <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400, fontSize: 11 }}>AI Decision Support</span></div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>내부 보안 위험 식별 <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400, fontSize: 11 }}>AI Decision Support</span></div>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>이상행위 탐지 / 의도 추론 / 조치 추천 / 활성 임직원 {employees.length.toLocaleString()}명</div>
             </div>
           </div>
@@ -1903,11 +1903,11 @@ export default function SecurityDashboard(props) {
         ];
 
         return (
-          <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
+          <div style={{ padding: "16px 24px", position: "relative", zIndex: 1, background: "#f8fafc", borderRadius: 16, minHeight: "calc(100vh - 200px)" }}>
             {/* 3-View Toggle Bar */}
-            <div style={{display:"flex",background:"rgba(255,255,255,0.04)",borderRadius:10,padding:3,marginBottom:16}}>
-              {[{id:"explorer",l:"\uD83D\uDCCA DB 탐색기"},{id:"map",l:"\uD83D\uDDFA\uFE0F 데이터 구조 맵"},{id:"ontology",l:"\uD83E\uDDE0 온톨로지 센터"}].map(function(v) {
-                return <button key={v.id} onClick={function(){setSecDataView(v.id);}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",fontSize:12,fontWeight:secDataView===v.id?700:500,background:secDataView===v.id?"rgba(10,132,255,0.15)":"transparent",color:secDataView===v.id?"#0a84ff":"rgba(255,255,255,0.4)",cursor:"pointer"}}>
+            <div style={{display:"flex",background:"#e2e8f0",borderRadius:10,padding:3,marginBottom:16}}>
+              {[{id:"explorer",l:"📊 DB 탐색기"},{id:"map",l:"🗺️ 데이터 구조 맵"},{id:"ontology",l:"🧠 온톨로지 센터"}].map(function(v) {
+                return <button key={v.id} onClick={function(){setSecDataView(v.id);}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",fontSize:12,fontWeight:secDataView===v.id?700:500,background:secDataView===v.id?"#fff":"transparent",color:secDataView===v.id?"#2563eb":"#64748b",cursor:"pointer",boxShadow:secDataView===v.id?"0 1px 3px rgba(0,0,0,0.1)":"none"}}>
                   {v.l}
                 </button>;
               })}
@@ -1919,38 +1919,38 @@ export default function SecurityDashboard(props) {
               <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
                 {subTabs.map(function(st) {
                   var active = dataSubTab === st.key;
-                  return <button key={st.key} onClick={function() { setDataSubTab(st.key); setDataPage(0); setDataSearch(""); }} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.5)", background: active ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
-                    {st.label} <span style={{ fontSize: 10, color: active ? "#5ac8fa" : "rgba(255,255,255,0.3)", marginLeft: 4 }}>({st.count})</span>
+                  return <button key={st.key} onClick={function() { setDataSubTab(st.key); setDataPage(0); setDataSearch(""); }} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: active ? 700 : 500, color: active ? "#fff" : "#64748b", background: active ? "#2563eb" : "#fff", border: active ? "1px solid #2563eb" : "1px solid #e2e8f0", cursor: "pointer", boxShadow: active ? "0 2px 4px rgba(37,99,235,0.2)" : "none" }}>
+                    {st.label} <span style={{ fontSize: 10, color: active ? "#bfdbfe" : "#94a3b8", marginLeft: 4 }}>({st.count})</span>
                   </button>;
                 })}
               </div>
 
               {/* Search + Download */}
               <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
-                <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"검색..."} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
-                <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(48,209,88,0.12)", border: "1px solid rgba(48,209,88,0.25)", color: "#30d158", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>XLSX 다운로드 ({filteredRows.length}건)</button>
-                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{filteredRows.length}건 중 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
+                <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"검색..."} style={{ flex: 1, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 14px", color: "#0f172a", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+                <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "#059669", border: "none", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>📥 XLSX 다운로드 ({filteredRows.length}건)</button>
+                <div style={{ fontSize: 10, color: "#64748b" }}>{filteredRows.length}건 중 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
               </div>
 
               {/* Table */}
-              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
                 <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11.5, fontFamily: "'Pretendard',sans-serif" }}>
                     <thead>
-                      <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <tr style={{ background: "#f1f5f9" }}>
                         {headers[dataSubTab].map(function(h) {
-                          return <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: 10, borderBottom: "1px solid rgba(255,255,255,0.06)", whiteSpace: "nowrap" }}>{h}</th>;
+                          return <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: "#475569", fontWeight: 700, fontSize: 11, borderBottom: "2px solid #e2e8f0", whiteSpace: "nowrap" }}>{h}</th>;
                         })}
                       </tr>
                     </thead>
                     <tbody>
                       {pagedRows.map(function(row, ri) {
                         return (
-                          <tr key={ri} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}
-                            onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.04)"; }}
-                            onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}>
+                          <tr key={ri} style={{ borderBottom: "1px solid #f1f5f9", background: ri % 2 === 0 ? "#fff" : "#f8fafc" }}
+                            onMouseEnter={function(e) { e.currentTarget.style.background = "#eff6ff"; }}
+                            onMouseLeave={function(e) { e.currentTarget.style.background = ri % 2 === 0 ? "#fff" : "#f8fafc"; }}>
                             {row.map(function(cell, ci) {
-                              return <td key={ci} style={{ padding: "8px 12px", color: "rgba(255,255,255,0.7)", fontSize: 11, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cell}</td>;
+                              return <td key={ci} style={{ padding: "8px 12px", color: ci === 0 ? "#64748b" : "#1e293b", fontSize: 11.5, maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cell}</td>;
                             })}
                           </tr>
                         );
@@ -1963,12 +1963,12 @@ export default function SecurityDashboard(props) {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 14, alignItems: "center" }}>
-                  <button onClick={function() { setDataPage(Math.max(0, dataPage - 1)); }} disabled={dataPage === 0} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage === 0 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage === 0 ? "default" : "pointer" }}>&lt;</button>
+                  <button onClick={function() { setDataPage(Math.max(0, dataPage - 1)); }} disabled={dataPage === 0} style={{ padding: "6px 12px", borderRadius: 6, background: "#fff", border: "1px solid #e2e8f0", color: dataPage === 0 ? "#cbd5e1" : "#1e293b", fontSize: 11, cursor: dataPage === 0 ? "default" : "pointer" }}>◀</button>
                   {Array.from({ length: Math.min(totalPages, 10) }, function(_, i) {
                     var page = totalPages <= 10 ? i : Math.max(0, Math.min(dataPage - 4, totalPages - 10)) + i;
-                    return <button key={page} onClick={function() { setDataPage(page); }} style={{ padding: "6px 10px", borderRadius: 6, background: page === dataPage ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: page === dataPage ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", color: page === dataPage ? "#0a84ff" : "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: page === dataPage ? 700 : 400, cursor: "pointer" }}>{page + 1}</button>;
+                    return <button key={page} onClick={function() { setDataPage(page); }} style={{ padding: "6px 10px", borderRadius: 6, background: page === dataPage ? "#2563eb" : "#fff", border: page === dataPage ? "1px solid #2563eb" : "1px solid #e2e8f0", color: page === dataPage ? "#fff" : "#64748b", fontSize: 11, fontWeight: page === dataPage ? 700 : 400, cursor: "pointer" }}>{page + 1}</button>;
                   })}
-                  <button onClick={function() { setDataPage(Math.min(totalPages - 1, dataPage + 1)); }} disabled={dataPage >= totalPages - 1} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage >= totalPages - 1 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage >= totalPages - 1 ? "default" : "pointer" }}>&gt;</button>
+                  <button onClick={function() { setDataPage(Math.min(totalPages - 1, dataPage + 1)); }} disabled={dataPage >= totalPages - 1} style={{ padding: "6px 12px", borderRadius: 6, background: "#fff", border: "1px solid #e2e8f0", color: dataPage >= totalPages - 1 ? "#cbd5e1" : "#1e293b", fontSize: 11, cursor: dataPage >= totalPages - 1 ? "default" : "pointer" }}>▶</button>
                 </div>
               )}
             </div>}
