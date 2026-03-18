@@ -1626,13 +1626,8 @@ export default function SecurityDashboard(props) {
           {/* Sidebar */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>전체 위험도 게이지</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>최근 20건 기준</div><RiskGauge events={events} /></div>
-            {/* TOP 5 Users + Depts side by side */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <div style={Object.assign({}, panelStyle, { padding: 10 })}><div style={{ fontSize: 10, fontWeight: 600, marginBottom: 3 }}>고위험 사용자 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>최고 위험 점수 기준</div><TopRiskUsers events={events} onMsg={function(u, t) { setMessageModal({ user: u, recipientType: t }); }} /></div>
-              <div style={Object.assign({}, panelStyle, { padding: 10 })}><div style={{ fontSize: 10, fontWeight: 600, marginBottom: 3 }}>고위험 부서 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>평균 위험 점수 기준</div><TopRiskDepts events={events} /></div>
-            </div>
-            {/* Event Distribution + Compliance side by side */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>🔴 고위험 사용자 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>최고 위험 점수 기준</div><TopRiskUsers events={events} onMsg={function(u, t) { setMessageModal({ user: u, recipientType: t }); }} /></div>
+            <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>🏢 고위험 부서 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>평균 위험 점수 기준</div><TopRiskDepts events={events} /></div>
               <div style={Object.assign({}, panelStyle, { padding: 10 })}>
                 <div style={{ fontSize: 10, fontWeight: 600, marginBottom: 6 }}>이벤트 유형 분포</div>
                 {EVENT_TYPES.map(function(et) {
@@ -1671,9 +1666,6 @@ export default function SecurityDashboard(props) {
                   );
                 })}
               </div>
-            </div>
-            {/* System Integration + 7Layer side by side */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div style={Object.assign({}, panelStyle, { padding: 10 })}>
                 <div onClick={function() { togglePanel("integration"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.integration ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span>{"🔗"} 시스템 연동 현황</span>
@@ -1714,7 +1706,6 @@ export default function SecurityDashboard(props) {
                   );
                 })}
               </div>
-            </div>
           </div>
         </div>
       </div>}
