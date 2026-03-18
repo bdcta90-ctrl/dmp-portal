@@ -2820,7 +2820,7 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
     }else clearUC();
   },[activeCase]);
 
-  const filteredMakes=VEHICLE_DB.filter(v=>origin==="전체"||v.origin===origin);
+  const filteredMakes=VEHICLE_DB.filter(v=>origin==="전체"||v.origin===origin||v.make===mk);
   const makeEntry=VEHICLE_DB.find(v=>v.make===mk);
   const models=makeEntry?.models||[];
   const yrs=Array.from({length:15},(_,i)=>String(2025-i));
@@ -3017,7 +3017,7 @@ ${cashSection}
         <div style={CD}>
           <h3 style={ST}>{IC.car}<span>차량 정보</span></h3>
           <div style={{display:"flex",gap:4,marginBottom:10}}>
-            {["전체","국산","외산"].map(o=><button key={o} onClick={()=>{setOrigin(o);const cur=VEHICLE_DB.find(v=>v.make===mk);if(cur&&o!=="전체"&&cur.origin!==o){sMk("");sMd("");}}} style={{
+            {["전체","국산","외산"].map(o=><button key={o} onClick={()=>{if(useCase){setOrigin(o);return;}setOrigin(o);sMk("");sMd("");}} style={{
               flex:1,padding:"6px 0",borderRadius:7,fontSize:11.5,cursor:"pointer",fontWeight:origin===o?700:400,
               background:origin===o?(o==="국산"?"#0891b2":o==="외산"?"#7c3aed":"#475569"):"#f8fafc",
               color:origin===o?"#fff":"#94a3b8",border:origin===o?"none":"1px solid #e2e8f0",
