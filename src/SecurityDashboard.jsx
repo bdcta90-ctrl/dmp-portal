@@ -1329,6 +1329,21 @@ export default function SecurityDashboard(props) {
   var stEventType = useState("all");
   var filterEventType = stEventType[0], setFilterEventType = stEventType[1];
   var feedRef = useRef(null);
+  var stDashTab = useState("monitor");
+  var dashTab = stDashTab[0], setDashTab = stDashTab[1];
+  var stDataSubTab = useState("employees");
+  var dataSubTab = stDataSubTab[0], setDataSubTab = stDataSubTab[1];
+  var stDataSearch = useState("");
+  var dataSearch = stDataSearch[0], setDataSearch = stDataSearch[1];
+  var stDataPage = useState(0);
+  var dataPage = stDataPage[0], setDataPage = stDataPage[1];
+  var stSearchMode = useState("name");
+  var searchMode = stSearchMode[0], setSearchMode = stSearchMode[1];
+  var graphCanvasRef = useRef(null);
+  var stGraphHover = useState(null);
+  var graphHover = stGraphHover[0], setGraphHover = stGraphHover[1];
+  var stGraphSelected = useState(null);
+  var graphSelected = stGraphSelected[0], setGraphSelected = stGraphSelected[1];
 
   var addEvent = useCallback(function() {
     setEvents(function(p) { return [generateEvent(employees, p)].concat(p).slice(0, 500); });
@@ -1362,7 +1377,10 @@ export default function SecurityDashboard(props) {
   var filtered = events.filter(function(e) {
     if (searchText) {
       var q = searchText.toLowerCase();
-      if (e.employee.name.toLowerCase().indexOf(q) === -1 && e.employee.department.toLowerCase().indexOf(q) === -1 && e.employee.id.toLowerCase().indexOf(q) === -1) return false;
+      if (searchMode === "name") { if (e.employee.name.toLowerCase().indexOf(q) === -1) return false; }
+      else if (searchMode === "dept") { if (e.employee.department.toLowerCase().indexOf(q) === -1) return false; }
+      else if (searchMode === "id") { if (e.employee.id.toLowerCase().indexOf(q) === -1) return false; }
+      else { if (e.employee.name.toLowerCase().indexOf(q) === -1 && e.employee.department.toLowerCase().indexOf(q) === -1 && e.employee.id.toLowerCase().indexOf(q) === -1) return false; }
     }
     if (filterSeverity !== "all" && e.eventType.severity !== filterSeverity) return false;
     if (filterEventType !== "all" && e.eventType.type !== filterEventType) return false;
@@ -1440,7 +1458,15 @@ export default function SecurityDashboard(props) {
         </div>
       </div>
 
-      <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
+      {/* Tab Bar */}
+      <div style={{ position: "sticky", top: 58, zIndex: 99, background: "rgba(10,10,15,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", display: "flex", gap: 0 }}>
+        {[["monitor", "\uD83D\uDEE1\uFE0F \uC2E4\uC2DC\uAC04 \uAC10\uC2DC"], ["data", "\uD83D\uDCCA \uB370\uC774\uD130 \uBDF0\uC5B4"], ["graph", "\uD83E\uDDE0 \uC9C0\uC2DD \uADF8\uB798\uD504"]].map(function(t) {
+          var active = dashTab === t[0];
+          return <button key={t[0]} onClick={function() { setDashTab(t[0]); }} style={{ padding: "10px 20px", fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.4)", background: "transparent", border: "none", borderBottom: active ? "2px solid #0a84ff" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s", letterSpacing: 0.3 }}>{t[1]}</button>;
+        })}
+      </div>
+
+      {dashTab === "monitor" && <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
         {/* Real-time Risk Chart - HERO */}
         <div style={Object.assign({}, panelStyle, { padding: "16px 18px", marginBottom: 16, border: "1px solid rgba(10,132,255,0.15)", background: "rgba(10,132,255,0.04)" })}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
@@ -1479,9 +1505,17 @@ export default function SecurityDashboard(props) {
 
         {/* Search & Filters */}
         <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
-          <div style={{ position: "relative", flex: 1 }}>
-            <input value={searchText} onChange={function(e) { setSearchText(e.target.value); }} placeholder="이름, 부서, 사번으로 검색..." style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", fontFamily: "'Pretendard',sans-serif", boxSizing: "border-box" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, overflow: "hidden" }}>
+            {[["name", "\uC774\uB984"], ["dept", "\uBD80\uC11C"], ["id", "\uC0AC\uBC88"]].map(function(m) {
+              var active = searchMode === m[0];
+              return <button key={m[0]} onClick={function() { setSearchMode(m[0]); }} style={{ padding: "8px 10px", fontSize: 10, fontWeight: active ? 700 : 500, color: active ? "#0a84ff" : "rgba(255,255,255,0.4)", background: active ? "rgba(10,132,255,0.12)" : "transparent", border: "none", cursor: "pointer", borderRight: "1px solid rgba(255,255,255,0.06)" }}>{m[1]}</button>;
+            })}
           </div>
+          <div style={{ position: "relative", flex: 1 }}>
+            <input value={searchText} onChange={function(e) { setSearchText(e.target.value); }} placeholder={searchMode === "name" ? "\uC774\uB984\uC73C\uB85C \uAC80\uC0C9..." : searchMode === "dept" ? "\uBD80\uC11C\uBA85\uC73C\uB85C \uAC80\uC0C9..." : "\uC0AC\uBC88\uC73C\uB85C \uAC80\uC0C9..."} style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", fontFamily: "'Pretendard',sans-serif", boxSizing: "border-box" }} />
+          </div>
+          <button onClick={function() { /* search is live */ }} style={{ padding: "6px 14px", borderRadius: 7, background: "#3b82f6", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", border: "none" }}>{"\uD83D\uDD0D"} 검색</button>
+          <button onClick={function() { setSearchText(""); setFilterSeverity("all"); setFilterEventType("all"); setSearchMode("name"); }} style={{ padding: "6px 14px", borderRadius: 7, background: "rgba(255,45,85,0.1)", border: "1px solid rgba(255,45,85,0.2)", color: "#ff2d55", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>초기화</button>
           <select value={filterSeverity} onChange={function(e) { setFilterSeverity(e.target.value); }} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", padding: "10px 12px", borderRadius: 10, fontSize: 12, cursor: "pointer" }}>
             <option value="all" style={{ background: "#1a1a2e" }}>전체 위험도</option>
             <option value="critical" style={{ background: "#1a1a2e" }}>심각</option>
@@ -1493,9 +1527,6 @@ export default function SecurityDashboard(props) {
             <option value="all" style={{ background: "#1a1a2e" }}>전체 행위</option>
             {EVENT_TYPES.map(function(et) { return <option key={et.type} value={et.type} style={{ background: "#1a1a2e" }}>{et.label}</option>; })}
           </select>
-          {(searchText || filterSeverity !== "all" || filterEventType !== "all") && (
-            <button onClick={function() { setSearchText(""); setFilterSeverity("all"); setFilterEventType("all"); }} style={{ background: "rgba(255,45,85,0.1)", border: "1px solid rgba(255,45,85,0.2)", color: "#ff2d55", padding: "10px 14px", borderRadius: 10, fontSize: 11, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>초기화</button>
-          )}
           <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", whiteSpace: "nowrap" }}>결과: {filtered.length}건</div>
         </div>
 
@@ -1590,7 +1621,350 @@ export default function SecurityDashboard(props) {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
+
+      {/* Data Viewer Tab */}
+      {dashTab === "data" && (function() {
+        var DATA_PAGE_SIZE = 100;
+        var subTabs = [
+          { key: "employees", label: "\uC9C1\uC6D0DB", count: employees.length },
+          { key: "assets", label: "\uC790\uC0B0DB", count: ASSETS.length },
+          { key: "events", label: "\uC774\uBCA4\uD2B8 \uC720\uD615DB", count: EVENT_TYPES.length },
+          { key: "actions", label: "\uC870\uCE58 \uAC00\uC774\uB4DCDB", count: Object.keys(ACTION_GUIDES).length },
+          { key: "compliance", label: "\uBC95\uADDCDB", count: 6 }
+        ];
+
+        var headers = {
+          employees: ["\uC0AC\uBC88","\uC774\uB984","\uBD80\uC11C","\uC9C1\uAE09","\uACE0\uC6A9\uD615\uD0DC","\uBCF4\uC548\uB4F1\uAE09","\uC0C1\uAE09\uC790","\uC785\uC0AC\uC77C","\uD1F4\uC0AC\uC608\uC815","\uBD80\uC11C\uC774\uB3D9","\uACBD\uACE0\uD69F\uC218","\uC131\uACFC\uB4F1\uAE09"],
+          assets: ["\uC790\uC0B0\uBA85","\uC720\uD615","\uBCF4\uC548\uB4F1\uAE09","\uBBFC\uAC10\uB3C4","\uC811\uADFC\uAC00\uB2A5\uBD80\uC11C"],
+          events: ["\uC774\uBCA4\uD2B8","\uCF54\uB4DC","\uC2EC\uAC01\uB3C4","\uAE30\uBCF8\uC810\uC218","\uAC00\uC911\uCE58(%)","\uC124\uBA85"],
+          actions: ["\uC870\uCE58\uBA85","\uAE34\uAE09\uB3C4","\uC608\uC0C1\uC2DC\uAC04","\uC124\uBA85","\uB2E8\uACC4\uC218"],
+          compliance: ["\uBC95\uADDC","\uC870\uD56D","\uC694\uAD6C\uC0AC\uD56D","\uD604\uC7AC\uC0C1\uD0DC","\uBE44\uACE0"]
+        };
+
+        var complianceData = [
+          ["\uAC1C\uC778\uC815\uBCF4\uBCF4\uD638\uBC95","\uC81C29\uC870","\uC548\uC804\uC131 \uD655\uBCF4\uC870\uCE58","\uBD80\uBD84 \uC900\uC218","\uC554\uD638\uD654 \uC801\uC6A9 \uD544\uC694"],
+          ["\uC815\uBCF4\uD1B5\uC2E0\uB9DD\uBC95","\uC81C28\uC870","\uC811\uADFC\uAE30\uB85D \uBCF4\uAD00","\uC900\uC218","\uB85C\uADF8 \uAE30\uB85D \uD65C\uC131"],
+          ["\uC804\uC790\uAE08\uC735\uAC70\uB798\uBC95","\uC81C21\uC870","\uC774\uC0C1\uAC70\uB798 \uD0D0\uC9C0","\uBD80\uBD84 \uC900\uC218","\uC2E4\uC2DC\uAC04 \uBAA8\uB2C8\uD130\uB9C1 \uAD6C\uCD95\uC911"],
+          ["\uC2E0\uC6A9\uC815\uBCF4\uBC95","\uC81C32\uC870","\uAE30\uC220\uC801 \uBCF4\uD638\uC870\uCE58","\uBBF8\uC900\uC218","DLP \uC5F0\uB3D9 \uD544\uC694"],
+          ["\uC0B0\uC5C5\uAE30\uC220\uBCF4\uD638\uBC95","\uC81C2\uC870","\uC601\uC5C5\uBE44\uBC00 \uBCF4\uD638","\uC900\uC218","\uC811\uADFC\uD1B5\uC81C \uC801\uC6A9"],
+          ["ISO 27001","A.12.4","\uB85C\uAE45 \uBC0F \uBAA8\uB2C8\uD130\uB9C1","\uBD80\uBD84 \uC900\uC218","\uAC10\uC0AC\uCD94\uC801 \uC2DC\uC2A4\uD15C \uBBF8\uC5F0\uB3D9"]
+        ];
+
+        var getRows = function() {
+          if (dataSubTab === "employees") {
+            return employees.map(function(emp) {
+              return [emp.id, emp.name, emp.department, emp.role, emp.employmentType, emp.clearanceLevel, emp.managerId, emp.profile.hireDate.toLocaleDateString("ko-KR"), emp.profile.resignPlanned ? "\uC608" : "\uC544\uB2C8\uC624", emp.profile.recentTransfer ? "\uC788\uC74C" : "\uC5C6\uC74C", emp.profile.warningCount, emp.profile.performanceRating];
+            });
+          } else if (dataSubTab === "assets") {
+            return ASSETS.map(function(a) {
+              var depts = [];
+              Object.keys(DEPT_ASSETS).forEach(function(d) { if (DEPT_ASSETS[d].indexOf(a.name) !== -1) depts.push(d); });
+              return [a.name, a.type, a.classification, a.sensitivity, depts.join(", ") || "-"];
+            });
+          } else if (dataSubTab === "events") {
+            return EVENT_TYPES.map(function(et, i) {
+              var baseScore = ({low:15,medium:30,high:55,critical:75})[et.severity] || 20;
+              return [et.icon + " " + et.label, et.type, et.severity, baseScore, EVENT_WEIGHTS[i] || 0, et.label];
+            });
+          } else if (dataSubTab === "actions") {
+            var urgMap = {"\uAD00\uB9AC\uC790 \uD655\uC778 \uC694\uCCAD":"low","\uCD94\uAC00 MFA \uC778\uC99D":"medium","\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C":"high","\uACC4\uC815 \uC7A0\uAE08":"critical","\uAC10\uC0AC \uB85C\uADF8 \uC790\uB3D9 \uC0DD\uC131":"medium","HR \uC5F0\uACC4 \uC870\uC0AC \uC694\uCCAD":"high"};
+            return Object.keys(ACTION_GUIDES).map(function(name) {
+              var g = ACTION_GUIDES[name];
+              return [name, urgMap[name] || "medium", g.estimatedTime, g.summary.slice(0, 50) + "...", g.steps.length];
+            });
+          } else {
+            return complianceData;
+          }
+        };
+
+        var allRows = getRows();
+        var filteredRows = dataSearch ? allRows.filter(function(r) {
+          return r.some(function(c) { return String(c).toLowerCase().indexOf(dataSearch.toLowerCase()) !== -1; });
+        }) : allRows;
+        var totalPages = Math.ceil(filteredRows.length / DATA_PAGE_SIZE);
+        var pagedRows = filteredRows.slice(dataPage * DATA_PAGE_SIZE, (dataPage + 1) * DATA_PAGE_SIZE);
+
+        var downloadData = function() {
+          var hdr = headers[dataSubTab];
+          var ws = XLSX.utils.aoa_to_sheet([hdr].concat(filteredRows));
+          var wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, dataSubTab);
+          XLSX.writeFile(wb, dataSubTab + "_" + new Date().toISOString().slice(0, 10) + ".xlsx");
+        };
+
+        return (
+          <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
+            {/* Sub tabs */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+              {subTabs.map(function(st) {
+                var active = dataSubTab === st.key;
+                return <button key={st.key} onClick={function() { setDataSubTab(st.key); setDataPage(0); setDataSearch(""); }} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.5)", background: active ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
+                  {st.label} <span style={{ fontSize: 10, color: active ? "#5ac8fa" : "rgba(255,255,255,0.3)", marginLeft: 4 }}>({st.count})</span>
+                </button>;
+              })}
+            </div>
+
+            {/* Search + Download */}
+            <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
+              <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"\uAC80\uC0C9..."} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+              <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(48,209,88,0.12)", border: "1px solid rgba(48,209,88,0.25)", color: "#30d158", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>XLSX \uB2E4\uC6B4\uB85C\uB4DC ({filteredRows.length}\uAC74)</button>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{filteredRows.length}\uAC74 \uC911 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
+            </div>
+
+            {/* Table */}
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                  <thead>
+                    <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                      {headers[dataSubTab].map(function(h) {
+                        return <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: 10, borderBottom: "1px solid rgba(255,255,255,0.06)", whiteSpace: "nowrap" }}>{h}</th>;
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pagedRows.map(function(row, ri) {
+                      return (
+                        <tr key={ri} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}
+                          onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.04)"; }}
+                          onMouseLeave={function(e) { e.currentTarget.style.background = "transparent"; }}>
+                          {row.map(function(cell, ci) {
+                            return <td key={ci} style={{ padding: "8px 12px", color: "rgba(255,255,255,0.7)", fontSize: 11, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cell}</td>;
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 14, alignItems: "center" }}>
+                <button onClick={function() { setDataPage(Math.max(0, dataPage - 1)); }} disabled={dataPage === 0} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage === 0 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage === 0 ? "default" : "pointer" }}>&lt;</button>
+                {Array.from({ length: Math.min(totalPages, 10) }, function(_, i) {
+                  var page = totalPages <= 10 ? i : Math.max(0, Math.min(dataPage - 4, totalPages - 10)) + i;
+                  return <button key={page} onClick={function() { setDataPage(page); }} style={{ padding: "6px 10px", borderRadius: 6, background: page === dataPage ? "rgba(10,132,255,0.2)" : "rgba(255,255,255,0.04)", border: page === dataPage ? "1px solid rgba(10,132,255,0.4)" : "1px solid rgba(255,255,255,0.06)", color: page === dataPage ? "#0a84ff" : "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: page === dataPage ? 700 : 400, cursor: "pointer" }}>{page + 1}</button>;
+                })}
+                <button onClick={function() { setDataPage(Math.min(totalPages - 1, dataPage + 1)); }} disabled={dataPage >= totalPages - 1} style={{ padding: "6px 12px", borderRadius: 6, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: dataPage >= totalPages - 1 ? "rgba(255,255,255,0.2)" : "#fff", fontSize: 11, cursor: dataPage >= totalPages - 1 ? "default" : "pointer" }}>&gt;</button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Knowledge Graph Tab */}
+      {dashTab === "graph" && (function() {
+        var canvasW = 1100, canvasH = 700;
+
+        // Build nodes
+        var nodes = [];
+        var edges = [];
+
+        // Top 10 high-risk employees
+        var empScores = {};
+        events.forEach(function(e) {
+          if (!empScores[e.employee.id] || empScores[e.employee.id].score < e.riskScore) {
+            empScores[e.employee.id] = { score: e.riskScore, emp: e.employee };
+          }
+        });
+        var topEmps = Object.values(empScores).sort(function(a, b) { return b.score - a.score; }).slice(0, 10);
+
+        // Departments
+        var deptSet = {};
+        DEPARTMENTS.forEach(function(d, i) {
+          var angle = (i / DEPARTMENTS.length) * Math.PI * 2 - Math.PI / 2;
+          var rx = 420, ry = 280;
+          nodes.push({ id: "dept-" + d, label: d, type: "dept", x: canvasW / 2 + Math.cos(angle) * rx, y: canvasH / 2 + Math.sin(angle) * ry, w: 70, h: 26 });
+          deptSet[d] = true;
+        });
+
+        // Assets in inner ring
+        ASSETS.forEach(function(a, i) {
+          var angle = (i / ASSETS.length) * Math.PI * 2 - Math.PI / 2;
+          nodes.push({ id: "asset-" + a.name, label: a.name.slice(0, 10), type: "asset", x: canvasW / 2 + Math.cos(angle) * 200, y: canvasH / 2 + Math.sin(angle) * 150, w: 72, h: 26 });
+        });
+
+        // Event types in middle ring
+        EVENT_TYPES.forEach(function(et, i) {
+          var angle = (i / EVENT_TYPES.length) * Math.PI * 2 - Math.PI / 4;
+          nodes.push({ id: "evt-" + et.type, label: et.label.slice(0, 8), type: "eventType", x: canvasW / 2 + Math.cos(angle) * 310, y: canvasH / 2 + Math.sin(angle) * 220, w: 20, h: 20 });
+        });
+
+        // Employees near center
+        topEmps.forEach(function(item, i) {
+          var angle = (i / topEmps.length) * Math.PI * 2;
+          nodes.push({ id: "emp-" + item.emp.id, label: item.emp.name, type: "employee", x: canvasW / 2 + Math.cos(angle) * 100, y: canvasH / 2 + Math.sin(angle) * 70, w: 18, h: 18, score: item.score });
+        });
+
+        // Action guides
+        var actionKeys = Object.keys(ACTION_GUIDES);
+        actionKeys.forEach(function(name, i) {
+          var angle = (i / actionKeys.length) * Math.PI * 2 + Math.PI / 3;
+          nodes.push({ id: "action-" + name, label: name.slice(0, 6), type: "action", x: canvasW / 2 + Math.cos(angle) * 380, y: canvasH / 2 + Math.sin(angle) * 260, w: 60, h: 24 });
+        });
+
+        // Edges: employee -> dept (belongs)
+        topEmps.forEach(function(item) {
+          if (deptSet[item.emp.department]) {
+            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "\uC18C\uC18D", color: "rgba(94,92,230,0.3)" });
+          }
+        });
+
+        // Edges: employee -> asset (access from recent events)
+        var empAssetEdges = {};
+        events.slice(0, 50).forEach(function(e) {
+          var key = e.employee.id + "|" + e.asset.name;
+          if (!empAssetEdges[key] && topEmps.some(function(t) { return t.emp.id === e.employee.id; })) {
+            empAssetEdges[key] = true;
+            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "\uC811\uADFC", color: "rgba(10,132,255,0.25)" });
+          }
+        });
+
+        // Edges: dept -> asset (permission)
+        Object.keys(DEPT_ASSETS).forEach(function(d) {
+          DEPT_ASSETS[d].forEach(function(a) {
+            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "\uAD8C\uD55C", color: "rgba(48,209,88,0.15)" });
+          });
+        });
+
+        // Edges: eventType -> asset (target) - from events
+        var evtAssetEdges = {};
+        events.slice(0, 30).forEach(function(e) {
+          var key = e.eventType.type + "|" + e.asset.name;
+          if (!evtAssetEdges[key]) {
+            evtAssetEdges[key] = true;
+            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "\uB300\uC0C1", color: "rgba(255,149,0,0.2)" });
+          }
+        });
+
+        // Edges: eventType -> action (trigger)
+        EVENT_TYPES.forEach(function(et) {
+          var sev = et.severity;
+          if (sev === "critical") {
+            edges.push({ from: "evt-" + et.type, to: "action-\uACC4\uC815 \uC7A0\uAE08", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,45,85,0.2)" });
+          } else if (sev === "high") {
+            edges.push({ from: "evt-" + et.type, to: "action-\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,149,0,0.2)" });
+          }
+        });
+
+        var nodeMap = {};
+        nodes.forEach(function(n) { nodeMap[n.id] = n; });
+
+        var typeColors = {
+          employee: "#0a84ff",
+          asset: "#30d158",
+          eventType: "#ff9500",
+          dept: "#5e5ce6",
+          action: "#ff2d55"
+        };
+
+        var typeLabels = {
+          employee: "\uC9C1\uC6D0",
+          asset: "\uC790\uC0B0",
+          eventType: "\uC774\uBCA4\uD2B8\uC720\uD615",
+          dept: "\uBD80\uC11C",
+          action: "\uC870\uCE58"
+        };
+
+        return (
+          <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>{"\uD83E\uDDE0"} \uC9C0\uC2DD \uADF8\uB798\uD504 \u2014 \uB370\uC774\uD130 \uAD00\uACC4 \uC2DC\uAC01\uD654</div>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                {Object.keys(typeColors).map(function(t) {
+                  return <div key={t} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: t === "employee" ? "50%" : t === "eventType" ? 0 : 3, background: typeColors[t], transform: t === "eventType" ? "rotate(45deg) scale(0.7)" : "none" }} />
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{typeLabels[t]}</span>
+                  </div>;
+                })}
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", position: "relative" }}>
+              <svg width="100%" viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
+                onMouseMove={function(evt) {
+                  var rect = evt.currentTarget.getBoundingClientRect();
+                  var scaleX = canvasW / rect.width;
+                  var mx = (evt.clientX - rect.left) * scaleX;
+                  var my = (evt.clientY - rect.top) * scaleX;
+                  var found = null;
+                  nodes.forEach(function(n) {
+                    var dx = mx - n.x, dy = my - n.y;
+                    if (Math.abs(dx) < (n.w || 20) && Math.abs(dy) < (n.h || 20)) found = n.id;
+                  });
+                  setGraphHover(found);
+                }}
+                onClick={function(evt) {
+                  var rect = evt.currentTarget.getBoundingClientRect();
+                  var scaleX = canvasW / rect.width;
+                  var mx = (evt.clientX - rect.left) * scaleX;
+                  var my = (evt.clientY - rect.top) * scaleX;
+                  var found = null;
+                  nodes.forEach(function(n) {
+                    var dx = mx - n.x, dy = my - n.y;
+                    if (Math.abs(dx) < (n.w || 20) && Math.abs(dy) < (n.h || 20)) found = n.id;
+                  });
+                  setGraphSelected(graphSelected === found ? null : found);
+                }}>
+
+                {/* Edges */}
+                {edges.map(function(e, i) {
+                  var from = nodeMap[e.from], to = nodeMap[e.to];
+                  if (!from || !to) return null;
+                  var isHighlighted = graphSelected && (e.from === graphSelected || e.to === graphSelected);
+                  var opacity = graphSelected ? (isHighlighted ? 1 : 0.05) : 0.6;
+                  return <line key={i} x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={isHighlighted ? e.color.replace(/[\d.]+\)/, "0.8)") : e.color} strokeWidth={isHighlighted ? 2 : 1} opacity={opacity} />;
+                })}
+
+                {/* Nodes */}
+                {nodes.map(function(n) {
+                  var c = typeColors[n.type];
+                  var isHovered = graphHover === n.id;
+                  var isSelected = graphSelected === n.id;
+                  var isConnected = graphSelected && edges.some(function(e) { return (e.from === graphSelected && e.to === n.id) || (e.to === graphSelected && e.from === n.id); });
+                  var dimmed = graphSelected && !isSelected && !isConnected;
+                  var nodeOpacity = dimmed ? 0.15 : 1;
+
+                  if (n.type === "employee") {
+                    return <g key={n.id} opacity={nodeOpacity}>
+                      <circle cx={n.x} cy={n.y} r={isHovered || isSelected ? 16 : 12} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 3 : 1.5} />
+                      <text x={n.x} y={n.y + 24} textAnchor="middle" fill={c} fontSize="9" fontWeight="600">{n.label}</text>
+                      {isHovered && <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">{n.label + " (\uC704\uD5D8:" + (n.score || "?") + ")"}</text>}
+                    </g>;
+                  } else if (n.type === "eventType") {
+                    return <g key={n.id} opacity={nodeOpacity}>
+                      <rect x={n.x - 12} y={n.y - 12} width={24} height={24} rx={3} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 2.5 : 1} transform={"rotate(45 " + n.x + " " + n.y + ")"} />
+                      <text x={n.x} y={n.y + 28} textAnchor="middle" fill={c} fontSize="8" fontWeight="500">{n.label}</text>
+                      {isHovered && <text x={n.x} y={n.y - 22} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">{n.label}</text>}
+                    </g>;
+                  } else {
+                    return <g key={n.id} opacity={nodeOpacity}>
+                      <rect x={n.x - n.w / 2} y={n.y - n.h / 2} width={n.w} height={n.h} rx={6} fill={c + "20"} stroke={c} strokeWidth={isSelected ? 2.5 : 1} />
+                      <text x={n.x} y={n.y + 4} textAnchor="middle" fill={c} fontSize="9" fontWeight="600">{n.label}</text>
+                      {isHovered && <text x={n.x} y={n.y - n.h / 2 - 6} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">{n.label}</text>}
+                    </g>;
+                  }
+                })}
+              </svg>
+
+              {/* Node detail tooltip */}
+              {graphSelected && nodeMap[graphSelected] && (
+                <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(18,18,26,0.95)", border: "1px solid " + typeColors[nodeMap[graphSelected].type] + "40", borderRadius: 12, padding: 16, maxWidth: 240, animation: "fadeIn 0.3s", zIndex: 5 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: typeColors[nodeMap[graphSelected].type], marginBottom: 6 }}>{nodeMap[graphSelected].label}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>\uC720\uD615: {typeLabels[nodeMap[graphSelected].type]}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
+                    \uC5F0\uACB0\uB41C \uB178\uB4DC: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}\uAC74
+                  </div>
+                  {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>\uC704\uD5D8\uC810\uC218: {nodeMap[graphSelected].score}</div>}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }
