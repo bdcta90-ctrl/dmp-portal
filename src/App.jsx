@@ -92,7 +92,7 @@ const MVPS = [
     desc: "견적 산정 · 과실비율 분석 · 처리방법 제안까지 AI가 의사결정을 지원하는 자동차 손해사정 포탈",
     tags: ["AI Agent", "손해사정", "AI진단"],
     date: "2025.02",
-    status: "Live",
+    status: "준비중",
     gradient: "linear-gradient(135deg,rgba(244,63,94,0.08),rgba(251,146,60,0.06))",
     border: "rgba(244,63,94,0.2)",
   },
@@ -123,6 +123,20 @@ const MVPS = [
     status: "Live",
     gradient: "linear-gradient(135deg,rgba(249,115,22,0.08),rgba(234,88,12,0.06))",
     border: "rgba(249,115,22,0.2)",
+  },
+  {
+    id: "claimsNewBackup",
+    category: "AI",
+    catColor: "#10b981",
+    icon: "🚗",
+    iconBg: "linear-gradient(135deg,#10b981,#059669)",
+    title: "AI 자동차 손해사정 (New)",
+    desc: "20260318 DB자동차손해사정 시연버전",
+    tags: ["AI Agent", "손해사정", "시연백업"],
+    date: "2026.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(16,185,129,0.08),rgba(5,150,105,0.06))",
+    border: "rgba(16,185,129,0.2)",
   },
   {
     id: "koreaJobs",
@@ -160,6 +174,7 @@ export default function App() {
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
   if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
   if (page === "claimsNew") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
+  if (page === "claimsNewBackup") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
   if (page === "stockpilot") return <StockPilot onBack={() => setPage("portal")} />;
   if (page === "koreaJobs") return (
     <div style={{width:"100%",height:"100vh",position:"relative"}}>
@@ -403,7 +418,7 @@ export default function App() {
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "claims" || mvp.id === "security" || mvp.id === "firewall" || mvp.id === "claimsNew" || mvp.id === "stockpilot" || mvp.id === "koreaJobs";
+            const isClickable = mvp.id === "security" || mvp.id === "firewall" || mvp.id === "claimsNew" || mvp.id === "claimsNewBackup" || mvp.id === "stockpilot" || mvp.id === "koreaJobs";
             return (
               <div
                 key={mvp.id}
