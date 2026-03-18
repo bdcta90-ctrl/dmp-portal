@@ -1428,6 +1428,8 @@ export default function SecurityDashboard(props) {
   var graphHover = stGraphHover[0], setGraphHover = stGraphHover[1];
   var stGraphSelected = useState(null);
   var graphSelected = stGraphSelected[0], setGraphSelected = stGraphSelected[1];
+  var stOntoSubView = useState("graph");
+  var ontoSubView = stOntoSubView[0], setOntoSubView = stOntoSubView[1];
   var stCollapsed = useState({ compliance: true, integration: true, layer7: true });
   var collapsedPanels = stCollapsed[0], setCollapsedPanels = stCollapsed[1];
   var togglePanel = function(key) { setCollapsedPanels(function(p) { var n = Object.assign({}, p); n[key] = !n[key]; return n; }); };
@@ -1547,7 +1549,7 @@ export default function SecurityDashboard(props) {
 
       {/* Tab Bar */}
       <div style={{ position: "sticky", top: 58, zIndex: 99, background: "rgba(10,10,15,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", display: "flex", gap: 0 }}>
-        {[["monitor", "🛡️ 실시간 감시"], ["data", "📊 데이터 뷰어"], ["graph", "🧠 지식 그래프"]].map(function(t) {
+        {[["monitor", "🛡️ 실시간 감시"], ["data", "📊 데이터 뷰어"]].map(function(t) {
           var active = dashTab === t[0];
           return <button key={t[0]} onClick={function() { setDashTab(t[0]); }} style={{ padding: "10px 20px", fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.4)", background: "transparent", border: "none", borderBottom: active ? "2px solid #0a84ff" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s", letterSpacing: 0.3 }}>{t[1]}</button>;
         })}
@@ -2032,6 +2034,310 @@ export default function SecurityDashboard(props) {
             {secDataView === "ontology" && <div>
               <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:16}}>보안 온톨로지 구조, 엔티티 관계, 위험도 산정 공식을 시각화합니다.</div>
 
+              {/* Ontology Sub-Navigation */}
+              <div style={{display:"flex",gap:6,marginBottom:16}}>
+                {[{id:"graph",l:"🔗 지식 그래프"},{id:"rules",l:"⚙️ 추론 규칙"},{id:"formula",l:"📊 위험도 공식"}].map(function(v) {
+                  var active = ontoSubView === v.id;
+                  return <button key={v.id} onClick={function(){setOntoSubView(v.id);}} style={{padding:"7px 16px",fontSize:12,fontWeight:active?700:500,color:active?"#fff":"rgba(255,255,255,0.5)",background:active?"rgba(10,132,255,0.18)":"rgba(255,255,255,0.04)",border:active?"1px solid rgba(10,132,255,0.4)":"1px solid rgba(255,255,255,0.08)",borderRadius:8,cursor:"pointer",transition:"all 0.2s"}}>{v.l}</button>;
+                })}
+              </div>
+
+              {/* Sub-view: Knowledge Graph */}
+              {ontoSubView === "graph" && (function() {
+                var canvasW = 1100, canvasH = 700;
+                var nodes = [];
+                var edges = [];
+                var empScores = {};
+                events.forEach(function(e, idx) {
+                  var recencyWeight = 1 / (1 + idx * 0.05);
+                  if (!empScores[e.employee.id]) {
+                    empScores[e.employee.id] = { score: 0, maxScore: 0, count: 0, emp: e.employee };
+                  }
+                  empScores[e.employee.id].score += e.riskScore * recencyWeight;
+                  empScores[e.employee.id].count += 1;
+                  if (e.riskScore > empScores[e.employee.id].maxScore) {
+                    empScores[e.employee.id].maxScore = e.riskScore;
+                    empScores[e.employee.id].emp = e.employee;
+                  }
+                });
+                var topEmps = Object.values(empScores).sort(function(a, b) { return b.score - a.score; }).slice(0, 10);
+                topEmps.forEach(function(item) { item.score = item.maxScore; });
+                var deptSet = {};
+                DEPARTMENTS.forEach(function(d, i) {
+                  var angle = (i / DEPARTMENTS.length) * Math.PI * 2 - Math.PI / 2;
+                  var rx = 420, ry = 280;
+                  nodes.push({ id: "dept-" + d, label: d, type: "dept", x: canvasW / 2 + Math.cos(angle) * rx, y: canvasH / 2 + Math.sin(angle) * ry, w: 70, h: 26 });
+                  deptSet[d] = true;
+                });
+                ASSETS.forEach(function(a, i) {
+                  var angle = (i / ASSETS.length) * Math.PI * 2 - Math.PI / 2;
+                  nodes.push({ id: "asset-" + a.name, label: a.name.slice(0, 10), type: "asset", x: canvasW / 2 + Math.cos(angle) * 200, y: canvasH / 2 + Math.sin(angle) * 150, w: 72, h: 26 });
+                });
+                EVENT_TYPES.forEach(function(et, i) {
+                  var angle = (i / EVENT_TYPES.length) * Math.PI * 2 - Math.PI / 4;
+                  nodes.push({ id: "evt-" + et.type, label: et.label.slice(0, 8), type: "eventType", x: canvasW / 2 + Math.cos(angle) * 310, y: canvasH / 2 + Math.sin(angle) * 220, w: 20, h: 20 });
+                });
+                topEmps.forEach(function(item, i) {
+                  var angle = (i / topEmps.length) * Math.PI * 2;
+                  nodes.push({ id: "emp-" + item.emp.id, label: item.emp.name, type: "employee", x: canvasW / 2 + Math.cos(angle) * 100, y: canvasH / 2 + Math.sin(angle) * 70, w: 18, h: 18, score: item.score });
+                });
+                var actionKeys = Object.keys(ACTION_GUIDES);
+                actionKeys.forEach(function(name, i) {
+                  var angle = (i / actionKeys.length) * Math.PI * 2 + Math.PI / 3;
+                  nodes.push({ id: "action-" + name, label: name.slice(0, 6), type: "action", x: canvasW / 2 + Math.cos(angle) * 380, y: canvasH / 2 + Math.sin(angle) * 260, w: 60, h: 24 });
+                });
+                topEmps.forEach(function(item) {
+                  if (deptSet[item.emp.department]) {
+                    edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "소속", color: "rgba(94,92,230,0.5)" });
+                  }
+                });
+                var empAssetEdges = {};
+                events.slice(0, 50).forEach(function(e) {
+                  var key = e.employee.id + "|" + e.asset.name;
+                  if (!empAssetEdges[key] && topEmps.some(function(t) { return t.emp.id === e.employee.id; })) {
+                    empAssetEdges[key] = true;
+                    edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "접근", color: "rgba(10,132,255,0.45)" });
+                  }
+                });
+                Object.keys(DEPT_ASSETS).forEach(function(d) {
+                  DEPT_ASSETS[d].forEach(function(a) {
+                    edges.push({ from: "dept-" + d, to: "asset-" + a, label: "권한", color: "rgba(48,209,88,0.35)" });
+                  });
+                });
+                var evtAssetEdges = {};
+                events.slice(0, 30).forEach(function(e) {
+                  var key = e.eventType.type + "|" + e.asset.name;
+                  if (!evtAssetEdges[key]) {
+                    evtAssetEdges[key] = true;
+                    edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "대상", color: "rgba(255,149,0,0.4)" });
+                  }
+                });
+                EVENT_TYPES.forEach(function(et) {
+                  var sev = et.severity;
+                  if (sev === "critical") {
+                    edges.push({ from: "evt-" + et.type, to: "action-계정 잠금", label: "트리거", color: "rgba(255,45,85,0.45)" });
+                  } else if (sev === "high") {
+                    edges.push({ from: "evt-" + et.type, to: "action-접근 일시 제한", label: "트리거", color: "rgba(255,149,0,0.4)" });
+                  }
+                });
+                var nodeMap = {};
+                nodes.forEach(function(n) { nodeMap[n.id] = n; });
+                var typeColors = { employee: "#0a84ff", asset: "#30d158", eventType: "#ff9500", dept: "#5e5ce6", action: "#ff2d55" };
+                var typeLabels = { employee: "직원", asset: "자산", eventType: "이벤트유형", dept: "부서", action: "조치" };
+
+                return <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700 }}>{"🧠"} 지식 그래프 — 데이터 관계 시각화</div>
+                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                      {Object.keys(typeColors).map(function(t) {
+                        return <div key={t} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <div style={{ width: 10, height: 10, borderRadius: t === "employee" ? "50%" : t === "eventType" ? 0 : 3, background: typeColors[t], transform: t === "eventType" ? "rotate(45deg) scale(0.7)" : "none" }} />
+                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{typeLabels[t]}</span>
+                        </div>;
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", position: "relative" }}>
+                    <svg width="100%" viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
+                      onMouseMove={function(evt) {
+                        var rect = evt.currentTarget.getBoundingClientRect();
+                        var scaleX = canvasW / rect.width;
+                        var mx = (evt.clientX - rect.left) * scaleX;
+                        var my = (evt.clientY - rect.top) * scaleX;
+                        var found = null;
+                        nodes.forEach(function(n) {
+                          var dx = mx - n.x, dy = my - n.y;
+                          if (Math.abs(dx) < (n.w || 20) && Math.abs(dy) < (n.h || 20)) found = n.id;
+                        });
+                        setGraphHover(found);
+                      }}
+                      onClick={function(evt) {
+                        var rect = evt.currentTarget.getBoundingClientRect();
+                        var scaleX = canvasW / rect.width;
+                        var mx = (evt.clientX - rect.left) * scaleX;
+                        var my = (evt.clientY - rect.top) * scaleX;
+                        var found = null;
+                        nodes.forEach(function(n) {
+                          var dx = mx - n.x, dy = my - n.y;
+                          if (Math.abs(dx) < (n.w || 20) && Math.abs(dy) < (n.h || 20)) found = n.id;
+                        });
+                        setGraphSelected(graphSelected === found ? null : found);
+                      }}>
+                      {edges.map(function(e, i) {
+                        var from = nodeMap[e.from], to = nodeMap[e.to];
+                        if (!from || !to) return null;
+                        var isHighlighted = graphSelected && (e.from === graphSelected || e.to === graphSelected);
+                        var opacity = graphSelected ? (isHighlighted ? 1 : 0.08) : 0.7;
+                        var midX = (from.x + to.x) / 2;
+                        var midY = (from.y + to.y) / 2;
+                        return <g key={i}>
+                          <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={isHighlighted ? e.color.replace(/[\d.]+\)/, "0.9)") : e.color} strokeWidth={isHighlighted ? 3 : 1.5} opacity={opacity} />
+                          {isHighlighted && <g>
+                            <rect x={midX - 16} y={midY - 8} width={32} height={16} rx={4} fill="rgba(0,0,0,0.75)" />
+                            <text x={midX} y={midY + 4} textAnchor="middle" fill="rgba(255,255,255,0.8)" fontSize="9" fontWeight="600">{e.label}</text>
+                          </g>}
+                        </g>;
+                      })}
+                      {nodes.map(function(n) {
+                        var c = typeColors[n.type];
+                        var isHovered = graphHover === n.id;
+                        var isSelected = graphSelected === n.id;
+                        var isConnected = graphSelected && edges.some(function(e) { return (e.from === graphSelected && e.to === n.id) || (e.to === graphSelected && e.from === n.id); });
+                        var dimmed = graphSelected && !isSelected && !isConnected;
+                        var nodeOpacity = dimmed ? 0.15 : 1;
+                        if (n.type === "employee") {
+                          return <g key={n.id} opacity={nodeOpacity}>
+                            <circle cx={n.x} cy={n.y} r={isHovered || isSelected ? 18 : 14} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 3 : 2} />
+                            <rect x={n.x - 18} y={n.y + 16} width={36} height={16} rx={4} fill="rgba(0,0,0,0.7)" />
+                            <text x={n.x} y={n.y + 28} textAnchor="middle" fill={c} fontSize="11" fontWeight="700">{n.label}</text>
+                            {isHovered && <g>
+                              <rect x={n.x - 50} y={n.y - 34} width={100} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
+                              <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (" + "위험" + ":" + (n.score || "?") + ")"}</text>
+                            </g>}
+                          </g>;
+                        } else if (n.type === "eventType") {
+                          return <g key={n.id} opacity={nodeOpacity}>
+                            <rect x={n.x - 14} y={n.y - 14} width={28} height={28} rx={3} fill={c + "30"} stroke={c} strokeWidth={isSelected ? 2.5 : 1.5} transform={"rotate(45 " + n.x + " " + n.y + ")"} />
+                            <rect x={n.x - 28} y={n.y + 18} width={56} height={16} rx={4} fill="rgba(0,0,0,0.7)" />
+                            <text x={n.x} y={n.y + 30} textAnchor="middle" fill={c} fontSize="10" fontWeight="600">{n.label}</text>
+                            {isHovered && <g>
+                              <rect x={n.x - 36} y={n.y - 32} width={72} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
+                              <text x={n.x} y={n.y - 18} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label}</text>
+                            </g>}
+                          </g>;
+                        } else {
+                          return <g key={n.id} opacity={nodeOpacity}>
+                            <rect x={n.x - n.w / 2} y={n.y - n.h / 2} width={n.w} height={n.h} rx={6} fill={c + "20"} stroke={c} strokeWidth={isSelected ? 3 : 1.5} />
+                            <text x={n.x} y={n.y + 5} textAnchor="middle" fill={c} fontSize="11" fontWeight="700">{n.label}</text>
+                            {isHovered && <g>
+                              <rect x={n.x - 40} y={n.y - n.h / 2 - 20} width={80} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
+                              <text x={n.x} y={n.y - n.h / 2 - 6} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label}</text>
+                            </g>}
+                          </g>;
+                        }
+                      })}
+                    </svg>
+                    {graphSelected && nodeMap[graphSelected] && (
+                      <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(18,18,26,0.95)", border: "1px solid " + typeColors[nodeMap[graphSelected].type] + "40", borderRadius: 12, padding: 16, maxWidth: 240, animation: "fadeIn 0.3s", zIndex: 5 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: typeColors[nodeMap[graphSelected].type], marginBottom: 6 }}>{nodeMap[graphSelected].label}</div>
+                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>유형: {typeLabels[nodeMap[graphSelected].type]}</div>
+                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
+                          연결된 노드: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}건
+                        </div>
+                        {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{background:"rgba(255,255,255,0.03)", borderRadius:12, padding:16, border:"1px solid rgba(255,255,255,0.06)", marginTop:12}}>
+                    <div style={{fontSize:13, fontWeight:700, color:"#e2e8f0", marginBottom:8}}>{"📖"} 지식 그래프 활용 가이드</div>
+                    <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, fontSize:11.5, color:"#94a3b8", lineHeight:1.7}}>
+                      <div>
+                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"🔍"} 위협 경로 분석</div>
+                        직원→자산 연결선을 통해 누가 어떤 민감 자산에 접근했는지 한눈에 파악할 수 있습니다. 비정상적인 접근 경로(부서 권한 외 자산 접근)를 시각적으로 탐지합니다.
+                      </div>
+                      <div>
+                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"👥"} 조직 리스크 맵</div>
+                        부서→자산 권한 관계와 실제 접근 패턴을 비교하여 권한 외 접근을 식별합니다. 특정 부서에 위험 이벤트가 집중되는지 확인할 수 있습니다.
+                      </div>
+                      <div>
+                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"⚡"} 이벤트-조치 연계</div>
+                        이벤트 유형별로 어떤 조치가 트리거되는지 확인하고, 조치 실행의 우선순위를 판단할 수 있습니다.
+                      </div>
+                      <div>
+                        <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"🎯"} 노드 클릭 활용법</div>
+                        노드를 클릭하면 해당 노드와 연결된 관계만 강조됩니다. 특정 직원의 접근 자산, 특정 자산에 접근한 직원, 특정 부서의 권한 범위를 빠르게 파악할 수 있습니다.
+                      </div>
+                    </div>
+                  </div>
+                </div>;
+              })()}
+
+              {/* Sub-view: Inference Rules */}
+              {ontoSubView === "rules" && (function() {
+                var SECURITY_RULES = [
+                  {id:"SR01",name:"야간 접근 가중",cat:"시간",priority:1,condition:"접근 시간 22시~07시",then:"위험점수 +20",severity:"warning"},
+                  {id:"SR02",name:"주말 접근 가중",cat:"시간",priority:2,condition:"토요일 또는 일요일",then:"위험점수 +10",severity:"info"},
+                  {id:"SR03",name:"퇴사 예정자 가중",cat:"HR",priority:0,condition:"profile.resignPlanned === true",then:"위험점수 +25",severity:"critical"},
+                  {id:"SR04",name:"최근 부서 이동자",cat:"HR",priority:1,condition:"profile.recentTransfer === true",then:"위험점수 +10",severity:"warning"},
+                  {id:"SR05",name:"경고 이력 가중",cat:"HR",priority:1,condition:"profile.warningCount > 0",then:"위험점수 +(경고횟수 \u00D7 8)",severity:"warning"},
+                  {id:"SR06",name:"저성과자 가중",cat:"HR",priority:2,condition:"profile.performanceRating === 'D'",then:"위험점수 +15",severity:"info"},
+                  {id:"SR07",name:"역할-자산 불일치",cat:"접근",priority:0,condition:"자산이 부서 DEPT_ASSETS에 없음",then:"위험점수 +20, '권한외 접근' 배지",severity:"critical"},
+                  {id:"SR08",name:"보안등급 위반",cat:"접근",priority:0,condition:"일반등급 직원이 기밀/최고기밀 접근 (합법부서 제외)",then:"위험점수 +20",severity:"critical"},
+                  {id:"SR09",name:"외주/협력사 가중",cat:"고용",priority:1,condition:"employmentType === '\uC678\uC8FC' 또는 '\uD611\uB825\uC0AC'",then:"위험점수 +15",severity:"warning"},
+                  {id:"SR10",name:"복합 위협 탐지",cat:"패턴",priority:0,condition:"동일 사용자 10분 내 고위험(70+) 3건 이상",then:"위험점수 +15, 복합 위협 플래그",severity:"critical"},
+                  {id:"SR11",name:"USB 복사 감지",cat:"이벤트",priority:0,condition:"eventType === 'Copy to USB'",then:"기본점수 55 (HIGH)",severity:"critical"},
+                  {id:"SR12",name:"외부 AI 업로드",cat:"이벤트",priority:0,condition:"eventType === 'External AI Upload'",then:"기본점수 75 (CRITICAL)",severity:"critical"},
+                  {id:"SR13",name:"권한 상승 탐지",cat:"이벤트",priority:0,condition:"eventType === 'Permission Escalation'",then:"기본점수 75 (CRITICAL)",severity:"critical"},
+                  {id:"SR14",name:"삭제/변조 시도",cat:"이벤트",priority:0,condition:"eventType === 'Delete/Modify'",then:"기본점수 75 (CRITICAL)",severity:"critical"},
+                  {id:"SR15",name:"대량 조회 감지",cat:"이벤트",priority:1,condition:"eventType === 'Bulk Query'",then:"기본점수 55 (HIGH)",severity:"warning"},
+                  {id:"SR16",name:"외부 공유 링크",cat:"이벤트",priority:1,condition:"eventType === 'Share Link Created'",then:"기본점수 55 (HIGH)",severity:"warning"},
+                  {id:"SR17",name:"민감도 가중 (합법)",cat:"자산",priority:2,condition:"합법 접근 시",then:"위험점수 +(민감도 \u00D7 2)",severity:"info"},
+                  {id:"SR18",name:"민감도 가중 (무단)",cat:"자산",priority:1,condition:"무단 접근 시",then:"위험점수 +(민감도 \u00D7 5)",severity:"warning"},
+                  {id:"SR19",name:"빈도 이상 (3건+)",cat:"패턴",priority:1,condition:"동일 사용자 이벤트 3건 이상",then:"위험점수 +10",severity:"warning"},
+                  {id:"SR20",name:"빈도 이상 (5건+)",cat:"패턴",priority:0,condition:"동일 사용자 이벤트 5건 이상",then:"위험점수 +20",severity:"critical"},
+                ];
+                var sevColors = {critical:"#ff2d55",warning:"#ff9500",info:"#0a84ff"};
+                var sevLabels = {critical:"CRITICAL",warning:"WARNING",info:"INFO"};
+                var catOrder = ["시간","HR","접근","고용","패턴","이벤트","자산"];
+                var catColors = {"시간":"#5e5ce6","HR":"#30d158","접근":"#ff2d55","고용":"#ff9500","패턴":"#bf5af2","이벤트":"#0a84ff","자산":"#ff9f0a"};
+                var grouped = {};
+                catOrder.forEach(function(c) { grouped[c] = []; });
+                SECURITY_RULES.forEach(function(r) { if (grouped[r.cat]) grouped[r.cat].push(r); });
+
+                return <div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+                    <div style={{fontSize:15,fontWeight:700}}>{"⚙️"} 보안 추론 규칙 ({SECURITY_RULES.length}개)</div>
+                    <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                      {Object.keys(sevColors).map(function(s) {
+                        return <div key={s} style={{display:"flex",alignItems:"center",gap:4}}>
+                          <div style={{width:8,height:8,borderRadius:"50%",background:sevColors[s]}} />
+                          <span style={{fontSize:10,color:"rgba(255,255,255,0.5)"}}>{sevLabels[s]}</span>
+                        </div>;
+                      })}
+                    </div>
+                  </div>
+                  {catOrder.map(function(cat) {
+                    var rules = grouped[cat];
+                    if (!rules || rules.length === 0) return null;
+                    return <div key={cat} style={{marginBottom:16}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                        <div style={{width:4,height:16,borderRadius:2,background:catColors[cat]}} />
+                        <span style={{fontSize:13,fontWeight:700,color:catColors[cat]}}>{cat}</span>
+                        <span style={{fontSize:10,color:"rgba(255,255,255,0.35)"}}>{rules.length}개 규칙</span>
+                      </div>
+                      <div style={{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,overflow:"hidden"}}>
+                        <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+                          <thead>
+                            <tr style={{background:"rgba(255,255,255,0.04)"}}>
+                              {["ID","규칙명","우선순위","조건 (IF)","결과 (THEN)","심각도"].map(function(h) {
+                                return <th key={h} style={{textAlign:"left",padding:"8px 12px",color:"rgba(255,255,255,0.5)",fontWeight:600,fontSize:10,borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{h}</th>;
+                              })}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rules.map(function(r) {
+                              var sc = sevColors[r.severity] || "#fff";
+                              var prioLabel = r.priority === 0 ? "P0 (최고)" : r.priority === 1 ? "P1 (높음)" : "P2 (보통)";
+                              var prioColor = r.priority === 0 ? "#ff2d55" : r.priority === 1 ? "#ff9500" : "#0a84ff";
+                              return <tr key={r.id} style={{borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
+                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.6)",fontFamily:"'JetBrains Mono',monospace",fontWeight:600}}>{r.id}</td>
+                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.8)",fontWeight:600}}>{r.name}</td>
+                                <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:prioColor+"18",color:prioColor,fontSize:10,fontWeight:600}}>{prioLabel}</span></td>
+                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.55)",fontFamily:"'JetBrains Mono',monospace",fontSize:10,maxWidth:200}}>{r.condition}</td>
+                                <td style={{padding:"8px 12px",color:"rgba(255,255,255,0.7)",fontFamily:"'JetBrains Mono',monospace",fontSize:10}}>{r.then}</td>
+                                <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:sc+"18",color:sc,fontSize:10,fontWeight:600}}>{sevLabels[r.severity]}</span></td>
+                              </tr>;
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>;
+                  })}
+                </div>;
+              })()}
+
+              {/* Sub-view: Risk Formula & Ontology Details */}
+              {ontoSubView === "formula" && <div>
               {/* Risk Score Formula */}
               <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:18,marginBottom:16}}>
                 <div style={{fontSize:13,fontWeight:700,color:"#fff",marginBottom:12}}>Risk Score Formula</div>
@@ -2109,13 +2415,14 @@ export default function SecurityDashboard(props) {
                   </table>
                 </div>
               </div>
+              </div>}
             </div>}
           </div>
         );
       })()}
 
-      {/* Knowledge Graph Tab */}
-      {dashTab === "graph" && (function() {
+      {/* Knowledge Graph Tab - REMOVED, moved to ontology center */}
+      {false && (function() { /* REMOVED: Knowledge Graph moved to Ontology Center */
         var canvasW = 1100, canvasH = 700;
 
         // Build nodes
