@@ -42,15 +42,15 @@ function generateAllEmployees() {
 }
 
 const EVENT_TYPES = [
-  { type: "File Open", icon: "\uD83D\uDCC2", label: "고보안 파일 열람", severity: "low" },
-  { type: "File Download", icon: "\u2B07\uFE0F", label: "다운로드 발생", severity: "medium" },
-  { type: "Print", icon: "\uD83D\uDDA8\uFE0F", label: "출력 요청", severity: "medium" },
-  { type: "Copy to USB", icon: "\uD83D\uDCBE", label: "외부 저장장치 복사", severity: "high" },
-  { type: "Bulk Query", icon: "\uD83D\uDD0D", label: "대량 조회", severity: "high" },
-  { type: "Permission Escalation", icon: "\uD83D\uDD11", label: "권한 상승", severity: "critical" },
-  { type: "Share Link Created", icon: "\uD83D\uDD17", label: "외부 공유 링크 생성", severity: "high" },
-  { type: "Delete/Modify", icon: "\uD83D\uDDD1\uFE0F", label: "삭제/변조 시도", severity: "critical" },
-  { type: "External AI Upload", icon: "\uD83E\uDD16", label: "외부 AI 업로드", severity: "critical" },
+  { type: "File Open", icon: "📂", label: "고보안 파일 열람", severity: "low" },
+  { type: "File Download", icon: "⬇️", label: "다운로드 발생", severity: "medium" },
+  { type: "Print", icon: "🖨️", label: "출력 요청", severity: "medium" },
+  { type: "Copy to USB", icon: "💾", label: "외부 저장장치 복사", severity: "high" },
+  { type: "Bulk Query", icon: "🔍", label: "대량 조회", severity: "high" },
+  { type: "Permission Escalation", icon: "🔑", label: "권한 상승", severity: "critical" },
+  { type: "Share Link Created", icon: "🔗", label: "외부 공유 링크 생성", severity: "high" },
+  { type: "Delete/Modify", icon: "🗑️", label: "삭제/변조 시도", severity: "critical" },
+  { type: "External AI Upload", icon: "🤖", label: "외부 AI 업로드", severity: "critical" },
 ];
 
 const ASSETS = [
@@ -1419,6 +1419,9 @@ export default function SecurityDashboard(props) {
   var graphHover = stGraphHover[0], setGraphHover = stGraphHover[1];
   var stGraphSelected = useState(null);
   var graphSelected = stGraphSelected[0], setGraphSelected = stGraphSelected[1];
+  var stCollapsed = useState({ compliance: true, integration: true, layer7: true });
+  var collapsedPanels = stCollapsed[0], setCollapsedPanels = stCollapsed[1];
+  var togglePanel = function(key) { setCollapsedPanels(function(p) { var n = Object.assign({}, p); n[key] = !n[key]; return n; }); };
 
   var addEvent = useCallback(function() {
     setEvents(function(p) { return [generateEvent(employees, p)].concat(p).slice(0, 500); });
@@ -1535,7 +1538,7 @@ export default function SecurityDashboard(props) {
 
       {/* Tab Bar */}
       <div style={{ position: "sticky", top: 58, zIndex: 99, background: "rgba(10,10,15,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", display: "flex", gap: 0 }}>
-        {[["monitor", "\uD83D\uDEE1\uFE0F \uC2E4\uC2DC\uAC04 \uAC10\uC2DC"], ["data", "\uD83D\uDCCA \uB370\uC774\uD130 \uBDF0\uC5B4"], ["graph", "\uD83E\uDDE0 \uC9C0\uC2DD \uADF8\uB798\uD504"]].map(function(t) {
+        {[["monitor", "🛡️ 실시간 감시"], ["data", "📊 데이터 뷰어"], ["graph", "🧠 지식 그래프"]].map(function(t) {
           var active = dashTab === t[0];
           return <button key={t[0]} onClick={function() { setDashTab(t[0]); }} style={{ padding: "10px 20px", fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "#fff" : "rgba(255,255,255,0.4)", background: "transparent", border: "none", borderBottom: active ? "2px solid #0a84ff" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s", letterSpacing: 0.3 }}>{t[1]}</button>;
         })}
@@ -1581,15 +1584,15 @@ export default function SecurityDashboard(props) {
         {/* Search & Filters */}
         <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, overflow: "hidden" }}>
-            {[["name", "\uC774\uB984"], ["dept", "\uBD80\uC11C"], ["id", "\uC0AC\uBC88"]].map(function(m) {
+            {[["name", "이름"], ["dept", "부서"], ["id", "사번"]].map(function(m) {
               var active = searchMode === m[0];
               return <button key={m[0]} onClick={function() { setSearchMode(m[0]); }} style={{ padding: "8px 10px", fontSize: 10, fontWeight: active ? 700 : 500, color: active ? "#0a84ff" : "rgba(255,255,255,0.4)", background: active ? "rgba(10,132,255,0.12)" : "transparent", border: "none", cursor: "pointer", borderRight: "1px solid rgba(255,255,255,0.06)" }}>{m[1]}</button>;
             })}
           </div>
           <div style={{ position: "relative", flex: 1 }}>
-            <input value={searchText} onChange={function(e) { setSearchText(e.target.value); }} placeholder={searchMode === "name" ? "\uC774\uB984\uC73C\uB85C \uAC80\uC0C9..." : searchMode === "dept" ? "\uBD80\uC11C\uBA85\uC73C\uB85C \uAC80\uC0C9..." : "\uC0AC\uBC88\uC73C\uB85C \uAC80\uC0C9..."} style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", fontFamily: "'Pretendard',sans-serif", boxSizing: "border-box" }} />
+            <input value={searchText} onChange={function(e) { setSearchText(e.target.value); }} placeholder={searchMode === "name" ? "이름으로 검색..." : searchMode === "dept" ? "부서명으로 검색..." : "사번으로 검색..."} style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", fontFamily: "'Pretendard',sans-serif", boxSizing: "border-box" }} />
           </div>
-          <button onClick={function() { /* search is live */ }} style={{ padding: "6px 14px", borderRadius: 7, background: "#3b82f6", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", border: "none" }}>{"\uD83D\uDD0D"} 검색</button>
+          <button onClick={function() { /* search is live */ }} style={{ padding: "6px 14px", borderRadius: 7, background: "#3b82f6", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", border: "none" }}>{"🔍"} 검색</button>
           <button onClick={function() { setSearchText(""); setFilterSeverity("all"); setFilterEventType("all"); setSearchMode("name"); }} style={{ padding: "6px 14px", borderRadius: 7, background: "rgba(255,45,85,0.1)", border: "1px solid rgba(255,45,85,0.2)", color: "#ff2d55", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>초기화</button>
           <select value={filterSeverity} onChange={function(e) { setFilterSeverity(e.target.value); }} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#fff", padding: "10px 12px", borderRadius: 10, fontSize: 12, cursor: "pointer" }}>
             <option value="all" style={{ background: "#1a1a2e" }}>전체 위험도</option>
@@ -1621,78 +1624,96 @@ export default function SecurityDashboard(props) {
           </div>
 
           {/* Sidebar */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={panelStyle}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>전체 위험도 게이지</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>최근 20건 기준</div><RiskGauge events={events} /></div>
-            <div style={panelStyle}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>고위험 사용자 TOP 5</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 10 }}>최고 위험 점수 기준</div><TopRiskUsers events={events} onMsg={function(u, t) { setMessageModal({ user: u, recipientType: t }); }} /></div>
-            <div style={panelStyle}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>고위험 부서 TOP 5</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 10 }}>평균 위험 점수 기준</div><TopRiskDepts events={events} /></div>
-            <div style={panelStyle}>
-              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10 }}>이벤트 유형 분포</div>
-              {EVENT_TYPES.map(function(et) {
-                var cnt = events.filter(function(e) { return e.eventType.type === et.type; }).length;
-                var sc = { low: "#30d158", medium: "#ffcc00", high: "#ff9500", critical: "#ff2d55" };
-                return (
-                  <div key={et.type} style={{ marginBottom: 6 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>{et.icon} {et.label}</span>
-                      <span style={{ fontSize: 10, color: sc[et.severity], fontFamily: "monospace", fontWeight: 600 }}>{cnt}</span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>전체 위험도 게이지</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>최근 20건 기준</div><RiskGauge events={events} /></div>
+            {/* TOP 5 Users + Depts side by side */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={Object.assign({}, panelStyle, { padding: 10 })}><div style={{ fontSize: 10, fontWeight: 600, marginBottom: 3 }}>고위험 사용자 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>최고 위험 점수 기준</div><TopRiskUsers events={events} onMsg={function(u, t) { setMessageModal({ user: u, recipientType: t }); }} /></div>
+              <div style={Object.assign({}, panelStyle, { padding: 10 })}><div style={{ fontSize: 10, fontWeight: 600, marginBottom: 3 }}>고위험 부서 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>평균 위험 점수 기준</div><TopRiskDepts events={events} /></div>
+            </div>
+            {/* Event Distribution + Compliance side by side */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
+                <div style={{ fontSize: 10, fontWeight: 600, marginBottom: 6 }}>이벤트 유형 분포</div>
+                {EVENT_TYPES.map(function(et) {
+                  var cnt = events.filter(function(e) { return e.eventType.type === et.type; }).length;
+                  var sc = { low: "#30d158", medium: "#ffcc00", high: "#ff9500", critical: "#ff2d55" };
+                  return (
+                    <div key={et.type} style={{ marginBottom: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 1 }}>
+                        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.45)" }}>{et.icon} {et.label}</span>
+                        <span style={{ fontSize: 9, color: sc[et.severity], fontFamily: "monospace", fontWeight: 600 }}>{cnt}</span>
+                      </div>
+                      <MiniBar value={cnt} max={Math.max(1, Math.max.apply(null, EVENT_TYPES.map(function(t) { return events.filter(function(e) { return e.eventType.type === t.type; }).length; })))} color={sc[et.severity]} />
                     </div>
-                    <MiniBar value={cnt} max={Math.max(1, Math.max.apply(null, EVENT_TYPES.map(function(t) { return events.filter(function(e) { return e.eventType.type === t.type; }).length; })))} color={sc[et.severity]} />
-                  </div>
-                );
-              })}
-            </div>
-            <div style={panelStyle}>
-              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10 }}>{"📋"} 법규 준수 현황</div>
-              {[
-                {icon:"✅",label:"접근 로그 기록",status:"활성",color:"#30d158"},
-                {icon:"✅",label:"이벤트 모니터링",status:"실시간",color:"#30d158"},
-                {icon:"⚠️",label:"데이터 보유기한",status:"500건 제한 (장기보관 미설정)",color:"#ff9f0a"},
-                {icon:"⚠️",label:"직원 동의 절차",status:"미구현",color:"#ff9f0a"},
-                {icon:"❌",label:"감사 추적 시스템",status:"미연동",color:"#ff2d55"},
-                {icon:"❌",label:"개인정보 영향평가",status:"미실시",color:"#ff2d55"},
-              ].map(function(item,idx){
-                return(
-                  <div key={idx} style={{display:"flex",alignItems:"center",gap:7,padding:"4px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
-                    <span style={{fontSize:12,flexShrink:0}}>{item.icon}</span>
-                    <span style={{fontSize:10,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
-                    <span style={{fontSize:9,color:item.color,fontWeight:600}}>{item.status}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={panelStyle}>
-              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10 }}>{"🔗"} 시스템 연동 현황</div>
-              {[
-                {icon:"🟢",label:"이벤트 로그",status:"연동 (시뮬레이션)",color:"#30d158"},
-                {icon:"🟡",label:"SIEM (Splunk/ELK)",status:"준비중",color:"#ff9f0a"},
-                {icon:"🟡",label:"IAM (Okta/Azure AD)",status:"준비중",color:"#ff9f0a"},
-                {icon:"🟡",label:"DLP (Symantec)",status:"준비중",color:"#ff9f0a"},
-                {icon:"🟡",label:"HR Portal (SAP)",status:"준비중",color:"#ff9f0a"},
-                {icon:"🟡",label:"메일/메신저 자동화",status:"준비중",color:"#ff9f0a"},
-              ].map(function(item,idx){
-                return(
-                  <div key={idx} style={{display:"flex",alignItems:"center",gap:7,padding:"4px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
-                    <span style={{fontSize:10,flexShrink:0}}>{item.icon}</span>
-                    <span style={{fontSize:10,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
-                    <span style={{fontSize:9,color:item.color,fontWeight:600}}>{item.status}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={panelStyle}>
-              <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 10 }}>7 Layer 데이터 상태</div>
-              {[{ n: 1, name: "사용자/조직", s: "active" }, { n: 2, name: "권한/IAM", s: "active" }, { n: 3, name: "자산 메타", s: "active" }, { n: 4, name: "행동 로그", s: "streaming" }, { n: 5, name: "기준선", s: "active" }, { n: 6, name: "업무 Context", s: "active" }, { n: 7, name: "대응 Playbook", s: "active" }].map(function(l) {
-                return (
-                  <div key={l.n} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 0", borderBottom: l.n < 7 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
-                    <div style={{ width: 18, height: 18, borderRadius: 4, background: "rgba(10,132,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "#0a84ff", fontWeight: 700 }}>{l.n}</div>
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", flex: 1 }}>{l.name}</span>
-                    <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                      {l.s === "streaming" && <PulsingDot color="#0a84ff" />}
-                      <span style={{ fontSize: 8, fontWeight: 600, color: l.s === "streaming" ? "#0a84ff" : "#30d158" }}>{l.s === "streaming" ? "STREAMING" : "ACTIVE"}</span>
+                  );
+                })}
+              </div>
+              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
+                <div onClick={function() { togglePanel("compliance"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.compliance ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>{"📋"} 법규 준수 현황</span>
+                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.compliance ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+                </div>
+                {!collapsedPanels.compliance && [
+                  {icon:"✅",label:"접근 로그 기록",status:"활성",color:"#30d158"},
+                  {icon:"✅",label:"이벤트 모니터링",status:"실시간",color:"#30d158"},
+                  {icon:"⚠️",label:"데이터 보유기한",status:"500건 제한",color:"#ff9f0a"},
+                  {icon:"⚠️",label:"직원 동의 절차",status:"미구현",color:"#ff9f0a"},
+                  {icon:"❌",label:"감사 추적 시스템",status:"미연동",color:"#ff2d55"},
+                  {icon:"❌",label:"개인정보 영향평가",status:"미실시",color:"#ff2d55"},
+                ].map(function(item,idx){
+                  return(
+                    <div key={idx} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
+                      <span style={{fontSize:10,flexShrink:0}}>{item.icon}</span>
+                      <span style={{fontSize:9,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
+                      <span style={{fontSize:8,color:item.color,fontWeight:600}}>{item.status}</span>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            </div>
+            {/* System Integration + 7Layer side by side */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
+                <div onClick={function() { togglePanel("integration"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.integration ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>{"🔗"} 시스템 연동 현황</span>
+                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.integration ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+                </div>
+                {!collapsedPanels.integration && [
+                  {icon:"🟢",label:"이벤트 로그",status:"연동",color:"#30d158"},
+                  {icon:"🟡",label:"SIEM",status:"준비중",color:"#ff9f0a"},
+                  {icon:"🟡",label:"IAM",status:"준비중",color:"#ff9f0a"},
+                  {icon:"🟡",label:"DLP",status:"준비중",color:"#ff9f0a"},
+                  {icon:"🟡",label:"HR Portal",status:"준비중",color:"#ff9f0a"},
+                  {icon:"🟡",label:"메일/메신저",status:"준비중",color:"#ff9f0a"},
+                ].map(function(item,idx){
+                  return(
+                    <div key={idx} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
+                      <span style={{fontSize:9,flexShrink:0}}>{item.icon}</span>
+                      <span style={{fontSize:9,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
+                      <span style={{fontSize:8,color:item.color,fontWeight:600}}>{item.status}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
+                <div onClick={function() { togglePanel("layer7"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.layer7 ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>7 Layer 상태</span>
+                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.layer7 ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+                </div>
+                {!collapsedPanels.layer7 && [{ n: 1, name: "사용자/조직", s: "active" }, { n: 2, name: "권한/IAM", s: "active" }, { n: 3, name: "자산 메타", s: "active" }, { n: 4, name: "행동 로그", s: "streaming" }, { n: 5, name: "기준선", s: "active" }, { n: 6, name: "업무 Context", s: "active" }, { n: 7, name: "대응 Playbook", s: "active" }].map(function(l) {
+                  return (
+                    <div key={l.n} style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 0", borderBottom: l.n < 7 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
+                      <div style={{ width: 16, height: 16, borderRadius: 3, background: "rgba(10,132,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#0a84ff", fontWeight: 700 }}>{l.n}</div>
+                      <span style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", flex: 1 }}>{l.name}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        {l.s === "streaming" && <PulsingDot color="#0a84ff" />}
+                        <span style={{ fontSize: 7, fontWeight: 600, color: l.s === "streaming" ? "#0a84ff" : "#30d158" }}>{l.s === "streaming" ? "LIVE" : "OK"}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -1702,19 +1723,19 @@ export default function SecurityDashboard(props) {
       {dashTab === "data" && (function() {
         var DATA_PAGE_SIZE = 100;
         var subTabs = [
-          { key: "employees", label: "\uC9C1\uC6D0DB", count: employees.length },
-          { key: "assets", label: "\uC790\uC0B0DB", count: ASSETS.length },
-          { key: "events", label: "\uC774\uBCA4\uD2B8 \uC720\uD615DB", count: EVENT_TYPES.length },
-          { key: "actions", label: "\uC870\uCE58 \uAC00\uC774\uB4DCDB", count: Object.keys(ACTION_GUIDES).length },
-          { key: "compliance", label: "\uBC95\uADDCDB", count: 31 }
+          { key: "employees", label: "직원DB", count: employees.length },
+          { key: "assets", label: "자산DB", count: ASSETS.length },
+          { key: "events", label: "이벤트 유형DB", count: EVENT_TYPES.length },
+          { key: "actions", label: "조치 가이드DB", count: Object.keys(ACTION_GUIDES).length },
+          { key: "compliance", label: "법규DB", count: 31 }
         ];
 
         var headers = {
-          employees: ["\uC0AC\uBC88","\uC774\uB984","\uBD80\uC11C","\uC9C1\uAE09","\uACE0\uC6A9\uD615\uD0DC","\uBCF4\uC548\uB4F1\uAE09","\uC0C1\uAE09\uC790","\uC785\uC0AC\uC77C","\uD1F4\uC0AC\uC608\uC815","\uBD80\uC11C\uC774\uB3D9","\uACBD\uACE0\uD69F\uC218","\uC131\uACFC\uB4F1\uAE09"],
-          assets: ["\uC790\uC0B0\uBA85","\uC720\uD615","\uBCF4\uC548\uB4F1\uAE09","\uBBFC\uAC10\uB3C4","\uAD00\uB9AC\uC2DC\uC791","\uCD5C\uADFC\uAC10\uC0AC","\uC811\uADFC\uAC00\uB2A5\uBD80\uC11C"],
-          events: ["\uC774\uBCA4\uD2B8","\uCF54\uB4DC","\uC2EC\uAC01\uB3C4","\uAE30\uBCF8\uC810\uC218","\uAC00\uC911\uCE58(%)","\uC124\uBA85"],
-          actions: ["\uC870\uCE58\uBA85","\uAE34\uAE09\uB3C4","\uC608\uC0C1\uC2DC\uAC04","\uC124\uBA85","\uB2E8\uACC4\uC218"],
-          compliance: ["\uBC95\uADDC/\uAE30\uC900","\uC870\uD56D","\uC694\uAD6C\uC0AC\uD56D","\uC900\uC218\uC0C1\uD0DC","\uBE44\uACE0"]
+          employees: ["사번","이름","부서","직급","고용형태","보안등급","상급자","입사일","퇴사예정","부서이동","경고횟수","성과등급"],
+          assets: ["자산명","유형","보안등급","민감도","관리시작","최근감사","접근가능부서"],
+          events: ["이벤트","코드","심각도","기본점수","가중치(%)","설명"],
+          actions: ["조치명","긴급도","예상시간","설명","단계수"],
+          compliance: ["법규/기준","조항","요구사항","준수상태","비고"]
         };
 
         var complianceData = [
@@ -1767,7 +1788,7 @@ export default function SecurityDashboard(props) {
               return a.employmentType.localeCompare(b.employmentType);
             });
             return sortedEmployees.map(function(emp) {
-              return [emp.id, emp.name, emp.department, emp.role, emp.employmentType, emp.clearanceLevel, emp.managerId, emp.profile.hireDate.toLocaleDateString("ko-KR"), emp.profile.resignPlanned ? "\uC608" : "\uC544\uB2C8\uC624", emp.profile.recentTransfer ? "\uC788\uC74C" : "\uC5C6\uC74C", emp.profile.warningCount, emp.profile.performanceRating];
+              return [emp.id, emp.name, emp.department, emp.role, emp.employmentType, emp.clearanceLevel, emp.managerId, emp.profile.hireDate.toLocaleDateString("ko-KR"), emp.profile.resignPlanned ? "예" : "아니오", emp.profile.recentTransfer ? "있음" : "없음", emp.profile.warningCount, emp.profile.performanceRating];
             });
           } else if (dataSubTab === "assets") {
             return ASSETS.map(function(a) {
@@ -1781,7 +1802,7 @@ export default function SecurityDashboard(props) {
               return [et.icon + " " + et.label, et.type, et.severity, baseScore, EVENT_WEIGHTS[i] || 0, et.label];
             });
           } else if (dataSubTab === "actions") {
-            var urgMap = {"\uAD00\uB9AC\uC790 \uD655\uC778 \uC694\uCCAD":"low","\uCD94\uAC00 MFA \uC778\uC99D":"medium","\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C":"high","\uACC4\uC815 \uC7A0\uAE08":"critical","\uAC10\uC0AC \uB85C\uADF8 \uC790\uB3D9 \uC0DD\uC131":"medium","HR \uC5F0\uACC4 \uC870\uC0AC \uC694\uCCAD":"high","\uB370\uC774\uD130 \uBC31\uC5C5 \uACA9\uB9AC":"high","\uD3EC\uB80C\uC2DD \uC870\uC0AC \uC758\uB8B0":"critical","\uBCF4\uC548\uAD50\uC721 \uC9C0\uC815":"low","CISO \uAE34\uAE09 \uBCF4\uACE0":"critical","\uC678\uBD80 \uC2E0\uACE0":"critical"};
+            var urgMap = {"관리자 확인 요청":"low","추가 MFA 인증":"medium","접근 일시 제한":"high","계정 잠금":"critical","감사 로그 자동 생성":"medium","HR 연계 조사 요청":"high","데이터 백업 격리":"high","포렌식 조사 의뢰":"critical","보안교육 지정":"low","CISO 긴급 보고":"critical","외부 신고":"critical"};
             return Object.keys(ACTION_GUIDES).map(function(name) {
               var g = ACTION_GUIDES[name];
               return [name, urgMap[name] || "medium", g.estimatedTime, g.summary.slice(0, 50) + "...", g.steps.length];
@@ -1820,9 +1841,9 @@ export default function SecurityDashboard(props) {
 
             {/* Search + Download */}
             <div style={{ display: "flex", gap: 10, marginBottom: 14, alignItems: "center" }}>
-              <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"\uAC80\uC0C9..."} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
-              <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(48,209,88,0.12)", border: "1px solid rgba(48,209,88,0.25)", color: "#30d158", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>XLSX \uB2E4\uC6B4\uB85C\uB4DC ({filteredRows.length}\uAC74)</button>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{filteredRows.length}\uAC74 \uC911 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
+              <input value={dataSearch} onChange={function(e) { setDataSearch(e.target.value); setDataPage(0); }} placeholder={"검색..."} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 12, outline: "none", boxSizing: "border-box" }} />
+              <button onClick={downloadData} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(48,209,88,0.12)", border: "1px solid rgba(48,209,88,0.25)", color: "#30d158", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>XLSX 다운로드 ({filteredRows.length}건)</button>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{filteredRows.length}건 중 {dataPage * DATA_PAGE_SIZE + 1}~{Math.min((dataPage + 1) * DATA_PAGE_SIZE, filteredRows.length)}</div>
             </div>
 
             {/* Table */}
@@ -1876,14 +1897,23 @@ export default function SecurityDashboard(props) {
         var nodes = [];
         var edges = [];
 
-        // Top 10 high-risk employees
+        // Top 10 high-risk employees (based on recent events - weighted sum)
         var empScores = {};
-        events.forEach(function(e) {
-          if (!empScores[e.employee.id] || empScores[e.employee.id].score < e.riskScore) {
-            empScores[e.employee.id] = { score: e.riskScore, emp: e.employee };
+        events.forEach(function(e, idx) {
+          var recencyWeight = 1 / (1 + idx * 0.05); // More recent events weighted higher
+          if (!empScores[e.employee.id]) {
+            empScores[e.employee.id] = { score: 0, maxScore: 0, count: 0, emp: e.employee };
+          }
+          empScores[e.employee.id].score += e.riskScore * recencyWeight;
+          empScores[e.employee.id].count += 1;
+          if (e.riskScore > empScores[e.employee.id].maxScore) {
+            empScores[e.employee.id].maxScore = e.riskScore;
+            empScores[e.employee.id].emp = e.employee; // Update to latest employee data
           }
         });
         var topEmps = Object.values(empScores).sort(function(a, b) { return b.score - a.score; }).slice(0, 10);
+        // Use maxScore for display
+        topEmps.forEach(function(item) { item.score = item.maxScore; });
 
         // Departments
         var deptSet = {};
@@ -1922,7 +1952,7 @@ export default function SecurityDashboard(props) {
         // Edges: employee -> dept (belongs)
         topEmps.forEach(function(item) {
           if (deptSet[item.emp.department]) {
-            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "\uC18C\uC18D", color: "rgba(94,92,230,0.5)" });
+            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "소속", color: "rgba(94,92,230,0.5)" });
           }
         });
 
@@ -1932,14 +1962,14 @@ export default function SecurityDashboard(props) {
           var key = e.employee.id + "|" + e.asset.name;
           if (!empAssetEdges[key] && topEmps.some(function(t) { return t.emp.id === e.employee.id; })) {
             empAssetEdges[key] = true;
-            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "\uC811\uADFC", color: "rgba(10,132,255,0.45)" });
+            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "접근", color: "rgba(10,132,255,0.45)" });
           }
         });
 
         // Edges: dept -> asset (permission)
         Object.keys(DEPT_ASSETS).forEach(function(d) {
           DEPT_ASSETS[d].forEach(function(a) {
-            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "\uAD8C\uD55C", color: "rgba(48,209,88,0.35)" });
+            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "권한", color: "rgba(48,209,88,0.35)" });
           });
         });
 
@@ -1949,7 +1979,7 @@ export default function SecurityDashboard(props) {
           var key = e.eventType.type + "|" + e.asset.name;
           if (!evtAssetEdges[key]) {
             evtAssetEdges[key] = true;
-            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "\uB300\uC0C1", color: "rgba(255,149,0,0.4)" });
+            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "대상", color: "rgba(255,149,0,0.4)" });
           }
         });
 
@@ -1957,9 +1987,9 @@ export default function SecurityDashboard(props) {
         EVENT_TYPES.forEach(function(et) {
           var sev = et.severity;
           if (sev === "critical") {
-            edges.push({ from: "evt-" + et.type, to: "action-\uACC4\uC815 \uC7A0\uAE08", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,45,85,0.45)" });
+            edges.push({ from: "evt-" + et.type, to: "action-계정 잠금", label: "트리거", color: "rgba(255,45,85,0.45)" });
           } else if (sev === "high") {
-            edges.push({ from: "evt-" + et.type, to: "action-\uC811\uADFC \uC77C\uC2DC \uC81C\uD55C", label: "\uD2B8\uB9AC\uAC70", color: "rgba(255,149,0,0.4)" });
+            edges.push({ from: "evt-" + et.type, to: "action-접근 일시 제한", label: "트리거", color: "rgba(255,149,0,0.4)" });
           }
         });
 
@@ -1975,17 +2005,17 @@ export default function SecurityDashboard(props) {
         };
 
         var typeLabels = {
-          employee: "\uC9C1\uC6D0",
-          asset: "\uC790\uC0B0",
-          eventType: "\uC774\uBCA4\uD2B8\uC720\uD615",
-          dept: "\uBD80\uC11C",
-          action: "\uC870\uCE58"
+          employee: "직원",
+          asset: "자산",
+          eventType: "이벤트유형",
+          dept: "부서",
+          action: "조치"
         };
 
         return (
           <div style={{ padding: "16px 24px", position: "relative", zIndex: 1 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>{"\uD83E\uDDE0"} \uC9C0\uC2DD \uADF8\uB798\uD504 \u2014 \uB370\uC774\uD130 \uAD00\uACC4 \uC2DC\uAC01\uD654</div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>{"🧠"} 지식 그래프 — 데이터 관계 시각화</div>
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                 {Object.keys(typeColors).map(function(t) {
                   return <div key={t} style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -2055,7 +2085,7 @@ export default function SecurityDashboard(props) {
                       <text x={n.x} y={n.y + 28} textAnchor="middle" fill={c} fontSize="11" fontWeight="700">{n.label}</text>
                       {isHovered && <g>
                         <rect x={n.x - 50} y={n.y - 34} width={100} height={18} rx={4} fill="rgba(0,0,0,0.85)" />
-                        <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (" + "\uC704\uD5D8" + ":" + (n.score || "?") + ")"}</text>
+                        <text x={n.x} y={n.y - 20} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (" + "위험" + ":" + (n.score || "?") + ")"}</text>
                       </g>}
                     </g>;
                   } else if (n.type === "eventType") {
@@ -2085,13 +2115,34 @@ export default function SecurityDashboard(props) {
               {graphSelected && nodeMap[graphSelected] && (
                 <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(18,18,26,0.95)", border: "1px solid " + typeColors[nodeMap[graphSelected].type] + "40", borderRadius: 12, padding: 16, maxWidth: 240, animation: "fadeIn 0.3s", zIndex: 5 }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: typeColors[nodeMap[graphSelected].type], marginBottom: 6 }}>{nodeMap[graphSelected].label}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>\uC720\uD615: {typeLabels[nodeMap[graphSelected].type]}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>유형: {typeLabels[nodeMap[graphSelected].type]}</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
-                    \uC5F0\uACB0\uB41C \uB178\uB4DC: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}\uAC74
+                    연결된 노드: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}건
                   </div>
-                  {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>\uC704\uD5D8\uC810\uC218: {nodeMap[graphSelected].score}</div>}
+                  {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
                 </div>
               )}
+            </div>
+            <div style={{background:"rgba(255,255,255,0.03)", borderRadius:12, padding:16, border:"1px solid rgba(255,255,255,0.06)", marginTop:12}}>
+              <div style={{fontSize:13, fontWeight:700, color:"#e2e8f0", marginBottom:8}}>{"📖"} 지식 그래프 활용 가이드</div>
+              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, fontSize:11.5, color:"#94a3b8", lineHeight:1.7}}>
+                <div>
+                  <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"🔍"} 위협 경로 분석</div>
+                  직원→자산 연결선을 통해 누가 어떤 민감 자산에 접근했는지 한눈에 파악할 수 있습니다. 비정상적인 접근 경로(부서 권한 외 자산 접근)를 시각적으로 탐지합니다.
+                </div>
+                <div>
+                  <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"👥"} 조직 리스크 맵</div>
+                  부서→자산 권한 관계와 실제 접근 패턴을 비교하여 권한 외 접근을 식별합니다. 특정 부서에 위험 이벤트가 집중되는지 확인할 수 있습니다.
+                </div>
+                <div>
+                  <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"⚡"} 이벤트-조치 연계</div>
+                  이벤트 유형별로 어떤 조치가 트리거되는지 확인하고, 조치 실행의 우선순위를 판단할 수 있습니다.
+                </div>
+                <div>
+                  <div style={{fontWeight:600, color:"#e2e8f0", marginBottom:4}}>{"🎯"} 노드 클릭 활용법</div>
+                  노드를 클릭하면 해당 노드와 연결된 관계만 강조됩니다. 특정 직원의 접근 자산, 특정 자산에 접근한 직원, 특정 부서의 권한 범위를 빠르게 파악할 수 있습니다.
+                </div>
+              </div>
             </div>
           </div>
         );
