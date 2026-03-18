@@ -1404,7 +1404,7 @@ const VEHICLE_CLASS_MULTIPLIERS = {
       partsMult: 2.5,
       laborRate: 62000,
       makes: [],
-      examples: ["아이오닉5 N", "EV9", "iX", "EQS", "모델S", "타이칸"]
+      examples: ["아이오닉5 N", "EV9", "iX", "EQS", "모델S", "타이칸", "넥쏘(FCEV)", "미라이(FCEV)"]
     },
     {
       id: "import_premium",
@@ -1460,7 +1460,7 @@ const VEHICLE_CLASS_MULTIPLIERS = {
       "팰리세이드": "domestic_large",
       "스타리아": "domestic_large",
       "스타리아 라운지": "domestic_large",
-      "넥쏘": "domestic_large",
+      "넥쏘": "ev_premium",  // 수소전기차 (FCEV) — 수소탱크+연료전지 스택
       "아이오닉5": "domestic_std",
       "아이오닉5 N": "ev_premium",
       "아이오닉6": "domestic_std",
@@ -1733,7 +1733,8 @@ const VEHICLE_CLASS_MULTIPLIERS = {
       "랜드크루저 프라도": "import_mid",
       "시에나": "import_std",
       "타코마": "import_std",
-      "툰드라": "import_mid"
+      "툰드라": "import_mid",
+      "미라이": "ev_premium"  // 수소전기차 (FCEV)
     },
     // ── 혼다 (기본: import_std) ──
     "혼다": {
