@@ -5266,6 +5266,7 @@ function TabData(){
   const[page,setPage]=useState(0);
   const[fullData,setFullData]=useState({});
   const[loadingJson,setLoadingJson]=useState("");
+  const[selectedRow,setSelectedRow]=useState(null);
   useEffect(()=>{const key=DK[dk];if(fullData[key]||!DATA_JSON_MAP[key])return;setLoadingJson(key);
     fetch("/data/"+DATA_JSON_MAP[key]+".json").then(r=>r.ok?r.json():Promise.reject()).then(d=>{
       setFullData(prev=>({...prev,[key]:{headers:d.headers,rows:d.rows}}));setLoadingJson("");
@@ -5288,7 +5289,7 @@ function TabData(){
   const filtered=search===""?allRows:allRows.filter(row=>row.some(c=>c&&c.toString().toLowerCase().includes(search.toLowerCase())));
   const totalPages=Math.ceil(filtered.length/PER);
   const paged=filtered.slice(page*PER,(page+1)*PER);
-  useEffect(()=>{setPage(0);setSearch("");},[dk]);
+  useEffect(()=>{setPage(0);setSearch("");setSelectedRow(null);},[dk]);
   useEffect(()=>{setPage(0);},[search]);
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(""),4000);};
   const cds=[{bg:"#0891b2",lbg:"#ecfeff",nm:"차량"},{bg:"#059669",lbg:"#ecfdf5",nm:"서비스센터"},{bg:"#7c3aed",lbg:"#f5f3ff",nm:"렌터카"},{bg:"#ea580c",lbg:"#fff7ed",nm:"부품"},{bg:"#b45309",lbg:"#fffbeb",nm:"약관기준"},{bg:"#dc2626",lbg:"#fef2f2",nm:"추론규칙"},{bg:"#6366f1",lbg:"#eef2ff",nm:"사고유형"},{bg:"#0d9488",lbg:"#f0fdfa",nm:"수리방법"},{bg:"#be185d",lbg:"#fdf2f8",nm:"연쇄손상"},{bg:"#ca8a04",lbg:"#fefce8",nm:"차종배율"}];
@@ -6065,11 +6066,19 @@ function TabData(){
         </tr></thead>
         <tbody>{paged.length===0?<tr><td colSpan={headers.length+1} style={{padding:40,textAlign:"center",color:"#94a3b8",fontSize:13}}>
             {search?"검색 결과가 없습니다":"데이터가 없습니다"}</td></tr>
-          :paged.map((row,ri)=>{const rowNum=page*PER+ri+1;return(
-            <tr key={ri} style={{background:ri%2===0?"#fff":"#f8fafc",transition:"background .1s"}} onMouseEnter={e=>e.currentTarget.style.background="#f0f9ff"} onMouseLeave={e=>e.currentTarget.style.background=ri%2===0?"#fff":"#f8fafc"}>
+          :paged.map((row,ri)=>{const rowNum=page*PER+ri+1;const isSel=selectedRow===rowNum;return(<React.Fragment key={ri}>
+            <tr onClick={()=>setSelectedRow(isSel?null:rowNum)} style={{background:isSel?"#eff6ff":ri%2===0?"#fff":"#f8fafc",transition:"background .1s",cursor:"pointer",borderLeft:isSel?`3px solid ${cd.bg}`:"3px solid transparent"}} onMouseEnter={e=>{if(!isSel)e.currentTarget.style.background="#f0f9ff";}} onMouseLeave={e=>{if(!isSel)e.currentTarget.style.background=ri%2===0?"#fff":"#f8fafc";}}>
               <td style={{padding:"6px 10px",borderBottom:"1px solid #f1f5f9",color:"#64748b",fontSize:11,fontWeight:500,textAlign:"center",borderRight:"1px solid #f1f5f9"}}>{rowNum.toLocaleString()}</td>
               {row.map((cell,ci)=><td key={ci} style={{padding:"6px 10px",borderBottom:"1px solid #f1f5f9",whiteSpace:"nowrap",maxWidth:220,overflow:"hidden",textOverflow:"ellipsis",color:ci===0?"#64748b":"#1e293b",fontSize:11.5,fontWeight:ci===0?500:400}} title={cell}>{cell}</td>)}
-            </tr>)})}</tbody></table></div>
+            </tr>
+            {isSel&&<tr><td colSpan={headers.length+1} style={{padding:0,background:"#f0f9ff",borderBottom:`2px solid ${cd.bg}`}}>
+              <div style={{padding:"14px 18px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+                {headers.map((h,hi)=><div key={hi} style={{background:"#fff",borderRadius:8,padding:"10px 14px",border:"1px solid #e2e8f0"}}>
+                  <div style={{fontSize:10,color:cd.bg,fontWeight:700,marginBottom:4,textTransform:"uppercase"}}>{h}</div>
+                  <div style={{fontSize:12.5,color:"#0f172a",fontWeight:500,wordBreak:"break-word",whiteSpace:"pre-wrap",lineHeight:1.5}}>{row[hi]||"-"}</div>
+                </div>)}
+              </div></td></tr>}
+            </React.Fragment>)})}</tbody></table></div>
     {/* 하단 */}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0"}}>
       <div style={{fontSize:11,color:"#64748b"}}>💡 탭 전환 시 전체 데이터가 자동 로드됩니다. 엑셀(.xlsx) 업로드로 데이터 교체도 가능합니다.</div>

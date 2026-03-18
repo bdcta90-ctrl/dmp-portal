@@ -78,6 +78,78 @@ const REPAIR_METHODS = [
     laborType: "진단공임",
     includesPaint: false,
     sot: 1.5
+  },
+  {
+    id: "pdr",
+    name: "PDR (무도장 덴트복원)",
+    nameEn: "Paintless Dent Repair",
+    desc: "도장면 손상 없이 금속 패널의 찌그러짐을 전용 공구로 복원. 우박 손상, 주차장 경미 덴트에 적합. 도장 불필요로 원래 도장 유지.",
+    applicableMaterials: ["metal"],
+    severityRange: ["경미"],
+    costMultiplier: 0.3,
+    laborType: "PDR공임",
+    includesPaint: false,
+    sot: 0.8
+  },
+  {
+    id: "glass_repair",
+    name: "유리 보수",
+    nameEn: "Glass Repair",
+    desc: "전면 유리 소형 파손(500원 동전 크기 이하) 레진 충전 보수. 교환 대비 80% 비용 절감. 운전석 정면, 유리 가장자리 5cm 이내는 보수 불가.",
+    applicableMaterials: ["glass"],
+    severityRange: ["경미"],
+    costMultiplier: 0.15,
+    laborType: "유리보수공임",
+    includesPaint: false,
+    sot: 0.5
+  },
+  {
+    id: "welding",
+    name: "용접",
+    nameEn: "Welding",
+    desc: "구조부·프레임 손상 시 절단 후 용접 접합. CO2/MIG/스팟 용접. 사이드실, 필러, 서브프레임 등 구조부 복원에 필수. 프레임 수정기 병행.",
+    applicableMaterials: ["metal"],
+    severityRange: ["심각"],
+    costMultiplier: 1.2,
+    laborType: "용접공임",
+    includesPaint: false,
+    sot: 3.0
+  },
+  {
+    id: "polish_compound",
+    name: "광택/컴파운딩",
+    nameEn: "Polish & Compound",
+    desc: "클리어코트 스크래치·스월마크 제거. 1단계 컴파운딩 → 2단계 폴리싱 → 3단계 왁싱/코팅. 도장면 자체 손상 없는 표면 결함만 해당.",
+    applicableMaterials: ["metal", "plastic"],
+    severityRange: ["경미"],
+    costMultiplier: 0.1,
+    laborType: "광택공임",
+    includesPaint: false,
+    sot: 0.5
+  },
+  {
+    id: "wrapping",
+    name: "랩핑/필름",
+    nameEn: "Wrapping / PPF",
+    desc: "도장 대신 비닐 필름으로 외관 복원 또는 보호. PPF(Paint Protection Film), 컬러 랩핑. 원래 도장 보존 가능. 임시 복원 또는 고객 요청 시.",
+    applicableMaterials: ["metal", "plastic"],
+    severityRange: ["경미", "중간"],
+    costMultiplier: 0.4,
+    laborType: "랩핑공임",
+    includesPaint: false,
+    sot: 2.0
+  },
+  {
+    id: "ecu_coding",
+    name: "ECU 코딩/프로그래밍",
+    nameEn: "ECU Coding / Programming",
+    desc: "전자제어장치 소프트웨어 업데이트·재설정. 부품 교환 후 차량-부품 매칭, 에어백 리셋, 키 등록, 자기학습 초기화 등. 제조사 전용 진단장비 필요.",
+    applicableMaterials: ["electronic"],
+    severityRange: ["경미", "중간", "심각"],
+    costMultiplier: 0.6,
+    laborType: "진단공임",
+    includesPaint: false,
+    sot: 1.0
   }
 ];
 
