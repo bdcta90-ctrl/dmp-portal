@@ -4846,7 +4846,7 @@ function TabKPI(){
   const[reports,setReports]=useState([
     {id:"RPT-001",date:"2025.03.04",type:"견적",case:"Case 2 — 주차장 GV80 충돌",adjuster:"이현수 사정사",status:"분석완료",cost:9190000,repairDays:14,faultRatio:"100:0(자사과실)",severity:"심각",claimants:0,priority:"높음",summary:"타사 GV80 수리비 ₩10M 청구 → AI 적정 ₩6.38M.",originalClaim:10000000,aiResult:6380000,aiSaving:3620000,savingBasis:"타사 보험사 최초 청구액 ₩10,000,000 대비 AI 적정 견적 ₩6,380,000",unrepaired:false,fraudDetected:false,complaint:false},
     {id:"RPT-002",date:"2025.03.04",type:"과실",case:"Case 3 — 차선변경 과실분쟁",adjuster:"박서연 사정사",status:"협의중",cost:7750000,repairDays:21,faultRatio:"85:15(AI판정)",severity:"중간",claimants:2,priority:"높음",summary:"차선변경 충돌. 타사 10:0 주장 → AI 85:15 판정.",originalClaim:15800000,aiResult:7300000,aiSaving:8500000,savingBasis:"타사 100:0 주장 시 자사 전액부담 ₩15,800,000 대비 AI 85:15 판정 ₩7,300,000",unrepaired:false,fraudDetected:false,complaint:true},
-    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000",unrepaired:false,fraudDetected:true,complaint:true},
+    {id:"RPT-003",date:"2025.03.04",type:"처리",case:"Case 1 — 교차로 그랜저vs BMW",adjuster:"김민준 사정사",status:"협의중",cost:18700000,repairDays:28,faultRatio:"50:50(AI적정)",severity:"심각",claimants:5,priority:"긴급",summary:"교차로 충돌. BMW 수리비 ₩25M 과다청구. 대인 5명.",originalClaim:30450000,aiResult:18700000,aiSaving:11750000,savingBasis:"타사 주장(70:30) 시 자사 부담 ₩30,450,000 대비 AI 적정(50:50) ₩18,700,000",unrepaired:false,fraudDetected:true,fraudReason:"BMW 수리비 ₩25M은 동일 차종 평균 수리비(₩14~18M)의 1.4~1.8배 수준. 범퍼 ASSY 교체 청구(₩3.5M)이나 판금 복원 가능한 손상 수준. 타사 정비소가 최근 6개월 내 동일 보험사 청구 5건 집중. 과실비율 70:30 주장은 교차로 기본(50:50) 대비 과도.",complaint:true},
     {id:"RPT-004",date:"2025.03.03",type:"견적",case:"후미추돌 — 쏘나타 vs K5",adjuster:"정태우 사정사",status:"종결",cost:2800000,repairDays:7,faultRatio:"0:100(타사과실)",severity:"경미",claimants:0,priority:"보통",summary:"후미추돌. 자사 쏘나타 리어범퍼 파손.",originalClaim:2800000,aiResult:2800000,aiSaving:0,savingBasis:"자사 인지 손해액 ₩2,800,000 — AI 검증 결과 적정",unrepaired:true,fraudDetected:false,complaint:false},
     {id:"RPT-005",date:"2025.03.03",type:"대인",case:"Case 1 교차로 — 대인 5명",adjuster:"김민준 사정사",status:"진행중",cost:6400000,repairDays:0,faultRatio:"50:50",severity:"중간",claimants:5,priority:"높음",summary:"타사 3명 + 자사 2명. 개별합의 또는 일괄패키지.",originalClaim:10500000,aiResult:7200000,aiSaving:3300000,savingBasis:"타사 대인 3명 최초 청구 ₩10,500,000 대비 AI 적정 합의 ₩7,200,000",unrepaired:false,fraudDetected:false,complaint:false},
     {id:"RPT-006",date:"2025.03.02",type:"과실",case:"신호위반 — 좌회전 충돌",adjuster:"한예진 사정사",status:"종결",cost:4200000,repairDays:10,faultRatio:"20:80(확정)",severity:"중간",claimants:2,priority:"낮음",summary:"신호위반 좌회전 충돌. 과실 20:80 확정.",originalClaim:5400000,aiResult:4200000,aiSaving:1200000,savingBasis:"자사 최초 인지 ₩5,400,000 대비 AI 과실 적용 후 ₩4,200,000",unrepaired:false,fraudDetected:false,complaint:false},
@@ -4854,10 +4854,10 @@ function TabKPI(){
     {id:"RPT-008",date:"2025.03.04",type:"견적",case:"고속도로 추돌 — 아반떼 vs 투싼",adjuster:"윤동훈 사정사",status:"분석완료",cost:4500000,repairDays:12,faultRatio:"10:90",severity:"중간",claimants:1,priority:"보통",summary:"고속도로 다차로 추돌.",originalClaim:5300000,aiResult:4500000,aiSaving:800000,savingBasis:"타사 최초 청구 ₩5,300,000 대비 AI 적정 ₩4,500,000",unrepaired:false,fraudDetected:false,complaint:false},
     {id:"RPT-009",date:"2025.03.03",type:"처리",case:"이면도로 측면충돌 — K8 vs 말리부",adjuster:"서수빈 사정사",status:"진행중",cost:8200000,repairDays:18,faultRatio:"40:60",severity:"중간",claimants:2,priority:"높음",summary:"이면도로 측면충돌. 쌍방 과실.",originalClaim:10300000,aiResult:8200000,aiSaving:2100000,savingBasis:"자사 최초 인지 ₩10,300,000 대비 AI 최적 처리 ₩8,200,000",unrepaired:false,fraudDetected:false,complaint:false},
     {id:"RPT-010",date:"2025.03.02",type:"과실",case:"유턴사고 — 쏘렌토 vs 셀토스",adjuster:"강재현 사정사",status:"종결",cost:3100000,repairDays:8,faultRatio:"70:30(확정)",severity:"경미",claimants:0,priority:"낮음",summary:"유턴 중 직진차량 접촉. 종결.",originalClaim:3750000,aiResult:3100000,aiSaving:650000,savingBasis:"자사 최초 인지 ₩3,750,000 대비 AI 적정 과실 ₩3,100,000",unrepaired:false,fraudDetected:false,complaint:false},
-    {id:"RPT-011",date:"2025.03.04",type:"대인",case:"횡단보도 보행자 — 카니발",adjuster:"조소영 사정사",status:"진행중",cost:12000000,repairDays:0,faultRatio:"60:40",severity:"심각",claimants:1,priority:"긴급",summary:"횡단보도 보행자 접촉. 합의금 산정 중.",originalClaim:15500000,aiResult:12000000,aiSaving:3500000,savingBasis:"피해자 최초 청구 ₩15,500,000 대비 AI 적정 합의 ₩12,000,000",unrepaired:false,fraudDetected:true,complaint:true},
+    {id:"RPT-011",date:"2025.03.04",type:"대인",case:"횡단보도 보행자 — 카니발",adjuster:"조소영 사정사",status:"진행중",cost:12000000,repairDays:0,faultRatio:"60:40",severity:"심각",claimants:1,priority:"긴급",summary:"횡단보도 보행자 접촉. 합의금 산정 중.",originalClaim:15500000,aiResult:12000000,aiSaving:3500000,savingBasis:"피해자 최초 청구 ₩15,500,000 대비 AI 적정 합의 ₩12,000,000",unrepaired:false,fraudDetected:true,fraudReason:"피해자 치료기간 14급 기준 대비 2.5배 초과(35일). 접수 후 72시간 뒤 최초 병원 방문. 동일 피해자가 최근 18개월 내 타 보험사 대인 접수 2건 이력. 진단서 발급 병원이 사고 지점에서 45km 거리(인근 병원 미이용).",complaint:true},
     {id:"RPT-012",date:"2025.03.01",type:"견적",case:"후진사고 — 팰리세이드",adjuster:"정태우 사정사",status:"종결",cost:1800000,repairDays:5,faultRatio:"100:0",severity:"경미",claimants:0,priority:"낮음",summary:"후진 시 기둥 접촉. 단독 과실.",originalClaim:1800000,aiResult:1800000,aiSaving:0,savingBasis:"자사 인지 ₩1,800,000 — 단독사고 절감 대상 아님",unrepaired:true,fraudDetected:false,complaint:false},
     {id:"RPT-013",date:"2025.03.03",type:"처리",case:"끼어들기 — 제네시스 G80",adjuster:"박서연 사정사",status:"종결",cost:5600000,repairDays:14,faultRatio:"65:35(확정)",severity:"중간",claimants:1,priority:"보통",summary:"끼어들기 접촉. 종결.",originalClaim:7400000,aiResult:5600000,aiSaving:1800000,savingBasis:"타사 최초 청구 ₩7,400,000 대비 AI 종합 처리 ₩5,600,000",unrepaired:false,fraudDetected:false,complaint:false},
-    {id:"RPT-014",date:"2025.03.04",type:"견적",case:"중앙선침범 — 스타리아 vs K5",adjuster:"윤동훈 사정사",status:"협의중",cost:15000000,repairDays:25,faultRatio:"90:10",severity:"심각",claimants:3,priority:"긴급",summary:"커브구간 중앙선침범 정면충돌.",originalClaim:19200000,aiResult:15000000,aiSaving:4200000,savingBasis:"타사 최초 청구 ₩19,200,000 대비 AI 적정 견적 ₩15,000,000",unrepaired:false,fraudDetected:true,complaint:false},
+    {id:"RPT-014",date:"2025.03.04",type:"견적",case:"중앙선침범 — 스타리아 vs K5",adjuster:"윤동훈 사정사",status:"협의중",cost:15000000,repairDays:25,faultRatio:"90:10",severity:"심각",claimants:3,priority:"긴급",summary:"커브구간 중앙선침범 정면충돌.",originalClaim:19200000,aiResult:15000000,aiSaving:4200000,savingBasis:"타사 최초 청구 ₩19,200,000 대비 AI 적정 견적 ₩15,000,000",unrepaired:false,fraudDetected:true,fraudReason:"타사 청구 견적서 내 에어백 미전개 차량에 에어백 교체비(₩2.8M) 포함. 사진 상 사이드미러 정상이나 교체 청구(₩650K). 블랙박스 미제출(장착 차량임에도 '고장' 주장). 수리비 청구 총액이 차량가액의 38%로 전손 회피 의심.",complaint:false},
     {id:"RPT-015",date:"2025.03.02",type:"과실",case:"비접촉사고 — 오토바이 전도",adjuster:"한예진 사정사",status:"협의중",cost:2200000,repairDays:0,faultRatio:"30:70(AI판정)",severity:"중간",claimants:1,priority:"보통",summary:"차선변경 시 오토바이 회피 전도.",originalClaim:3100000,aiResult:2200000,aiSaving:900000,savingBasis:"피해자 최초 청구 ₩3,100,000 대비 AI 과실 적용 ₩2,200,000",unrepaired:false,fraudDetected:false,complaint:false},
     {id:"RPT-016",date:"2025.03.01",type:"견적",case:"주차장 접촉 — BMW X5 vs 벤츠 GLC",adjuster:"강재현 사정사",status:"종결",cost:6800000,repairDays:12,faultRatio:"50:50",severity:"중간",claimants:0,priority:"보통",summary:"주차장 통로 쌍방 접촉. 외제차 검증.",originalClaim:8300000,aiResult:6800000,aiSaving:1500000,savingBasis:"타사 최초 청구 ₩8,300,000 대비 AI 적정 ₩6,800,000",unrepaired:true,fraudDetected:false,complaint:false},
   ]);
@@ -5087,6 +5087,10 @@ function TabKPI(){
                   <div style={{fontSize:10,color:"#2563eb",fontWeight:700,marginBottom:4}}>💰 절감 근거</div>
                   <div style={{fontSize:11,color:"#1e40af",lineHeight:1.5}}>{selReport.savingBasis}</div>
                 </div>
+                {selReport.fraudDetected&&selReport.fraudReason&&<div style={{marginTop:10,padding:"10px 12px",background:"#fef2f2",borderRadius:8,border:"1px solid #fecaca"}}>
+                  <div style={{fontSize:10,color:"#991b1b",fontWeight:700,marginBottom:6}}>🚨 사기 의심 근거 (SIU 검토 필요)</div>
+                  <div style={{fontSize:11.5,color:"#7f1d1d",lineHeight:1.7}}>{selReport.fraudReason}</div>
+                </div>}
               </div>
             </div>
           </div>
@@ -5254,6 +5258,10 @@ function TabKPI(){
                   <div style={{fontSize:10,color:"#2563eb",fontWeight:700,marginBottom:4}}>💰 절감 근거</div>
                   <div style={{fontSize:11,color:"#1e40af",lineHeight:1.5}}>{selReport.savingBasis}</div>
                 </div>
+                {selReport.fraudDetected&&selReport.fraudReason&&<div style={{marginTop:10,padding:"10px 12px",background:"#fef2f2",borderRadius:8,border:"1px solid #fecaca"}}>
+                  <div style={{fontSize:10,color:"#991b1b",fontWeight:700,marginBottom:6}}>🚨 사기 의심 근거 (SIU 검토 필요)</div>
+                  <div style={{fontSize:11.5,color:"#7f1d1d",lineHeight:1.7}}>{selReport.fraudReason}</div>
+                </div>}
               </div>
             </div>
           </div>
@@ -5312,6 +5320,10 @@ function TabKPI(){
           <div style={{fontSize:10,fontWeight:700,color:"#065f46",marginBottom:3}}>💰 AI 절감 근거</div>
           <div style={{fontSize:11,color:"#475569",lineHeight:1.6}}>{selReport.savingBasis}</div>
           <div style={{fontSize:10,color:"#059669",fontWeight:700,marginTop:3}}>절감률: {Math.round(selReport.aiSaving/selReport.originalClaim*100)}%</div>
+        </div>}
+        {selReport.fraudDetected&&selReport.fraudReason&&<div style={{padding:"10px 14px",borderRadius:10,background:"#fef2f2",border:"1px solid #fecaca",marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:700,color:"#991b1b",marginBottom:6}}>🚨 사기 의심 근거 (SIU 검토 필요)</div>
+          <div style={{fontSize:11.5,color:"#7f1d1d",lineHeight:1.7}}>{selReport.fraudReason}</div>
         </div>}
         <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#f0f9ff",borderRadius:10,border:"1px solid #bae6fd",marginBottom:14}}>
           <div style={{width:30,height:30,borderRadius:8,background:"#0891b2",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:12}}>👤</div>
