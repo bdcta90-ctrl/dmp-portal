@@ -60,7 +60,7 @@ const MVPS = [
     catColor: "#10b981",
     icon: "🛡️",
     iconBg: "linear-gradient(135deg,#ef4444,#f97316)",
-    title: "내부 정보 유출 위험자 식별",
+    title: "내부 보안 위험 식별",
     desc: "1,800명 임직원 이상행위 탐지 · AI 의도 추론 · 조치 추천까지 제공하는 실시간 보안 위험 모니터링 대시보드",
     tags: ["보안관제", "AI분석", "실시간"],
     date: "2025.02",

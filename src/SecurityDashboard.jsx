@@ -1623,89 +1623,97 @@ export default function SecurityDashboard(props) {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar — 위험도 게이지 + TOP5 사용자만 */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>전체 위험도 게이지</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>최근 20건 기준</div><RiskGauge events={events} /></div>
             <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>🔴 고위험 사용자 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>최고 위험 점수 기준</div><TopRiskUsers events={events} onMsg={function(u, t) { setMessageModal({ user: u, recipientType: t }); }} /></div>
-            <div style={Object.assign({}, panelStyle, { padding: 12 })}><div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>🏢 고위험 부서 TOP 5</div><div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginBottom: 6 }}>평균 위험 점수 기준</div><TopRiskDepts events={events} /></div>
-              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
-                <div style={{ fontSize: 10, fontWeight: 600, marginBottom: 6 }}>이벤트 유형 분포</div>
-                {EVENT_TYPES.map(function(et) {
-                  var cnt = events.filter(function(e) { return e.eventType.type === et.type; }).length;
-                  var sc = { low: "#30d158", medium: "#ffcc00", high: "#ff9500", critical: "#ff2d55" };
-                  return (
-                    <div key={et.type} style={{ marginBottom: 4 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 1 }}>
-                        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.45)" }}>{et.icon} {et.label}</span>
-                        <span style={{ fontSize: 9, color: sc[et.severity], fontFamily: "monospace", fontWeight: 600 }}>{cnt}</span>
-                      </div>
-                      <MiniBar value={cnt} max={Math.max(1, Math.max.apply(null, EVENT_TYPES.map(function(t) { return events.filter(function(e) { return e.eventType.type === t.type; }).length; })))} color={sc[et.severity]} />
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
-                <div onClick={function() { togglePanel("compliance"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.compliance ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>{"📋"} 법규 준수 현황</span>
-                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.compliance ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+          </div>
+        </div>
+
+        {/* ═══ 피드 하단 영역 1: 이벤트 유형 분포 + 고위험 부서 ═══ */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 14 }}>
+          <div style={Object.assign({}, panelStyle, { padding: 14 })}>
+            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>📊 이벤트 유형 분포</div>
+            {EVENT_TYPES.map(function(et) {
+              var cnt = events.filter(function(e) { return e.eventType.type === et.type; }).length;
+              var sc = { low: "#30d158", medium: "#ffcc00", high: "#ff9500", critical: "#ff2d55" };
+              return (
+                <div key={et.type} style={{ marginBottom: 5 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.55)" }}>{et.icon} {et.label}</span>
+                    <span style={{ fontSize: 11, color: sc[et.severity], fontFamily: "monospace", fontWeight: 700 }}>{cnt}</span>
+                  </div>
+                  <MiniBar value={cnt} max={Math.max(1, Math.max.apply(null, EVENT_TYPES.map(function(t) { return events.filter(function(e) { return e.eventType.type === t.type; }).length; })))} color={sc[et.severity]} />
                 </div>
-                {!collapsedPanels.compliance && [
-                  {icon:"✅",label:"접근 로그 기록",status:"활성",color:"#30d158"},
-                  {icon:"✅",label:"이벤트 모니터링",status:"실시간",color:"#30d158"},
-                  {icon:"⚠️",label:"데이터 보유기한",status:"500건 제한",color:"#ff9f0a"},
-                  {icon:"⚠️",label:"직원 동의 절차",status:"미구현",color:"#ff9f0a"},
-                  {icon:"❌",label:"감사 추적 시스템",status:"미연동",color:"#ff2d55"},
-                  {icon:"❌",label:"개인정보 영향평가",status:"미실시",color:"#ff2d55"},
-                ].map(function(item,idx){
-                  return(
-                    <div key={idx} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
-                      <span style={{fontSize:10,flexShrink:0}}>{item.icon}</span>
-                      <span style={{fontSize:9,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
-                      <span style={{fontSize:8,color:item.color,fontWeight:600}}>{item.status}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
-                <div onClick={function() { togglePanel("integration"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.integration ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>{"🔗"} 시스템 연동 현황</span>
-                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.integration ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+              );
+            })}
+          </div>
+          <div style={Object.assign({}, panelStyle, { padding: 14 })}>
+            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>🏢 고위험 부서 TOP 5</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>평균 위험 점수 기준</div>
+            <TopRiskDepts events={events} />
+          </div>
+        </div>
+
+        {/* ═══ 피드 하단 영역 2: 법규 준수 + 시스템 연동 + 7Layer ═══ */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginTop: 14 }}>
+          <div style={Object.assign({}, panelStyle, { padding: 14 })}>
+            <div onClick={function() { togglePanel("compliance"); }} style={{ fontSize: 12, fontWeight: 700, marginBottom: collapsedPanels.compliance ? 0 : 8, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>{"📋"} 법규 준수 현황</span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.compliance ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+            </div>
+            {!collapsedPanels.compliance && [
+              {icon:"✅",label:"접근 로그 기록",status:"활성",color:"#30d158"},
+              {icon:"✅",label:"이벤트 모니터링",status:"실시간",color:"#30d158"},
+              {icon:"⚠️",label:"데이터 보유기한",status:"500건 제한",color:"#ff9f0a"},
+              {icon:"⚠️",label:"직원 동의 절차",status:"미구현",color:"#ff9f0a"},
+              {icon:"❌",label:"감사 추적 시스템",status:"미연동",color:"#ff2d55"},
+              {icon:"❌",label:"개인정보 영향평가",status:"미실시",color:"#ff2d55"},
+            ].map(function(item,idx){
+              return(<div key={idx} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.04)":"none"}}>
+                <span style={{fontSize:11,flexShrink:0}}>{item.icon}</span>
+                <span style={{fontSize:10,color:"rgba(255,255,255,0.6)",flex:1}}>{item.label}</span>
+                <span style={{fontSize:9,color:item.color,fontWeight:600}}>{item.status}</span>
+              </div>);
+            })}
+          </div>
+          <div style={Object.assign({}, panelStyle, { padding: 14 })}>
+            <div onClick={function() { togglePanel("integration"); }} style={{ fontSize: 12, fontWeight: 700, marginBottom: collapsedPanels.integration ? 0 : 8, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>{"🔗"} 시스템 연동 현황</span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.integration ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+            </div>
+            {!collapsedPanels.integration && [
+              {icon:"🟢",label:"이벤트 로그",status:"연동",color:"#30d158"},
+              {icon:"🟡",label:"SIEM",status:"준비중",color:"#ff9f0a"},
+              {icon:"🟡",label:"IAM",status:"준비중",color:"#ff9f0a"},
+              {icon:"🟡",label:"DLP",status:"준비중",color:"#ff9f0a"},
+              {icon:"🟡",label:"HR Portal",status:"준비중",color:"#ff9f0a"},
+              {icon:"🟡",label:"메일/메신저",status:"준비중",color:"#ff9f0a"},
+            ].map(function(item,idx){
+              return(<div key={idx} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.04)":"none"}}>
+                <span style={{fontSize:10,flexShrink:0}}>{item.icon}</span>
+                <span style={{fontSize:10,color:"rgba(255,255,255,0.6)",flex:1}}>{item.label}</span>
+                <span style={{fontSize:9,color:item.color,fontWeight:600}}>{item.status}</span>
+              </div>);
+            })}
+          </div>
+          <div style={Object.assign({}, panelStyle, { padding: 14 })}>
+            <div onClick={function() { togglePanel("layer7"); }} style={{ fontSize: 12, fontWeight: 700, marginBottom: collapsedPanels.layer7 ? 0 : 8, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>📡 7 Layer 데이터 상태</span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.layer7 ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
+            </div>
+            {!collapsedPanels.layer7 && [{ n: 1, name: "사용자/조직", s: "active" }, { n: 2, name: "권한/IAM", s: "active" }, { n: 3, name: "자산 메타", s: "active" }, { n: 4, name: "행동 로그", s: "streaming" }, { n: 5, name: "기준선", s: "active" }, { n: 6, name: "업무 Context", s: "active" }, { n: 7, name: "대응 Playbook", s: "active" }].map(function(l) {
+              return (
+                <div key={l.n} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 0", borderBottom: l.n < 7 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                  <div style={{ width: 18, height: 18, borderRadius: 4, background: "rgba(10,132,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "#0a84ff", fontWeight: 700 }}>{l.n}</div>
+                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", flex: 1 }}>{l.name}</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                    {l.s === "streaming" && <PulsingDot color="#0a84ff" />}
+                    <span style={{ fontSize: 8, fontWeight: 700, color: l.s === "streaming" ? "#0a84ff" : "#30d158" }}>{l.s === "streaming" ? "LIVE" : "OK"}</span>
+                  </div>
                 </div>
-                {!collapsedPanels.integration && [
-                  {icon:"🟢",label:"이벤트 로그",status:"연동",color:"#30d158"},
-                  {icon:"🟡",label:"SIEM",status:"준비중",color:"#ff9f0a"},
-                  {icon:"🟡",label:"IAM",status:"준비중",color:"#ff9f0a"},
-                  {icon:"🟡",label:"DLP",status:"준비중",color:"#ff9f0a"},
-                  {icon:"🟡",label:"HR Portal",status:"준비중",color:"#ff9f0a"},
-                  {icon:"🟡",label:"메일/메신저",status:"준비중",color:"#ff9f0a"},
-                ].map(function(item,idx){
-                  return(
-                    <div key={idx} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",borderBottom:idx<5?"1px solid rgba(255,255,255,0.03)":"none"}}>
-                      <span style={{fontSize:9,flexShrink:0}}>{item.icon}</span>
-                      <span style={{fontSize:9,color:"rgba(255,255,255,0.55)",flex:1}}>{item.label}</span>
-                      <span style={{fontSize:8,color:item.color,fontWeight:600}}>{item.status}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={Object.assign({}, panelStyle, { padding: 10 })}>
-                <div onClick={function() { togglePanel("layer7"); }} style={{ fontSize: 10, fontWeight: 600, marginBottom: collapsedPanels.layer7 ? 0 : 6, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>7 Layer 상태</span>
-                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", transform: collapsedPanels.layer7 ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"▼"}</span>
-                </div>
-                {!collapsedPanels.layer7 && [{ n: 1, name: "사용자/조직", s: "active" }, { n: 2, name: "권한/IAM", s: "active" }, { n: 3, name: "자산 메타", s: "active" }, { n: 4, name: "행동 로그", s: "streaming" }, { n: 5, name: "기준선", s: "active" }, { n: 6, name: "업무 Context", s: "active" }, { n: 7, name: "대응 Playbook", s: "active" }].map(function(l) {
-                  return (
-                    <div key={l.n} style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 0", borderBottom: l.n < 7 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
-                      <div style={{ width: 16, height: 16, borderRadius: 3, background: "rgba(10,132,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#0a84ff", fontWeight: 700 }}>{l.n}</div>
-                      <span style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", flex: 1 }}>{l.name}</span>
-                      <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        {l.s === "streaming" && <PulsingDot color="#0a84ff" />}
-                        <span style={{ fontSize: 7, fontWeight: 600, color: l.s === "streaming" ? "#0a84ff" : "#30d158" }}>{l.s === "streaming" ? "LIVE" : "OK"}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              );
+            })}
           </div>
         </div>
       </div>}
