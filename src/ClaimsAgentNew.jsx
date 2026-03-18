@@ -2820,7 +2820,7 @@ function Tab1({activeCase,setActiveCase,flow,onNext}){
     }else clearUC();
   },[activeCase]);
 
-  const filteredMakes=VEHICLE_DB.filter(v=>origin==="전체"||v.origin===origin||v.make===mk);
+  const filteredMakes=VEHICLE_DB.filter(v=>origin==="전체"||v.origin===origin||(mk&&v.make===mk));
   const makeEntry=VEHICLE_DB.find(v=>v.make===mk);
   const models=makeEntry?.models||[];
   const yrs=Array.from({length:15},(_,i)=>String(2025-i));
@@ -3016,16 +3016,26 @@ ${cashSection}
         {/* 차량 정보 */}
         <div style={CD}>
           <h3 style={ST}>{IC.car}<span>차량 정보</span></h3>
+          {/* 자사/타사 차량 선택 */}
+          <div style={{display:"flex",gap:4,marginBottom:8}}>
+            {[{id:0,label:"🚗 자사 차량 (A)",color:"#2563eb"},{id:1,label:"🚙 타사 차량 (B)",color:"#dc2626"}].map(t=>
+              <button key={t.id} onClick={()=>setDmgTab(t.id)} style={{
+                flex:1,padding:"7px 0",borderRadius:8,fontSize:11.5,cursor:"pointer",fontWeight:dmgTab===t.id?700:400,
+                background:dmgTab===t.id?t.color:"#f8fafc",
+                color:dmgTab===t.id?"#fff":"#94a3b8",border:dmgTab===t.id?"none":"1px solid #e2e8f0",transition:"all .2s"
+              }}>{t.label}</button>)}
+          </div>
+          {/* 국산/외산 분류 */}
           <div style={{display:"flex",gap:4,marginBottom:10}}>
-            {["전체","국산","외산"].map(o=><button key={o} onClick={()=>{if(useCase){setOrigin(o);return;}setOrigin(o);sMk("");sMd("");}} style={{
-              flex:1,padding:"6px 0",borderRadius:7,fontSize:11.5,cursor:"pointer",fontWeight:origin===o?700:400,
-              background:origin===o?(o==="국산"?"#0891b2":o==="외산"?"#7c3aed":"#475569"):"#f8fafc",
-              color:origin===o?"#fff":"#94a3b8",border:origin===o?"none":"1px solid #e2e8f0",
-            }}>{o==="전체"?"전체":o==="국산"?"🇰🇷 국산":"🌍 외산"}</button>)}
+            {["국산","외산"].map(o=><button key={o} onClick={()=>{setOrigin(o);if(!useCase){sMk("");sMd("");}}} style={{
+              flex:1,padding:"5px 0",borderRadius:7,fontSize:11,cursor:"pointer",fontWeight:origin===o?700:400,
+              background:origin===o?(o==="국산"?"#0891b2":"#7c3aed"):"#f8fafc",
+              color:origin===o?"#fff":"#94a3b8",border:origin===o?"none":"1px solid #e2e8f0",transition:"all .2s"
+            }}>{o==="국산"?"🇰🇷 국산":"🌍 외산"}</button>)}
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
             <div><label style={LB}>제조사 {makeEntry&&<span style={{color:isImport?"#7c3aed":"#0891b2",fontSize:9}}>({makeEntry.origin})</span>}</label>
-              <select value={mk} onChange={e=>{sMk(e.target.value);sMd("")}} style={SL}><option value="">선택</option>
+              <select value={mk} onChange={e=>{sMk(e.target.value);sMd("");const m=VEHICLE_DB.find(v=>v.make===e.target.value);if(m)setOrigin(m.origin);}} style={SL}><option value="">선택</option>
                 {filteredMakes.map(v=><option key={v.make} value={v.make}>{v.make}</option>)}</select></div>
             <div><label style={LB}>모델</label>
               <select value={md} onChange={e=>sMd(e.target.value)} style={SL}><option value="">선택</option>
@@ -3033,8 +3043,10 @@ ${cashSection}
             <SB label="연식" value={yr} onChange={sYr} opts={yrs}/>
             <IB label="주행거리(km)" value={ml} onChange={sMl} ph="35874"/>
           </div>
-          {isSuper&&<div style={{marginTop:8,padding:"5px 10px",borderRadius:7,background:"#fef3c7",border:"1px solid #fde68a",fontSize:11,color:"#92400e"}}>⚠️ 슈퍼카/럭셔리 — 부품비 할증(3x) 적용</div>}
-          {isImport&&!isSuper&&<div style={{marginTop:8,padding:"5px 10px",borderRadius:7,background:"#f5f3ff",border:"1px solid #ddd6fe",fontSize:11,color:"#6d28d9"}}>🌍 외산 차량 — 부품비 할증(1.6x) 적용</div>}
+          {mk&&<div style={{marginTop:6,padding:"5px 10px",borderRadius:7,background:dmgTab===0?"#eff6ff":"#fef2f2",border:`1px solid ${dmgTab===0?"#bfdbfe":"#fecaca"}`,fontSize:11,color:dmgTab===0?"#1d4ed8":"#991b1b",display:"flex",alignItems:"center",gap:6}}>
+            <span style={{fontWeight:700}}>{dmgTab===0?"🚗 자사":"🚙 타사"}</span>
+            <span>{mk} {md} {yr&&yr+"년식"} {isImport?"(외산 ×1.6)":""}{isSuper?"(슈퍼카 ×3.0)":""}</span>
+          </div>}
         </div>
 
         {/* 사진 업로드 */}
