@@ -12,200 +12,105 @@ body {
   font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
   overflow-x: hidden;
 }
-.header {
-  padding: 24px 32px 8px;
-}
-.header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 4px;
-}
-.header p {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 16px;
-}
-.header .source {
-  font-size: 11px;
-  color: #666;
-}
+.header { padding: 24px 32px 8px; }
+.header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.header p { font-size: 13px; color: #888; margin-bottom: 16px; }
+.header .source { font-size: 11px; color: #666; }
 .controls {
-  display: flex;
-  gap: 8px;
-  padding: 8px 32px 12px;
-  flex-wrap: wrap;
+  display: flex; gap: 8px; padding: 8px 32px 8px; flex-wrap: wrap; align-items: center;
 }
 .controls button {
-  padding: 8px 18px;
-  border: 1px solid #333;
-  border-radius: 6px;
-  background: #151520;
-  color: #aaa;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
+  padding: 8px 18px; border: 1px solid #333; border-radius: 6px;
+  background: #151520; color: #aaa; font-size: 13px; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
 }
 .controls button:hover { border-color: #555; color: #ddd; }
-.controls button.active {
-  background: #1a2a3a;
-  border-color: #4a8ab5;
-  color: #8ac4f0;
+.controls button.active { background: #1a2a3a; border-color: #4a8ab5; color: #8ac4f0; }
+.search-wrap {
+  display: flex; align-items: center; gap: 6px; margin-left: auto;
 }
-.main-container {
-  display: flex;
-  padding: 0 32px 24px;
-  gap: 24px;
+.search-wrap input {
+  padding: 7px 12px; border: 1px solid #333; border-radius: 6px;
+  background: #151520; color: #ddd; font-size: 13px; width: 200px;
+  font-family: inherit; outline: none;
 }
-.treemap-container {
-  flex: 1;
-  min-width: 0;
+.search-wrap input:focus { border-color: #4a8ab5; }
+.search-wrap input::placeholder { color: #555; }
+.zoom-bar {
+  display: flex; align-items: center; gap: 8px; padding: 4px 32px 8px; font-size: 12px;
 }
-#treemap {
-  width: 100%;
-  border-radius: 8px;
-  cursor: default;
+.zoom-bar .breadcrumb { color: #888; }
+.zoom-bar .breadcrumb span { color: #8ac4f0; cursor: pointer; }
+.zoom-bar .breadcrumb span:hover { text-decoration: underline; }
+.zoom-bar .zoom-reset {
+  padding: 4px 12px; border: 1px solid #333; border-radius: 4px;
+  background: #151520; color: #aaa; font-size: 11px; cursor: pointer;
+  font-family: inherit; display: none;
 }
-.sidebar {
-  width: 340px;
-  flex-shrink: 0;
-}
+.zoom-bar .zoom-reset:hover { border-color: #555; color: #ddd; }
 .legend {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 32px 4px;
-  font-size: 11px;
-  color: #888;
+  display: flex; align-items: center; gap: 8px; padding: 4px 32px 4px;
+  font-size: 11px; color: #888;
 }
-.gradient-bar {
-  width: 200px;
-  height: 12px;
-  border-radius: 3px;
-}
+.gradient-bar { width: 200px; height: 12px; border-radius: 3px; }
+.main-container { display: flex; padding: 0 32px 24px; gap: 24px; }
+.treemap-container { flex: 1; min-width: 0; position: relative; }
+#treemap { width: 100%; border-radius: 8px; cursor: default; }
+.sidebar { width: 340px; flex-shrink: 0; max-height: 80vh; overflow-y: auto; }
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 .stat-card {
-  background: #12121a;
-  border: 1px solid #222;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
+  background: #12121a; border: 1px solid #222; border-radius: 8px;
+  padding: 16px; margin-bottom: 12px;
 }
 .stat-card h3 {
-  font-size: 12px;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  font-size: 12px; color: #888; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 8px;
 }
-.stat-card .big-num {
-  font-size: 32px;
-  font-weight: 700;
-  color: #fff;
-}
-.stat-card .sub {
-  font-size: 12px;
-  color: #666;
-  margin-top: 2px;
-}
-.hist-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
-  font-size: 11px;
-}
-.hist-label {
-  width: 100px;
-  color: #999;
-  flex-shrink: 0;
-  text-align: right;
-  padding-right: 8px;
-}
-.hist-bar-bg {
-  flex: 1;
-  height: 16px;
-  background: #1a1a25;
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-}
-.hist-bar {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.4s ease;
-}
-.hist-val {
-  width: 70px;
-  text-align: right;
-  color: #aaa;
-  padding-left: 6px;
-  flex-shrink: 0;
-}
-.tier-row {
-  display: flex;
-  align-items: center;
-  padding: 4px 0;
-  border-bottom: 1px solid #1a1a25;
-  font-size: 12px;
-}
-.tier-color {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  margin-right: 8px;
-  flex-shrink: 0;
-}
+.stat-card .big-num { font-size: 32px; font-weight: 700; color: #fff; }
+.stat-card .sub { font-size: 12px; color: #666; margin-top: 2px; }
+.hist-row { display: flex; align-items: center; margin-bottom: 4px; font-size: 11px; }
+.hist-label { width: 100px; color: #999; flex-shrink: 0; text-align: right; padding-right: 8px; }
+.hist-bar-bg { flex: 1; height: 16px; background: #1a1a25; border-radius: 3px; overflow: hidden; }
+.hist-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.hist-val { width: 70px; text-align: right; color: #aaa; padding-left: 6px; flex-shrink: 0; }
+.tier-row { display: flex; align-items: center; padding: 4px 0; border-bottom: 1px solid #1a1a25; font-size: 12px; }
+.tier-color { width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; flex-shrink: 0; }
 .tier-label { flex: 1; color: #ccc; }
 .tier-count { color: #888; margin-left: 8px; }
 .tier-pct { color: #666; margin-left: 4px; width: 45px; text-align: right; }
-
 .tooltip {
-  position: fixed;
-  background: #1a1a2a;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 14px;
-  font-size: 12px;
-  pointer-events: none;
-  z-index: 1000;
-  max-width: 320px;
-  display: none;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  position: fixed; background: #1a1a2a; border: 1px solid #333; border-radius: 8px;
+  padding: 14px; font-size: 12px; pointer-events: none; z-index: 1000;
+  max-width: 320px; display: none; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
-.tooltip .tt-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 8px;
-}
-.tooltip .tt-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 3px;
-}
+.tooltip .tt-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.tooltip .tt-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
 .tooltip .tt-label { color: #888; }
 .tooltip .tt-value { color: #ddd; font-weight: 600; }
-.tooltip .tt-desc {
-  margin-top: 8px;
-  color: #777;
-  font-size: 11px;
-  line-height: 1.5;
-  border-top: 1px solid #222;
-  padding-top: 8px;
+.tooltip .tt-desc { margin-top: 8px; color: #777; font-size: 11px; line-height: 1.5; border-top: 1px solid #222; padding-top: 8px; }
+.search-results {
+  position: absolute; top: 0; left: 0; pointer-events: none; z-index: 50;
 }
-
+.search-highlight {
+  position: absolute; border: 2px solid #ffcc00; border-radius: 3px;
+  pointer-events: none; box-shadow: 0 0 10px rgba(255,204,0,0.5);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 @media (max-width: 900px) {
   .main-container { flex-direction: column; }
-  .sidebar { width: 100%; }
+  .sidebar { width: 100%; max-height: none; }
+  .search-wrap input { width: 140px; }
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🇰🇷 대한민국 취업시장 시각화</h1>
-  <p>한국 경제의 약 2,880만 취업자를 175개 직업으로 시각화합니다. 사각형의 크기는 취업자 수, 색상은 선택한 지표를 나타냅니다.</p>
-  <div class="source">데이터 출처: 통계청 경제활동인구조사(2024), 한국고용정보원, 고용노동부 | 마우스를 올려 상세 정보를 확인하세요</div>
+  <h1>&#x1F1F0;&#x1F1F7; 대한민국 취업시장 시각화</h1>
+  <p>한국 경제의 약 2,880만 취업자를 KSCO 세세분류 기준 <strong>1031개 직업</strong>으로 시각화합니다. 사각형의 크기는 취업자 수, 색상은 선택한 지표를 나타냅니다. <strong>카테고리를 클릭하면 줌인</strong>됩니다.</p>
+  <div class="source">데이터 출처: 통계청 경제활동인구조사(2024), 한국고용정보원, 고용노동부 | KSCO 세세분류 기반</div>
 </div>
 
 <div class="controls">
@@ -213,6 +118,14 @@ body {
   <button data-mode="pay">💰 중위 임금</button>
   <button data-mode="education">🎓 학력 요건</button>
   <button data-mode="ai">🤖 AI 대체 위험</button>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="직업 검색...">
+  </div>
+</div>
+
+<div class="zoom-bar" id="zoomBar">
+  <div class="breadcrumb" id="breadcrumb"><span id="bcAll" style="cursor:pointer">전체 직업</span></div>
+  <button class="zoom-reset" id="zoomReset">전체보기</button>
 </div>
 
 <div class="legend" id="legendBar">
@@ -224,6 +137,7 @@ body {
 <div class="main-container">
   <div class="treemap-container">
     <canvas id="treemap"></canvas>
+    <div class="search-results" id="searchResults"></div>
   </div>
   <div class="sidebar" id="sidebar"></div>
 </div>
@@ -231,168 +145,8 @@ body {
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-// ===== 한국 직업 데이터 (통계청 2024 기반) =====
-const occupations = [
-  // 경영·사무
-  {name:"경영관련 사무원",cat:"경영·사무",emp:2499000,pay:3200,edu:3,outlook:2,ai:8.5,aiDesc:"반복적 문서작업, 데이터 정리 등 AI 자동화 가능성 높음"},
-  {name:"회계 및 경리사무원",cat:"경영·사무",emp:520000,pay:3100,edu:3,outlook:0,ai:9.0,aiDesc:"정형화된 회계 처리, 전표 입력 등 AI 대체 가능성 매우 높음"},
-  {name:"인사·노무 사무원",cat:"경영·사무",emp:310000,pay:3400,edu:3,outlook:1,ai:6.5,aiDesc:"채용 스크리닝, 급여 계산 자동화 가능하나 상담·판단은 인간 필요"},
-  {name:"기획·마케팅 사무원",cat:"경영·사무",emp:380000,pay:3600,edu:3,outlook:3,ai:5.0,aiDesc:"데이터 분석은 AI 활용 가능하나 전략 수립은 인간 주도"},
-  {name:"무역 사무원",cat:"경영·사무",emp:180000,pay:3300,edu:3,outlook:-1,ai:7.0,aiDesc:"통관서류, 무역서식 처리 자동화 진행 중"},
-  {name:"비서",cat:"경영·사무",emp:85000,pay:3000,edu:3,outlook:-2,ai:7.5,aiDesc:"일정 관리, 문서 정리 등 AI 비서 대체 가속화"},
-  {name:"총무 사무원",cat:"경영·사무",emp:270000,pay:3000,edu:3,outlook:0,ai:7.0,aiDesc:"시설관리, 자산관리 등 정형화된 업무 자동화 가능"},
-  {name:"법률 사무원",cat:"경영·사무",emp:95000,pay:3200,edu:3,outlook:1,ai:6.0,aiDesc:"법률 문서 검토, 판례 검색 등 AI 보조 활용 확대"},
+const occupations = [{"name": "전략기획 전문가", "cat": "경영·사무", "emp": 81441, "pay": 4200, "edu": 3, "outlook": 4, "ai": 5.0, "aiDesc": "중장기 전략 수립, AI 보조 분석 활용"}, {"name": "사업기획 사무원", "cat": "경영·사무", "emp": 102872, "pay": 3800, "edu": 3, "outlook": 3, "ai": 5.5, "aiDesc": "신사업 발굴·사업계획 수립"}, {"name": "경영분석 전문가", "cat": "경영·사무", "emp": 72868, "pay": 3900, "edu": 3, "outlook": 4, "ai": 6.0, "aiDesc": "경영 데이터 분석, AI 도구 활용 확대"}, {"name": "경영컨설턴트", "cat": "경영·사무", "emp": 38577, "pay": 5500, "edu": 4, "outlook": 3, "ai": 4.5, "aiDesc": "기업 자문·진단, 고급 판단 필요"}, {"name": "M&A 전문가", "cat": "경영·사무", "emp": 12859, "pay": 6500, "edu": 4, "outlook": 2, "ai": 4.0, "aiDesc": "기업 인수합병 분석·실사"}, {"name": "총무 사무원", "cat": "경영·사무", "emp": 154309, "pay": 3000, "edu": 3, "outlook": 0, "ai": 7.0, "aiDesc": "시설·자산관리 정형업무 자동화 가능"}, {"name": "비품·자산관리 사무원", "cat": "경영·사무", "emp": 64295, "pay": 2800, "edu": 2, "outlook": -1, "ai": 7.5, "aiDesc": "물품관리·재고 파악 자동화"}, {"name": "일반 행정사무원", "cat": "경영·사무", "emp": 300045, "pay": 2900, "edu": 3, "outlook": -1, "ai": 8.5, "aiDesc": "문서작성·접수·분류 등 단순 반복 사무"}, {"name": "사무보조원", "cat": "경영·사무", "emp": 197172, "pay": 2200, "edu": 1, "outlook": -2, "ai": 8.0, "aiDesc": "단순 서류정리·복사·발송"}, {"name": "의전·행사 사무원", "cat": "경영·사무", "emp": 30004, "pay": 3000, "edu": 2, "outlook": 0, "ai": 4.0, "aiDesc": "행사 기획·운영, 대면 조율 필요"}, {"name": "비서", "cat": "경영·사무", "emp": 55723, "pay": 3200, "edu": 3, "outlook": -2, "ai": 7.5, "aiDesc": "일정·문서관리 AI 비서 대체 가속"}, {"name": "경영지원 사무원", "cat": "경영·사무", "emp": 102872, "pay": 3100, "edu": 3, "outlook": 0, "ai": 7.0, "aiDesc": "사내 부서간 업무 조율·지원"}, {"name": "구매 사무원", "cat": "경영·사무", "emp": 94300, "pay": 3200, "edu": 3, "outlook": 1, "ai": 7.5, "aiDesc": "발주·단가협상, 자동화 진행"}, {"name": "자재관리 사무원", "cat": "경영·사무", "emp": 81441, "pay": 3000, "edu": 2, "outlook": 0, "ai": 7.5, "aiDesc": "재고관리 ERP 자동화"}, {"name": "외주관리 사무원", "cat": "경영·사무", "emp": 47150, "pay": 3100, "edu": 3, "outlook": 0, "ai": 6.5, "aiDesc": "외주업체 관리·품질 확인"}, {"name": "계약관리 사무원", "cat": "경영·사무", "emp": 51436, "pay": 3300, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "계약서 검토·관리 AI 보조"}, {"name": "생산관리 사무원", "cat": "경영·사무", "emp": 111445, "pay": 3300, "edu": 3, "outlook": 0, "ai": 6.5, "aiDesc": "MES/ERP 연동, 현장 조율 필요"}, {"name": "생산계획 수립원", "cat": "경영·사무", "emp": 55723, "pay": 3400, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "수요예측·생산일정 수립"}, {"name": "공정관리 사무원", "cat": "경영·사무", "emp": 64295, "pay": 3200, "edu": 2, "outlook": 0, "ai": 6.5, "aiDesc": "공정 모니터링·개선"}, {"name": "품질경영(QM) 사무원", "cat": "경영·사무", "emp": 60009, "pay": 3200, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "품질 문서·인증 관리"}, {"name": "기업영업(B2B) 사무원", "cat": "경영·사무", "emp": 154309, "pay": 3400, "edu": 3, "outlook": 1, "ai": 5.5, "aiDesc": "고객관계 관리, CRM 활용"}, {"name": "영업관리 사무원", "cat": "경영·사무", "emp": 120018, "pay": 3100, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "매출관리·영업실적 분석"}, {"name": "영업지원 사무원", "cat": "경영·사무", "emp": 81441, "pay": 2900, "edu": 2, "outlook": 0, "ai": 6.5, "aiDesc": "견적·수주 서류 처리"}, {"name": "기술영업 전문가", "cat": "경영·사무", "emp": 64295, "pay": 4000, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "기술 이해 기반 솔루션 영업"}, {"name": "수출입관리 사무원", "cat": "경영·사무", "emp": 72868, "pay": 3300, "edu": 3, "outlook": -1, "ai": 7.0, "aiDesc": "통관·적하서류 자동화 가속"}, {"name": "무역 사무원", "cat": "경영·사무", "emp": 60009, "pay": 3100, "edu": 3, "outlook": -2, "ai": 7.5, "aiDesc": "무역서류 처리 자동화"}, {"name": "해외영업 사무원", "cat": "경영·사무", "emp": 55723, "pay": 3500, "edu": 3, "outlook": 1, "ai": 5.5, "aiDesc": "해외 바이어 관리·협상"}, {"name": "마케팅기획 전문가", "cat": "경영·사무", "emp": 102872, "pay": 3900, "edu": 3, "outlook": 3, "ai": 4.5, "aiDesc": "전략 기획·브랜딩 인간 주도"}, {"name": "디지털마케팅 전문가", "cat": "경영·사무", "emp": 72868, "pay": 3700, "edu": 3, "outlook": 5, "ai": 5.0, "aiDesc": "퍼포먼스마케팅 AI 자동화 진행"}, {"name": "콘텐츠마케팅 전문가", "cat": "경영·사무", "emp": 47150, "pay": 3400, "edu": 3, "outlook": 4, "ai": 5.5, "aiDesc": "브랜드 콘텐츠 기획·제작"}, {"name": "CRM마케팅 전문가", "cat": "경영·사무", "emp": 34291, "pay": 3600, "edu": 3, "outlook": 4, "ai": 6.0, "aiDesc": "고객 데이터 분석 기반 마케팅"}, {"name": "광고기획자(AE)", "cat": "경영·사무", "emp": 42864, "pay": 3500, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "매체 기획·집행, AI 최적화 활용"}, {"name": "홍보·PR 전문가", "cat": "경영·사무", "emp": 55723, "pay": 3600, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "위기관리·관계 구축 인간 역할"}, {"name": "브랜드 매니저", "cat": "경영·사무", "emp": 30004, "pay": 4200, "edu": 3, "outlook": 3, "ai": 4.5, "aiDesc": "브랜드 전략 수립·관리"}, {"name": "소셜미디어 운영자", "cat": "경영·사무", "emp": 38577, "pay": 2800, "edu": 2, "outlook": 3, "ai": 6.0, "aiDesc": "SNS 운영, AI 콘텐츠 생성 활용"}, {"name": "재무회계 사무원", "cat": "경영·사무", "emp": 154309, "pay": 3200, "edu": 3, "outlook": -1, "ai": 9.0, "aiDesc": "전표 입력·결산 AI 대체 가능성 높음"}, {"name": "세무회계 사무원", "cat": "경영·사무", "emp": 72868, "pay": 3200, "edu": 3, "outlook": 0, "ai": 8.5, "aiDesc": "세무 신고·조정 자동화"}, {"name": "원가회계 사무원", "cat": "경영·사무", "emp": 42864, "pay": 3400, "edu": 3, "outlook": 1, "ai": 7.0, "aiDesc": "원가분석 자동화, 전략 판단 필요"}, {"name": "관리회계 전문가", "cat": "경영·사무", "emp": 34291, "pay": 3800, "edu": 3, "outlook": 2, "ai": 6.5, "aiDesc": "경영 의사결정 지원 분석"}, {"name": "재무관리 전문가", "cat": "경영·사무", "emp": 38577, "pay": 4200, "edu": 3, "outlook": 2, "ai": 5.5, "aiDesc": "자금운용·투자 의사결정"}, {"name": "회계감사 보조원", "cat": "경영·사무", "emp": 25718, "pay": 3500, "edu": 3, "outlook": 0, "ai": 7.5, "aiDesc": "감사 자료 준비·검증 자동화"}, {"name": "ERP 운영 사무원", "cat": "경영·사무", "emp": 47150, "pay": 3300, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "ERP 시스템 운영·관리"}, {"name": "채용 사무원", "cat": "경영·사무", "emp": 55723, "pay": 3400, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "AI 이력서 스크리닝, 면접 인간 영역"}, {"name": "인사관리 사무원", "cat": "경영·사무", "emp": 64295, "pay": 3300, "edu": 3, "outlook": 1, "ai": 6.5, "aiDesc": "인사DB·평가 관리"}, {"name": "교육훈련(HRD) 사무원", "cat": "경영·사무", "emp": 42864, "pay": 3200, "edu": 3, "outlook": 2, "ai": 5.5, "aiDesc": "사내교육 기획·운영"}, {"name": "노무관리 사무원", "cat": "경영·사무", "emp": 38577, "pay": 3300, "edu": 3, "outlook": 0, "ai": 6.0, "aiDesc": "노사관계·취업규칙 관리"}, {"name": "급여·복리후생 사무원", "cat": "경영·사무", "emp": 68582, "pay": 3100, "edu": 3, "outlook": 0, "ai": 7.5, "aiDesc": "급여계산·4대보험 자동화 가속"}, {"name": "조직문화 담당자", "cat": "경영·사무", "emp": 21432, "pay": 3500, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "조직 진단·문화 개선"}, {"name": "콜센터 상담원", "cat": "경영·사무", "emp": 171454, "pay": 2400, "edu": 1, "outlook": -4, "ai": 8.5, "aiDesc": "AI 챗봇·콜봇 1차 상담 대체"}, {"name": "온라인 고객상담원", "cat": "경영·사무", "emp": 68582, "pay": 2500, "edu": 1, "outlook": -2, "ai": 8.0, "aiDesc": "채팅 상담 AI 대체 가속"}, {"name": "고객불만처리(CS) 전문가", "cat": "경영·사무", "emp": 47150, "pay": 2800, "edu": 2, "outlook": 0, "ai": 6.0, "aiDesc": "복잡 민원 처리 인간 판단 필요"}, {"name": "고객경험(CX) 기획자", "cat": "경영·사무", "emp": 21432, "pay": 3500, "edu": 3, "outlook": 4, "ai": 4.5, "aiDesc": "CX 전략 수립·분석"}, {"name": "법률 사무원", "cat": "경영·사무", "emp": 55723, "pay": 3200, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "판례 검색·법률문서 AI 보조"}, {"name": "특허 사무원", "cat": "경영·사무", "emp": 25718, "pay": 3300, "edu": 3, "outlook": 0, "ai": 6.5, "aiDesc": "특허 출원 서류 AI 보조 작성"}, {"name": "컴플라이언스 사무원", "cat": "경영·사무", "emp": 21432, "pay": 3800, "edu": 3, "outlook": 2, "ai": 5.5, "aiDesc": "규제 준수·내부통제 관리"}, {"name": "사업개발(BD) 전문가", "cat": "경영·사무", "emp": 34291, "pay": 4500, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "신사업·파트너십 발굴"}, {"name": "IR·투자유치 전문가", "cat": "경영·사무", "emp": 12859, "pay": 5000, "edu": 4, "outlook": 2, "ai": 4.5, "aiDesc": "투자자 관계·자금유치"}, {"name": "ESG 전문가", "cat": "경영·사무", "emp": 17145, "pay": 4000, "edu": 3, "outlook": 5, "ai": 4.0, "aiDesc": "환경·사회·지배구조 전략"}, {"name": "리스크관리 전문가", "cat": "경영·사무", "emp": 15431, "pay": 4500, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "기업 리스크 분석·대응"}, {"name": "데이터거버넌스 사무원", "cat": "경영·사무", "emp": 12859, "pay": 3800, "edu": 3, "outlook": 4, "ai": 5.0, "aiDesc": "데이터 품질·정책 관리"}, {"name": "의류 판매원", "cat": "판매·서비스", "emp": 214318, "pay": 2100, "edu": 1, "outlook": -6, "ai": 5.5, "aiDesc": "온라인 패션 성장, 오프라인 감소"}, {"name": "잡화·액세서리 판매원", "cat": "판매·서비스", "emp": 68582, "pay": 2000, "edu": 1, "outlook": -5, "ai": 5.0, "aiDesc": "온라인 전환 가속"}, {"name": "식품·음료 매장 판매원", "cat": "판매·서비스", "emp": 171454, "pay": 2000, "edu": 0, "outlook": -3, "ai": 5.0, "aiDesc": "편의점·마트 무인화"}, {"name": "편의점 점원", "cat": "판매·서비스", "emp": 274327, "pay": 1900, "edu": 0, "outlook": -2, "ai": 5.5, "aiDesc": "24시간 무인화 진행 중"}, {"name": "전자제품 판매원", "cat": "판매·서비스", "emp": 72868, "pay": 2400, "edu": 1, "outlook": -5, "ai": 5.5, "aiDesc": "온라인 비교 구매 일반화"}, {"name": "자동차 판매원", "cat": "판매·서비스", "emp": 55723, "pay": 3600, "edu": 2, "outlook": -2, "ai": 4.0, "aiDesc": "온라인 직판 확대"}, {"name": "의약·건강식품 판매원", "cat": "판매·서비스", "emp": 64295, "pay": 2300, "edu": 1, "outlook": -1, "ai": 4.5, "aiDesc": "건강 관심 증가"}, {"name": "화장품 판매원(뷰티어드바이저)", "cat": "판매·서비스", "emp": 77154, "pay": 2300, "edu": 1, "outlook": 0, "ai": 4.5, "aiDesc": "뷰티 전문 상담 수요"}, {"name": "대형마트 판매원", "cat": "판매·서비스", "emp": 154309, "pay": 2200, "edu": 1, "outlook": -5, "ai": 6.0, "aiDesc": "셀프계산대 확대"}, {"name": "백화점 판매원", "cat": "판매·서비스", "emp": 102872, "pay": 2300, "edu": 1, "outlook": -4, "ai": 5.5, "aiDesc": "온라인 전환 영향"}, {"name": "아울렛·면세점 판매원", "cat": "판매·서비스", "emp": 47150, "pay": 2400, "edu": 1, "outlook": -3, "ai": 5.0, "aiDesc": "관광 수요 변동성"}, {"name": "온라인 쇼핑몰 MD", "cat": "판매·서비스", "emp": 81441, "pay": 2900, "edu": 2, "outlook": 5, "ai": 5.0, "aiDesc": "이커머스 성장"}, {"name": "라이브커머스 진행자", "cat": "판매·서비스", "emp": 30004, "pay": 2800, "edu": 1, "outlook": 6, "ai": 3.5, "aiDesc": "라이브커머스 급성장"}, {"name": "소셜커머스 운영자", "cat": "판매·서비스", "emp": 38577, "pay": 2700, "edu": 2, "outlook": 4, "ai": 5.5, "aiDesc": "플랫폼 운영 자동화 진행"}, {"name": "가구·인테리어 판매원", "cat": "판매·서비스", "emp": 55723, "pay": 2400, "edu": 1, "outlook": -2, "ai": 4.0, "aiDesc": "체험형 쇼룸 유지"}, {"name": "서적·문구 판매원", "cat": "판매·서비스", "emp": 21432, "pay": 2000, "edu": 1, "outlook": -7, "ai": 5.0, "aiDesc": "서점 구조적 감소"}, {"name": "꽃·원예 판매원", "cat": "판매·서비스", "emp": 17145, "pay": 2100, "edu": 0, "outlook": -3, "ai": 3.0, "aiDesc": "대면 판매 특성"}, {"name": "중고차·차량용품 판매원", "cat": "판매·서비스", "emp": 42864, "pay": 2800, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "온라인 중고차 플랫폼 성장"}, {"name": "주유소 종사자", "cat": "판매·서비스", "emp": 55723, "pay": 2000, "edu": 0, "outlook": -5, "ai": 4.0, "aiDesc": "셀프주유 확대"}, {"name": "세차장 종사자", "cat": "판매·서비스", "emp": 25718, "pay": 2100, "edu": 0, "outlook": -3, "ai": 4.5, "aiDesc": "자동세차 확대"}, {"name": "한식당 서빙원", "cat": "판매·서비스", "emp": 240036, "pay": 1900, "edu": 0, "outlook": -2, "ai": 3.0, "aiDesc": "서빙로봇 도입되나 대면 유지"}, {"name": "양식당 서빙원", "cat": "판매·서비스", "emp": 72868, "pay": 2000, "edu": 0, "outlook": -2, "ai": 3.0, "aiDesc": "서비스 품질 중시"}, {"name": "일식당 서빙원", "cat": "판매·서비스", "emp": 51436, "pay": 2000, "edu": 0, "outlook": -1, "ai": 3.0, "aiDesc": "오마카세 등 프리미엄 서비스"}, {"name": "중식당 서빙원", "cat": "판매·서비스", "emp": 47150, "pay": 1900, "edu": 0, "outlook": -2, "ai": 3.0, "aiDesc": "대면 서비스 유지"}, {"name": "패스트푸드 점원", "cat": "판매·서비스", "emp": 188599, "pay": 1800, "edu": 0, "outlook": -4, "ai": 4.5, "aiDesc": "키오스크·자동화 확대"}, {"name": "카페 종사자", "cat": "판매·서비스", "emp": 171454, "pay": 1900, "edu": 0, "outlook": -1, "ai": 3.5, "aiDesc": "로봇카페 등장하나 스페셜티 수요"}, {"name": "배달전문점 종사자", "cat": "판매·서비스", "emp": 102872, "pay": 2000, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "배달 수요 유지"}, {"name": "급식·구내식당 조리보조", "cat": "판매·서비스", "emp": 214318, "pay": 2100, "edu": 0, "outlook": 0, "ai": 2.5, "aiDesc": "급식 수요 안정적"}, {"name": "뷔페·연회 서비스원", "cat": "판매·서비스", "emp": 55723, "pay": 2100, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "행사 수요 변동"}, {"name": "주점·바텐더", "cat": "판매·서비스", "emp": 47150, "pay": 2200, "edu": 0, "outlook": 0, "ai": 2.5, "aiDesc": "칵테일바 수요 증가"}, {"name": "호텔 프론트 직원", "cat": "판매·서비스", "emp": 47150, "pay": 2400, "edu": 2, "outlook": 0, "ai": 5.0, "aiDesc": "무인 체크인 확대"}, {"name": "호텔 컨시어지", "cat": "판매·서비스", "emp": 12859, "pay": 2800, "edu": 2, "outlook": 1, "ai": 4.0, "aiDesc": "고급 서비스 수요 유지"}, {"name": "객실 하우스키핑", "cat": "판매·서비스", "emp": 81441, "pay": 2000, "edu": 0, "outlook": 1, "ai": 2.0, "aiDesc": "세밀한 관리 인간 필요"}, {"name": "호텔·리조트 식음료(F&B) 종사자", "cat": "판매·서비스", "emp": 47150, "pay": 2200, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "관광 수요 회복"}, {"name": "여행사 직원", "cat": "판매·서비스", "emp": 30004, "pay": 2600, "edu": 2, "outlook": 0, "ai": 6.0, "aiDesc": "온라인 예약 확대"}, {"name": "관광가이드", "cat": "판매·서비스", "emp": 25718, "pay": 2500, "edu": 2, "outlook": 3, "ai": 4.5, "aiDesc": "체험형 가이드 수요"}, {"name": "의료관광 코디네이터", "cat": "판매·서비스", "emp": 10287, "pay": 3000, "edu": 2, "outlook": 4, "ai": 4.0, "aiDesc": "의료관광 성장"}, {"name": "항공사 지상직원", "cat": "판매·서비스", "emp": 34291, "pay": 2800, "edu": 2, "outlook": 2, "ai": 5.0, "aiDesc": "셀프체크인 확대"}, {"name": "항공권·호텔 예약 사무원", "cat": "판매·서비스", "emp": 21432, "pay": 2500, "edu": 2, "outlook": -4, "ai": 7.5, "aiDesc": "OTA 자동화"}, {"name": "카지노 딜러", "cat": "판매·서비스", "emp": 6858, "pay": 2800, "edu": 1, "outlook": 0, "ai": 3.0, "aiDesc": "대면 게임 운영"}, {"name": "테마파크 안내원", "cat": "판매·서비스", "emp": 25718, "pay": 2200, "edu": 1, "outlook": 1, "ai": 3.0, "aiDesc": "체험·여가 산업 성장"}, {"name": "펜션·민박 운영자", "cat": "판매·서비스", "emp": 38577, "pay": 2300, "edu": 0, "outlook": 0, "ai": 2.5, "aiDesc": "소규모 숙박 수요"}, {"name": "헤어 디자이너", "cat": "판매·서비스", "emp": 137163, "pay": 2500, "edu": 1, "outlook": 2, "ai": 1.5, "aiDesc": "손기술 중심 AI 대체 어려움"}, {"name": "헤어 보조(어시스턴트)", "cat": "판매·서비스", "emp": 42864, "pay": 1900, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "기술 습득 과정"}, {"name": "피부관리사", "cat": "판매·서비스", "emp": 68582, "pay": 2300, "edu": 1, "outlook": 3, "ai": 1.5, "aiDesc": "뷰티 관심 증가"}, {"name": "네일아티스트", "cat": "판매·서비스", "emp": 38577, "pay": 2100, "edu": 1, "outlook": 1, "ai": 1.0, "aiDesc": "세밀한 수작업"}, {"name": "메이크업 아티스트", "cat": "판매·서비스", "emp": 30004, "pay": 2400, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "영상·웨딩 수요"}, {"name": "두피·탈모관리사", "cat": "판매·서비스", "emp": 12859, "pay": 2600, "edu": 1, "outlook": 3, "ai": 1.5, "aiDesc": "탈모 관리 수요 증가"}, {"name": "반영구화장 전문가", "cat": "판매·서비스", "emp": 10287, "pay": 3000, "edu": 1, "outlook": 2, "ai": 1.0, "aiDesc": "시술 기술 대체 어려움"}, {"name": "결혼·예식 서비스원", "cat": "판매·서비스", "emp": 34291, "pay": 2500, "edu": 1, "outlook": -5, "ai": 2.0, "aiDesc": "혼인율 급감"}, {"name": "장례·상조 서비스원", "cat": "판매·서비스", "emp": 47150, "pay": 2400, "edu": 1, "outlook": 2, "ai": 1.5, "aiDesc": "고령화 수요 증가"}, {"name": "세탁·드라이클리닝 종사자", "cat": "판매·서비스", "emp": 51436, "pay": 2000, "edu": 0, "outlook": -1, "ai": 4.0, "aiDesc": "특수세탁 인력 필요"}, {"name": "수선·의복수리 종사자", "cat": "판매·서비스", "emp": 12859, "pay": 2000, "edu": 0, "outlook": -3, "ai": 2.0, "aiDesc": "수작업 대체 어려움"}, {"name": "사진관·증명사진 촬영원", "cat": "판매·서비스", "emp": 10287, "pay": 2200, "edu": 1, "outlook": -4, "ai": 4.5, "aiDesc": "스마트폰·AI 보정 영향"}, {"name": "부동산 중개보조원", "cat": "판매·서비스", "emp": 102872, "pay": 2800, "edu": 2, "outlook": -2, "ai": 5.0, "aiDesc": "프롭테크 발전"}, {"name": "보험 설계사(생명)", "cat": "판매·서비스", "emp": 111445, "pay": 3000, "edu": 2, "outlook": -5, "ai": 7.0, "aiDesc": "디지털 보험 확대"}, {"name": "보험 설계사(손해)", "cat": "판매·서비스", "emp": 85727, "pay": 2900, "edu": 2, "outlook": -4, "ai": 7.0, "aiDesc": "비교플랫폼 확대"}, {"name": "금융상품 영업원", "cat": "판매·서비스", "emp": 102872, "pay": 3400, "edu": 2, "outlook": -3, "ai": 6.5, "aiDesc": "비대면 금융 확대"}, {"name": "대출 모집인", "cat": "판매·서비스", "emp": 68582, "pay": 2700, "edu": 1, "outlook": -4, "ai": 7.5, "aiDesc": "AI 대출심사 확대"}, {"name": "방문판매원", "cat": "판매·서비스", "emp": 85727, "pay": 2000, "edu": 1, "outlook": -6, "ai": 4.0, "aiDesc": "비대면 소비 확산"}, {"name": "텔레마케터", "cat": "판매·서비스", "emp": 102872, "pay": 2100, "edu": 1, "outlook": -8, "ai": 9.5, "aiDesc": "AI 콜봇 대체 가속화"}, {"name": "홈쇼핑 쇼호스트", "cat": "판매·서비스", "emp": 6858, "pay": 3500, "edu": 2, "outlook": 2, "ai": 3.5, "aiDesc": "라이브커머스 수요"}, {"name": "전시·컨벤션 기획자", "cat": "판매·서비스", "emp": 21432, "pay": 3000, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "MICE 산업 성장"}, {"name": "내과 전문의", "cat": "보건·의료", "emp": 21432, "pay": 9000, "edu": 5, "outlook": 4, "ai": 3.5, "aiDesc": "AI 진단 보조, 최종 판단 의사"}, {"name": "가정의학과 전문의", "cat": "보건·의료", "emp": 15431, "pay": 7500, "edu": 5, "outlook": 5, "ai": 3.5, "aiDesc": "1차 의료 수요 증가"}, {"name": "외과 전문의", "cat": "보건·의료", "emp": 10287, "pay": 9500, "edu": 5, "outlook": 3, "ai": 2.5, "aiDesc": "수술 로봇 보조"}, {"name": "정형외과 전문의", "cat": "보건·의료", "emp": 12859, "pay": 9000, "edu": 5, "outlook": 4, "ai": 2.5, "aiDesc": "고령화 근골격계 수요"}, {"name": "신경외과 전문의", "cat": "보건·의료", "emp": 4286, "pay": 10000, "edu": 5, "outlook": 3, "ai": 2.0, "aiDesc": "고난도 수술 인간 필수"}, {"name": "소아청소년과 전문의", "cat": "보건·의료", "emp": 8573, "pay": 7500, "edu": 5, "outlook": -3, "ai": 3.0, "aiDesc": "저출산 영향"}, {"name": "산부인과 전문의", "cat": "보건·의료", "emp": 6858, "pay": 8500, "edu": 5, "outlook": -2, "ai": 2.5, "aiDesc": "저출산 영향 심각"}, {"name": "정신건강의학과 전문의", "cat": "보건·의료", "emp": 8573, "pay": 8000, "edu": 5, "outlook": 8, "ai": 2.0, "aiDesc": "정신건강 수요 폭증"}, {"name": "피부과 전문의", "cat": "보건·의료", "emp": 6858, "pay": 8000, "edu": 5, "outlook": 3, "ai": 2.5, "aiDesc": "미용 시술 수요"}, {"name": "안과 전문의", "cat": "보건·의료", "emp": 6001, "pay": 8500, "edu": 5, "outlook": 3, "ai": 2.5, "aiDesc": "노안·백내장 수요 증가"}, {"name": "이비인후과 전문의", "cat": "보건·의료", "emp": 6001, "pay": 7500, "edu": 5, "outlook": 1, "ai": 3.0, "aiDesc": "알레르기·수면 수요"}, {"name": "비뇨의학과 전문의", "cat": "보건·의료", "emp": 4286, "pay": 8000, "edu": 5, "outlook": 2, "ai": 2.5, "aiDesc": "고령화 수요 증가"}, {"name": "영상의학과 전문의", "cat": "보건·의료", "emp": 4286, "pay": 9000, "edu": 5, "outlook": 2, "ai": 5.5, "aiDesc": "AI 영상판독 도입 확대"}, {"name": "병리과 전문의", "cat": "보건·의료", "emp": 2572, "pay": 8500, "edu": 5, "outlook": 2, "ai": 5.0, "aiDesc": "디지털 병리 AI 확대"}, {"name": "마취통증의학과 전문의", "cat": "보건·의료", "emp": 5144, "pay": 9000, "edu": 5, "outlook": 3, "ai": 2.5, "aiDesc": "수술 증가에 따른 수요"}, {"name": "응급의학과 전문의", "cat": "보건·의료", "emp": 3429, "pay": 8500, "edu": 5, "outlook": 5, "ai": 2.0, "aiDesc": "응급의료 수요 증가"}, {"name": "재활의학과 전문의", "cat": "보건·의료", "emp": 3429, "pay": 7500, "edu": 5, "outlook": 5, "ai": 2.5, "aiDesc": "재활 수요 증가"}, {"name": "일반의·공중보건의", "cat": "보건·의료", "emp": 12859, "pay": 6500, "edu": 5, "outlook": 2, "ai": 3.0, "aiDesc": "1차 의료 수요 안정"}, {"name": "치과의사", "cat": "보건·의료", "emp": 25718, "pay": 7500, "edu": 5, "outlook": 3, "ai": 2.5, "aiDesc": "시술 대체 제한적"}, {"name": "치과교정 전문의", "cat": "보건·의료", "emp": 4286, "pay": 8000, "edu": 5, "outlook": 2, "ai": 2.5, "aiDesc": "심미 교정 수요"}, {"name": "한의사", "cat": "보건·의료", "emp": 18860, "pay": 6000, "edu": 5, "outlook": 1, "ai": 2.0, "aiDesc": "한방 진료 경험 기반"}, {"name": "수의사", "cat": "보건·의료", "emp": 12859, "pay": 5000, "edu": 5, "outlook": 3, "ai": 2.0, "aiDesc": "반려동물 산업 성장"}, {"name": "약사(약국)", "cat": "보건·의료", "emp": 34291, "pay": 6000, "edu": 5, "outlook": 2, "ai": 4.0, "aiDesc": "조제·상담 인간 역할"}, {"name": "약사(병원)", "cat": "보건·의료", "emp": 15431, "pay": 5500, "edu": 5, "outlook": 2, "ai": 4.0, "aiDesc": "약물관리·상호작용 체크"}, {"name": "약사(제약회사)", "cat": "보건·의료", "emp": 10287, "pay": 5800, "edu": 5, "outlook": 1, "ai": 4.5, "aiDesc": "임상·규제 업무"}, {"name": "병원 간호사(일반병동)", "cat": "보건·의료", "emp": 154309, "pay": 3800, "edu": 3, "outlook": 6, "ai": 2.0, "aiDesc": "고령화 수요 급증"}, {"name": "중환자실(ICU) 간호사", "cat": "보건·의료", "emp": 30004, "pay": 4200, "edu": 3, "outlook": 7, "ai": 2.0, "aiDesc": "전문 간호 수요"}, {"name": "수술실 간호사", "cat": "보건·의료", "emp": 25718, "pay": 4100, "edu": 3, "outlook": 5, "ai": 2.0, "aiDesc": "수술 보조 전문성"}, {"name": "응급실 간호사", "cat": "보건·의료", "emp": 21432, "pay": 4000, "edu": 3, "outlook": 6, "ai": 2.0, "aiDesc": "응급의료 수요 증가"}, {"name": "외래·진료보조 간호사", "cat": "보건·의료", "emp": 42864, "pay": 3500, "edu": 3, "outlook": 4, "ai": 2.5, "aiDesc": "외래 진료 보조"}, {"name": "보건소·지역사회 간호사", "cat": "보건·의료", "emp": 34291, "pay": 3600, "edu": 3, "outlook": 5, "ai": 2.0, "aiDesc": "지역 보건 수요 확대"}, {"name": "요양시설 간호사", "cat": "보건·의료", "emp": 47150, "pay": 3400, "edu": 3, "outlook": 10, "ai": 1.5, "aiDesc": "고령 요양 수요 폭증"}, {"name": "산업보건 간호사", "cat": "보건·의료", "emp": 12859, "pay": 3700, "edu": 3, "outlook": 3, "ai": 2.5, "aiDesc": "산업보건 관리 수요"}, {"name": "전문간호사(마취·감염 등)", "cat": "보건·의료", "emp": 17145, "pay": 4300, "edu": 4, "outlook": 7, "ai": 2.0, "aiDesc": "전문 간호 수요 증가"}, {"name": "간호조무사", "cat": "보건·의료", "emp": 171454, "pay": 2500, "edu": 1, "outlook": 5, "ai": 2.5, "aiDesc": "의료기관 보조 인력 수요"}, {"name": "물리치료사", "cat": "보건·의료", "emp": 42864, "pay": 3200, "edu": 3, "outlook": 7, "ai": 2.0, "aiDesc": "재활 수요 증가"}, {"name": "작업치료사", "cat": "보건·의료", "emp": 30004, "pay": 3100, "edu": 3, "outlook": 6, "ai": 2.0, "aiDesc": "고령·장애인 재활"}, {"name": "언어재활사", "cat": "보건·의료", "emp": 12859, "pay": 2800, "edu": 3, "outlook": 5, "ai": 2.0, "aiDesc": "발달장애·노인 수요"}, {"name": "임상병리사", "cat": "보건·의료", "emp": 32576, "pay": 3400, "edu": 3, "outlook": 3, "ai": 5.5, "aiDesc": "검사 자동화, 판독 인력 필요"}, {"name": "방사선사", "cat": "보건·의료", "emp": 24004, "pay": 3600, "edu": 3, "outlook": 3, "ai": 4.5, "aiDesc": "장비 운영·환자 관리"}, {"name": "치과위생사", "cat": "보건·의료", "emp": 51436, "pay": 3000, "edu": 2, "outlook": 4, "ai": 2.0, "aiDesc": "치과 수요 안정적"}, {"name": "치과기공사", "cat": "보건·의료", "emp": 15431, "pay": 2800, "edu": 2, "outlook": 0, "ai": 5.0, "aiDesc": "디지털 치과 기공 확대"}, {"name": "안경사", "cat": "보건·의료", "emp": 21432, "pay": 2800, "edu": 2, "outlook": 0, "ai": 3.0, "aiDesc": "검안·렌즈 피팅"}, {"name": "응급구조사", "cat": "보건·의료", "emp": 17145, "pay": 3400, "edu": 2, "outlook": 5, "ai": 1.5, "aiDesc": "현장 긴급의료"}, {"name": "위생사(구강)", "cat": "보건·의료", "emp": 4286, "pay": 2600, "edu": 2, "outlook": 1, "ai": 3.0, "aiDesc": "구강 보건 수요"}, {"name": "의료코디네이터", "cat": "보건·의료", "emp": 30004, "pay": 2800, "edu": 2, "outlook": 4, "ai": 5.5, "aiDesc": "의료관광·환자상담"}, {"name": "의무기록사", "cat": "보건·의료", "emp": 15431, "pay": 3000, "edu": 3, "outlook": 1, "ai": 7.0, "aiDesc": "EMR 자동화 진행"}, {"name": "원무·의료비 청구원", "cat": "보건·의료", "emp": 38577, "pay": 2700, "edu": 2, "outlook": -1, "ai": 7.5, "aiDesc": "보험청구 자동화"}, {"name": "의료장비 기사", "cat": "보건·의료", "emp": 17145, "pay": 3500, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "의료기기 유지보수"}, {"name": "임상시험 코디네이터(CRC)", "cat": "보건·의료", "emp": 12859, "pay": 3200, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "신약 임상 수요 증가"}, {"name": "요양보호사", "cat": "보건·의료", "emp": 471499, "pay": 2100, "edu": 1, "outlook": 10, "ai": 1.0, "aiDesc": "초고령사회 돌봄 수요 폭증"}, {"name": "간병인", "cat": "보건·의료", "emp": 240036, "pay": 2000, "edu": 0, "outlook": 8, "ai": 1.0, "aiDesc": "대면 돌봄 AI 대체 불가"}, {"name": "정신건강 요양보호사", "cat": "보건·의료", "emp": 25718, "pay": 2200, "edu": 1, "outlook": 7, "ai": 1.0, "aiDesc": "정신건강 돌봄 수요"}, {"name": "재가돌봄 서비스원", "cat": "보건·의료", "emp": 68582, "pay": 2100, "edu": 0, "outlook": 8, "ai": 1.0, "aiDesc": "재가 돌봄 서비스 확대"}, {"name": "초등학교 교사", "cat": "교육", "emp": 162881, "pay": 4200, "edu": 4, "outlook": -3, "ai": 3.0, "aiDesc": "학령인구 감소"}, {"name": "초등특수학급 교사", "cat": "교육", "emp": 12859, "pay": 4300, "edu": 4, "outlook": 2, "ai": 2.0, "aiDesc": "특수교육 수요"}, {"name": "중학교 국어·사회 교사", "cat": "교육", "emp": 30004, "pay": 4400, "edu": 4, "outlook": -2, "ai": 3.5, "aiDesc": "AI 맞춤학습 도구 활용"}, {"name": "중학교 수학·과학 교사", "cat": "교육", "emp": 34291, "pay": 4400, "edu": 4, "outlook": -2, "ai": 3.5, "aiDesc": "AI 보조 교육 확대"}, {"name": "중학교 영어 교사", "cat": "교육", "emp": 21432, "pay": 4400, "edu": 4, "outlook": -3, "ai": 4.0, "aiDesc": "AI 영어학습 앱 성장"}, {"name": "중학교 예체능 교사", "cat": "교육", "emp": 17145, "pay": 4300, "edu": 4, "outlook": -2, "ai": 2.0, "aiDesc": "실기 지도 대면 필수"}, {"name": "고등학교 국어·사회 교사", "cat": "교육", "emp": 38577, "pay": 4600, "edu": 4, "outlook": -2, "ai": 3.5, "aiDesc": "입시지도 인간 역할"}, {"name": "고등학교 수학·과학 교사", "cat": "교육", "emp": 42864, "pay": 4600, "edu": 4, "outlook": -1, "ai": 3.5, "aiDesc": "심화 수업 수요"}, {"name": "고등학교 영어 교사", "cat": "교육", "emp": 25718, "pay": 4600, "edu": 4, "outlook": -2, "ai": 4.0, "aiDesc": "AI 번역·학습 도구 영향"}, {"name": "고등학교 예체능 교사", "cat": "교육", "emp": 21432, "pay": 4500, "edu": 4, "outlook": -2, "ai": 2.0, "aiDesc": "실기 교육 대면 필수"}, {"name": "고등학교 직업·기술 교사", "cat": "교육", "emp": 8573, "pay": 4400, "edu": 4, "outlook": -1, "ai": 3.0, "aiDesc": "직업교육 수요 유지"}, {"name": "대학교수(인문·사회)", "cat": "교육", "emp": 21432, "pay": 6000, "edu": 5, "outlook": -3, "ai": 4.0, "aiDesc": "학령인구 감소"}, {"name": "대학교수(이공·의학)", "cat": "교육", "emp": 25718, "pay": 6500, "edu": 5, "outlook": -1, "ai": 3.5, "aiDesc": "연구·교육 병행"}, {"name": "대학교수(예술·체육)", "cat": "교육", "emp": 10287, "pay": 5500, "edu": 5, "outlook": -2, "ai": 2.5, "aiDesc": "실기 교육 대면"}, {"name": "대학 시간강사·겸임교수", "cat": "교육", "emp": 34291, "pay": 3500, "edu": 5, "outlook": -3, "ai": 4.5, "aiDesc": "비정규직 불안정"}, {"name": "대학 연구교수·박사후연구원", "cat": "교육", "emp": 12859, "pay": 3800, "edu": 5, "outlook": 0, "ai": 3.5, "aiDesc": "연구 인력 수요"}, {"name": "유치원 교사", "cat": "교육", "emp": 94300, "pay": 2600, "edu": 2, "outlook": -5, "ai": 1.5, "aiDesc": "출생률 급감"}, {"name": "어린이집 보육교사", "cat": "교육", "emp": 128591, "pay": 2400, "edu": 2, "outlook": -5, "ai": 1.5, "aiDesc": "저출산 영향 심각"}, {"name": "누리과정 보조교사", "cat": "교육", "emp": 30004, "pay": 2200, "edu": 1, "outlook": -4, "ai": 1.5, "aiDesc": "보조 인력 수요 감소"}, {"name": "영어학원 강사(성인)", "cat": "교육", "emp": 25718, "pay": 3200, "edu": 3, "outlook": -3, "ai": 6.5, "aiDesc": "AI 영어회화 앱 성장"}, {"name": "영어학원 강사(초등)", "cat": "교육", "emp": 34291, "pay": 2800, "edu": 3, "outlook": -4, "ai": 5.5, "aiDesc": "AI 학습 도구 확대"}, {"name": "수학학원 강사", "cat": "교육", "emp": 60009, "pay": 3200, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "입시 수요 유지"}, {"name": "과학학원 강사", "cat": "교육", "emp": 21432, "pay": 3000, "edu": 3, "outlook": -1, "ai": 4.5, "aiDesc": "과학 실험 교육 대면"}, {"name": "국어·논술 학원강사", "cat": "교육", "emp": 25718, "pay": 2800, "edu": 3, "outlook": -2, "ai": 5.0, "aiDesc": "AI 글쓰기 도구 영향"}, {"name": "입시컨설턴트", "cat": "교육", "emp": 17145, "pay": 4000, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "입시 전략 수요 유지"}, {"name": "미술학원 강사", "cat": "교육", "emp": 30004, "pay": 2400, "edu": 2, "outlook": 0, "ai": 2.0, "aiDesc": "실기 교육 대면"}, {"name": "음악학원 강사(피아노 등)", "cat": "교육", "emp": 34291, "pay": 2300, "edu": 2, "outlook": -1, "ai": 2.0, "aiDesc": "실기 지도 대면"}, {"name": "체육학원·태권도 강사", "cat": "교육", "emp": 25718, "pay": 2500, "edu": 2, "outlook": 0, "ai": 1.5, "aiDesc": "체육 교육 대면 필수"}, {"name": "무용학원 강사", "cat": "교육", "emp": 8573, "pay": 2200, "edu": 2, "outlook": -1, "ai": 1.5, "aiDesc": "실기 교육"}, {"name": "코딩·IT 교육강사", "cat": "교육", "emp": 38577, "pay": 3500, "edu": 3, "outlook": 5, "ai": 4.0, "aiDesc": "디지털 교육 수요 확대"}, {"name": "로봇·AI 교육강사", "cat": "교육", "emp": 12859, "pay": 3300, "edu": 3, "outlook": 6, "ai": 3.5, "aiDesc": "AI 리터러시 교육 수요"}, {"name": "특수교육 교사", "cat": "교육", "emp": 34291, "pay": 4200, "edu": 4, "outlook": 3, "ai": 2.0, "aiDesc": "특수교육 수요 증가"}, {"name": "평생교육 강사", "cat": "교육", "emp": 51436, "pay": 2700, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "성인 재교육 수요"}, {"name": "직업훈련 교사", "cat": "교육", "emp": 34291, "pay": 3000, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "재취업·전직 교육"}, {"name": "온라인 강의 크리에이터", "cat": "교육", "emp": 38577, "pay": 3200, "edu": 3, "outlook": 6, "ai": 3.5, "aiDesc": "에듀테크 성장"}, {"name": "기업교육(사내강사) 전문가", "cat": "교육", "emp": 21432, "pay": 3500, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "기업 역량개발 수요"}, {"name": "외국어 교육강사(일·중 등)", "cat": "교육", "emp": 17145, "pay": 2800, "edu": 3, "outlook": -2, "ai": 5.5, "aiDesc": "AI 번역 도구 영향"}, {"name": "방과후교실 강사", "cat": "교육", "emp": 25718, "pay": 2300, "edu": 2, "outlook": -3, "ai": 3.0, "aiDesc": "학령인구 감소"}, {"name": "교육행정·학사 사무원", "cat": "교육", "emp": 30004, "pay": 3000, "edu": 3, "outlook": -1, "ai": 6.0, "aiDesc": "학사행정 시스템 자동화"}, {"name": "백엔드 개발자(Java/Spring)", "cat": "정보통신(IT)", "emp": 55723, "pay": 5200, "edu": 3, "outlook": 7, "ai": 4.0, "aiDesc": "AI 코딩 보조, 아키텍처 인간 주도"}, {"name": "백엔드 개발자(Python/Node)", "cat": "정보통신(IT)", "emp": 47150, "pay": 5100, "edu": 3, "outlook": 8, "ai": 4.0, "aiDesc": "서버 개발 수요 지속"}, {"name": "프론트엔드 개발자(React)", "cat": "정보통신(IT)", "emp": 42864, "pay": 4800, "edu": 3, "outlook": 6, "ai": 4.5, "aiDesc": "UI 자동생성 도구 등장"}, {"name": "프론트엔드 개발자(Vue/기타)", "cat": "정보통신(IT)", "emp": 30004, "pay": 4500, "edu": 3, "outlook": 5, "ai": 4.5, "aiDesc": "프론트엔드 수요 유지"}, {"name": "풀스택 개발자", "cat": "정보통신(IT)", "emp": 38577, "pay": 5300, "edu": 3, "outlook": 7, "ai": 4.0, "aiDesc": "다재다능 인력 수요"}, {"name": "모바일앱 개발자(iOS)", "cat": "정보통신(IT)", "emp": 25718, "pay": 5200, "edu": 3, "outlook": 5, "ai": 4.0, "aiDesc": "네이티브 전문성 필요"}, {"name": "모바일앱 개발자(Android)", "cat": "정보통신(IT)", "emp": 30004, "pay": 5000, "edu": 3, "outlook": 5, "ai": 4.0, "aiDesc": "모바일 앱 수요 유지"}, {"name": "크로스플랫폼 앱 개발자(Flutter)", "cat": "정보통신(IT)", "emp": 17145, "pay": 4800, "edu": 3, "outlook": 6, "ai": 4.0, "aiDesc": "크로스플랫폼 확대"}, {"name": "임베디드 SW 개발자", "cat": "정보통신(IT)", "emp": 42864, "pay": 4800, "edu": 3, "outlook": 5, "ai": 3.0, "aiDesc": "IoT·자동차 수요"}, {"name": "시스템 SW 개발자", "cat": "정보통신(IT)", "emp": 21432, "pay": 5000, "edu": 3, "outlook": 4, "ai": 3.5, "aiDesc": "OS·펌웨어 전문"}, {"name": "게임 클라이언트 프로그래머", "cat": "정보통신(IT)", "emp": 17145, "pay": 4800, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "게임 산업 수요"}, {"name": "게임 서버 프로그래머", "cat": "정보통신(IT)", "emp": 10287, "pay": 5200, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "온라인 게임 인프라"}, {"name": "게임 기획자", "cat": "정보통신(IT)", "emp": 17145, "pay": 4200, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "핵심 재미 설계 인간"}, {"name": "게임 아티스트(2D/3D)", "cat": "정보통신(IT)", "emp": 15431, "pay": 3800, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "AI 생성 아트 활용 확대"}, {"name": "데이터 엔지니어", "cat": "정보통신(IT)", "emp": 34291, "pay": 5500, "edu": 3, "outlook": 10, "ai": 3.5, "aiDesc": "파이프라인 구축 수요 급증"}, {"name": "데이터 분석가", "cat": "정보통신(IT)", "emp": 38577, "pay": 5000, "edu": 3, "outlook": 8, "ai": 4.0, "aiDesc": "인사이트 도출 인간 역할"}, {"name": "데이터 과학자", "cat": "정보통신(IT)", "emp": 25718, "pay": 6000, "edu": 4, "outlook": 10, "ai": 3.0, "aiDesc": "ML 모델 설계 수요"}, {"name": "비즈니스 인텔리전스(BI) 분석가", "cat": "정보통신(IT)", "emp": 21432, "pay": 4500, "edu": 3, "outlook": 5, "ai": 5.0, "aiDesc": "BI 도구 활용 확대"}, {"name": "데이터베이스 관리자(DBA)", "cat": "정보통신(IT)", "emp": 25718, "pay": 4500, "edu": 3, "outlook": 1, "ai": 5.5, "aiDesc": "클라우드 매니지드 DB"}, {"name": "AI·머신러닝 엔지니어", "cat": "정보통신(IT)", "emp": 25718, "pay": 7000, "edu": 4, "outlook": 15, "ai": 2.0, "aiDesc": "AI 기술 개발 수요 폭발"}, {"name": "자연어처리(NLP) 전문가", "cat": "정보통신(IT)", "emp": 8573, "pay": 7200, "edu": 4, "outlook": 12, "ai": 2.0, "aiDesc": "LLM 관련 수요 급증"}, {"name": "컴퓨터비전 전문가", "cat": "정보통신(IT)", "emp": 8573, "pay": 6800, "edu": 4, "outlook": 10, "ai": 2.0, "aiDesc": "영상 AI 수요 증가"}, {"name": "MLOps 엔지니어", "cat": "정보통신(IT)", "emp": 10287, "pay": 6500, "edu": 3, "outlook": 12, "ai": 2.5, "aiDesc": "ML 운영 자동화 수요"}, {"name": "AI 윤리·정책 전문가", "cat": "정보통신(IT)", "emp": 2572, "pay": 5500, "edu": 4, "outlook": 8, "ai": 2.5, "aiDesc": "AI 규제·윤리 수요"}, {"name": "클라우드 아키텍트", "cat": "정보통신(IT)", "emp": 12859, "pay": 7000, "edu": 3, "outlook": 12, "ai": 3.0, "aiDesc": "클라우드 전환 수요"}, {"name": "클라우드 엔지니어(AWS/GCP)", "cat": "정보통신(IT)", "emp": 30004, "pay": 5800, "edu": 3, "outlook": 10, "ai": 3.0, "aiDesc": "디지털 전환 가속"}, {"name": "DevOps 엔지니어", "cat": "정보통신(IT)", "emp": 17145, "pay": 5800, "edu": 3, "outlook": 10, "ai": 3.5, "aiDesc": "CI/CD 자동화 수요"}, {"name": "SRE(Site Reliability) 엔지니어", "cat": "정보통신(IT)", "emp": 8573, "pay": 6200, "edu": 3, "outlook": 8, "ai": 3.5, "aiDesc": "서비스 안정성 수요"}, {"name": "쿠버네티스·컨테이너 전문가", "cat": "정보통신(IT)", "emp": 6858, "pay": 6000, "edu": 3, "outlook": 10, "ai": 3.0, "aiDesc": "컨테이너 오케스트레이션 수요"}, {"name": "정보보안 컨설턴트", "cat": "정보통신(IT)", "emp": 17145, "pay": 5500, "edu": 3, "outlook": 8, "ai": 3.0, "aiDesc": "보안 자문 수요 증가"}, {"name": "침해사고 대응(CERT) 전문가", "cat": "정보통신(IT)", "emp": 10287, "pay": 5200, "edu": 3, "outlook": 9, "ai": 3.0, "aiDesc": "사이버 위협 증가"}, {"name": "보안관제(SOC) 운영자", "cat": "정보통신(IT)", "emp": 21432, "pay": 4000, "edu": 3, "outlook": 5, "ai": 4.5, "aiDesc": "보안 모니터링 자동화"}, {"name": "모의해킹(PT) 전문가", "cat": "정보통신(IT)", "emp": 6858, "pay": 5500, "edu": 3, "outlook": 7, "ai": 3.0, "aiDesc": "취약점 진단 수요"}, {"name": "개인정보보호 전문가", "cat": "정보통신(IT)", "emp": 8573, "pay": 4800, "edu": 3, "outlook": 6, "ai": 4.0, "aiDesc": "데이터 규제 강화"}, {"name": "네트워크 엔지니어", "cat": "정보통신(IT)", "emp": 47150, "pay": 3800, "edu": 3, "outlook": 1, "ai": 5.5, "aiDesc": "클라우드 전환 영향"}, {"name": "시스템 엔지니어", "cat": "정보통신(IT)", "emp": 55723, "pay": 4000, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "자동화 도구 도입"}, {"name": "IT 인프라 운영자", "cat": "정보통신(IT)", "emp": 42864, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "클라우드 전환 영향"}, {"name": "IT 헬프데스크·기술지원", "cat": "정보통신(IT)", "emp": 34291, "pay": 3000, "edu": 2, "outlook": -1, "ai": 6.0, "aiDesc": "AI 챗봇 기술지원 확대"}, {"name": "UX 디자이너", "cat": "정보통신(IT)", "emp": 38577, "pay": 4200, "edu": 3, "outlook": 5, "ai": 4.5, "aiDesc": "사용자 리서치 인간 역할"}, {"name": "UI 디자이너", "cat": "정보통신(IT)", "emp": 42864, "pay": 3500, "edu": 3, "outlook": 3, "ai": 6.0, "aiDesc": "AI 디자인 도구 확대"}, {"name": "UX 리서처", "cat": "정보통신(IT)", "emp": 10287, "pay": 4500, "edu": 3, "outlook": 6, "ai": 3.5, "aiDesc": "사용자 연구 수요 증가"}, {"name": "인터랙션 디자이너", "cat": "정보통신(IT)", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "인터페이스 설계"}, {"name": "IT 프로젝트 매니저(PM)", "cat": "정보통신(IT)", "emp": 34291, "pay": 5200, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "이해관계자 조율 인간 주도"}, {"name": "프로덕트 오너(PO)/매니저", "cat": "정보통신(IT)", "emp": 21432, "pay": 5500, "edu": 3, "outlook": 6, "ai": 4.0, "aiDesc": "제품 전략 수립"}, {"name": "IT 컨설턴트", "cat": "정보통신(IT)", "emp": 25718, "pay": 5800, "edu": 4, "outlook": 5, "ai": 4.5, "aiDesc": "디지털 전환 자문"}, {"name": "기술 아키텍트", "cat": "정보통신(IT)", "emp": 12859, "pay": 6500, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "시스템 설계 전문"}, {"name": "QA·테스트 엔지니어", "cat": "정보통신(IT)", "emp": 30004, "pay": 4000, "edu": 3, "outlook": 3, "ai": 5.0, "aiDesc": "자동화 테스트 확대"}, {"name": "테크니컬 라이터", "cat": "정보통신(IT)", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 2, "ai": 5.5, "aiDesc": "기술 문서 AI 보조 작성"}, {"name": "블록체인 개발자", "cat": "정보통신(IT)", "emp": 8573, "pay": 5500, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "Web3·디지털자산"}, {"name": "SAP·ERP 컨설턴트", "cat": "정보통신(IT)", "emp": 12859, "pay": 5200, "edu": 3, "outlook": 2, "ai": 4.5, "aiDesc": "기업 시스템 구축·운영"}, {"name": "기계설계 기술자", "cat": "공학·기술", "emp": 85727, "pay": 4200, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "CAD/CAE AI 활용 증가"}, {"name": "기계가공 기술자", "cat": "공학·기술", "emp": 42864, "pay": 3800, "edu": 2, "outlook": 0, "ai": 4.0, "aiDesc": "CNC 프로그래밍 전문"}, {"name": "자동화설비 기술자", "cat": "공학·기술", "emp": 47150, "pay": 4500, "edu": 3, "outlook": 8, "ai": 3.0, "aiDesc": "스마트팩토리 수요"}, {"name": "로봇 기술자", "cat": "공학·기술", "emp": 25718, "pay": 5000, "edu": 3, "outlook": 8, "ai": 3.0, "aiDesc": "로봇 설계·제어"}, {"name": "금형설계 기술자", "cat": "공학·기술", "emp": 30004, "pay": 3800, "edu": 2, "outlook": -1, "ai": 4.0, "aiDesc": "3D프린팅 확대"}, {"name": "정밀계측 기술자", "cat": "공학·기술", "emp": 17145, "pay": 3600, "edu": 2, "outlook": 0, "ai": 4.5, "aiDesc": "자동 검사 장비 도입"}, {"name": "유공압설비 기술자", "cat": "공학·기술", "emp": 12859, "pay": 3500, "edu": 2, "outlook": 0, "ai": 3.5, "aiDesc": "유압·공압 시스템 유지보수"}, {"name": "CAE 해석 전문가", "cat": "공학·기술", "emp": 12859, "pay": 4800, "edu": 4, "outlook": 3, "ai": 4.0, "aiDesc": "시뮬레이션 AI 활용"}, {"name": "반도체 공정(FAB) 기술자", "cat": "공학·기술", "emp": 55723, "pay": 5500, "edu": 3, "outlook": 7, "ai": 3.0, "aiDesc": "반도체 투자 확대"}, {"name": "반도체 설계(IC) 기술자", "cat": "공학·기술", "emp": 25718, "pay": 6500, "edu": 4, "outlook": 8, "ai": 3.0, "aiDesc": "시스템반도체 인력 부족"}, {"name": "반도체 패키징 기술자", "cat": "공학·기술", "emp": 17145, "pay": 5000, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "후공정 기술 수요"}, {"name": "반도체 장비 기술자", "cat": "공학·기술", "emp": 21432, "pay": 4800, "edu": 3, "outlook": 5, "ai": 3.0, "aiDesc": "장비 유지보수 수요"}, {"name": "반도체 테스트 기술자", "cat": "공학·기술", "emp": 12859, "pay": 4500, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "테스트 자동화 진행"}, {"name": "디스플레이 공정 기술자", "cat": "공학·기술", "emp": 21432, "pay": 5000, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "OLED·마이크로LED"}, {"name": "디스플레이 설계 기술자", "cat": "공학·기술", "emp": 10287, "pay": 5200, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "차세대 디스플레이 R&D"}, {"name": "전기설계 기술자", "cat": "공학·기술", "emp": 68582, "pay": 4300, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "전기차·신재생 수요"}, {"name": "전력시스템 기술자", "cat": "공학·기술", "emp": 38577, "pay": 4500, "edu": 3, "outlook": 4, "ai": 3.5, "aiDesc": "전력 인프라 수요"}, {"name": "신재생에너지 기술자", "cat": "공학·기술", "emp": 25718, "pay": 4800, "edu": 3, "outlook": 8, "ai": 3.0, "aiDesc": "태양광·풍력 확대"}, {"name": "전기안전 관리자", "cat": "공학·기술", "emp": 21432, "pay": 3800, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "전기 안전 규제 강화"}, {"name": "전자회로 설계 기술자", "cat": "공학·기술", "emp": 38577, "pay": 4600, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "IoT·가전 수요"}, {"name": "RF·무선통신 기술자", "cat": "공학·기술", "emp": 17145, "pay": 4800, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "5G/6G 수요"}, {"name": "광통신·네트워크장비 기술자", "cat": "공학·기술", "emp": 12859, "pay": 4500, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "통신 인프라 수요"}, {"name": "PCB 설계 기술자", "cat": "공학·기술", "emp": 12859, "pay": 4000, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "PCB 설계 자동화"}, {"name": "EMC·인증시험 기술자", "cat": "공학·기술", "emp": 8573, "pay": 4000, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "전자파 적합성 시험"}, {"name": "배터리셀 개발 기술자", "cat": "공학·기술", "emp": 21432, "pay": 5500, "edu": 3, "outlook": 10, "ai": 3.0, "aiDesc": "2차전지 산업 급성장"}, {"name": "배터리 시스템(BMS) 기술자", "cat": "공학·기술", "emp": 12859, "pay": 5200, "edu": 3, "outlook": 8, "ai": 3.0, "aiDesc": "전기차 BMS 수요"}, {"name": "수소·연료전지 기술자", "cat": "공학·기술", "emp": 6858, "pay": 5000, "edu": 3, "outlook": 7, "ai": 3.0, "aiDesc": "수소경제 투자 확대"}, {"name": "ESS(에너지저장) 기술자", "cat": "공학·기술", "emp": 6858, "pay": 4800, "edu": 3, "outlook": 6, "ai": 3.0, "aiDesc": "에너지저장 시장 성장"}, {"name": "화학공정 기술자", "cat": "공학·기술", "emp": 42864, "pay": 4800, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "소재·석유화학 안정적"}, {"name": "소재·고분자 기술자", "cat": "공학·기술", "emp": 21432, "pay": 4500, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "신소재 개발 수요"}, {"name": "바이오공정 기술자", "cat": "공학·기술", "emp": 17145, "pay": 4500, "edu": 3, "outlook": 6, "ai": 3.0, "aiDesc": "바이오시밀러 산업 성장"}, {"name": "제약(GMP) 기술자", "cat": "공학·기술", "emp": 21432, "pay": 4200, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "의약품 품질관리"}, {"name": "식품공학 기술자", "cat": "공학·기술", "emp": 12859, "pay": 3800, "edu": 3, "outlook": 1, "ai": 3.5, "aiDesc": "식품 안전 수요"}, {"name": "화장품 연구개발 기술자", "cat": "공학·기술", "emp": 10287, "pay": 4000, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "K-뷰티 R&D 수요"}, {"name": "대기환경 기술자", "cat": "공학·기술", "emp": 17145, "pay": 3800, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "환경규제 강화"}, {"name": "수질환경 기술자", "cat": "공학·기술", "emp": 17145, "pay": 3700, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "수처리 수요 유지"}, {"name": "폐기물·자원순환 기술자", "cat": "공학·기술", "emp": 12859, "pay": 3600, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "순환경제 정책"}, {"name": "소음·진동 기술자", "cat": "공학·기술", "emp": 6858, "pay": 3800, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "환경 규제 강화"}, {"name": "환경영향평가 전문가", "cat": "공학·기술", "emp": 8573, "pay": 4000, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "환경평가 의무화 확대"}, {"name": "건축설계(BIM) 기술자", "cat": "공학·기술", "emp": 51436, "pay": 4000, "edu": 3, "outlook": -3, "ai": 4.5, "aiDesc": "건설경기 침체 BIM 도입"}, {"name": "건축구조 기술자", "cat": "공학·기술", "emp": 30004, "pay": 4200, "edu": 3, "outlook": -2, "ai": 4.0, "aiDesc": "구조해석 AI 활용"}, {"name": "건축설비(기계) 기술자", "cat": "공학·기술", "emp": 25718, "pay": 3800, "edu": 3, "outlook": -1, "ai": 3.5, "aiDesc": "친환경 설비 일부 증가"}, {"name": "건축설비(전기) 기술자", "cat": "공학·기술", "emp": 21432, "pay": 3800, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "전기설비 수요 유지"}, {"name": "건축감리 기술자", "cat": "공학·기술", "emp": 17145, "pay": 4000, "edu": 3, "outlook": 0, "ai": 4.0, "aiDesc": "품질·안전 관리"}, {"name": "토목설계 기술자", "cat": "공학·기술", "emp": 47150, "pay": 3800, "edu": 3, "outlook": -2, "ai": 3.5, "aiDesc": "SOC 투자 축소"}, {"name": "토목구조 기술자", "cat": "공학·기술", "emp": 17145, "pay": 4000, "edu": 3, "outlook": -1, "ai": 3.5, "aiDesc": "인프라 유지보수"}, {"name": "지반·기초 기술자", "cat": "공학·기술", "emp": 12859, "pay": 3800, "edu": 3, "outlook": -1, "ai": 3.5, "aiDesc": "지반 조사·설계"}, {"name": "도시·교통계획 기술자", "cat": "공학·기술", "emp": 17145, "pay": 4000, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "스마트시티 수요"}, {"name": "전기차 파워트레인 기술자", "cat": "공학·기술", "emp": 25718, "pay": 5500, "edu": 3, "outlook": 10, "ai": 3.0, "aiDesc": "전기차 전환 수요"}, {"name": "자율주행 SW 기술자", "cat": "공학·기술", "emp": 12859, "pay": 6500, "edu": 4, "outlook": 12, "ai": 2.5, "aiDesc": "자율주행 기술 개발"}, {"name": "자동차 섀시·차체 기술자", "cat": "공학·기술", "emp": 25718, "pay": 4500, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "내연기관→전기차 전환"}, {"name": "자동차 전장(전자) 기술자", "cat": "공학·기술", "emp": 17145, "pay": 5000, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "차량 전자화 가속"}, {"name": "조선 설계 기술자", "cat": "공학·기술", "emp": 12859, "pay": 4500, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "친환경 선박 수요"}, {"name": "해양플랜트 기술자", "cat": "공학·기술", "emp": 8573, "pay": 5000, "edu": 3, "outlook": 1, "ai": 3.0, "aiDesc": "해양 에너지 수요"}, {"name": "항공기 설계·정비 기술자", "cat": "공학·기술", "emp": 10287, "pay": 5000, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "UAM·항공 수요"}, {"name": "우주·위성 기술자", "cat": "공학·기술", "emp": 4286, "pay": 5500, "edu": 4, "outlook": 6, "ai": 2.5, "aiDesc": "우주산업 성장"}, {"name": "산업안전 관리자", "cat": "공학·기술", "emp": 38577, "pay": 3600, "edu": 2, "outlook": 3, "ai": 3.0, "aiDesc": "중대재해법 강화"}, {"name": "소방안전 기술자", "cat": "공학·기술", "emp": 12859, "pay": 3500, "edu": 2, "outlook": 3, "ai": 3.0, "aiDesc": "소방규제 강화"}, {"name": "품질관리(QC) 기술자", "cat": "공학·기술", "emp": 55723, "pay": 3500, "edu": 2, "outlook": 0, "ai": 6.0, "aiDesc": "자동화 검사 시스템"}, {"name": "비파괴검사(NDT) 기술자", "cat": "공학·기술", "emp": 12859, "pay": 3800, "edu": 2, "outlook": 1, "ai": 4.0, "aiDesc": "검사 자동화 진행"}, {"name": "계측·시험 기술자", "cat": "공학·기술", "emp": 17145, "pay": 3600, "edu": 2, "outlook": 0, "ai": 4.5, "aiDesc": "자동 계측 장비"}, {"name": "산업공학(IE) 기술자", "cat": "공학·기술", "emp": 47150, "pay": 4300, "edu": 3, "outlook": 3, "ai": 5.0, "aiDesc": "공정 최적화 AI 활용"}, {"name": "CNC 선반 조작원", "cat": "제조·생산", "emp": 68582, "pay": 3200, "edu": 1, "outlook": -3, "ai": 7.0, "aiDesc": "자동화 가공 확대"}, {"name": "CNC 밀링 조작원", "cat": "제조·생산", "emp": 55723, "pay": 3200, "edu": 1, "outlook": -3, "ai": 7.0, "aiDesc": "복합가공기 도입"}, {"name": "범용 공작기계 조작원", "cat": "제조·생산", "emp": 30004, "pay": 2800, "edu": 1, "outlook": -5, "ai": 6.5, "aiDesc": "범용기계 수요 감소"}, {"name": "산업용 로봇 조작원", "cat": "제조·생산", "emp": 34291, "pay": 3500, "edu": 2, "outlook": 5, "ai": 4.0, "aiDesc": "스마트팩토리 확대"}, {"name": "사출성형기 조작원", "cat": "제조·생산", "emp": 81441, "pay": 2800, "edu": 1, "outlook": -3, "ai": 6.5, "aiDesc": "자동화 사출 확대"}, {"name": "프레스기 조작원", "cat": "제조·생산", "emp": 72868, "pay": 2700, "edu": 1, "outlook": -4, "ai": 7.0, "aiDesc": "자동 프레스 라인"}, {"name": "절단기·레이저가공 조작원", "cat": "제조·생산", "emp": 42864, "pay": 2900, "edu": 1, "outlook": -2, "ai": 6.5, "aiDesc": "레이저 가공 자동화"}, {"name": "포장·충전기 조작원", "cat": "제조·생산", "emp": 111445, "pay": 2500, "edu": 0, "outlook": -3, "ai": 7.5, "aiDesc": "포장 자동화 보편화"}, {"name": "컨베이어·운반설비 조작원", "cat": "제조·생산", "emp": 85727, "pay": 2600, "edu": 0, "outlook": -5, "ai": 8.0, "aiDesc": "AGV·자동운반 확대"}, {"name": "보일러 조작원", "cat": "제조·생산", "emp": 21432, "pay": 3400, "edu": 1, "outlook": -1, "ai": 5.0, "aiDesc": "자동 모니터링 도입"}, {"name": "발전설비 조작원", "cat": "제조·생산", "emp": 17145, "pay": 3800, "edu": 1, "outlook": 0, "ai": 4.5, "aiDesc": "발전소 운영 자동화"}, {"name": "금속 선삭·절삭 가공원", "cat": "제조·생산", "emp": 68582, "pay": 3100, "edu": 1, "outlook": -3, "ai": 5.5, "aiDesc": "CNC 자동화 확대"}, {"name": "금속 연삭·연마 가공원", "cat": "제조·생산", "emp": 34291, "pay": 2900, "edu": 1, "outlook": -3, "ai": 5.5, "aiDesc": "자동 연마 도입"}, {"name": "금속 용접 기능원", "cat": "제조·생산", "emp": 72868, "pay": 3300, "edu": 1, "outlook": -2, "ai": 5.0, "aiDesc": "용접 로봇 도입"}, {"name": "특수용접(TIG/MIG) 기능원", "cat": "제조·생산", "emp": 30004, "pay": 3600, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "숙련 특수용접 수요"}, {"name": "판금·제관 기능원", "cat": "제조·생산", "emp": 38577, "pay": 3100, "edu": 1, "outlook": -2, "ai": 4.5, "aiDesc": "자동 절곡기 도입"}, {"name": "주조 기능원", "cat": "제조·생산", "emp": 21432, "pay": 3000, "edu": 1, "outlook": -4, "ai": 5.0, "aiDesc": "자동화 주조 설비"}, {"name": "단조 기능원", "cat": "제조·생산", "emp": 17145, "pay": 3100, "edu": 1, "outlook": -3, "ai": 5.0, "aiDesc": "자동 단조 프레스"}, {"name": "열처리 기능원", "cat": "제조·생산", "emp": 30004, "pay": 2900, "edu": 1, "outlook": -2, "ai": 5.0, "aiDesc": "자동 열처리로 도입"}, {"name": "도금·표면처리 기능원", "cat": "제조·생산", "emp": 25718, "pay": 2800, "edu": 1, "outlook": -2, "ai": 5.0, "aiDesc": "공정 자동제어"}, {"name": "반도체 FAB 공정 조작원", "cat": "제조·생산", "emp": 68582, "pay": 3300, "edu": 1, "outlook": 2, "ai": 6.5, "aiDesc": "클린룸 자동화, 공정관리 인력 필요"}, {"name": "디스플레이 패널 조립원", "cat": "제조·생산", "emp": 34291, "pay": 3100, "edu": 1, "outlook": 0, "ai": 6.5, "aiDesc": "LCD→OLED 전환"}, {"name": "PCB 회로기판 조립원", "cat": "제조·생산", "emp": 55723, "pay": 2700, "edu": 1, "outlook": -3, "ai": 7.0, "aiDesc": "SMT 자동화 확대"}, {"name": "전자부품 삽입·검사원", "cat": "제조·생산", "emp": 47150, "pay": 2600, "edu": 1, "outlook": -3, "ai": 7.0, "aiDesc": "자동 삽입기 확대"}, {"name": "가전·IT기기 조립원", "cat": "제조·생산", "emp": 60009, "pay": 2800, "edu": 1, "outlook": -2, "ai": 6.5, "aiDesc": "조립 로봇 가속"}, {"name": "배터리셀 제조 조작원", "cat": "제조·생산", "emp": 30004, "pay": 3200, "edu": 1, "outlook": 5, "ai": 5.5, "aiDesc": "2차전지 생산 확대"}, {"name": "전선·케이블 제조원", "cat": "제조·생산", "emp": 21432, "pay": 2800, "edu": 1, "outlook": -2, "ai": 6.0, "aiDesc": "자동화 생산 라인"}, {"name": "섬유·방직 기능원", "cat": "제조·생산", "emp": 34291, "pay": 2200, "edu": 0, "outlook": -7, "ai": 5.0, "aiDesc": "해외이전·자동직기"}, {"name": "봉제·의복 제조원", "cat": "제조·생산", "emp": 68582, "pay": 2100, "edu": 0, "outlook": -7, "ai": 4.5, "aiDesc": "해외생산 이전"}, {"name": "염색·표백 기능원", "cat": "제조·생산", "emp": 12859, "pay": 2300, "edu": 0, "outlook": -5, "ai": 5.0, "aiDesc": "자동 염색기 도입"}, {"name": "인쇄기 조작원(옵셋)", "cat": "제조·생산", "emp": 21432, "pay": 2600, "edu": 0, "outlook": -6, "ai": 5.5, "aiDesc": "디지털화 인쇄 감소"}, {"name": "디지털 인쇄 조작원", "cat": "제조·생산", "emp": 12859, "pay": 2800, "edu": 1, "outlook": -2, "ai": 5.0, "aiDesc": "소량 맞춤 인쇄 수요"}, {"name": "제본·후가공 기능원", "cat": "제조·생산", "emp": 12859, "pay": 2300, "edu": 0, "outlook": -5, "ai": 5.5, "aiDesc": "자동 제본기 도입"}, {"name": "식품 가공원(육류)", "cat": "제조·생산", "emp": 47150, "pay": 2400, "edu": 0, "outlook": -1, "ai": 5.5, "aiDesc": "식품 특성 완전 자동화 어려움"}, {"name": "식품 가공원(수산)", "cat": "제조·생산", "emp": 30004, "pay": 2300, "edu": 0, "outlook": -1, "ai": 5.5, "aiDesc": "수산물 가공 자동화 한계"}, {"name": "식품 가공원(유제품·음료)", "cat": "제조·생산", "emp": 34291, "pay": 2400, "edu": 0, "outlook": 0, "ai": 5.5, "aiDesc": "음료 자동화 라인"}, {"name": "제과·제빵 공장 제조원", "cat": "제조·생산", "emp": 30004, "pay": 2200, "edu": 0, "outlook": 0, "ai": 5.0, "aiDesc": "대량 생산 자동화"}, {"name": "화학·의약 제조원", "cat": "제조·생산", "emp": 60009, "pay": 3300, "edu": 1, "outlook": 1, "ai": 5.0, "aiDesc": "GMP 관리 인력 필요"}, {"name": "석유화학 플랜트 조작원", "cat": "제조·생산", "emp": 34291, "pay": 3800, "edu": 1, "outlook": 0, "ai": 4.5, "aiDesc": "DCS 자동제어 확대"}, {"name": "고무·플라스틱 제조원", "cat": "제조·생산", "emp": 77154, "pay": 2700, "edu": 0, "outlook": -3, "ai": 6.0, "aiDesc": "사출 자동화 확대"}, {"name": "유리·세라믹 제조원", "cat": "제조·생산", "emp": 17145, "pay": 2600, "edu": 0, "outlook": -3, "ai": 5.0, "aiDesc": "자동화 가마 운영"}, {"name": "목재가공·가구 제조원", "cat": "제조·생산", "emp": 25718, "pay": 2500, "edu": 0, "outlook": -4, "ai": 4.5, "aiDesc": "CNC 목공 기계"}, {"name": "제지·펄프 제조원", "cat": "제조·생산", "emp": 15431, "pay": 2800, "edu": 0, "outlook": -4, "ai": 5.0, "aiDesc": "종이 수요 감소"}, {"name": "시멘트·콘크리트 제조원", "cat": "제조·생산", "emp": 17145, "pay": 2800, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "건설자재 수요 연동"}, {"name": "의료기기 조립·검사원", "cat": "제조·생산", "emp": 12859, "pay": 3000, "edu": 1, "outlook": 3, "ai": 5.0, "aiDesc": "의료기기 수요 증가"}, {"name": "자동차 부품 조립원", "cat": "제조·생산", "emp": 51436, "pay": 3000, "edu": 1, "outlook": -2, "ai": 6.5, "aiDesc": "자동화 라인 확대"}, {"name": "항공기 부품 제조원", "cat": "제조·생산", "emp": 6858, "pay": 3500, "edu": 2, "outlook": 3, "ai": 4.5, "aiDesc": "항공 정밀 부품 수요"}, {"name": "철근공", "cat": "건설", "emp": 51436, "pay": 3600, "edu": 0, "outlook": -5, "ai": 2.5, "aiDesc": "건설경기 침체"}, {"name": "형틀목공(거푸집)", "cat": "건설", "emp": 42864, "pay": 3500, "edu": 0, "outlook": -5, "ai": 2.5, "aiDesc": "건설 물량 감소"}, {"name": "콘크리트 타설공", "cat": "건설", "emp": 34291, "pay": 3200, "edu": 0, "outlook": -4, "ai": 3.0, "aiDesc": "레미콘 자동타설 일부"}, {"name": "조적공(벽돌쌓기)", "cat": "건설", "emp": 17145, "pay": 3200, "edu": 0, "outlook": -6, "ai": 2.5, "aiDesc": "건식공법 확대"}, {"name": "미장공", "cat": "건설", "emp": 21432, "pay": 3300, "edu": 0, "outlook": -5, "ai": 2.5, "aiDesc": "건설경기 침체"}, {"name": "방수공", "cat": "건설", "emp": 24004, "pay": 3200, "edu": 0, "outlook": -4, "ai": 2.5, "aiDesc": "리모델링 수요 일부"}, {"name": "도장공(건설)", "cat": "건설", "emp": 25718, "pay": 2900, "edu": 0, "outlook": -5, "ai": 3.0, "aiDesc": "건설 물량 감소"}, {"name": "타일공", "cat": "건설", "emp": 21432, "pay": 3400, "edu": 0, "outlook": -4, "ai": 2.0, "aiDesc": "시공 기술 대체 어려움"}, {"name": "석공", "cat": "건설", "emp": 8573, "pay": 3500, "edu": 0, "outlook": -5, "ai": 2.0, "aiDesc": "석재 수요 감소"}, {"name": "유리·창호 시공원", "cat": "건설", "emp": 17145, "pay": 3100, "edu": 0, "outlook": -3, "ai": 2.5, "aiDesc": "건설 물량 연동"}, {"name": "단열·보온 시공원", "cat": "건설", "emp": 12859, "pay": 3000, "edu": 0, "outlook": -3, "ai": 2.5, "aiDesc": "에너지 효율 규제"}, {"name": "지붕(옥상) 시공원", "cat": "건설", "emp": 10287, "pay": 3200, "edu": 0, "outlook": -4, "ai": 2.5, "aiDesc": "건설 물량 감소"}, {"name": "강구조물 설치원", "cat": "건설", "emp": 17145, "pay": 3500, "edu": 1, "outlook": -3, "ai": 3.0, "aiDesc": "철골 공사 자동화 일부"}, {"name": "비계(스캐폴딩) 설치원", "cat": "건설", "emp": 21432, "pay": 3200, "edu": 0, "outlook": -4, "ai": 2.5, "aiDesc": "안전 규제 강화"}, {"name": "토공·굴착작업원", "cat": "건설", "emp": 68582, "pay": 3000, "edu": 0, "outlook": -4, "ai": 3.0, "aiDesc": "SOC 투자 감소"}, {"name": "포장·도로작업원", "cat": "건설", "emp": 60009, "pay": 3100, "edu": 0, "outlook": -3, "ai": 3.0, "aiDesc": "도로 유지보수 안정"}, {"name": "상하수도 시공원", "cat": "건설", "emp": 21432, "pay": 3200, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "인프라 유지보수"}, {"name": "터널 시공원", "cat": "건설", "emp": 12859, "pay": 3500, "edu": 0, "outlook": -3, "ai": 3.0, "aiDesc": "터널 굴착 기계화"}, {"name": "교량 시공원", "cat": "건설", "emp": 10287, "pay": 3600, "edu": 1, "outlook": -3, "ai": 3.0, "aiDesc": "교량 유지보수 수요"}, {"name": "하천·항만 시공원", "cat": "건설", "emp": 8573, "pay": 3200, "edu": 0, "outlook": -3, "ai": 3.0, "aiDesc": "SOC 축소 영향"}, {"name": "건축 배관공", "cat": "건설", "emp": 68582, "pay": 3400, "edu": 1, "outlook": -1, "ai": 2.0, "aiDesc": "현장 배관 대체 어려움"}, {"name": "산업 배관공", "cat": "건설", "emp": 30004, "pay": 3600, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "플랜트 배관 수요"}, {"name": "건축 전기공", "cat": "건설", "emp": 85727, "pay": 3400, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "전기설비 수요 유지"}, {"name": "산업 전기공", "cat": "건설", "emp": 34291, "pay": 3600, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "공장 전기 설비"}, {"name": "소방설비 시공원", "cat": "건설", "emp": 25718, "pay": 3300, "edu": 1, "outlook": 2, "ai": 2.0, "aiDesc": "소방규제 강화"}, {"name": "냉동·공조 설비원", "cat": "건설", "emp": 47150, "pay": 3200, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "에너지 효율화 수요"}, {"name": "보일러 설비원", "cat": "건설", "emp": 12859, "pay": 3200, "edu": 1, "outlook": -1, "ai": 2.5, "aiDesc": "친환경 전환"}, {"name": "승강기 설치·정비원", "cat": "건설", "emp": 17145, "pay": 3500, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "유지보수 수요 안정"}, {"name": "자동문·셔터 설비원", "cat": "건설", "emp": 6858, "pay": 3000, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "설치·수리 대면"}, {"name": "태양광 설치원", "cat": "건설", "emp": 12859, "pay": 3200, "edu": 1, "outlook": 5, "ai": 2.5, "aiDesc": "신재생에너지 확대"}, {"name": "타워크레인 운전원", "cat": "건설", "emp": 21432, "pay": 4000, "edu": 1, "outlook": -3, "ai": 4.5, "aiDesc": "건설 물량 감소"}, {"name": "이동식크레인 운전원", "cat": "건설", "emp": 25718, "pay": 3600, "edu": 1, "outlook": -2, "ai": 5.0, "aiDesc": "무인 중장비 개발"}, {"name": "굴착기(포크레인) 운전원", "cat": "건설", "emp": 38577, "pay": 3400, "edu": 1, "outlook": -2, "ai": 4.5, "aiDesc": "자율 굴착 초기"}, {"name": "불도저·로더 운전원", "cat": "건설", "emp": 17145, "pay": 3200, "edu": 1, "outlook": -3, "ai": 4.5, "aiDesc": "중장비 자동화"}, {"name": "덤프트럭 운전원", "cat": "건설", "emp": 30004, "pay": 3000, "edu": 0, "outlook": -3, "ai": 4.5, "aiDesc": "건설 물량 감소"}, {"name": "지게차 운전원(건설현장)", "cat": "건설", "emp": 25718, "pay": 2800, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "AGV 도입 진행"}, {"name": "항타·천공기 운전원", "cat": "건설", "emp": 8573, "pay": 3600, "edu": 1, "outlook": -3, "ai": 4.0, "aiDesc": "기초공사 기계화"}, {"name": "인테리어 디자이너", "cat": "건설", "emp": 38577, "pay": 3300, "edu": 2, "outlook": 1, "ai": 4.5, "aiDesc": "AI 시뮬레이션 활용"}, {"name": "인테리어 목공(가구시공)", "cat": "건설", "emp": 30004, "pay": 3100, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "리모델링 수요"}, {"name": "인테리어 도배공", "cat": "건설", "emp": 21432, "pay": 2800, "edu": 0, "outlook": -2, "ai": 2.0, "aiDesc": "수작업 대체 어려움"}, {"name": "인테리어 바닥재 시공원", "cat": "건설", "emp": 12859, "pay": 3000, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "리모델링 수요 일부"}, {"name": "인테리어 전기·조명 시공원", "cat": "건설", "emp": 12859, "pay": 3100, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "스마트홈 수요"}, {"name": "측량 기술자", "cat": "건설", "emp": 18860, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "드론 측량·AI 분석"}, {"name": "지적·지형 측량원", "cat": "건설", "emp": 8573, "pay": 3400, "edu": 2, "outlook": -1, "ai": 5.0, "aiDesc": "디지털 측량 확대"}, {"name": "건설감리 기술자", "cat": "건설", "emp": 21432, "pay": 4000, "edu": 3, "outlook": 0, "ai": 4.0, "aiDesc": "품질·안전 관리"}, {"name": "건설안전 관리자", "cat": "건설", "emp": 15431, "pay": 3600, "edu": 2, "outlook": 3, "ai": 3.0, "aiDesc": "중대재해법 강화"}, {"name": "건설견적·공무 사무원", "cat": "건설", "emp": 17145, "pay": 3300, "edu": 2, "outlook": -1, "ai": 5.5, "aiDesc": "BIM 기반 자동견적"}, {"name": "택배 기사(집배)", "cat": "운송·물류", "emp": 128591, "pay": 2900, "edu": 0, "outlook": 3, "ai": 4.0, "aiDesc": "이커머스 성장"}, {"name": "택배 기사(집하·간선)", "cat": "운송·물류", "emp": 68582, "pay": 3000, "edu": 0, "outlook": 2, "ai": 4.5, "aiDesc": "물류 자동화 진행"}, {"name": "새벽배송·신선배송 기사", "cat": "운송·물류", "emp": 34291, "pay": 2800, "edu": 0, "outlook": 3, "ai": 4.0, "aiDesc": "새벽배송 수요 확대"}, {"name": "음식배달 라이더", "cat": "운송·물류", "emp": 154309, "pay": 2600, "edu": 0, "outlook": 1, "ai": 4.5, "aiDesc": "배달 수요 유지"}, {"name": "퀵서비스 라이더", "cat": "운송·물류", "emp": 25718, "pay": 2500, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "배달앱 대체"}, {"name": "장거리 화물차 기사", "cat": "운송·물류", "emp": 214318, "pay": 3400, "edu": 0, "outlook": -2, "ai": 5.5, "aiDesc": "자율주행 트럭 개발"}, {"name": "지역 화물차 기사", "cat": "운송·물류", "emp": 68582, "pay": 3000, "edu": 0, "outlook": -1, "ai": 5.0, "aiDesc": "단거리 배송 수요"}, {"name": "특수화물(탱크로리) 운전원", "cat": "운송·물류", "emp": 42864, "pay": 3800, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "위험물 운송 전문성"}, {"name": "냉동·냉장차 운전원", "cat": "운송·물류", "emp": 30004, "pay": 3200, "edu": 0, "outlook": 1, "ai": 4.0, "aiDesc": "콜드체인 수요 증가"}, {"name": "이삿짐 운송원", "cat": "운송·물류", "emp": 25718, "pay": 2800, "edu": 0, "outlook": -1, "ai": 2.5, "aiDesc": "대면 이동 서비스"}, {"name": "덤프트럭 운전원(운송)", "cat": "운송·물류", "emp": 34291, "pay": 3000, "edu": 0, "outlook": -3, "ai": 4.5, "aiDesc": "건설 물량 감소"}, {"name": "견인차(렉카) 운전원", "cat": "운송·물류", "emp": 12859, "pay": 3200, "edu": 0, "outlook": 0, "ai": 3.5, "aiDesc": "사고 처리 대면"}, {"name": "시내버스 운전원", "cat": "운송·물류", "emp": 85727, "pay": 3000, "edu": 0, "outlook": -3, "ai": 6.0, "aiDesc": "자율주행 버스 시범"}, {"name": "마을버스 운전원", "cat": "운송·물류", "emp": 21432, "pay": 2800, "edu": 0, "outlook": -3, "ai": 5.5, "aiDesc": "저상버스 자동화"}, {"name": "택시 운전원", "cat": "운송·물류", "emp": 128591, "pay": 2600, "edu": 0, "outlook": -5, "ai": 6.5, "aiDesc": "로보택시 시범 확대"}, {"name": "대리운전 기사", "cat": "운송·물류", "emp": 42864, "pay": 2200, "edu": 0, "outlook": -4, "ai": 6.0, "aiDesc": "자율주행 대체 전망"}, {"name": "고속·시외버스 운전원", "cat": "운송·물류", "emp": 34291, "pay": 3200, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "자율주행 고속도로"}, {"name": "관광버스 운전원", "cat": "운송·물류", "emp": 21432, "pay": 3000, "edu": 0, "outlook": 1, "ai": 4.5, "aiDesc": "관광 수요 회복"}, {"name": "통근버스 운전원", "cat": "운송·물류", "emp": 17145, "pay": 2800, "edu": 0, "outlook": -1, "ai": 5.0, "aiDesc": "셔틀버스 자동화"}, {"name": "지하철 기관사", "cat": "운송·물류", "emp": 10287, "pay": 4500, "edu": 2, "outlook": -1, "ai": 6.0, "aiDesc": "무인운전 경전철 확대"}, {"name": "철도(KTX·일반) 기관사", "cat": "운송·물류", "emp": 6858, "pay": 4800, "edu": 2, "outlook": 0, "ai": 5.5, "aiDesc": "자동운행 기술 발전"}, {"name": "철도 차량정비원", "cat": "운송·물류", "emp": 8573, "pay": 4000, "edu": 2, "outlook": 0, "ai": 4.0, "aiDesc": "차량 유지보수"}, {"name": "항공기 조종사(민간)", "cat": "운송·물류", "emp": 5144, "pay": 8500, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "항공 수요 회복"}, {"name": "항공기 조종사(화물)", "cat": "운송·물류", "emp": 1715, "pay": 7500, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "화물 항공 수요"}, {"name": "항공기 객실승무원", "cat": "운송·물류", "emp": 18860, "pay": 4000, "edu": 3, "outlook": 2, "ai": 2.0, "aiDesc": "안전·서비스 대면"}, {"name": "항공기 정비사", "cat": "운송·물류", "emp": 12859, "pay": 4500, "edu": 2, "outlook": 3, "ai": 3.0, "aiDesc": "항공기 정비 수요"}, {"name": "항공 관제사", "cat": "운송·물류", "emp": 2572, "pay": 5500, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "AI 관제 보조"}, {"name": "선장·항해사", "cat": "운송·물류", "emp": 10287, "pay": 5000, "edu": 2, "outlook": 0, "ai": 3.5, "aiDesc": "자율운항 선박 개발"}, {"name": "기관사(선박)", "cat": "운송·물류", "emp": 6858, "pay": 4800, "edu": 2, "outlook": 0, "ai": 3.5, "aiDesc": "선박 자동화 기술"}, {"name": "선박 갑판원", "cat": "운송·물류", "emp": 8573, "pay": 3500, "edu": 0, "outlook": -1, "ai": 3.0, "aiDesc": "선원 감소 추세"}, {"name": "항만 크레인 운전원", "cat": "운송·물류", "emp": 4286, "pay": 4500, "edu": 1, "outlook": -2, "ai": 6.0, "aiDesc": "자동화 항만 확대"}, {"name": "항만 하역 작업원", "cat": "운송·물류", "emp": 10287, "pay": 3500, "edu": 0, "outlook": -2, "ai": 5.5, "aiDesc": "스마트항만 확대"}, {"name": "물류센터 관리자", "cat": "운송·물류", "emp": 68582, "pay": 3300, "edu": 2, "outlook": 2, "ai": 6.0, "aiDesc": "WMS·AI 최적화"}, {"name": "물류기획·SCM 전문가", "cat": "운송·물류", "emp": 34291, "pay": 4000, "edu": 3, "outlook": 3, "ai": 5.5, "aiDesc": "공급망 AI 최적화"}, {"name": "창고 입출고 관리원", "cat": "운송·물류", "emp": 102872, "pay": 2500, "edu": 0, "outlook": -3, "ai": 7.0, "aiDesc": "로봇피킹 확대"}, {"name": "물류센터 피킹·패킹원", "cat": "운송·물류", "emp": 68582, "pay": 2300, "edu": 0, "outlook": -4, "ai": 7.5, "aiDesc": "자동화 물류센터"}, {"name": "지게차 운전원(물류)", "cat": "운송·물류", "emp": 51436, "pay": 2700, "edu": 0, "outlook": -2, "ai": 5.5, "aiDesc": "AGV 도입 가속"}, {"name": "포워더·국제물류 사무원", "cat": "운송·물류", "emp": 38577, "pay": 3200, "edu": 2, "outlook": 0, "ai": 6.0, "aiDesc": "통관·운송서류 자동화"}, {"name": "관세사 사무원", "cat": "운송·물류", "emp": 12859, "pay": 3500, "edu": 3, "outlook": 0, "ai": 6.5, "aiDesc": "통관 자동화 진행"}, {"name": "화물운송 중개인", "cat": "운송·물류", "emp": 17145, "pay": 3000, "edu": 1, "outlook": -1, "ai": 5.5, "aiDesc": "온라인 화물매칭"}, {"name": "벼 재배 농업인", "cat": "농림어업", "emp": 257181, "pay": 1800, "edu": 0, "outlook": -6, "ai": 3.5, "aiDesc": "고령화·기계화 진행"}, {"name": "밭작물(콩·옥수수 등) 재배자", "cat": "농림어업", "emp": 85727, "pay": 1800, "edu": 0, "outlook": -5, "ai": 3.5, "aiDesc": "경지면적 감소"}, {"name": "노지채소 재배자", "cat": "농림어업", "emp": 154309, "pay": 1900, "edu": 0, "outlook": -4, "ai": 3.0, "aiDesc": "채소 수요 안정"}, {"name": "시설채소(하우스) 재배자", "cat": "농림어업", "emp": 102872, "pay": 2100, "edu": 0, "outlook": -2, "ai": 3.5, "aiDesc": "스마트온실 확대"}, {"name": "특용작물(약초·버섯) 재배자", "cat": "농림어업", "emp": 51436, "pay": 2200, "edu": 0, "outlook": -2, "ai": 3.0, "aiDesc": "스마트팜 적용 선도"}, {"name": "인삼 재배자", "cat": "농림어업", "emp": 21432, "pay": 2400, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "인삼 수요 안정"}, {"name": "사과 재배자", "cat": "농림어업", "emp": 47150, "pay": 2000, "edu": 0, "outlook": -4, "ai": 3.0, "aiDesc": "과수원 고령화"}, {"name": "감귤·복숭아·배 재배자", "cat": "농림어업", "emp": 42864, "pay": 2000, "edu": 0, "outlook": -4, "ai": 3.0, "aiDesc": "과수 재배 고령화"}, {"name": "포도·딸기 재배자", "cat": "농림어업", "emp": 38577, "pay": 2100, "edu": 0, "outlook": -3, "ai": 3.0, "aiDesc": "시설재배 확대"}, {"name": "기타과수(블루베리 등) 재배자", "cat": "농림어업", "emp": 25718, "pay": 2200, "edu": 0, "outlook": -2, "ai": 3.0, "aiDesc": "소면적 특수과수"}, {"name": "화훼 재배자", "cat": "농림어업", "emp": 25718, "pay": 2000, "edu": 0, "outlook": -4, "ai": 2.5, "aiDesc": "화훼 수요 감소"}, {"name": "조경수·묘목 재배자", "cat": "농림어업", "emp": 12859, "pay": 2100, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "조경 수요 일부 유지"}, {"name": "시설원예(스마트팜) 기술자", "cat": "농림어업", "emp": 30004, "pay": 2800, "edu": 1, "outlook": 5, "ai": 4.0, "aiDesc": "첨단농업 기술 도입"}, {"name": "농업드론 조종사", "cat": "농림어업", "emp": 6858, "pay": 3000, "edu": 1, "outlook": 6, "ai": 3.5, "aiDesc": "정밀농업 수요 증가"}, {"name": "농기계 운전·정비원", "cat": "농림어업", "emp": 21432, "pay": 2500, "edu": 0, "outlook": -2, "ai": 3.5, "aiDesc": "농기계 자동화"}, {"name": "농산물 선별·포장원", "cat": "농림어업", "emp": 42864, "pay": 2000, "edu": 0, "outlook": -2, "ai": 4.0, "aiDesc": "자동 선별기 도입"}, {"name": "한우 사육자", "cat": "농림어업", "emp": 34291, "pay": 2500, "edu": 0, "outlook": -1, "ai": 3.5, "aiDesc": "자동 사양관리 도입"}, {"name": "젖소(낙농) 사육자", "cat": "농림어업", "emp": 12859, "pay": 2600, "edu": 0, "outlook": -2, "ai": 3.5, "aiDesc": "자동 착유기 도입"}, {"name": "양돈 종사자", "cat": "농림어업", "emp": 30004, "pay": 2300, "edu": 0, "outlook": -3, "ai": 3.5, "aiDesc": "대규모 자동화 농장"}, {"name": "양계 종사자(육계·산란)", "cat": "농림어업", "emp": 25718, "pay": 2100, "edu": 0, "outlook": -3, "ai": 4.0, "aiDesc": "계사 자동화 확대"}, {"name": "양봉 종사자", "cat": "농림어업", "emp": 4286, "pay": 2000, "edu": 0, "outlook": -2, "ai": 2.0, "aiDesc": "소규모 특수축산"}, {"name": "반려동물 관련 종사자", "cat": "농림어업", "emp": 21432, "pay": 2300, "edu": 1, "outlook": 5, "ai": 2.0, "aiDesc": "반려동물 산업 성장"}, {"name": "수의보조원(동물병원)", "cat": "농림어업", "emp": 12859, "pay": 2200, "edu": 1, "outlook": 4, "ai": 2.0, "aiDesc": "동물 의료 수요"}, {"name": "연근해 어업 종사자", "cat": "농림어업", "emp": 34291, "pay": 2500, "edu": 0, "outlook": -6, "ai": 2.5, "aiDesc": "어획량 감소·고령화"}, {"name": "양식업 종사자(어류)", "cat": "농림어업", "emp": 15431, "pay": 2600, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "스마트 양식 도입"}, {"name": "양식업 종사자(해조·패류)", "cat": "농림어업", "emp": 12859, "pay": 2400, "edu": 0, "outlook": -1, "ai": 3.0, "aiDesc": "양식 기술 발전"}, {"name": "원양어업 종사자", "cat": "농림어업", "emp": 6858, "pay": 3500, "edu": 0, "outlook": -3, "ai": 2.5, "aiDesc": "원양 선원 부족"}, {"name": "수산물 가공·선별원", "cat": "농림어업", "emp": 6858, "pay": 2200, "edu": 0, "outlook": -2, "ai": 4.0, "aiDesc": "선별 자동화"}, {"name": "산림경영 종사자", "cat": "농림어업", "emp": 8573, "pay": 2300, "edu": 0, "outlook": -1, "ai": 2.5, "aiDesc": "산림 드론 활용"}, {"name": "벌목·원목 종사자", "cat": "농림어업", "emp": 4286, "pay": 2400, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "기계화 벌목"}, {"name": "조경·녹지관리 종사자", "cat": "농림어업", "emp": 10287, "pay": 2400, "edu": 0, "outlook": 0, "ai": 2.0, "aiDesc": "도시 녹화 수요"}, {"name": "농업 컨설턴트", "cat": "농림어업", "emp": 4286, "pay": 3200, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "스마트농업 자문"}, {"name": "변호사(민사)", "cat": "법률·행정", "emp": 12859, "pay": 8000, "edu": 5, "outlook": 2, "ai": 4.5, "aiDesc": "AI 법률검색 보조"}, {"name": "변호사(형사)", "cat": "법률·행정", "emp": 6858, "pay": 7500, "edu": 5, "outlook": 1, "ai": 4.0, "aiDesc": "형사 변론 인간 역할"}, {"name": "변호사(기업·M&A)", "cat": "법률·행정", "emp": 6858, "pay": 10000, "edu": 5, "outlook": 3, "ai": 4.0, "aiDesc": "기업 자문 수요 증가"}, {"name": "변호사(IT·지식재산)", "cat": "법률·행정", "emp": 4286, "pay": 9000, "edu": 5, "outlook": 4, "ai": 4.0, "aiDesc": "기술 법률 수요 증가"}, {"name": "법무사", "cat": "법률·행정", "emp": 8573, "pay": 5500, "edu": 5, "outlook": -1, "ai": 5.5, "aiDesc": "등기 자동화 가속"}, {"name": "변리사", "cat": "법률·행정", "emp": 8573, "pay": 6500, "edu": 5, "outlook": 1, "ai": 5.0, "aiDesc": "특허 AI 보조 작성"}, {"name": "공인노무사", "cat": "법률·행정", "emp": 5144, "pay": 5000, "edu": 4, "outlook": 1, "ai": 4.5, "aiDesc": "노동분쟁 중재"}, {"name": "세무사", "cat": "법률·행정", "emp": 10287, "pay": 6000, "edu": 4, "outlook": -1, "ai": 7.0, "aiDesc": "세무 자동화 가속"}, {"name": "관세사", "cat": "법률·행정", "emp": 3429, "pay": 5000, "edu": 4, "outlook": 0, "ai": 6.5, "aiDesc": "통관 자동화 진행"}, {"name": "감정평가사", "cat": "법률·행정", "emp": 5144, "pay": 6000, "edu": 4, "outlook": 0, "ai": 5.0, "aiDesc": "AI 가격산정 보조"}, {"name": "공인중개사(사무소 운영)", "cat": "법률·행정", "emp": 85727, "pay": 3000, "edu": 2, "outlook": -2, "ai": 5.0, "aiDesc": "프롭테크 확대"}, {"name": "법원 사무원(법원직)", "cat": "법률·행정", "emp": 6858, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "사법행정 디지털화"}, {"name": "검찰 사무원(검찰직)", "cat": "법률·행정", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "수사 보조 디지털화"}, {"name": "중앙부처 일반행정 공무원", "cat": "법률·행정", "emp": 102872, "pay": 4200, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "정책 기획 인간 영역"}, {"name": "중앙부처 기술직 공무원", "cat": "법률·행정", "emp": 34291, "pay": 4300, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "기술 행정 수요"}, {"name": "지자체 일반행정 공무원", "cat": "법률·행정", "emp": 171454, "pay": 3600, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "민원 자동화 진행"}, {"name": "지자체 기술직 공무원", "cat": "법률·행정", "emp": 51436, "pay": 3700, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "시설·환경 관리"}, {"name": "교육행정 공무원", "cat": "법률·행정", "emp": 51436, "pay": 3800, "edu": 3, "outlook": -1, "ai": 5.5, "aiDesc": "학사행정 자동화"}, {"name": "세무 공무원(국세청)", "cat": "법률·행정", "emp": 17145, "pay": 4000, "edu": 3, "outlook": -1, "ai": 6.0, "aiDesc": "AI 세무조사 활용"}, {"name": "관세 공무원(관세청)", "cat": "법률·행정", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "전자통관 고도화"}, {"name": "외교관·외무공무원", "cat": "법률·행정", "emp": 4286, "pay": 5000, "edu": 4, "outlook": 0, "ai": 3.5, "aiDesc": "외교 판단 인간 역할"}, {"name": "국회·의정 사무원", "cat": "법률·행정", "emp": 4286, "pay": 4200, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "의정활동 보조"}, {"name": "수사 경찰관", "cat": "법률·행정", "emp": 38577, "pay": 3800, "edu": 2, "outlook": 1, "ai": 3.5, "aiDesc": "AI 수사분석 활용"}, {"name": "지역경찰·순찰 경찰관", "cat": "법률·행정", "emp": 42864, "pay": 3500, "edu": 2, "outlook": 1, "ai": 3.0, "aiDesc": "현장 대응 필수"}, {"name": "교통경찰관", "cat": "법률·행정", "emp": 17145, "pay": 3500, "edu": 2, "outlook": 0, "ai": 3.5, "aiDesc": "AI CCTV 활용"}, {"name": "사이버수사 경찰관", "cat": "법률·행정", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "사이버범죄 증가"}, {"name": "경찰 행정(사무) 직원", "cat": "법률·행정", "emp": 12859, "pay": 3500, "edu": 2, "outlook": 0, "ai": 5.0, "aiDesc": "경찰 행정 자동화"}, {"name": "소방관(화재진압)", "cat": "법률·행정", "emp": 25718, "pay": 3500, "edu": 2, "outlook": 3, "ai": 1.5, "aiDesc": "현장 긴급대응"}, {"name": "소방관(구급·구조)", "cat": "법률·행정", "emp": 21432, "pay": 3600, "edu": 2, "outlook": 4, "ai": 1.5, "aiDesc": "긴급구조 수요 증가"}, {"name": "소방관(예방·조사)", "cat": "법률·행정", "emp": 8573, "pay": 3500, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "화재 예방 활동"}, {"name": "해경·해양안전요원", "cat": "법률·행정", "emp": 6858, "pay": 3700, "edu": 2, "outlook": 1, "ai": 2.0, "aiDesc": "해양 안전 수요"}, {"name": "교도관·보호관찰관", "cat": "법률·행정", "emp": 12859, "pay": 3400, "edu": 2, "outlook": 0, "ai": 2.5, "aiDesc": "교정시설 관리"}, {"name": "군인(장교)", "cat": "법률·행정", "emp": 60009, "pay": 3500, "edu": 3, "outlook": 0, "ai": 2.0, "aiDesc": "전문 군사 인력"}, {"name": "군인(부사관)", "cat": "법률·행정", "emp": 68582, "pay": 2800, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "무인시스템 도입"}, {"name": "군무원(국방부)", "cat": "법률·행정", "emp": 21432, "pay": 3500, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "국방 행정"}, {"name": "은행 창구직원(텔러)", "cat": "금융·보험", "emp": 42864, "pay": 4000, "edu": 3, "outlook": -7, "ai": 8.5, "aiDesc": "비대면 뱅킹 확대"}, {"name": "은행 외환·국제업무 직원", "cat": "금융·보험", "emp": 10287, "pay": 4500, "edu": 3, "outlook": -3, "ai": 7.0, "aiDesc": "외환 자동화"}, {"name": "은행 여신심사 직원", "cat": "금융·보험", "emp": 30004, "pay": 5500, "edu": 3, "outlook": -3, "ai": 7.5, "aiDesc": "AI 신용평가 도입"}, {"name": "은행 PB·자산관리 직원", "cat": "금융·보험", "emp": 21432, "pay": 6000, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "고액자산 상담"}, {"name": "은행 디지털금융 직원", "cat": "금융·보험", "emp": 10287, "pay": 5500, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "디지털 뱅킹 수요"}, {"name": "은행 리스크관리 직원", "cat": "금융·보험", "emp": 8573, "pay": 5800, "edu": 3, "outlook": 1, "ai": 5.0, "aiDesc": "리스크 모델링 AI"}, {"name": "증권사 리서치 애널리스트", "cat": "금융·보험", "emp": 8573, "pay": 7500, "edu": 4, "outlook": 0, "ai": 6.0, "aiDesc": "AI 퀀트 분석 확대"}, {"name": "증권사 트레이더", "cat": "금융·보험", "emp": 4286, "pay": 8000, "edu": 4, "outlook": -2, "ai": 7.0, "aiDesc": "알고리즘 트레이딩"}, {"name": "증권사 IB(투자은행) 직원", "cat": "금융·보험", "emp": 6858, "pay": 8500, "edu": 4, "outlook": 1, "ai": 4.5, "aiDesc": "M&A·IPO 자문"}, {"name": "증권사 WM·영업 직원", "cat": "금융·보험", "emp": 12859, "pay": 5500, "edu": 3, "outlook": -1, "ai": 5.5, "aiDesc": "대면 자산관리"}, {"name": "자산운용사 펀드매니저", "cat": "금융·보험", "emp": 3429, "pay": 9000, "edu": 4, "outlook": 0, "ai": 5.5, "aiDesc": "AI 투자모델 활용"}, {"name": "자산운용사 운용지원 직원", "cat": "금융·보험", "emp": 4286, "pay": 5000, "edu": 3, "outlook": -1, "ai": 6.0, "aiDesc": "운용 보조 자동화"}, {"name": "보험회사 언더라이터", "cat": "금융·보험", "emp": 15431, "pay": 4500, "edu": 3, "outlook": -3, "ai": 8.0, "aiDesc": "AI 위험평가 도입"}, {"name": "보험회사 보상(손해사정) 직원", "cat": "금융·보험", "emp": 12859, "pay": 4000, "edu": 3, "outlook": -2, "ai": 7.5, "aiDesc": "AI 사고 분석"}, {"name": "보험회사 상품개발 직원", "cat": "금융·보험", "emp": 6858, "pay": 5500, "edu": 3, "outlook": 1, "ai": 5.0, "aiDesc": "상품 설계 인간 주도"}, {"name": "보험계리사", "cat": "금융·보험", "emp": 3429, "pay": 7000, "edu": 4, "outlook": 1, "ai": 5.5, "aiDesc": "리스크 모델링 AI"}, {"name": "생명보험 설계사", "cat": "금융·보험", "emp": 85727, "pay": 2800, "edu": 2, "outlook": -5, "ai": 7.0, "aiDesc": "디지털 보험 확대"}, {"name": "손해보험 설계사", "cat": "금융·보험", "emp": 68582, "pay": 2900, "edu": 2, "outlook": -4, "ai": 7.0, "aiDesc": "비교 플랫폼 확대"}, {"name": "GA(독립보험대리점) 설계사", "cat": "금융·보험", "emp": 42864, "pay": 3000, "edu": 2, "outlook": -3, "ai": 6.5, "aiDesc": "보험 플랫폼 성장"}, {"name": "여신·대출전문 금융회사 직원", "cat": "금융·보험", "emp": 21432, "pay": 4000, "edu": 3, "outlook": -2, "ai": 7.0, "aiDesc": "AI 심사 자동화"}, {"name": "카드사 직원", "cat": "금융·보험", "emp": 12859, "pay": 5000, "edu": 3, "outlook": -2, "ai": 6.5, "aiDesc": "디지털 결제 확대"}, {"name": "핀테크 개발자", "cat": "금융·보험", "emp": 12859, "pay": 6000, "edu": 3, "outlook": 8, "ai": 3.5, "aiDesc": "디지털 금융 성장"}, {"name": "핀테크 기획·PM", "cat": "금융·보험", "emp": 6858, "pay": 5500, "edu": 3, "outlook": 6, "ai": 4.0, "aiDesc": "금융 서비스 기획"}, {"name": "금융데이터 분석가", "cat": "금융·보험", "emp": 6858, "pay": 5500, "edu": 3, "outlook": 5, "ai": 4.0, "aiDesc": "금융 AI 분석"}, {"name": "투자자문사 직원", "cat": "금융·보험", "emp": 4286, "pay": 5000, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "로보어드바이저 영향"}, {"name": "여신심사·리스크 관리자", "cat": "금융·보험", "emp": 8573, "pay": 5500, "edu": 3, "outlook": 0, "ai": 6.5, "aiDesc": "AI 신용분석 활용"}, {"name": "금융감독·감사 전문가", "cat": "금융·보험", "emp": 4286, "pay": 6000, "edu": 4, "outlook": 1, "ai": 4.5, "aiDesc": "규제·감독 인간 판단"}, {"name": "가상자산 거래소 직원", "cat": "금융·보험", "emp": 4286, "pay": 5000, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "디지털자산 시장"}, {"name": "웹 그래픽 디자이너", "cat": "문화·예술·디자인", "emp": 34291, "pay": 3200, "edu": 3, "outlook": 0, "ai": 6.0, "aiDesc": "AI 이미지 생성 활용"}, {"name": "모바일 UI 디자이너", "cat": "문화·예술·디자인", "emp": 25718, "pay": 3500, "edu": 3, "outlook": 2, "ai": 6.0, "aiDesc": "앱 디자인 수요"}, {"name": "편집·출판 디자이너", "cat": "문화·예술·디자인", "emp": 25718, "pay": 2800, "edu": 3, "outlook": -3, "ai": 7.0, "aiDesc": "출판 축소, AI 레이아웃"}, {"name": "광고 디자이너", "cat": "문화·예술·디자인", "emp": 30004, "pay": 3200, "edu": 3, "outlook": 0, "ai": 6.0, "aiDesc": "AI 시안 생성 활용"}, {"name": "CI/BI 디자이너", "cat": "문화·예술·디자인", "emp": 12859, "pay": 3500, "edu": 3, "outlook": 1, "ai": 5.5, "aiDesc": "브랜딩 전문성 필요"}, {"name": "패키지 디자이너", "cat": "문화·예술·디자인", "emp": 12859, "pay": 3000, "edu": 3, "outlook": -1, "ai": 5.5, "aiDesc": "패키징 디자인 수요"}, {"name": "캐릭터 디자이너", "cat": "문화·예술·디자인", "emp": 8573, "pay": 3200, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "캐릭터 IP 시장 성장"}, {"name": "영상 PD·감독", "cat": "문화·예술·디자인", "emp": 21432, "pay": 3800, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "OTT 콘텐츠 수요"}, {"name": "영화 감독·연출가", "cat": "문화·예술·디자인", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 2, "ai": 2.5, "aiDesc": "영화·드라마 수요"}, {"name": "TV 방송작가", "cat": "문화·예술·디자인", "emp": 8573, "pay": 3000, "edu": 3, "outlook": -2, "ai": 5.0, "aiDesc": "AI 대본 보조 활용"}, {"name": "영상 편집자(프리미어/파이널컷)", "cat": "문화·예술·디자인", "emp": 30004, "pay": 3000, "edu": 2, "outlook": 3, "ai": 5.0, "aiDesc": "AI 자동편집 도구"}, {"name": "유튜브 크리에이터", "cat": "문화·예술·디자인", "emp": 25718, "pay": 2800, "edu": 1, "outlook": 5, "ai": 3.0, "aiDesc": "1인미디어 성장"}, {"name": "숏폼(릴스·쇼츠) 크리에이터", "cat": "문화·예술·디자인", "emp": 12859, "pay": 2500, "edu": 1, "outlook": 6, "ai": 3.5, "aiDesc": "숏폼 콘텐츠 급증"}, {"name": "VFX 아티스트", "cat": "문화·예술·디자인", "emp": 10287, "pay": 3800, "edu": 3, "outlook": 4, "ai": 4.5, "aiDesc": "AI VFX 효율화"}, {"name": "모션그래픽 디자이너", "cat": "문화·예술·디자인", "emp": 12859, "pay": 3300, "edu": 3, "outlook": 3, "ai": 4.5, "aiDesc": "영상 콘텐츠 수요"}, {"name": "3D 모델러·애니메이터", "cat": "문화·예술·디자인", "emp": 10287, "pay": 3500, "edu": 3, "outlook": 3, "ai": 5.0, "aiDesc": "AI 3D 생성 도구 등장"}, {"name": "2D 애니메이터", "cat": "문화·예술·디자인", "emp": 6858, "pay": 2800, "edu": 2, "outlook": 0, "ai": 4.5, "aiDesc": "애니메이션 수요"}, {"name": "음악가·작곡가(클래식)", "cat": "문화·예술·디자인", "emp": 10287, "pay": 2500, "edu": 3, "outlook": 0, "ai": 2.5, "aiDesc": "라이브 공연 수요"}, {"name": "음악가·작곡가(대중음악)", "cat": "문화·예술·디자인", "emp": 12859, "pay": 2800, "edu": 3, "outlook": 1, "ai": 3.5, "aiDesc": "AI 작곡 도구 등장"}, {"name": "음향 엔지니어", "cat": "문화·예술·디자인", "emp": 8573, "pay": 3000, "edu": 2, "outlook": 1, "ai": 3.5, "aiDesc": "공연·녹음 기술"}, {"name": "음반·음원 프로듀서", "cat": "문화·예술·디자인", "emp": 6858, "pay": 3500, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "음원 시장 성장"}, {"name": "공연기획자", "cat": "문화·예술·디자인", "emp": 12859, "pay": 2800, "edu": 2, "outlook": 2, "ai": 2.0, "aiDesc": "공연 산업 회복"}, {"name": "무대감독·스태프", "cat": "문화·예술·디자인", "emp": 10287, "pay": 2500, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "라이브 공연 대면"}, {"name": "조명 디자이너·기사", "cat": "문화·예술·디자인", "emp": 6858, "pay": 2800, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "공연·이벤트 수요"}, {"name": "미술가·화가", "cat": "문화·예술·디자인", "emp": 8573, "pay": 2200, "edu": 3, "outlook": -1, "ai": 2.0, "aiDesc": "창작 영역 인간 고유"}, {"name": "조각가·설치미술가", "cat": "문화·예술·디자인", "emp": 4286, "pay": 2300, "edu": 3, "outlook": -1, "ai": 1.5, "aiDesc": "물리적 창작 대체 어려움"}, {"name": "사진작가(스튜디오)", "cat": "문화·예술·디자인", "emp": 10287, "pay": 2600, "edu": 2, "outlook": -2, "ai": 4.0, "aiDesc": "AI 보정 가능, 촬영 인간"}, {"name": "사진작가(보도·상업)", "cat": "문화·예술·디자인", "emp": 8573, "pay": 3200, "edu": 2, "outlook": -1, "ai": 3.5, "aiDesc": "전문 촬영 수요 유지"}, {"name": "영상 촬영감독·촬영기사", "cat": "문화·예술·디자인", "emp": 15431, "pay": 3200, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "영상 콘텐츠 수요 증가"}, {"name": "드론 촬영기사", "cat": "문화·예술·디자인", "emp": 4286, "pay": 3000, "edu": 1, "outlook": 3, "ai": 3.5, "aiDesc": "드론 영상 수요"}, {"name": "제품·산업 디자이너", "cat": "문화·예술·디자인", "emp": 34291, "pay": 3500, "edu": 3, "outlook": 2, "ai": 4.5, "aiDesc": "AI 생성디자인 활용"}, {"name": "패션 디자이너", "cat": "문화·예술·디자인", "emp": 21432, "pay": 3000, "edu": 3, "outlook": -1, "ai": 4.0, "aiDesc": "AI 트렌드 분석"}, {"name": "패션 MD·바이어", "cat": "문화·예술·디자인", "emp": 12859, "pay": 3200, "edu": 3, "outlook": -1, "ai": 5.0, "aiDesc": "트렌드 분석 AI 활용"}, {"name": "보석·귀금속 디자이너", "cat": "문화·예술·디자인", "emp": 4286, "pay": 3000, "edu": 2, "outlook": -1, "ai": 3.0, "aiDesc": "수공예 영역"}, {"name": "소설·시나리오 작가", "cat": "문화·예술·디자인", "emp": 12859, "pay": 2500, "edu": 3, "outlook": -2, "ai": 5.5, "aiDesc": "AI 글쓰기 도구"}, {"name": "방송·영화 시나리오 작가", "cat": "문화·예술·디자인", "emp": 6858, "pay": 3000, "edu": 3, "outlook": -1, "ai": 5.0, "aiDesc": "스토리텔링 인간 영역"}, {"name": "번역가(영→한)", "cat": "문화·예술·디자인", "emp": 15431, "pay": 2800, "edu": 3, "outlook": -5, "ai": 8.0, "aiDesc": "AI 번역 품질 급상승"}, {"name": "번역가(기타언어→한)", "cat": "문화·예술·디자인", "emp": 10287, "pay": 2700, "edu": 3, "outlook": -4, "ai": 7.5, "aiDesc": "AI 번역 기술 발전"}, {"name": "통역사(회의·동시통역)", "cat": "문화·예술·디자인", "emp": 6858, "pay": 3500, "edu": 3, "outlook": -3, "ai": 7.0, "aiDesc": "AI 통역 도구 발전"}, {"name": "웹툰 작가", "cat": "문화·예술·디자인", "emp": 8573, "pay": 2500, "edu": 2, "outlook": 3, "ai": 4.0, "aiDesc": "웹툰 시장 성장"}, {"name": "만화·일러스트레이터", "cat": "문화·예술·디자인", "emp": 10287, "pay": 2400, "edu": 2, "outlook": 0, "ai": 5.0, "aiDesc": "AI 일러스트 도구"}, {"name": "카피라이터·콘텐츠 작가", "cat": "문화·예술·디자인", "emp": 17145, "pay": 2800, "edu": 3, "outlook": -2, "ai": 7.0, "aiDesc": "AI 카피 생성 확대"}, {"name": "신문 기자", "cat": "문화·예술·디자인", "emp": 12859, "pay": 4200, "edu": 4, "outlook": -4, "ai": 5.5, "aiDesc": "AI 기사 자동생성"}, {"name": "방송 기자·PD", "cat": "문화·예술·디자인", "emp": 8573, "pay": 4500, "edu": 4, "outlook": -3, "ai": 5.0, "aiDesc": "미디어 구조 변화"}, {"name": "온라인 미디어 기자·에디터", "cat": "문화·예술·디자인", "emp": 12859, "pay": 3200, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "디지털 미디어 수요"}, {"name": "큐레이터·학예사", "cat": "문화·예술·디자인", "emp": 6858, "pay": 3000, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "문화 해석 인간 역할"}, {"name": "건물 내부 청소원", "cat": "청소·경비", "emp": 300045, "pay": 1900, "edu": 0, "outlook": 2, "ai": 3.0, "aiDesc": "로봇 보조, 인력 필요"}, {"name": "건물 외부·유리 청소원", "cat": "청소·경비", "emp": 42864, "pay": 2100, "edu": 0, "outlook": 1, "ai": 2.5, "aiDesc": "고소 작업 인간 필수"}, {"name": "사무실·빌딩 청소원", "cat": "청소·경비", "emp": 128591, "pay": 1900, "edu": 0, "outlook": 1, "ai": 3.0, "aiDesc": "청소 로봇 보조"}, {"name": "거리·환경미화원", "cat": "청소·경비", "emp": 77154, "pay": 2100, "edu": 0, "outlook": 1, "ai": 2.5, "aiDesc": "도시환경 관리 유지"}, {"name": "하수구·맨홀 청소원", "cat": "청소·경비", "emp": 17145, "pay": 2300, "edu": 0, "outlook": 1, "ai": 2.0, "aiDesc": "특수 환경 인력 필요"}, {"name": "공장·산업시설 청소원", "cat": "청소·경비", "emp": 85727, "pay": 2200, "edu": 0, "outlook": 1, "ai": 3.0, "aiDesc": "산업 청소 수요"}, {"name": "병원·의료시설 청소원", "cat": "청소·경비", "emp": 51436, "pay": 2100, "edu": 0, "outlook": 2, "ai": 2.5, "aiDesc": "의료 위생 중요"}, {"name": "소독·방역 종사자", "cat": "청소·경비", "emp": 38577, "pay": 2300, "edu": 0, "outlook": 2, "ai": 3.0, "aiDesc": "감염병 대응 수요"}, {"name": "쓰레기 수거·분리원", "cat": "청소·경비", "emp": 42864, "pay": 2300, "edu": 0, "outlook": 1, "ai": 3.0, "aiDesc": "환경규제 강화"}, {"name": "폐기물 처리·재활용 종사자", "cat": "청소·경비", "emp": 30004, "pay": 2500, "edu": 0, "outlook": 2, "ai": 3.0, "aiDesc": "순환경제 정책"}, {"name": "특수청소(범죄현장 등) 종사자", "cat": "청소·경비", "emp": 4286, "pay": 3000, "edu": 0, "outlook": 2, "ai": 1.5, "aiDesc": "특수 상황 대면"}, {"name": "세탁소·세탁원", "cat": "청소·경비", "emp": 42864, "pay": 1900, "edu": 0, "outlook": -1, "ai": 4.0, "aiDesc": "자동 세탁 확대"}, {"name": "아파트 경비원", "cat": "청소·경비", "emp": 171454, "pay": 2000, "edu": 0, "outlook": -3, "ai": 5.5, "aiDesc": "무인경비·AI CCTV"}, {"name": "건물 경비원(상업시설)", "cat": "청소·경비", "emp": 68582, "pay": 2100, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "출입관리 자동화"}, {"name": "산업시설 경비원", "cat": "청소·경비", "emp": 34291, "pay": 2200, "edu": 0, "outlook": -1, "ai": 5.0, "aiDesc": "보안 시스템 강화"}, {"name": "공공시설 경비원", "cat": "청소·경비", "emp": 25718, "pay": 2100, "edu": 0, "outlook": -1, "ai": 4.5, "aiDesc": "공공 안전 관리"}, {"name": "야간 경비원(당직)", "cat": "청소·경비", "emp": 25718, "pay": 2000, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "무인경비 확대"}, {"name": "보안요원(이벤트·행사)", "cat": "청소·경비", "emp": 17145, "pay": 2500, "edu": 1, "outlook": 0, "ai": 3.0, "aiDesc": "현장 대응 필수"}, {"name": "경호원", "cat": "청소·경비", "emp": 12859, "pay": 2800, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "대면 경호 서비스"}, {"name": "주차관리원", "cat": "청소·경비", "emp": 68582, "pay": 1900, "edu": 0, "outlook": -5, "ai": 7.0, "aiDesc": "무인주차 시스템 확대"}, {"name": "주차장 안내원", "cat": "청소·경비", "emp": 25718, "pay": 1900, "edu": 0, "outlook": -4, "ai": 6.5, "aiDesc": "자동화 안내 시스템"}, {"name": "가사도우미", "cat": "청소·경비", "emp": 128591, "pay": 2100, "edu": 0, "outlook": 5, "ai": 1.5, "aiDesc": "맞벌이 수요 확대"}, {"name": "가사관리사(전문)", "cat": "청소·경비", "emp": 34291, "pay": 2300, "edu": 0, "outlook": 4, "ai": 1.5, "aiDesc": "전문 가사 서비스"}, {"name": "노인돌봄 서비스원", "cat": "청소·경비", "emp": 154309, "pay": 2100, "edu": 0, "outlook": 10, "ai": 1.0, "aiDesc": "초고령사회 수요 폭증"}, {"name": "아이돌봄 서비스원", "cat": "청소·경비", "emp": 42864, "pay": 2100, "edu": 0, "outlook": 2, "ai": 1.0, "aiDesc": "돌봄 서비스 수요"}, {"name": "산후도우미", "cat": "청소·경비", "emp": 17145, "pay": 2300, "edu": 0, "outlook": -2, "ai": 1.0, "aiDesc": "출생률 감소 영향"}, {"name": "사회복지사(노인복지시설)", "cat": "사회복지·상담", "emp": 47150, "pay": 2700, "edu": 3, "outlook": 5, "ai": 2.0, "aiDesc": "고령화 수요 증가"}, {"name": "사회복지사(장애인복지시설)", "cat": "사회복지·상담", "emp": 30004, "pay": 2700, "edu": 3, "outlook": 4, "ai": 2.0, "aiDesc": "장애인 복지 확대"}, {"name": "사회복지사(아동복지시설)", "cat": "사회복지·상담", "emp": 21432, "pay": 2600, "edu": 3, "outlook": 1, "ai": 2.0, "aiDesc": "아동보호 수요"}, {"name": "사회복지사(종합사회복지관)", "cat": "사회복지·상담", "emp": 25718, "pay": 2800, "edu": 3, "outlook": 3, "ai": 2.0, "aiDesc": "지역복지 수요"}, {"name": "사회복지 공무원", "cat": "사회복지·상담", "emp": 34291, "pay": 3200, "edu": 3, "outlook": 3, "ai": 2.5, "aiDesc": "복지정책 확대"}, {"name": "정신건강사회복지사", "cat": "사회복지·상담", "emp": 21432, "pay": 3100, "edu": 4, "outlook": 7, "ai": 2.0, "aiDesc": "정신건강 관심 급증"}, {"name": "의료사회복지사", "cat": "사회복지·상담", "emp": 8573, "pay": 3000, "edu": 3, "outlook": 3, "ai": 2.5, "aiDesc": "의료복지 수요"}, {"name": "학교사회복지사", "cat": "사회복지·상담", "emp": 6858, "pay": 2800, "edu": 3, "outlook": 2, "ai": 2.5, "aiDesc": "학교폭력·상담 수요"}, {"name": "청소년상담사", "cat": "사회복지·상담", "emp": 12859, "pay": 2800, "edu": 3, "outlook": 4, "ai": 2.5, "aiDesc": "청소년 문제 증가"}, {"name": "임상심리전문가", "cat": "사회복지·상담", "emp": 10287, "pay": 3800, "edu": 5, "outlook": 7, "ai": 2.5, "aiDesc": "심리 진단·치료 수요"}, {"name": "상담심리사", "cat": "사회복지·상담", "emp": 30004, "pay": 2800, "edu": 4, "outlook": 6, "ai": 2.5, "aiDesc": "정신건강 관심 증가"}, {"name": "중독상담 전문가(알코올·도박)", "cat": "사회복지·상담", "emp": 4286, "pay": 2800, "edu": 3, "outlook": 3, "ai": 2.0, "aiDesc": "중독 문제 상담"}, {"name": "가족·부부 상담사", "cat": "사회복지·상담", "emp": 6858, "pay": 2900, "edu": 4, "outlook": 3, "ai": 2.5, "aiDesc": "가족상담 수요"}, {"name": "위기상담 전문가", "cat": "사회복지·상담", "emp": 4286, "pay": 3000, "edu": 3, "outlook": 4, "ai": 2.0, "aiDesc": "위기개입 수요 증가"}, {"name": "직업상담사", "cat": "사회복지·상담", "emp": 17145, "pay": 2800, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "AI 직업추천 활용"}, {"name": "진로상담교사", "cat": "사회복지·상담", "emp": 8573, "pay": 3500, "edu": 4, "outlook": 2, "ai": 3.0, "aiDesc": "진로 상담 수요"}, {"name": "장애인 활동지원사", "cat": "사회복지·상담", "emp": 51436, "pay": 2300, "edu": 1, "outlook": 6, "ai": 1.0, "aiDesc": "장애인 복지 확대"}, {"name": "수어통역사", "cat": "사회복지·상담", "emp": 2572, "pay": 2800, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "수어 소통 대면"}, {"name": "장애인 직업재활 상담원", "cat": "사회복지·상담", "emp": 6858, "pay": 2700, "edu": 3, "outlook": 3, "ai": 2.5, "aiDesc": "장애인 취업 지원"}, {"name": "자원봉사 코디네이터", "cat": "사회복지·상담", "emp": 4286, "pay": 2500, "edu": 3, "outlook": 1, "ai": 2.5, "aiDesc": "자원봉사 관리"}, {"name": "지역아동센터 종사자", "cat": "사회복지·상담", "emp": 12859, "pay": 2400, "edu": 2, "outlook": 0, "ai": 2.0, "aiDesc": "아동 돌봄 수요"}, {"name": "다문화가족 지원사", "cat": "사회복지·상담", "emp": 4286, "pay": 2500, "edu": 3, "outlook": 2, "ai": 2.0, "aiDesc": "다문화 가정 지원"}, {"name": "물리학 연구원", "cat": "과학·연구", "emp": 10287, "pay": 4500, "edu": 5, "outlook": 3, "ai": 3.0, "aiDesc": "AI 실험설계 활용"}, {"name": "화학 연구원", "cat": "과학·연구", "emp": 12859, "pay": 4500, "edu": 5, "outlook": 3, "ai": 3.0, "aiDesc": "소재·화학 연구"}, {"name": "생물학 연구원", "cat": "과학·연구", "emp": 15431, "pay": 4200, "edu": 5, "outlook": 5, "ai": 3.0, "aiDesc": "바이오 연구 수요"}, {"name": "생명공학 연구원", "cat": "과학·연구", "emp": 12859, "pay": 4500, "edu": 5, "outlook": 6, "ai": 3.0, "aiDesc": "유전체·mRNA 연구"}, {"name": "분자생물학·유전학 연구원", "cat": "과학·연구", "emp": 8573, "pay": 4600, "edu": 5, "outlook": 7, "ai": 3.0, "aiDesc": "정밀의료 수요 증가"}, {"name": "의약·약학 연구원", "cat": "과학·연구", "emp": 12859, "pay": 4800, "edu": 5, "outlook": 5, "ai": 3.0, "aiDesc": "신약개발 AI 활용"}, {"name": "임상시험(CRA) 전문가", "cat": "과학·연구", "emp": 8573, "pay": 4200, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "임상 연구 수요"}, {"name": "환경·생태 연구원", "cat": "과학·연구", "emp": 6858, "pay": 4000, "edu": 5, "outlook": 3, "ai": 3.0, "aiDesc": "기후변화 연구"}, {"name": "지구과학·기상 연구원", "cat": "과학·연구", "emp": 4286, "pay": 4200, "edu": 5, "outlook": 2, "ai": 3.0, "aiDesc": "기후·기상 예측"}, {"name": "수학 연구원", "cat": "과학·연구", "emp": 2572, "pay": 4500, "edu": 5, "outlook": 3, "ai": 3.5, "aiDesc": "AI·암호 기초 수요"}, {"name": "통계학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 4500, "edu": 5, "outlook": 4, "ai": 3.5, "aiDesc": "데이터 분석 기초"}, {"name": "경제학 연구원", "cat": "과학·연구", "emp": 6858, "pay": 4200, "edu": 5, "outlook": 1, "ai": 4.5, "aiDesc": "경제 정책 분석"}, {"name": "사회학·정치학 연구원", "cat": "과학·연구", "emp": 6858, "pay": 3800, "edu": 5, "outlook": 0, "ai": 4.5, "aiDesc": "사회 조사·분석"}, {"name": "심리학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 3800, "edu": 5, "outlook": 2, "ai": 4.0, "aiDesc": "심리 연구 수요"}, {"name": "교육학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 3600, "edu": 5, "outlook": 0, "ai": 4.0, "aiDesc": "교육 정책 연구"}, {"name": "역사·철학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 3400, "edu": 5, "outlook": -1, "ai": 3.5, "aiDesc": "인문학 연구"}, {"name": "언어학·문학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 3400, "edu": 5, "outlook": -1, "ai": 4.5, "aiDesc": "NLP AI 연관 수요"}, {"name": "AI·컴퓨터과학 연구원", "cat": "과학·연구", "emp": 12859, "pay": 6000, "edu": 5, "outlook": 12, "ai": 2.0, "aiDesc": "AI 연구 수요 폭발"}, {"name": "로봇공학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 5500, "edu": 5, "outlook": 8, "ai": 2.5, "aiDesc": "로봇 R&D 수요"}, {"name": "재료공학 연구원", "cat": "과학·연구", "emp": 8573, "pay": 4500, "edu": 5, "outlook": 3, "ai": 3.0, "aiDesc": "신소재 연구 수요"}, {"name": "에너지공학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 4800, "edu": 5, "outlook": 5, "ai": 3.0, "aiDesc": "에너지 기술 R&D"}, {"name": "전기·전자공학 연구원", "cat": "과학·연구", "emp": 10287, "pay": 4800, "edu": 5, "outlook": 3, "ai": 3.0, "aiDesc": "반도체·전자 연구"}, {"name": "기계공학 연구원", "cat": "과학·연구", "emp": 8573, "pay": 4500, "edu": 5, "outlook": 2, "ai": 3.0, "aiDesc": "기계 설계 연구"}, {"name": "R&D 기획·관리자", "cat": "과학·연구", "emp": 25718, "pay": 5500, "edu": 4, "outlook": 3, "ai": 3.5, "aiDesc": "연구 기획 인간 주도"}, {"name": "연구실 기술원·조교", "cat": "과학·연구", "emp": 12859, "pay": 2800, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "실험 보조 일부 자동화"}, {"name": "기술이전(TLO) 전문가", "cat": "과학·연구", "emp": 2572, "pay": 4500, "edu": 4, "outlook": 2, "ai": 3.5, "aiDesc": "기술사업화 수요"}, {"name": "한식 조리사(일반)", "cat": "식품·조리", "emp": 154309, "pay": 2400, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "조리 자동화 제한적"}, {"name": "한식 조리사(고급)", "cat": "식품·조리", "emp": 25718, "pay": 3500, "edu": 1, "outlook": 2, "ai": 1.5, "aiDesc": "파인다이닝 수요"}, {"name": "한식 조리사(전문점·찌개/국밥)", "cat": "식품·조리", "emp": 68582, "pay": 2300, "edu": 0, "outlook": 0, "ai": 2.0, "aiDesc": "프랜차이즈 표준화"}, {"name": "분식·김밥 조리원", "cat": "식품·조리", "emp": 85727, "pay": 2000, "edu": 0, "outlook": -1, "ai": 2.5, "aiDesc": "간편식 수요"}, {"name": "양식 조리사", "cat": "식품·조리", "emp": 47150, "pay": 3000, "edu": 1, "outlook": 2, "ai": 2.0, "aiDesc": "파인다이닝·호텔 수요"}, {"name": "중식 조리사", "cat": "식품·조리", "emp": 34291, "pay": 2800, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "중식 외식 수요"}, {"name": "일식 조리사(초밥·사시미)", "cat": "식품·조리", "emp": 30004, "pay": 3200, "edu": 1, "outlook": 2, "ai": 1.5, "aiDesc": "오마카세 트렌드"}, {"name": "일식 조리사(라멘·돈카츠 등)", "cat": "식품·조리", "emp": 17145, "pay": 2600, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "일식 프랜차이즈"}, {"name": "동남아·에스닉 조리사", "cat": "식품·조리", "emp": 12859, "pay": 2500, "edu": 1, "outlook": 2, "ai": 2.0, "aiDesc": "다문화 음식 수요"}, {"name": "제과사", "cat": "식품·조리", "emp": 42864, "pay": 2300, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "디저트 시장 성장"}, {"name": "제빵사", "cat": "식품·조리", "emp": 47150, "pay": 2300, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "베이커리 수요"}, {"name": "바리스타(스페셜티)", "cat": "식품·조리", "emp": 42864, "pay": 2200, "edu": 0, "outlook": 1, "ai": 2.5, "aiDesc": "스페셜티 카페 성장"}, {"name": "바리스타(프랜차이즈)", "cat": "식품·조리", "emp": 85727, "pay": 2000, "edu": 0, "outlook": -1, "ai": 3.5, "aiDesc": "로봇카페 등장"}, {"name": "조리보조원(주방보조)", "cat": "식품·조리", "emp": 154309, "pay": 2000, "edu": 0, "outlook": 0, "ai": 2.5, "aiDesc": "기본 수요 유지"}, {"name": "호텔·리조트 셰프", "cat": "식품·조리", "emp": 21432, "pay": 3500, "edu": 2, "outlook": 2, "ai": 2.0, "aiDesc": "고급 조리 수요"}, {"name": "급식 조리사(학교·기업)", "cat": "식품·조리", "emp": 102872, "pay": 2200, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "급식 수요 안정"}, {"name": "외식업체 메뉴개발자", "cat": "식품·조리", "emp": 6858, "pay": 3200, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "트렌드 분석·개발"}, {"name": "영양사", "cat": "식품·조리", "emp": 30004, "pay": 2800, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "건강 관심 증가"}, {"name": "식품위생 관리자", "cat": "식품·조리", "emp": 10287, "pay": 3000, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "식품 안전 규제"}, {"name": "소믈리에·와인전문가", "cat": "식품·조리", "emp": 4286, "pay": 3000, "edu": 2, "outlook": 1, "ai": 2.0, "aiDesc": "와인 시장 성장"}, {"name": "푸드스타일리스트", "cat": "식품·조리", "emp": 2572, "pay": 2800, "edu": 2, "outlook": 1, "ai": 3.5, "aiDesc": "음식 촬영·SNS 수요"}, {"name": "푸드트럭 운영자", "cat": "식품·조리", "emp": 8573, "pay": 2300, "edu": 0, "outlook": 1, "ai": 2.0, "aiDesc": "소규모 외식 창업"}, {"name": "케이터링 조리사", "cat": "식품·조리", "emp": 6858, "pay": 2500, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "행사 케이터링 수요"}, {"name": "학교체육 교사", "cat": "스포츠·레저", "emp": 34291, "pay": 4200, "edu": 4, "outlook": -1, "ai": 1.5, "aiDesc": "학령인구 감소"}, {"name": "헬스·PT 트레이너", "cat": "스포츠·레저", "emp": 47150, "pay": 2600, "edu": 2, "outlook": 4, "ai": 2.0, "aiDesc": "건강 관심 증가"}, {"name": "그룹운동(에어로빅 등) 강사", "cat": "스포츠·레저", "emp": 12859, "pay": 2300, "edu": 2, "outlook": 2, "ai": 1.5, "aiDesc": "그룹 피트니스 수요"}, {"name": "요가 강사", "cat": "스포츠·레저", "emp": 25718, "pay": 2600, "edu": 2, "outlook": 5, "ai": 1.5, "aiDesc": "웰빙 트렌드"}, {"name": "필라테스 강사", "cat": "스포츠·레저", "emp": 25718, "pay": 2800, "edu": 2, "outlook": 5, "ai": 1.5, "aiDesc": "필라테스 인기 급증"}, {"name": "수영 강사", "cat": "스포츠·레저", "emp": 17145, "pay": 2500, "edu": 2, "outlook": 2, "ai": 1.5, "aiDesc": "실기 지도 대면"}, {"name": "축구·야구 코치", "cat": "스포츠·레저", "emp": 8573, "pay": 2500, "edu": 2, "outlook": 1, "ai": 1.5, "aiDesc": "유소년 스포츠 수요"}, {"name": "태권도·무도 사범", "cat": "스포츠·레저", "emp": 17145, "pay": 2400, "edu": 2, "outlook": 0, "ai": 1.5, "aiDesc": "체육 교육 대면"}, {"name": "골프 프로·강사", "cat": "스포츠·레저", "emp": 15431, "pay": 3200, "edu": 2, "outlook": 3, "ai": 1.5, "aiDesc": "골프 인구 증가"}, {"name": "테니스 코치", "cat": "스포츠·레저", "emp": 8573, "pay": 2800, "edu": 2, "outlook": 3, "ai": 1.5, "aiDesc": "테니스 인기 급증"}, {"name": "스키·수상스포츠 강사", "cat": "스포츠·레저", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "계절 레저 수요"}, {"name": "클라이밍·아웃도어 강사", "cat": "스포츠·레저", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 2, "ai": 1.5, "aiDesc": "아웃도어 트렌드"}, {"name": "댄스·K-POP 강사", "cat": "스포츠·레저", "emp": 10287, "pay": 2300, "edu": 1, "outlook": 3, "ai": 1.5, "aiDesc": "K-POP 댄스 수요"}, {"name": "유소년 스포츠 지도사", "cat": "스포츠·레저", "emp": 17145, "pay": 2400, "edu": 2, "outlook": 1, "ai": 1.5, "aiDesc": "체험형 교육"}, {"name": "노인건강운동 지도사", "cat": "스포츠·레저", "emp": 10287, "pay": 2500, "edu": 2, "outlook": 7, "ai": 1.5, "aiDesc": "고령화 운동 수요"}, {"name": "장애인 체육지도사", "cat": "스포츠·레저", "emp": 4286, "pay": 2500, "edu": 2, "outlook": 3, "ai": 1.5, "aiDesc": "장애인 체육 확대"}, {"name": "스포츠 재활 트레이너", "cat": "스포츠·레저", "emp": 6858, "pay": 3000, "edu": 3, "outlook": 4, "ai": 2.0, "aiDesc": "운동선수 재활"}, {"name": "스포츠 심리상담사", "cat": "스포츠·레저", "emp": 2572, "pay": 3200, "edu": 4, "outlook": 3, "ai": 2.5, "aiDesc": "운동선수 멘탈 관리"}, {"name": "프로선수(야구·축구·농구 등)", "cat": "스포츠·레저", "emp": 3429, "pay": 5500, "edu": 2, "outlook": 0, "ai": 1.0, "aiDesc": "경기 인간 영역"}, {"name": "e스포츠 프로게이머", "cat": "스포츠·레저", "emp": 1715, "pay": 3500, "edu": 1, "outlook": 0, "ai": 1.5, "aiDesc": "e스포츠 성장"}, {"name": "e스포츠 코치·감독", "cat": "스포츠·레저", "emp": 857, "pay": 3500, "edu": 2, "outlook": 1, "ai": 2.0, "aiDesc": "e스포츠 전략 분석"}, {"name": "스포츠 코치·감독", "cat": "스포츠·레저", "emp": 6858, "pay": 3500, "edu": 2, "outlook": 1, "ai": 2.5, "aiDesc": "AI 데이터 분석 활용"}, {"name": "스포츠 에이전트·매니저", "cat": "스포츠·레저", "emp": 1715, "pay": 4000, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "선수 관리 인간 주도"}, {"name": "스포츠 해설·캐스터", "cat": "스포츠·레저", "emp": 857, "pay": 3500, "edu": 3, "outlook": 1, "ai": 3.0, "aiDesc": "AI 분석 보조"}, {"name": "체육시설 관리원", "cat": "스포츠·레저", "emp": 21432, "pay": 2200, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "체육시설 운영"}, {"name": "수영장·워터파크 안전요원", "cat": "스포츠·레저", "emp": 8573, "pay": 2200, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "수상 안전 대면"}, {"name": "놀이공원·테마파크 운영원", "cat": "스포츠·레저", "emp": 21432, "pay": 2200, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "체험 산업 성장"}, {"name": "PC방·오락실 관리원", "cat": "스포츠·레저", "emp": 8573, "pay": 2000, "edu": 0, "outlook": -3, "ai": 4.0, "aiDesc": "무인 운영 확대"}, {"name": "볼링장·당구장 관리원", "cat": "스포츠·레저", "emp": 6858, "pay": 2100, "edu": 0, "outlook": -1, "ai": 3.0, "aiDesc": "여가 시설 운영"}, {"name": "캠핑장·펜션 관리원", "cat": "스포츠·레저", "emp": 6858, "pay": 2200, "edu": 0, "outlook": 2, "ai": 2.0, "aiDesc": "캠핑 트렌드 유지"}, {"name": "스포츠용품 판매원", "cat": "스포츠·레저", "emp": 12859, "pay": 2300, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "온라인 판매 확대"}, {"name": "프랜차이즈 본사 관리자", "cat": "경영·사무", "emp": 30004, "pay": 3500, "edu": 3, "outlook": 1, "ai": 5.0, "aiDesc": "가맹점 관리·운영 지원"}, {"name": "경영정보시스템(MIS) 관리자", "cat": "경영·사무", "emp": 21432, "pay": 3600, "edu": 3, "outlook": 1, "ai": 5.5, "aiDesc": "사내 시스템 운영·관리"}, {"name": "사내벤처·혁신담당자", "cat": "경영·사무", "emp": 8573, "pay": 4000, "edu": 3, "outlook": 4, "ai": 3.5, "aiDesc": "사내 혁신 프로그램 운영"}, {"name": "CSR·사회공헌 사무원", "cat": "경영·사무", "emp": 10287, "pay": 3200, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "기업 사회공헌 활동 기획"}, {"name": "지식재산(IP)전략 담당자", "cat": "경영·사무", "emp": 6858, "pay": 4200, "edu": 3, "outlook": 3, "ai": 4.5, "aiDesc": "특허 포트폴리오 전략"}, {"name": "해외법인 관리 사무원", "cat": "경영·사무", "emp": 12859, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "해외법인 재무·인사 관리"}, {"name": "투자심사 사무원", "cat": "경영·사무", "emp": 6858, "pay": 4500, "edu": 4, "outlook": 2, "ai": 5.0, "aiDesc": "투자안건 분석·심사"}, {"name": "자산운용 보조 사무원", "cat": "경영·사무", "emp": 8573, "pay": 3500, "edu": 3, "outlook": 0, "ai": 6.5, "aiDesc": "자산관리 보조 업무"}, {"name": "감사(내부감사) 사무원", "cat": "경영·사무", "emp": 12859, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "내부통제·감사 실시"}, {"name": "환율·외환관리 사무원", "cat": "경영·사무", "emp": 6858, "pay": 3500, "edu": 3, "outlook": -1, "ai": 6.5, "aiDesc": "외환 리스크 관리"}, {"name": "보안관리(시설보안) 사무원", "cat": "경영·사무", "emp": 17145, "pay": 3000, "edu": 2, "outlook": 0, "ai": 4.5, "aiDesc": "시설 보안 관리 운영"}, {"name": "안내·접수 사무원(리셉션)", "cat": "경영·사무", "emp": 47150, "pay": 2300, "edu": 1, "outlook": -2, "ai": 6.5, "aiDesc": "방문객 안내·접수 자동화"}, {"name": "통계·데이터입력 사무원", "cat": "경영·사무", "emp": 34291, "pay": 2500, "edu": 2, "outlook": -3, "ai": 8.5, "aiDesc": "단순 데이터 입력 AI 대체"}, {"name": "문서관리·기록물 사무원", "cat": "경영·사무", "emp": 21432, "pay": 2700, "edu": 2, "outlook": -2, "ai": 7.5, "aiDesc": "전자문서 관리 자동화"}, {"name": "우편·발송 사무원", "cat": "경영·사무", "emp": 25718, "pay": 2200, "edu": 0, "outlook": -3, "ai": 7.0, "aiDesc": "전자문서 전환 가속"}, {"name": "번역·통역 사무원(사내)", "cat": "경영·사무", "emp": 12859, "pay": 3200, "edu": 3, "outlook": -3, "ai": 7.5, "aiDesc": "AI 번역 활용 확대"}, {"name": "사회적기업 경영지원", "cat": "경영·사무", "emp": 6858, "pay": 2800, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "사회적경제 성장"}, {"name": "스타트업 COO·운영총괄", "cat": "경영·사무", "emp": 10287, "pay": 4500, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "스타트업 생태계 성장"}, {"name": "프로젝트 매니저(비IT)", "cat": "경영·사무", "emp": 25718, "pay": 3800, "edu": 3, "outlook": 1, "ai": 4.5, "aiDesc": "프로젝트 관리 수요"}, {"name": "이벤트·프로모션 기획자", "cat": "경영·사무", "emp": 17145, "pay": 3000, "edu": 2, "outlook": 1, "ai": 4.0, "aiDesc": "행사 기획·운영"}, {"name": "유통채널 관리자", "cat": "경영·사무", "emp": 21432, "pay": 3200, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "유통 채널 전략 관리"}, {"name": "가격·원가분석 전문가", "cat": "경영·사무", "emp": 10287, "pay": 3600, "edu": 3, "outlook": 1, "ai": 6.0, "aiDesc": "가격 정책 분석 AI 활용"}, {"name": "서비스기획(서비스디자인) 전문가", "cat": "경영·사무", "emp": 8573, "pay": 3800, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "서비스 경험 설계"}, {"name": "정부지원사업 관리 사무원", "cat": "경영·사무", "emp": 12859, "pay": 3000, "edu": 3, "outlook": 1, "ai": 5.0, "aiDesc": "정부과제 행정 관리"}, {"name": "노사협의·단체교섭 전문가", "cat": "경영·사무", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "노사 관계 조율"}, {"name": "반려동물 미용사(그루머)", "cat": "판매·서비스", "emp": 17145, "pay": 2300, "edu": 1, "outlook": 5, "ai": 1.0, "aiDesc": "반려동물 산업 성장"}, {"name": "반려동물 행동교정사", "cat": "판매·서비스", "emp": 4286, "pay": 2800, "edu": 2, "outlook": 4, "ai": 1.5, "aiDesc": "펫 행동 교정 수요"}, {"name": "반려동물 호텔·시터", "cat": "판매·서비스", "emp": 8573, "pay": 2200, "edu": 0, "outlook": 4, "ai": 1.0, "aiDesc": "펫 돌봄 서비스 성장"}, {"name": "웨딩플래너", "cat": "판매·서비스", "emp": 12859, "pay": 2800, "edu": 2, "outlook": -3, "ai": 3.0, "aiDesc": "혼인율 감소 영향"}, {"name": "파티·이벤트 플래너", "cat": "판매·서비스", "emp": 6858, "pay": 2700, "edu": 2, "outlook": 1, "ai": 3.0, "aiDesc": "소규모 이벤트 수요"}, {"name": "커피머신 수리·정비원", "cat": "판매·서비스", "emp": 4286, "pay": 2800, "edu": 1, "outlook": 2, "ai": 2.5, "aiDesc": "카페 장비 유지보수"}, {"name": "자판기·무인매장 관리원", "cat": "판매·서비스", "emp": 10287, "pay": 2200, "edu": 0, "outlook": 2, "ai": 5.0, "aiDesc": "무인화 확대"}, {"name": "꽃집·플로리스트", "cat": "판매·서비스", "emp": 12859, "pay": 2200, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "화훼 디자인 수요"}, {"name": "장난감·완구 판매원", "cat": "판매·서비스", "emp": 8573, "pay": 2100, "edu": 0, "outlook": -3, "ai": 5.0, "aiDesc": "온라인 전환"}, {"name": "스포츠용품 전문 판매원", "cat": "판매·서비스", "emp": 10287, "pay": 2300, "edu": 1, "outlook": -1, "ai": 4.5, "aiDesc": "오프라인 매장 축소"}, {"name": "안경·렌즈 판매원", "cat": "판매·서비스", "emp": 12859, "pay": 2300, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "안경원 판매 유지"}, {"name": "건강식품·영양제 판매원", "cat": "판매·서비스", "emp": 17145, "pay": 2500, "edu": 1, "outlook": 2, "ai": 5.0, "aiDesc": "건강 관심 증가"}, {"name": "중고거래 플랫폼 운영자", "cat": "판매·서비스", "emp": 6858, "pay": 2700, "edu": 2, "outlook": 3, "ai": 4.5, "aiDesc": "중고시장 성장"}, {"name": "경매사(농수산물)", "cat": "판매·서비스", "emp": 2572, "pay": 3200, "edu": 1, "outlook": 0, "ai": 3.0, "aiDesc": "경매 전문성 필요"}, {"name": "자동차 정비 접수원(SA)", "cat": "판매·서비스", "emp": 8573, "pay": 2600, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "정비 접수·상담"}, {"name": "학습지교사(방문교육)", "cat": "판매·서비스", "emp": 42864, "pay": 2200, "edu": 2, "outlook": -5, "ai": 6.0, "aiDesc": "비대면·AI 학습 확대"}, {"name": "홈클리닝 서비스원", "cat": "판매·서비스", "emp": 25718, "pay": 2200, "edu": 0, "outlook": 4, "ai": 1.5, "aiDesc": "가사서비스 플랫폼 성장"}, {"name": "가전·수리 출장서비스원", "cat": "판매·서비스", "emp": 21432, "pay": 2600, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "가전 수리 대면 필요"}, {"name": "렌탈·구독 서비스 관리원", "cat": "판매·서비스", "emp": 12859, "pay": 2500, "edu": 1, "outlook": 2, "ai": 5.0, "aiDesc": "구독경제 성장"}, {"name": "자동차 딜러(수입차)", "cat": "판매·서비스", "emp": 12859, "pay": 3800, "edu": 2, "outlook": 0, "ai": 4.0, "aiDesc": "수입차 전문 상담"}, {"name": "이사 서비스 코디네이터", "cat": "판매·서비스", "emp": 6858, "pay": 2600, "edu": 1, "outlook": 0, "ai": 3.5, "aiDesc": "이사 서비스 기획"}, {"name": "명품 브랜드 판매원", "cat": "판매·서비스", "emp": 12859, "pay": 2800, "edu": 2, "outlook": 0, "ai": 3.5, "aiDesc": "프리미엄 서비스 수요"}, {"name": "면세점 판매원", "cat": "판매·서비스", "emp": 17145, "pay": 2500, "edu": 1, "outlook": -2, "ai": 4.5, "aiDesc": "관광객 변동"}, {"name": "할인마트·SSM 계산원", "cat": "판매·서비스", "emp": 102872, "pay": 1900, "edu": 0, "outlook": -4, "ai": 7.0, "aiDesc": "셀프계산대 확대"}, {"name": "약국 보조원", "cat": "판매·서비스", "emp": 17145, "pay": 2100, "edu": 1, "outlook": 1, "ai": 4.0, "aiDesc": "약국 보조 업무"}, {"name": "병원 원무·접수원", "cat": "판매·서비스", "emp": 34291, "pay": 2400, "edu": 1, "outlook": -1, "ai": 6.5, "aiDesc": "무인접수 키오스크 확대"}, {"name": "은행·관공서 안내원", "cat": "판매·서비스", "emp": 12859, "pay": 2200, "edu": 1, "outlook": -3, "ai": 6.0, "aiDesc": "무인 안내 시스템"}, {"name": "공항 면세점·라운지 직원", "cat": "판매·서비스", "emp": 8573, "pay": 2600, "edu": 1, "outlook": 1, "ai": 4.0, "aiDesc": "공항 서비스 수요"}, {"name": "야구장·공연장 매점 직원", "cat": "판매·서비스", "emp": 12859, "pay": 2000, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "이벤트 현장 수요"}, {"name": "뷰티 유튜버·인플루언서", "cat": "판매·서비스", "emp": 4286, "pay": 3000, "edu": 1, "outlook": 4, "ai": 2.5, "aiDesc": "인플루언서 마케팅 성장"}, {"name": "성형외과 전문의", "cat": "보건·의료", "emp": 4286, "pay": 10000, "edu": 5, "outlook": 2, "ai": 2.5, "aiDesc": "미용 시술 수요 유지"}, {"name": "치과보철과 전문의", "cat": "보건·의료", "emp": 3429, "pay": 8000, "edu": 5, "outlook": 2, "ai": 2.5, "aiDesc": "보철 시술 수요"}, {"name": "한약사", "cat": "보건·의료", "emp": 2572, "pay": 5000, "edu": 5, "outlook": 0, "ai": 3.0, "aiDesc": "한약 조제·상담"}, {"name": "동물간호복지사", "cat": "보건·의료", "emp": 8573, "pay": 2200, "edu": 2, "outlook": 5, "ai": 2.0, "aiDesc": "반려동물 의료 보조"}, {"name": "방문간호사(재가)", "cat": "보건·의료", "emp": 12859, "pay": 3400, "edu": 3, "outlook": 6, "ai": 2.0, "aiDesc": "재가의료 서비스 확대"}, {"name": "감염관리 간호사", "cat": "보건·의료", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 5, "ai": 2.5, "aiDesc": "감염병 대응 수요"}, {"name": "보건교육사", "cat": "보건·의료", "emp": 6858, "pay": 3000, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "건강증진 교육 수요"}, {"name": "의료통역사", "cat": "보건·의료", "emp": 2572, "pay": 3200, "edu": 3, "outlook": 2, "ai": 6.0, "aiDesc": "AI 통역 발전 영향"}, {"name": "안마사·마사지사", "cat": "보건·의료", "emp": 25718, "pay": 2300, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "대면 시술 대체 어려움"}, {"name": "재활운동지도사", "cat": "보건·의료", "emp": 6858, "pay": 2800, "edu": 2, "outlook": 4, "ai": 2.0, "aiDesc": "재활 운동 수요"}, {"name": "의료정보(HIS) 관리자", "cat": "보건·의료", "emp": 6858, "pay": 3500, "edu": 3, "outlook": 3, "ai": 5.0, "aiDesc": "의료정보시스템 운영"}, {"name": "원격의료 코디네이터", "cat": "보건·의료", "emp": 4286, "pay": 3000, "edu": 2, "outlook": 5, "ai": 4.5, "aiDesc": "원격진료 확대"}, {"name": "구급차 운전원", "cat": "보건·의료", "emp": 6858, "pay": 2800, "edu": 1, "outlook": 3, "ai": 2.0, "aiDesc": "응급이송 대면 필수"}, {"name": "장기이식 코디네이터", "cat": "보건·의료", "emp": 1715, "pay": 3500, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "이식의료 전문"}, {"name": "호스피스 간호사", "cat": "보건·의료", "emp": 4286, "pay": 3400, "edu": 3, "outlook": 5, "ai": 1.5, "aiDesc": "완화의료 수요 증가"}, {"name": "치매전담 간호사", "cat": "보건·의료", "emp": 6858, "pay": 3300, "edu": 3, "outlook": 7, "ai": 1.5, "aiDesc": "치매 관리 수요 폭증"}, {"name": "영양상담사(병원)", "cat": "보건·의료", "emp": 4286, "pay": 3000, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "환자 영양 관리"}, {"name": "산후조리원 간호사", "cat": "보건·의료", "emp": 4286, "pay": 3200, "edu": 3, "outlook": -2, "ai": 2.0, "aiDesc": "출생률 감소 영향"}, {"name": "치과 진료보조원", "cat": "보건·의료", "emp": 17145, "pay": 2300, "edu": 1, "outlook": 2, "ai": 2.5, "aiDesc": "치과 진료 보조"}, {"name": "정형외과 재활보조원", "cat": "보건·의료", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 3, "ai": 2.0, "aiDesc": "재활 보조 수요"}, {"name": "방문요양 관리사(사회복지)", "cat": "보건·의료", "emp": 21432, "pay": 2400, "edu": 1, "outlook": 8, "ai": 1.5, "aiDesc": "재가요양 확대"}, {"name": "노인주간보호 종사자", "cat": "보건·의료", "emp": 12859, "pay": 2200, "edu": 1, "outlook": 7, "ai": 1.5, "aiDesc": "주간보호 수요 증가"}, {"name": "정신건강복지센터 종사자", "cat": "보건·의료", "emp": 6858, "pay": 2800, "edu": 3, "outlook": 5, "ai": 2.5, "aiDesc": "정신건강 인프라 확충"}, {"name": "산업보건 관리자", "cat": "보건·의료", "emp": 8573, "pay": 3500, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "산업 안전보건 강화"}, {"name": "한방물리치료사", "cat": "보건·의료", "emp": 6858, "pay": 2800, "edu": 2, "outlook": 1, "ai": 2.0, "aiDesc": "한방 치료 보조"}, {"name": "영재교육 강사", "cat": "교육", "emp": 6858, "pay": 3500, "edu": 3, "outlook": 1, "ai": 3.5, "aiDesc": "영재교육 수요"}, {"name": "한국어교육(외국인 대상) 강사", "cat": "교육", "emp": 10287, "pay": 2800, "edu": 3, "outlook": 2, "ai": 4.5, "aiDesc": "외국인 유학생 증가"}, {"name": "성인 문해교육 강사", "cat": "교육", "emp": 4286, "pay": 2500, "edu": 2, "outlook": 1, "ai": 3.5, "aiDesc": "성인 문해 수요"}, {"name": "운전학원 강사", "cat": "교육", "emp": 12859, "pay": 2800, "edu": 1, "outlook": -3, "ai": 5.5, "aiDesc": "자율주행 영향 전망"}, {"name": "자격증·공무원 학원강사", "cat": "교육", "emp": 17145, "pay": 3500, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "자격 시험 수요"}, {"name": "바리스타·제과 직업훈련 강사", "cat": "교육", "emp": 4286, "pay": 2700, "edu": 2, "outlook": 1, "ai": 3.0, "aiDesc": "직업훈련 수요"}, {"name": "어학원 원장·운영자", "cat": "교육", "emp": 12859, "pay": 3200, "edu": 3, "outlook": -3, "ai": 4.5, "aiDesc": "영어학원 구조조정"}, {"name": "교육콘텐츠 기획자(에듀테크)", "cat": "교육", "emp": 10287, "pay": 3500, "edu": 3, "outlook": 5, "ai": 4.0, "aiDesc": "에듀테크 콘텐츠 개발"}, {"name": "교육과정(커리큘럼) 개발자", "cat": "교육", "emp": 6858, "pay": 3400, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "교육과정 설계"}, {"name": "도서관 사서", "cat": "교육", "emp": 10287, "pay": 3000, "edu": 3, "outlook": -1, "ai": 5.0, "aiDesc": "디지털 자료 관리 확대"}, {"name": "사서교사", "cat": "교육", "emp": 4286, "pay": 4000, "edu": 4, "outlook": -1, "ai": 5.0, "aiDesc": "학교도서관 운영"}, {"name": "박물관·과학관 교육사", "cat": "교육", "emp": 4286, "pay": 2800, "edu": 3, "outlook": 1, "ai": 3.0, "aiDesc": "체험 교육 수요"}, {"name": "학교 상담교사", "cat": "교육", "emp": 8573, "pay": 4000, "edu": 4, "outlook": 2, "ai": 2.5, "aiDesc": "학교 상담 수요"}, {"name": "학원 행정·접수 사무원", "cat": "교육", "emp": 25718, "pay": 2200, "edu": 1, "outlook": -2, "ai": 6.0, "aiDesc": "학원 관리 자동화"}, {"name": "방문 과외교사", "cat": "교육", "emp": 34291, "pay": 2800, "edu": 3, "outlook": -2, "ai": 4.5, "aiDesc": "AI 튜터 등장 영향"}, {"name": "음악치료사", "cat": "교육", "emp": 2572, "pay": 2800, "edu": 3, "outlook": 3, "ai": 2.0, "aiDesc": "예술치료 수요"}, {"name": "미술치료사", "cat": "교육", "emp": 2572, "pay": 2700, "edu": 3, "outlook": 3, "ai": 2.0, "aiDesc": "예술치료 수요 증가"}, {"name": "특수체육 교사", "cat": "교육", "emp": 2572, "pay": 3200, "edu": 3, "outlook": 2, "ai": 1.5, "aiDesc": "장애인 체육교육"}, {"name": "직업훈련 실기교사(용접·전기 등)", "cat": "교육", "emp": 6858, "pay": 3200, "edu": 2, "outlook": 1, "ai": 3.0, "aiDesc": "산업 실기 교육"}, {"name": "보육시설 원장", "cat": "교육", "emp": 17145, "pay": 2800, "edu": 2, "outlook": -4, "ai": 2.0, "aiDesc": "저출산 영향"}, {"name": "로우코드·노코드 개발자", "cat": "정보통신(IT)", "emp": 6858, "pay": 4000, "edu": 2, "outlook": 8, "ai": 5.0, "aiDesc": "시민개발자 수요 증가"}, {"name": "API·마이크로서비스 개발자", "cat": "정보통신(IT)", "emp": 10287, "pay": 5200, "edu": 3, "outlook": 6, "ai": 4.0, "aiDesc": "분산시스템 수요"}, {"name": "검색엔진(SEO/SEM) 기술자", "cat": "정보통신(IT)", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 3, "ai": 5.5, "aiDesc": "검색 최적화 AI 활용"}, {"name": "음성인식·대화형AI 개발자", "cat": "정보통신(IT)", "emp": 4286, "pay": 6500, "edu": 4, "outlook": 10, "ai": 2.5, "aiDesc": "음성 AI 수요 급증"}, {"name": "추천시스템 개발자", "cat": "정보통신(IT)", "emp": 4286, "pay": 6000, "edu": 4, "outlook": 8, "ai": 3.0, "aiDesc": "개인화 추천 수요"}, {"name": "VR·AR 개발자", "cat": "정보통신(IT)", "emp": 6858, "pay": 5000, "edu": 3, "outlook": 5, "ai": 3.0, "aiDesc": "XR 콘텐츠 수요 성장"}, {"name": "메타버스 플랫폼 개발자", "cat": "정보통신(IT)", "emp": 4286, "pay": 4800, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "메타버스 시장 변동"}, {"name": "IoT 플랫폼 개발자", "cat": "정보통신(IT)", "emp": 8573, "pay": 5000, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "사물인터넷 수요 증가"}, {"name": "RPA·업무자동화 개발자", "cat": "정보통신(IT)", "emp": 8573, "pay": 4500, "edu": 3, "outlook": 5, "ai": 5.0, "aiDesc": "업무자동화 수요 확대"}, {"name": "CRM·마테크 시스템 개발자", "cat": "정보통신(IT)", "emp": 6858, "pay": 4500, "edu": 3, "outlook": 4, "ai": 4.5, "aiDesc": "마케팅 자동화 수요"}, {"name": "오픈소스 컨트리뷰터·DevRel", "cat": "정보통신(IT)", "emp": 2572, "pay": 5000, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "개발자 생태계 수요"}, {"name": "IT 교육·부트캠프 운영자", "cat": "정보통신(IT)", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "IT 교육 수요"}, {"name": "개인정보보호(CPO) 담당자", "cat": "정보통신(IT)", "emp": 4286, "pay": 5000, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "데이터 규제 강화"}, {"name": "IT 감사·컴플라이언스 전문가", "cat": "정보통신(IT)", "emp": 4286, "pay": 5200, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "IT 감사 수요"}, {"name": "IT 자산·라이선스 관리자", "cat": "정보통신(IT)", "emp": 6858, "pay": 3500, "edu": 2, "outlook": 0, "ai": 5.5, "aiDesc": "SW 라이선스 관리"}, {"name": "데이터센터 운영 기술자", "cat": "정보통신(IT)", "emp": 12859, "pay": 3800, "edu": 2, "outlook": 2, "ai": 4.5, "aiDesc": "IDC 운영 수요"}, {"name": "스토리지·백업 관리자", "cat": "정보통신(IT)", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "데이터 저장 관리"}, {"name": "VoIP·UC(통합커뮤니케이션) 기술자", "cat": "정보통신(IT)", "emp": 4286, "pay": 3800, "edu": 3, "outlook": -1, "ai": 5.0, "aiDesc": "통신 인프라 관리"}, {"name": "전산실·서버실 관리자", "cat": "정보통신(IT)", "emp": 8573, "pay": 3500, "edu": 2, "outlook": -1, "ai": 5.5, "aiDesc": "클라우드 전환 영향"}, {"name": "GIS(지리정보시스템) 기술자", "cat": "정보통신(IT)", "emp": 6858, "pay": 3800, "edu": 3, "outlook": 2, "ai": 4.5, "aiDesc": "공간정보 수요"}, {"name": "웹 접근성·표준 전문가", "cat": "정보통신(IT)", "emp": 2572, "pay": 3800, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "디지털 접근성 규제"}, {"name": "프로젝트 스크럼마스터", "cat": "정보통신(IT)", "emp": 4286, "pay": 4800, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "애자일 방법론 확대"}, {"name": "정보처리·정보관리 기술사", "cat": "정보통신(IT)", "emp": 4286, "pay": 5500, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "IT 자격 전문가"}, {"name": "디지털포렌식 전문가", "cat": "정보통신(IT)", "emp": 2572, "pay": 5000, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "디지털 증거 수요 증가"}, {"name": "IT 아웃소싱 관리자", "cat": "정보통신(IT)", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "외주 IT 관리"}, {"name": "원자력공학 기술자", "cat": "공학·기술", "emp": 6858, "pay": 5500, "edu": 4, "outlook": 1, "ai": 3.0, "aiDesc": "원전 운영·해체 수요"}, {"name": "플랜트 배관 설계 기술자", "cat": "공학·기술", "emp": 8573, "pay": 4200, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "플랜트 수요"}, {"name": "플랜트 전기·계장 기술자", "cat": "공학·기술", "emp": 8573, "pay": 4300, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "계장설비 수요"}, {"name": "수처리·정수 설비 기술자", "cat": "공학·기술", "emp": 6858, "pay": 3800, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "수처리 수요 유지"}, {"name": "HVAC(공조) 설계 기술자", "cat": "공학·기술", "emp": 8573, "pay": 4000, "edu": 3, "outlook": 1, "ai": 3.5, "aiDesc": "빌딩 공조 수요"}, {"name": "방폭·방화 설비 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3800, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "안전설비 규제"}, {"name": "3D프린팅 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "적층제조 기술 성장"}, {"name": "드론 설계·정비 기술자", "cat": "공학·기술", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 5, "ai": 3.0, "aiDesc": "드론 산업 성장"}, {"name": "의료기기 설계 기술자", "cat": "공학·기술", "emp": 8573, "pay": 4500, "edu": 3, "outlook": 4, "ai": 3.0, "aiDesc": "의료기기 수요 증가"}, {"name": "광학·렌즈 기술자", "cat": "공학·기술", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 1, "ai": 3.5, "aiDesc": "광학 부품 수요"}, {"name": "음향·진동 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 1, "ai": 3.5, "aiDesc": "음향 설계 전문"}, {"name": "식품기계·설비 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3600, "edu": 2, "outlook": 1, "ai": 3.5, "aiDesc": "식품 설비 유지보수"}, {"name": "포장기계 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3500, "edu": 2, "outlook": 0, "ai": 4.0, "aiDesc": "포장 자동화 설비"}, {"name": "섬유·염색 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3200, "edu": 2, "outlook": -3, "ai": 4.0, "aiDesc": "섬유 산업 축소"}, {"name": "농업기계·설비 기술자", "cat": "공학·기술", "emp": 4286, "pay": 3200, "edu": 2, "outlook": 1, "ai": 3.5, "aiDesc": "농업 기계화"}, {"name": "엘리베이터·에스컬레이터 기술자", "cat": "공학·기술", "emp": 6858, "pay": 3800, "edu": 2, "outlook": 1, "ai": 2.5, "aiDesc": "승강기 유지보수"}, {"name": "자동차 정비 기술자", "cat": "공학·기술", "emp": 55723, "pay": 3200, "edu": 1, "outlook": 0, "ai": 4.0, "aiDesc": "자동차 정비 수요"}, {"name": "자동차 도장·판금 기술자", "cat": "공학·기술", "emp": 17145, "pay": 3000, "edu": 1, "outlook": -1, "ai": 4.5, "aiDesc": "자동화 도장 확대"}, {"name": "이륜차(오토바이) 정비사", "cat": "공학·기술", "emp": 4286, "pay": 2600, "edu": 1, "outlook": 0, "ai": 3.0, "aiDesc": "배달용 오토바이 수요"}, {"name": "농기계 정비 기술자", "cat": "공학·기술", "emp": 4286, "pay": 2800, "edu": 1, "outlook": -1, "ai": 3.0, "aiDesc": "농기계 유지보수"}, {"name": "태양광 패널 제조원", "cat": "제조·생산", "emp": 12859, "pay": 3000, "edu": 1, "outlook": 3, "ai": 5.5, "aiDesc": "태양광 산업 성장"}, {"name": "LED·조명 제조원", "cat": "제조·생산", "emp": 8573, "pay": 2700, "edu": 1, "outlook": -1, "ai": 6.0, "aiDesc": "LED 자동화 생산"}, {"name": "화장품 제조원", "cat": "제조·생산", "emp": 12859, "pay": 2500, "edu": 1, "outlook": 1, "ai": 5.0, "aiDesc": "K-뷰티 생산 수요"}, {"name": "자동차 엔진 조립원", "cat": "제조·생산", "emp": 21432, "pay": 3200, "edu": 1, "outlook": -3, "ai": 6.5, "aiDesc": "내연기관 축소"}, {"name": "자동차 도장 조작원", "cat": "제조·생산", "emp": 12859, "pay": 3000, "edu": 1, "outlook": -2, "ai": 7.0, "aiDesc": "자동 도장 라인"}, {"name": "타이어 제조원", "cat": "제조·생산", "emp": 8573, "pay": 3000, "edu": 1, "outlook": -1, "ai": 6.0, "aiDesc": "자동화 생산"}, {"name": "건축자재 제조원", "cat": "제조·생산", "emp": 12859, "pay": 2600, "edu": 0, "outlook": -2, "ai": 5.0, "aiDesc": "건설 수요 연동"}, {"name": "담배·주류 제조원", "cat": "제조·생산", "emp": 4286, "pay": 3000, "edu": 0, "outlook": -2, "ai": 5.5, "aiDesc": "자동화 생산 라인"}, {"name": "비누·세제 제조원", "cat": "제조·생산", "emp": 4286, "pay": 2600, "edu": 0, "outlook": -1, "ai": 5.5, "aiDesc": "자동화 생산"}, {"name": "반도체 세정·연마 조작원", "cat": "제조·생산", "emp": 12859, "pay": 3100, "edu": 1, "outlook": 2, "ai": 6.0, "aiDesc": "반도체 공정 보조"}, {"name": "2차전지 양극·음극재 제조원", "cat": "제조·생산", "emp": 12859, "pay": 3200, "edu": 1, "outlook": 5, "ai": 5.0, "aiDesc": "배터리 소재 생산 확대"}, {"name": "전기차 모터 조립원", "cat": "제조·생산", "emp": 8573, "pay": 3200, "edu": 1, "outlook": 5, "ai": 5.5, "aiDesc": "전기차 부품 생산"}, {"name": "정수기·공기청정기 제조원", "cat": "제조·생산", "emp": 6858, "pay": 2700, "edu": 1, "outlook": 0, "ai": 6.0, "aiDesc": "가전 자동화"}, {"name": "산업용가스 제조·충전원", "cat": "제조·생산", "emp": 4286, "pay": 3000, "edu": 0, "outlook": 0, "ai": 4.5, "aiDesc": "특수가스 취급"}, {"name": "페인트·도료 제조원", "cat": "제조·생산", "emp": 4286, "pay": 2700, "edu": 0, "outlook": -1, "ai": 5.0, "aiDesc": "자동 배합 시스템"}, {"name": "사료·비료 제조원", "cat": "제조·생산", "emp": 6858, "pay": 2600, "edu": 0, "outlook": -1, "ai": 5.0, "aiDesc": "자동화 생산"}, {"name": "완구·스포츠용품 제조원", "cat": "제조·생산", "emp": 4286, "pay": 2300, "edu": 0, "outlook": -3, "ai": 5.0, "aiDesc": "해외 생산 이전"}, {"name": "악기 제조·수리원", "cat": "제조·생산", "emp": 2572, "pay": 2800, "edu": 1, "outlook": -1, "ai": 2.5, "aiDesc": "수공예 영역"}, {"name": "안경·렌즈 제조원", "cat": "제조·생산", "emp": 4286, "pay": 2700, "edu": 1, "outlook": 0, "ai": 5.0, "aiDesc": "자동 렌즈 가공"}, {"name": "의수족·보조기구 제조원", "cat": "제조·생산", "emp": 2572, "pay": 3000, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "재활 보조기구 수요"}, {"name": "스마트홈 시스템 시공원", "cat": "건설", "emp": 4286, "pay": 3300, "edu": 1, "outlook": 4, "ai": 3.0, "aiDesc": "스마트홈 수요 성장"}, {"name": "CCTV·보안시스템 설치원", "cat": "건설", "emp": 8573, "pay": 3000, "edu": 1, "outlook": 1, "ai": 3.0, "aiDesc": "보안 설치 수요"}, {"name": "통신케이블(광케이블) 시공원", "cat": "건설", "emp": 12859, "pay": 3200, "edu": 1, "outlook": 1, "ai": 2.5, "aiDesc": "통신 인프라 수요"}, {"name": "도시가스 배관 시공원", "cat": "건설", "emp": 8573, "pay": 3300, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "가스 설비 안전"}, {"name": "철도·궤도 시공원", "cat": "건설", "emp": 6858, "pay": 3400, "edu": 1, "outlook": -1, "ai": 3.0, "aiDesc": "철도 인프라"}, {"name": "댐·수리시설 시공원", "cat": "건설", "emp": 4286, "pay": 3200, "edu": 0, "outlook": -2, "ai": 3.0, "aiDesc": "수리시설 유지보수"}, {"name": "조경 시공원", "cat": "건설", "emp": 12859, "pay": 2800, "edu": 0, "outlook": 0, "ai": 2.0, "aiDesc": "도시 녹화 수요"}, {"name": "수영장·스파 시공원", "cat": "건설", "emp": 2572, "pay": 3200, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "레저시설 수요"}, {"name": "건설현장 안전관리보조원", "cat": "건설", "emp": 10287, "pay": 2800, "edu": 1, "outlook": 2, "ai": 3.0, "aiDesc": "안전관리 강화"}, {"name": "건설현장 교통정리원", "cat": "건설", "emp": 8573, "pay": 2200, "edu": 0, "outlook": -2, "ai": 3.5, "aiDesc": "현장 안전 관리"}, {"name": "석면·유해물질 제거원", "cat": "건설", "emp": 4286, "pay": 3000, "edu": 0, "outlook": 1, "ai": 2.0, "aiDesc": "유해물질 제거 수요"}, {"name": "방음벽·차음재 시공원", "cat": "건설", "emp": 2572, "pay": 3100, "edu": 0, "outlook": -1, "ai": 2.5, "aiDesc": "소음 규제 대응"}, {"name": "외벽 마감(드라이비트 등) 시공원", "cat": "건설", "emp": 6858, "pay": 3000, "edu": 0, "outlook": -3, "ai": 2.5, "aiDesc": "건설 물량 감소"}, {"name": "옥외광고물 설치원", "cat": "건설", "emp": 4286, "pay": 2800, "edu": 0, "outlook": -2, "ai": 2.5, "aiDesc": "디지털 광고 전환"}, {"name": "철거·해체 작업원", "cat": "건설", "emp": 8573, "pay": 3000, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "리모델링·재개발 수요"}, {"name": "공항 수하물 처리원", "cat": "운송·물류", "emp": 6858, "pay": 2800, "edu": 0, "outlook": -1, "ai": 5.5, "aiDesc": "자동 수하물 시스템"}, {"name": "철도역 역무원", "cat": "운송·물류", "emp": 6858, "pay": 3200, "edu": 1, "outlook": -1, "ai": 5.0, "aiDesc": "무인발권 확대"}, {"name": "버스 안내·매표원", "cat": "운송·물류", "emp": 4286, "pay": 2200, "edu": 0, "outlook": -4, "ai": 6.0, "aiDesc": "교통카드 자동화"}, {"name": "화물열차 운전원", "cat": "운송·물류", "emp": 2572, "pay": 4200, "edu": 2, "outlook": 0, "ai": 5.5, "aiDesc": "화물 철도 자동화"}, {"name": "자동차 탁송 운전원", "cat": "운송·물류", "emp": 8573, "pay": 2600, "edu": 0, "outlook": 0, "ai": 5.0, "aiDesc": "자율주행 영향"}, {"name": "긴급배송(당일배송) 기사", "cat": "운송·물류", "emp": 17145, "pay": 2800, "edu": 0, "outlook": 3, "ai": 4.0, "aiDesc": "즉시배송 수요"}, {"name": "드론배송 운영자", "cat": "운송·물류", "emp": 1715, "pay": 3500, "edu": 2, "outlook": 8, "ai": 4.0, "aiDesc": "드론배송 시범 확대"}, {"name": "자율주행 모니터링 요원", "cat": "운송·물류", "emp": 2572, "pay": 3500, "edu": 2, "outlook": 6, "ai": 4.5, "aiDesc": "자율주행차 안전 관리"}, {"name": "선박 하역·적재 관리자", "cat": "운송·물류", "emp": 4286, "pay": 3500, "edu": 1, "outlook": -1, "ai": 5.0, "aiDesc": "항만 자동화"}, {"name": "자전거·킥보드 정비·관리원", "cat": "운송·물류", "emp": 4286, "pay": 2200, "edu": 0, "outlook": 2, "ai": 3.0, "aiDesc": "공유 모빌리티 관리"}, {"name": "유기농·친환경 인증 농가", "cat": "농림어업", "emp": 12859, "pay": 2300, "edu": 0, "outlook": 2, "ai": 3.0, "aiDesc": "친환경 농업 수요"}, {"name": "종자·종묘 생산자", "cat": "농림어업", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 1, "ai": 3.0, "aiDesc": "종자 산업"}, {"name": "곤충사육 종사자", "cat": "농림어업", "emp": 2572, "pay": 2300, "edu": 0, "outlook": 3, "ai": 3.0, "aiDesc": "식용곤충 시장 성장"}, {"name": "식물공장 종사자", "cat": "농림어업", "emp": 4286, "pay": 2800, "edu": 1, "outlook": 5, "ai": 4.0, "aiDesc": "실내농업 기술 성장"}, {"name": "가축방역 종사자", "cat": "농림어업", "emp": 4286, "pay": 2500, "edu": 0, "outlook": 1, "ai": 3.0, "aiDesc": "가축전염병 방역"}, {"name": "농촌관광(팜스테이) 운영자", "cat": "농림어업", "emp": 4286, "pay": 2200, "edu": 0, "outlook": 1, "ai": 2.0, "aiDesc": "농촌체험 수요"}, {"name": "어선원·선원", "cat": "농림어업", "emp": 6858, "pay": 2800, "edu": 0, "outlook": -3, "ai": 2.5, "aiDesc": "어업 종사자 감소"}, {"name": "수산양식장 관리원", "cat": "농림어업", "emp": 6858, "pay": 2400, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "양식장 운영"}, {"name": "산림치유지도사", "cat": "농림어업", "emp": 2572, "pay": 2500, "edu": 2, "outlook": 3, "ai": 2.0, "aiDesc": "산림치유 수요 증가"}, {"name": "경마·경주 관련 종사자", "cat": "농림어업", "emp": 2572, "pay": 2800, "edu": 1, "outlook": -1, "ai": 2.0, "aiDesc": "경마 산업"}, {"name": "행정사", "cat": "법률·행정", "emp": 6858, "pay": 3500, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "행정 대행 서비스"}, {"name": "법원 속기사·속기록사", "cat": "법률·행정", "emp": 2572, "pay": 3500, "edu": 2, "outlook": -2, "ai": 7.0, "aiDesc": "AI 음성인식 확대"}, {"name": "집행관·법원 집행원", "cat": "법률·행정", "emp": 2572, "pay": 3500, "edu": 2, "outlook": 0, "ai": 3.0, "aiDesc": "법적 집행 대면"}, {"name": "출입국관리 공무원", "cat": "법률·행정", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.0, "aiDesc": "출입국 자동화"}, {"name": "해양경찰·해양안전 공무원", "cat": "법률·행정", "emp": 4286, "pay": 3700, "edu": 2, "outlook": 1, "ai": 2.0, "aiDesc": "해양 안전 수요"}, {"name": "산림청·환경부 공무원", "cat": "법률·행정", "emp": 6858, "pay": 3700, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "환경정책 수요"}, {"name": "특허심사관(특허청)", "cat": "법률·행정", "emp": 2572, "pay": 4500, "edu": 4, "outlook": 0, "ai": 5.0, "aiDesc": "AI 특허심사 보조"}, {"name": "우체국 집배원", "cat": "법률·행정", "emp": 21432, "pay": 3000, "edu": 0, "outlook": -3, "ai": 5.5, "aiDesc": "우편물 감소"}, {"name": "우체국 창구직원", "cat": "법률·행정", "emp": 8573, "pay": 3200, "edu": 1, "outlook": -3, "ai": 6.5, "aiDesc": "비대면 서비스 확대"}, {"name": "국민건강보험공단 직원", "cat": "법률·행정", "emp": 8573, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "건강보험 행정"}, {"name": "국민연금공단 직원", "cat": "법률·행정", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 0, "ai": 5.5, "aiDesc": "연금 행정 관리"}, {"name": "한국전력공사 직원", "cat": "법률·행정", "emp": 6858, "pay": 4500, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "전력 인프라 관리"}, {"name": "수도·가스 공기업 직원", "cat": "법률·행정", "emp": 6858, "pay": 4000, "edu": 3, "outlook": 0, "ai": 4.0, "aiDesc": "공공 인프라 관리"}, {"name": "민간 조사원(탐정)", "cat": "법률·행정", "emp": 2572, "pay": 3000, "edu": 2, "outlook": 2, "ai": 3.5, "aiDesc": "민간 조사 수요"}, {"name": "안전관리 공무원(소방서 등)", "cat": "법률·행정", "emp": 4286, "pay": 3500, "edu": 2, "outlook": 2, "ai": 3.0, "aiDesc": "안전 관리 수요"}, {"name": "저축은행·상호금융 직원", "cat": "금융·보험", "emp": 12859, "pay": 3800, "edu": 3, "outlook": -2, "ai": 7.0, "aiDesc": "비대면 금융 확대"}, {"name": "캐피탈(여신)회사 직원", "cat": "금융·보험", "emp": 8573, "pay": 4200, "edu": 3, "outlook": -1, "ai": 6.5, "aiDesc": "대출 자동화"}, {"name": "신용평가 분석원", "cat": "금융·보험", "emp": 4286, "pay": 4500, "edu": 3, "outlook": 0, "ai": 6.0, "aiDesc": "AI 신용평가 모델"}, {"name": "자산건전성 심사원", "cat": "금융·보험", "emp": 2572, "pay": 4500, "edu": 3, "outlook": 0, "ai": 6.0, "aiDesc": "부실채권 관리 AI"}, {"name": "채권추심원", "cat": "금융·보험", "emp": 8573, "pay": 2800, "edu": 1, "outlook": -3, "ai": 6.5, "aiDesc": "AI 추심 시스템"}, {"name": "보험사고 조사원", "cat": "금융·보험", "emp": 6858, "pay": 3500, "edu": 2, "outlook": -1, "ai": 6.0, "aiDesc": "보험사기 AI 탐지"}, {"name": "증권사 준법감시(컴플라이언스) 직원", "cat": "금융·보험", "emp": 2572, "pay": 5500, "edu": 3, "outlook": 1, "ai": 4.5, "aiDesc": "금융 규제 준수"}, {"name": "자산운용사 퀀트 분석가", "cat": "금융·보험", "emp": 2572, "pay": 7500, "edu": 4, "outlook": 3, "ai": 4.0, "aiDesc": "퀀트 투자 AI"}, {"name": "보험중개사", "cat": "금융·보험", "emp": 4286, "pay": 4000, "edu": 3, "outlook": -1, "ai": 5.5, "aiDesc": "보험 중개 디지털화"}, {"name": "외환딜러", "cat": "금융·보험", "emp": 2572, "pay": 6000, "edu": 3, "outlook": -2, "ai": 6.5, "aiDesc": "외환 자동거래"}, {"name": "가상자산 분석가", "cat": "금융·보험", "emp": 2572, "pay": 4500, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "암호화폐 분석"}, {"name": "금융교육·리터러시 강사", "cat": "금융·보험", "emp": 2572, "pay": 3500, "edu": 3, "outlook": 2, "ai": 4.0, "aiDesc": "금융교육 수요"}, {"name": "P2P·크라우드펀딩 플랫폼 운영자", "cat": "금융·보험", "emp": 2572, "pay": 3800, "edu": 3, "outlook": 2, "ai": 4.5, "aiDesc": "대안금융 성장"}, {"name": "마이데이터 사업 운영자", "cat": "금융·보험", "emp": 2572, "pay": 4500, "edu": 3, "outlook": 4, "ai": 4.0, "aiDesc": "데이터 금융 수요"}, {"name": "연금·퇴직급여 컨설턴트", "cat": "금융·보험", "emp": 2572, "pay": 4000, "edu": 3, "outlook": 1, "ai": 5.0, "aiDesc": "연금 자문 수요"}, {"name": "공간(전시) 디자이너", "cat": "문화·예술·디자인", "emp": 6858, "pay": 3200, "edu": 3, "outlook": 1, "ai": 4.0, "aiDesc": "전시 공간 디자인"}, {"name": "환경·사인 디자이너", "cat": "문화·예술·디자인", "emp": 4286, "pay": 3000, "edu": 3, "outlook": -1, "ai": 5.0, "aiDesc": "사인물 디자인"}, {"name": "타이포그래피·폰트 디자이너", "cat": "문화·예술·디자인", "emp": 2572, "pay": 3200, "edu": 3, "outlook": 0, "ai": 4.5, "aiDesc": "폰트 디자인 전문"}, {"name": "음악 프로듀서(K-POP)", "cat": "문화·예술·디자인", "emp": 4286, "pay": 4000, "edu": 3, "outlook": 3, "ai": 3.0, "aiDesc": "K-POP 산업 성장"}, {"name": "DJ·전자음악 아티스트", "cat": "문화·예술·디자인", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 2, "ai": 2.5, "aiDesc": "클럽·페스티벌 수요"}, {"name": "성우", "cat": "문화·예술·디자인", "emp": 4286, "pay": 2800, "edu": 2, "outlook": -2, "ai": 6.5, "aiDesc": "AI TTS 기술 발전"}, {"name": "배우(영화·드라마)", "cat": "문화·예술·디자인", "emp": 8573, "pay": 2500, "edu": 2, "outlook": 1, "ai": 2.0, "aiDesc": "영상 콘텐츠 수요"}, {"name": "배우(연극·뮤지컬)", "cat": "문화·예술·디자인", "emp": 6858, "pay": 2300, "edu": 2, "outlook": 0, "ai": 1.5, "aiDesc": "공연 산업 수요"}, {"name": "개그맨·코미디언", "cat": "문화·예술·디자인", "emp": 2572, "pay": 2500, "edu": 1, "outlook": 0, "ai": 2.0, "aiDesc": "예능 콘텐츠 수요"}, {"name": "모델(패션·광고)", "cat": "문화·예술·디자인", "emp": 4286, "pay": 2500, "edu": 1, "outlook": -1, "ai": 3.0, "aiDesc": "AI 모델 등장 영향"}, {"name": "인플루언서·크리에이터 매니저", "cat": "문화·예술·디자인", "emp": 4286, "pay": 3000, "edu": 2, "outlook": 4, "ai": 3.5, "aiDesc": "크리에이터 산업 성장"}, {"name": "팟캐스트·오디오 콘텐츠 PD", "cat": "문화·예술·디자인", "emp": 2572, "pay": 3000, "edu": 3, "outlook": 3, "ai": 3.5, "aiDesc": "오디오 콘텐츠 수요"}, {"name": "NFT·디지털아트 작가", "cat": "문화·예술·디자인", "emp": 1715, "pay": 2500, "edu": 2, "outlook": 0, "ai": 3.5, "aiDesc": "디지털 아트 시장"}, {"name": "문화재 보존·복원사", "cat": "문화·예술·디자인", "emp": 2572, "pay": 3000, "edu": 3, "outlook": 1, "ai": 2.0, "aiDesc": "문화재 보존 수요"}, {"name": "도예·공예 작가", "cat": "문화·예술·디자인", "emp": 4286, "pay": 2200, "edu": 2, "outlook": -1, "ai": 1.5, "aiDesc": "수공예 영역"}, {"name": "무대의상·분장사", "cat": "문화·예술·디자인", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 0, "ai": 1.5, "aiDesc": "공연 의상·분장"}, {"name": "음반·공연 기획사 직원", "cat": "문화·예술·디자인", "emp": 6858, "pay": 3000, "edu": 2, "outlook": 1, "ai": 3.0, "aiDesc": "엔터테인먼트 산업"}, {"name": "영화제·영화배급 직원", "cat": "문화·예술·디자인", "emp": 2572, "pay": 3000, "edu": 3, "outlook": 0, "ai": 4.0, "aiDesc": "영화 배급 디지털화"}, {"name": "게임 사운드 디자이너", "cat": "문화·예술·디자인", "emp": 2572, "pay": 3800, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "게임 음향 수요"}, {"name": "미디어아트·인터랙티브 아트 작가", "cat": "문화·예술·디자인", "emp": 1715, "pay": 2800, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "미디어아트 수요"}, {"name": "에어컨·환기시스템 청소원", "cat": "청소·경비", "emp": 8573, "pay": 2300, "edu": 0, "outlook": 1, "ai": 3.0, "aiDesc": "실내공기질 관리 수요"}, {"name": "카펫·바닥 전문 청소원", "cat": "청소·경비", "emp": 6858, "pay": 2100, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "전문 청소 서비스"}, {"name": "외벽·간판 청소원(로프작업)", "cat": "청소·경비", "emp": 4286, "pay": 2500, "edu": 0, "outlook": 0, "ai": 2.0, "aiDesc": "고소작업 전문"}, {"name": "태양광 패널 청소원", "cat": "청소·경비", "emp": 2572, "pay": 2300, "edu": 0, "outlook": 3, "ai": 3.0, "aiDesc": "태양광 유지보수"}, {"name": "사무기기·IT장비 관리원", "cat": "청소·경비", "emp": 6858, "pay": 2500, "edu": 1, "outlook": 0, "ai": 4.5, "aiDesc": "장비 관리 수요"}, {"name": "재활용 선별원(MRF)", "cat": "청소·경비", "emp": 12859, "pay": 2200, "edu": 0, "outlook": 2, "ai": 4.0, "aiDesc": "자원순환 정책"}, {"name": "동물보호소 관리원", "cat": "청소·경비", "emp": 4286, "pay": 2200, "edu": 0, "outlook": 2, "ai": 1.5, "aiDesc": "동물 보호 수요"}, {"name": "묘지·납골당 관리원", "cat": "청소·경비", "emp": 4286, "pay": 2000, "edu": 0, "outlook": 0, "ai": 2.0, "aiDesc": "장묘시설 관리"}, {"name": "이동식 경비(순회경비)원", "cat": "청소·경비", "emp": 8573, "pay": 2200, "edu": 0, "outlook": -1, "ai": 5.0, "aiDesc": "원격 감시 확대"}, {"name": "무인매장·셀프스토리지 관리원", "cat": "청소·경비", "emp": 4286, "pay": 2200, "edu": 0, "outlook": 2, "ai": 5.5, "aiDesc": "무인화 시설 관리"}, {"name": "노인일자리 전담자", "cat": "사회복지·상담", "emp": 4286, "pay": 2600, "edu": 3, "outlook": 3, "ai": 2.5, "aiDesc": "노인 일자리 확대"}, {"name": "이주민·난민 지원 상담사", "cat": "사회복지·상담", "emp": 2572, "pay": 2700, "edu": 3, "outlook": 2, "ai": 2.0, "aiDesc": "이민 정책 수요"}, {"name": "가정폭력·성폭력 상담사", "cat": "사회복지·상담", "emp": 4286, "pay": 2800, "edu": 3, "outlook": 3, "ai": 2.0, "aiDesc": "피해 상담 수요"}, {"name": "학대피해아동 보호 전문가", "cat": "사회복지·상담", "emp": 2572, "pay": 2800, "edu": 3, "outlook": 3, "ai": 2.0, "aiDesc": "아동 보호 강화"}, {"name": "자살예방 상담사", "cat": "사회복지·상담", "emp": 2572, "pay": 2800, "edu": 3, "outlook": 4, "ai": 2.0, "aiDesc": "정신건강 위기 대응"}, {"name": "사회복지시설 사무원", "cat": "사회복지·상담", "emp": 12859, "pay": 2500, "edu": 2, "outlook": 2, "ai": 4.5, "aiDesc": "복지 행정 업무"}, {"name": "노인복지관 프로그램 강사", "cat": "사회복지·상담", "emp": 4286, "pay": 2400, "edu": 2, "outlook": 3, "ai": 2.0, "aiDesc": "노인 여가 프로그램"}, {"name": "장기요양 등급판정 조사원", "cat": "사회복지·상담", "emp": 2572, "pay": 2800, "edu": 3, "outlook": 3, "ai": 4.0, "aiDesc": "요양등급 심사"}, {"name": "보호관찰 상담원", "cat": "사회복지·상담", "emp": 2572, "pay": 2800, "edu": 3, "outlook": 1, "ai": 3.0, "aiDesc": "보호관찰 업무"}, {"name": "재활상담사(산재)", "cat": "사회복지·상담", "emp": 2572, "pay": 2700, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "산재 재활 상담"}, {"name": "천문학·우주과학 연구원", "cat": "과학·연구", "emp": 1715, "pay": 4200, "edu": 5, "outlook": 2, "ai": 3.0, "aiDesc": "우주 탐사 연구"}, {"name": "해양과학 연구원", "cat": "과학·연구", "emp": 2572, "pay": 4000, "edu": 5, "outlook": 2, "ai": 3.0, "aiDesc": "해양 연구 수요"}, {"name": "농업과학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 3800, "edu": 5, "outlook": 1, "ai": 3.0, "aiDesc": "농업 기술 R&D"}, {"name": "식품과학 연구원", "cat": "과학·연구", "emp": 4286, "pay": 3800, "edu": 5, "outlook": 1, "ai": 3.5, "aiDesc": "식품 안전 연구"}, {"name": "나노공학 연구원", "cat": "과학·연구", "emp": 2572, "pay": 4800, "edu": 5, "outlook": 4, "ai": 3.0, "aiDesc": "나노 기술 수요"}, {"name": "양자컴퓨팅 연구원", "cat": "과학·연구", "emp": 1715, "pay": 6000, "edu": 5, "outlook": 8, "ai": 2.0, "aiDesc": "양자 기술 초기 투자"}, {"name": "뇌과학·신경과학 연구원", "cat": "과학·연구", "emp": 2572, "pay": 4500, "edu": 5, "outlook": 5, "ai": 2.5, "aiDesc": "뇌과학 연구 확대"}, {"name": "법과학(포렌식) 연구원", "cat": "과학·연구", "emp": 1715, "pay": 4000, "edu": 5, "outlook": 2, "ai": 3.5, "aiDesc": "과학수사 수요"}, {"name": "특허·기술정보 분석원", "cat": "과학·연구", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 2, "ai": 5.0, "aiDesc": "특허 분석 AI 활용"}, {"name": "과학커뮤니케이터", "cat": "과학·연구", "emp": 1715, "pay": 3200, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "과학 대중화 수요"}, {"name": "치킨·피자 조리원", "cat": "식품·조리", "emp": 68582, "pay": 2000, "edu": 0, "outlook": 0, "ai": 3.0, "aiDesc": "프랜차이즈 수요"}, {"name": "분식·떡볶이 조리원", "cat": "식품·조리", "emp": 34291, "pay": 2000, "edu": 0, "outlook": 0, "ai": 2.5, "aiDesc": "분식 수요 유지"}, {"name": "도시락·밀키트 제조원", "cat": "식품·조리", "emp": 21432, "pay": 2200, "edu": 0, "outlook": 2, "ai": 4.0, "aiDesc": "간편식 시장 성장"}, {"name": "발효·장류 전문 조리사", "cat": "식품·조리", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 1, "ai": 2.0, "aiDesc": "전통 식품 수요"}, {"name": "채식·비건 전문 셰프", "cat": "식품·조리", "emp": 2572, "pay": 3000, "edu": 1, "outlook": 3, "ai": 2.0, "aiDesc": "비건 트렌드 성장"}, {"name": "할랄·코셔 전문 조리사", "cat": "식품·조리", "emp": 1715, "pay": 2800, "edu": 1, "outlook": 2, "ai": 2.0, "aiDesc": "다문화 음식 수요"}, {"name": "학교급식 영양교사", "cat": "식품·조리", "emp": 6858, "pay": 3500, "edu": 3, "outlook": 0, "ai": 3.5, "aiDesc": "학교급식 관리"}, {"name": "식품 품질관리(QC) 담당자", "cat": "식품·조리", "emp": 6858, "pay": 3000, "edu": 2, "outlook": 1, "ai": 4.5, "aiDesc": "식품 안전 관리"}, {"name": "음식배달앱 운영·기획자", "cat": "식품·조리", "emp": 4286, "pay": 3200, "edu": 2, "outlook": 2, "ai": 5.0, "aiDesc": "배달 플랫폼 관리"}, {"name": "식품 R&D 연구원", "cat": "식품·조리", "emp": 4286, "pay": 3800, "edu": 3, "outlook": 2, "ai": 3.5, "aiDesc": "신제품 개발"}, {"name": "등산·트레킹 가이드", "cat": "스포츠·레저", "emp": 4286, "pay": 2300, "edu": 0, "outlook": 2, "ai": 1.5, "aiDesc": "아웃도어 트렌드"}, {"name": "다이빙 강사", "cat": "스포츠·레저", "emp": 2572, "pay": 2800, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "해양 레저 수요"}, {"name": "마라톤·러닝 코치", "cat": "스포츠·레저", "emp": 2572, "pay": 2500, "edu": 1, "outlook": 2, "ai": 1.5, "aiDesc": "러닝 트렌드 성장"}, {"name": "승마 강사", "cat": "스포츠·레저", "emp": 1715, "pay": 2800, "edu": 1, "outlook": 1, "ai": 1.5, "aiDesc": "승마 체험 수요"}, {"name": "서핑 강사", "cat": "스포츠·레저", "emp": 2572, "pay": 2500, "edu": 1, "outlook": 3, "ai": 1.5, "aiDesc": "서핑 인구 급증"}, {"name": "스포츠 데이터 분석가", "cat": "스포츠·레저", "emp": 2572, "pay": 3800, "edu": 3, "outlook": 5, "ai": 3.5, "aiDesc": "스포츠 애널리틱스 수요"}, {"name": "스포츠 마케팅·이벤트 기획자", "cat": "스포츠·레저", "emp": 4286, "pay": 3200, "edu": 3, "outlook": 2, "ai": 3.0, "aiDesc": "스포츠 비즈니스 성장"}, {"name": "체육관·피트니스센터 운영자", "cat": "스포츠·레저", "emp": 12859, "pay": 2800, "edu": 2, "outlook": 2, "ai": 2.5, "aiDesc": "피트니스 산업 성장"}, {"name": "골프장·스키장 운영직원", "cat": "스포츠·레저", "emp": 8573, "pay": 2400, "edu": 1, "outlook": 0, "ai": 3.0, "aiDesc": "시설 운영 관리"}, {"name": "레저·스포츠 장비 수리원", "cat": "스포츠·레저", "emp": 4286, "pay": 2500, "edu": 1, "outlook": 0, "ai": 2.5, "aiDesc": "장비 유지보수"}];
 
-  // 판매·서비스
-  {name:"매장 판매원",cat:"판매·서비스",emp:1550000,pay:2200,edu:1,outlook:-5,ai:6.0,aiDesc:"온라인 쇼핑 확대로 오프라인 판매직 구조적 감소"},
-  {name:"음식서비스 종사자",cat:"판매·서비스",emp:1662000,pay:2000,edu:0,outlook:-2,ai:3.0,aiDesc:"키오스크 확대되나 조리·서빙 등 대면 서비스 유지"},
-  {name:"숙박시설 서비스원",cat:"판매·서비스",emp:320000,pay:2100,edu:1,outlook:0,ai:4.0,aiDesc:"무인 체크인 확대되나 고객 대응 필요"},
-  {name:"여행·관광 서비스원",cat:"판매·서비스",emp:150000,pay:2500,edu:2,outlook:3,ai:5.5,aiDesc:"AI 여행플래너 등장으로 단순 예약 업무 감소"},
-  {name:"미용·뷰티 서비스원",cat:"판매·서비스",emp:380000,pay:2300,edu:1,outlook:2,ai:1.5,aiDesc:"손기술 중심으로 AI 대체 어려움"},
-  {name:"결혼·장례 서비스원",cat:"판매·서비스",emp:120000,pay:2400,edu:1,outlook:-3,ai:2.0,aiDesc:"대면 의례 서비스로 AI 대체 제한적"},
-  {name:"부동산 중개인",cat:"판매·서비스",emp:210000,pay:3500,edu:2,outlook:-1,ai:5.0,aiDesc:"프롭테크 발전으로 단순 중개 감소 추세"},
-  {name:"보험·금융 설계사",cat:"판매·서비스",emp:420000,pay:3200,edu:2,outlook:-3,ai:7.0,aiDesc:"로보어드바이저, AI 상품추천 확대"},
-  {name:"텔레마케터",cat:"판매·서비스",emp:180000,pay:2100,edu:1,outlook:-8,ai:9.5,aiDesc:"AI 콜봇, 챗봇 대체 가속화 진행 중"},
-  {name:"방문판매원",cat:"판매·서비스",emp:250000,pay:2000,edu:1,outlook:-6,ai:4.0,aiDesc:"비대면 소비 확산으로 방문판매 급감"},
-
-  // 보건·의료
-  {name:"의사",cat:"보건·의료",emp:130000,pay:8500,edu:5,outlook:5,ai:3.0,aiDesc:"AI 진단 보조 도구 활용 증가하나 최종 판단은 의사 영역"},
-  {name:"간호사",cat:"보건·의료",emp:450000,pay:3800,edu:3,outlook:8,ai:2.0,aiDesc:"고령화로 수요 급증, 대면 케어 중심으로 AI 대체 어려움"},
-  {name:"약사",cat:"보건·의료",emp:72000,pay:6000,edu:5,outlook:2,ai:4.0,aiDesc:"AI 약물상호작용 체크 등 보조 역할, 조제·상담은 인간 필요"},
-  {name:"치과의사·한의사",cat:"보건·의료",emp:85000,pay:7000,edu:5,outlook:3,ai:2.5,aiDesc:"시술·진료 행위 자체는 AI 대체 제한적"},
-  {name:"물리·작업 치료사",cat:"보건·의료",emp:95000,pay:3200,edu:3,outlook:7,ai:2.0,aiDesc:"재활치료 수요 증가, 대면 치료 행위 대체 어려움"},
-  {name:"임상병리사·방사선사",cat:"보건·의료",emp:78000,pay:3500,edu:3,outlook:3,ai:5.0,aiDesc:"검사 자동화 진행되나 판독·관리 인력 필요"},
-  {name:"의료코디네이터",cat:"보건·의료",emp:45000,pay:2800,edu:2,outlook:4,ai:5.5,aiDesc:"의료관광·환자상담 수요 증가"},
-  {name:"요양보호사",cat:"보건·의료",emp:680000,pay:2100,edu:1,outlook:10,ai:1.0,aiDesc:"초고령사회 진입으로 돌봄 수요 폭증, AI 대체 매우 어려움"},
-  {name:"간병인",cat:"보건·의료",emp:350000,pay:2000,edu:0,outlook:8,ai:1.0,aiDesc:"대면 돌봄 서비스로 AI 대체 불가 영역"},
-
-  // 교육
-  {name:"초등학교 교사",cat:"교육",emp:190000,pay:4200,edu:4,outlook:-3,ai:3.0,aiDesc:"학령인구 감소로 수요 줄지만 교육 자체는 인간 역할 중요"},
-  {name:"중·고등학교 교사",cat:"교육",emp:280000,pay:4500,edu:4,outlook:-2,ai:3.5,aiDesc:"AI 맞춤학습 도구 활용 증가하나 교육자 역할 유지"},
-  {name:"대학교수·강사",cat:"교육",emp:120000,pay:5500,edu:5,outlook:-1,ai:4.0,aiDesc:"연구·강의 일부 AI 활용 가능, 학령인구 감소 영향"},
-  {name:"유치원·보육교사",cat:"교육",emp:310000,pay:2500,edu:2,outlook:-4,ai:1.5,aiDesc:"출생률 급감으로 수요 감소, 돌봄 자체는 대체 어려움"},
-  {name:"학원강사",cat:"교육",emp:350000,pay:2800,edu:3,outlook:-2,ai:5.0,aiDesc:"AI 튜터 등장으로 단순 지식 전달 강의 감소 예상"},
-  {name:"특수교육 교사",cat:"교육",emp:45000,pay:4200,edu:4,outlook:3,ai:2.0,aiDesc:"특수교육 수요 증가, 개별 맞춤 지도 필수"},
-  {name:"평생교육 강사",cat:"교육",emp:150000,pay:2600,edu:3,outlook:2,ai:4.0,aiDesc:"성인 재교육 수요 증가 추세"},
-
-  // 정보통신(IT)
-  {name:"소프트웨어 개발자",cat:"정보통신(IT)",emp:420000,pay:5000,edu:3,outlook:8,ai:4.0,aiDesc:"AI 코딩 보조 도구 활용하나 설계·아키텍처는 인간 주도"},
-  {name:"데이터 분석가·과학자",cat:"정보통신(IT)",emp:85000,pay:5500,edu:4,outlook:10,ai:3.5,aiDesc:"AI/ML 분석 역량 수요 급증"},
-  {name:"정보보안 전문가",cat:"정보통신(IT)",emp:65000,pay:5200,edu:3,outlook:9,ai:3.0,aiDesc:"사이버 위협 증가로 수요 폭증"},
-  {name:"시스템·네트워크 관리자",cat:"정보통신(IT)",emp:180000,pay:4200,edu:3,outlook:3,ai:5.0,aiDesc:"클라우드 자동화로 일부 감소하나 관리 인력 필요"},
-  {name:"웹·앱 디자이너",cat:"정보통신(IT)",emp:120000,pay:3800,edu:3,outlook:4,ai:5.5,aiDesc:"AI 디자인 도구 활용 증가하나 UX 설계는 인간 역할"},
-  {name:"AI·머신러닝 엔지니어",cat:"정보통신(IT)",emp:35000,pay:7000,edu:4,outlook:15,ai:2.0,aiDesc:"AI 기술 자체를 개발하는 직종으로 수요 폭발적 증가"},
-  {name:"클라우드 엔지니어",cat:"정보통신(IT)",emp:45000,pay:6000,edu:3,outlook:12,ai:3.0,aiDesc:"디지털 전환 가속으로 수요 급증"},
-  {name:"게임 개발자",cat:"정보통신(IT)",emp:55000,pay:4500,edu:3,outlook:3,ai:4.0,aiDesc:"AI 활용한 게임 제작 효율화, 창의적 기획은 인간 역할"},
-  {name:"IT 컨설턴트",cat:"정보통신(IT)",emp:40000,pay:5800,edu:4,outlook:5,ai:4.5,aiDesc:"디지털 전환 자문 수요 증가, 전략 수립은 인간 주도"},
-
-  // 공학·기술
-  {name:"기계공학 기술자",cat:"공학·기술",emp:280000,pay:4200,edu:3,outlook:2,ai:3.5,aiDesc:"설계 자동화 진행되나 창의적 엔지니어링 필요"},
-  {name:"전기·전자공학 기술자",cat:"공학·기술",emp:350000,pay:4500,edu:3,outlook:4,ai:3.5,aiDesc:"반도체·전기차 분야 수요 증가"},
-  {name:"화학공학 기술자",cat:"공학·기술",emp:120000,pay:4800,edu:4,outlook:2,ai:3.0,aiDesc:"소재·배터리 산업 수요 안정적"},
-  {name:"환경공학 기술자",cat:"공학·기술",emp:75000,pay:3800,edu:3,outlook:5,ai:3.0,aiDesc:"환경규제 강화로 수요 증가"},
-  {name:"건축공학 기술자",cat:"공학·기술",emp:180000,pay:4000,edu:3,outlook:-3,ai:4.0,aiDesc:"건설경기 침체 영향, BIM 등 디지털화 진행"},
-  {name:"토목공학 기술자",cat:"공학·기술",emp:150000,pay:3800,edu:3,outlook:-2,ai:3.5,aiDesc:"SOC 투자 축소 영향"},
-  {name:"산업공학 기술자",cat:"공학·기술",emp:90000,pay:4300,edu:3,outlook:3,ai:5.0,aiDesc:"공정 최적화 AI 활용 증가"},
-  {name:"반도체 공정 기술자",cat:"공학·기술",emp:85000,pay:5500,edu:3,outlook:7,ai:3.0,aiDesc:"반도체 산업 투자 확대로 수요 급증"},
-  {name:"자동차공학 기술자",cat:"공학·기술",emp:110000,pay:4800,edu:3,outlook:3,ai:3.5,aiDesc:"전기차·자율주행 전환으로 재편 중"},
-  {name:"품질관리 기술자",cat:"공학·기술",emp:160000,pay:3500,edu:2,outlook:0,ai:6.0,aiDesc:"자동화 검사 시스템 도입 확대"},
-
-  // 제조·생산
-  {name:"기계조작원",cat:"제조·생산",emp:950000,pay:2800,edu:1,outlook:-4,ai:7.5,aiDesc:"산업용 로봇, 스마트팩토리 확대로 감소"},
-  {name:"금속·주조 가공원",cat:"제조·생산",emp:280000,pay:3000,edu:1,outlook:-3,ai:6.0,aiDesc:"자동화 설비 도입 확대"},
-  {name:"전기·전자 조립원",cat:"제조·생산",emp:350000,pay:2800,edu:1,outlook:-2,ai:7.0,aiDesc:"자동화 라인 도입 가속화"},
-  {name:"섬유·의복 제조원",cat:"제조·생산",emp:180000,pay:2200,edu:0,outlook:-7,ai:5.0,aiDesc:"해외이전·자동화로 고용 급감"},
-  {name:"식품 가공원",cat:"제조·생산",emp:220000,pay:2300,edu:0,outlook:-1,ai:5.5,aiDesc:"자동화 진행되나 식품 특성상 인력 필요"},
-  {name:"화학제품 제조원",cat:"제조·생산",emp:150000,pay:3200,edu:1,outlook:0,ai:5.0,aiDesc:"공정 자동화 진행 중"},
-  {name:"인쇄·목재 가공원",cat:"제조·생산",emp:95000,pay:2500,edu:0,outlook:-6,ai:5.5,aiDesc:"디지털화로 인쇄 수요 감소"},
-  {name:"용접·판금원",cat:"제조·생산",emp:180000,pay:3200,edu:1,outlook:-2,ai:5.0,aiDesc:"용접 로봇 도입되나 현장 숙련공 필요"},
-  {name:"플라스틱·고무 제조원",cat:"제조·생산",emp:130000,pay:2700,edu:0,outlook:-3,ai:6.0,aiDesc:"사출성형 자동화 확대"},
-
-  // 건설
-  {name:"건축 시공 기술자",cat:"건설",emp:280000,pay:3500,edu:2,outlook:-5,ai:3.0,aiDesc:"건설경기 침체로 감소, 현장 기술은 대체 어려움"},
-  {name:"토목 시공원",cat:"건설",emp:220000,pay:3200,edu:1,outlook:-4,ai:3.0,aiDesc:"SOC 투자 감소 영향"},
-  {name:"전기·배관 설비원",cat:"건설",emp:350000,pay:3300,edu:1,outlook:-1,ai:2.0,aiDesc:"현장 설치·수리 작업은 AI 대체 어려움"},
-  {name:"도장·방수 기능원",cat:"건설",emp:120000,pay:3000,edu:0,outlook:-5,ai:3.0,aiDesc:"건설경기 침체 영향"},
-  {name:"중장비 운전원",cat:"건설",emp:180000,pay:3500,edu:1,outlook:-3,ai:5.0,aiDesc:"자율주행 중장비 개발 진행 중"},
-  {name:"인테리어 디자이너",cat:"건설",emp:95000,pay:3200,edu:2,outlook:1,ai:4.5,aiDesc:"AI 인테리어 시뮬레이션 활용 증가"},
-  {name:"측량·감리 기술자",cat:"건설",emp:60000,pay:3800,edu:3,outlook:0,ai:5.0,aiDesc:"드론·AI 측량 기술 도입 확대"},
-
-  // 운송·물류
-  {name:"택배·배달 기사",cat:"운송·물류",emp:450000,pay:2800,edu:0,outlook:3,ai:4.0,aiDesc:"이커머스 성장으로 수요 증가, 자율배송 아직 초기"},
-  {name:"화물차 운전원",cat:"운송·물류",emp:520000,pay:3200,edu:0,outlook:-1,ai:5.5,aiDesc:"자율주행 트럭 개발 진행 중"},
-  {name:"버스·택시 운전원",cat:"운송·물류",emp:380000,pay:2800,edu:0,outlook:-4,ai:6.0,aiDesc:"자율주행 기술 발전으로 중장기 감소 전망"},
-  {name:"항공기 조종사·승무원",cat:"운송·물류",emp:35000,pay:5500,edu:3,outlook:3,ai:3.0,aiDesc:"항공 수요 회복, 자동화 제한적"},
-  {name:"선박 운항원",cat:"운송·물류",emp:45000,pay:4500,edu:2,outlook:0,ai:3.5,aiDesc:"자율운항 선박 개발 진행 중"},
-  {name:"물류 관리자",cat:"운송·물류",emp:180000,pay:3200,edu:2,outlook:2,ai:6.5,aiDesc:"물류 AI 최적화 시스템 도입 확대"},
-  {name:"창고관리원",cat:"운송·물류",emp:250000,pay:2500,edu:0,outlook:-2,ai:7.0,aiDesc:"자동화 물류센터 확대"},
-
-  // 농림어업
-  {name:"작물재배 종사자",cat:"농림어업",emp:1375000,pay:1800,edu:0,outlook:-5,ai:3.0,aiDesc:"고령화·인구감소로 종사자 감소, 스마트팜 도입 확대"},
-  {name:"축산업 종사자",cat:"농림어업",emp:180000,pay:2200,edu:0,outlook:-3,ai:3.5,aiDesc:"자동 사양관리 시스템 도입 중"},
-  {name:"어업 종사자",cat:"농림어업",emp:120000,pay:2500,edu:0,outlook:-5,ai:2.5,aiDesc:"어업 인구 감소 추세, AI 어군탐지 활용"},
-  {name:"임업 종사자",cat:"농림어업",emp:35000,pay:2300,edu:0,outlook:-2,ai:2.0,aiDesc:"산림관리 드론 활용 증가"},
-
-  // 법률·행정
-  {name:"변호사",cat:"법률·행정",emp:35000,pay:8000,edu:5,outlook:2,ai:4.5,aiDesc:"AI 법률검색·문서작성 보조, 최종 판단은 인간 영역"},
-  {name:"법무사·변리사",cat:"법률·행정",emp:25000,pay:6000,edu:5,outlook:0,ai:5.0,aiDesc:"정형화된 서류 작업 AI 활용 증가"},
-  {name:"공무원(일반행정)",cat:"법률·행정",emp:680000,pay:3800,edu:3,outlook:0,ai:5.5,aiDesc:"전자정부 고도화로 단순 행정 감소"},
-  {name:"경찰관",cat:"법률·행정",emp:130000,pay:3600,edu:2,outlook:1,ai:3.0,aiDesc:"AI 범죄예측 활용 증가하나 현장 대응 필수"},
-  {name:"소방관",cat:"법률·행정",emp:65000,pay:3500,edu:2,outlook:3,ai:1.5,aiDesc:"현장 긴급대응으로 AI 대체 어려움"},
-  {name:"군인(직업)",cat:"법률·행정",emp:180000,pay:3200,edu:2,outlook:0,ai:2.0,aiDesc:"인구감소로 전문화 추세, 무인시스템 도입"},
-  {name:"세무사·관세사",cat:"법률·행정",emp:30000,pay:5500,edu:4,outlook:-1,ai:7.0,aiDesc:"세무·관세 신고 자동화 가속"},
-  {name:"공인중개사",cat:"법률·행정",emp:120000,pay:3000,edu:2,outlook:-2,ai:5.0,aiDesc:"프롭테크 플랫폼 확대"},
-
-  // 금융·보험
-  {name:"은행원",cat:"금융·보험",emp:180000,pay:5200,edu:3,outlook:-5,ai:8.0,aiDesc:"비대면 금융 확대로 지점·인력 감소"},
-  {name:"증권·투자 분석가",cat:"금융·보험",emp:55000,pay:7000,edu:4,outlook:1,ai:6.0,aiDesc:"AI 퀀트 투자 확대되나 고급 분석은 인간 필요"},
-  {name:"보험심사·손해사정인",cat:"금융·보험",emp:65000,pay:4000,edu:3,outlook:-3,ai:8.0,aiDesc:"보험청구 심사 AI 자동화 진행 중"},
-  {name:"금융상품 개발자",cat:"금융·보험",emp:25000,pay:6500,edu:4,outlook:2,ai:4.5,aiDesc:"핀테크 성장으로 수요 유지"},
-  {name:"자산관리사(PB)",cat:"금융·보험",emp:35000,pay:5500,edu:3,outlook:0,ai:5.5,aiDesc:"로보어드바이저 성장하나 고액자산 상담 수요 유지"},
-
-  // 문화·예술·디자인
-  {name:"그래픽 디자이너",cat:"문화·예술·디자인",emp:180000,pay:3000,edu:3,outlook:-1,ai:6.5,aiDesc:"AI 이미지 생성 기술로 단순 디자인 작업 감소"},
-  {name:"영상·방송 제작자",cat:"문화·예술·디자인",emp:120000,pay:3200,edu:3,outlook:3,ai:4.0,aiDesc:"1인 미디어·OTT 성장으로 수요 증가"},
-  {name:"공연·음악 관련 종사자",cat:"문화·예술·디자인",emp:85000,pay:2500,edu:3,outlook:2,ai:2.0,aiDesc:"라이브 공연·창작 영역은 AI 대체 어려움"},
-  {name:"사진작가·촬영기사",cat:"문화·예술·디자인",emp:60000,pay:2800,edu:2,outlook:-2,ai:4.0,aiDesc:"AI 사진 보정은 가능하나 촬영 자체는 인간 역할"},
-  {name:"제품·산업 디자이너",cat:"문화·예술·디자인",emp:55000,pay:3500,edu:3,outlook:2,ai:4.5,aiDesc:"AI 생성디자인 활용 증가하나 감성·기획은 인간 주도"},
-  {name:"패션 디자이너",cat:"문화·예술·디자인",emp:40000,pay:3000,edu:3,outlook:-1,ai:4.0,aiDesc:"AI 트렌드 분석 활용, 창의적 디자인은 인간 영역"},
-  {name:"작가·번역가",cat:"문화·예술·디자인",emp:95000,pay:2500,edu:3,outlook:-3,ai:7.0,aiDesc:"AI 번역·작문 기술 급발전으로 단순 번역 감소"},
-  {name:"기자·언론인",cat:"문화·예술·디자인",emp:50000,pay:4000,edu:4,outlook:-4,ai:5.5,aiDesc:"AI 기사 자동생성 확대, 탐사보도는 인간 역할"},
-
-  // 청소·경비
-  {name:"청소 종사자",cat:"청소·경비",emp:1249000,pay:1900,edu:0,outlook:2,ai:3.0,aiDesc:"로봇청소기 도입되나 대부분 현장 인력 필요"},
-  {name:"경비원",cat:"청소·경비",emp:520000,pay:2000,edu:0,outlook:-2,ai:5.0,aiDesc:"무인경비·CCTV AI 감시 확대"},
-  {name:"주차관리원",cat:"청소·경비",emp:120000,pay:1900,edu:0,outlook:-5,ai:7.0,aiDesc:"무인주차·자동결제 시스템 확대"},
-  {name:"돌봄서비스원",cat:"청소·경비",emp:450000,pay:2100,edu:0,outlook:8,ai:1.0,aiDesc:"고령화로 돌봄 수요 폭증, 대면 서비스 대체 어려움"},
-
-  // 사회복지·상담
-  {name:"사회복지사",cat:"사회복지·상담",emp:280000,pay:2800,edu:3,outlook:5,ai:2.0,aiDesc:"복지 수요 증가, 대면 상담·개입은 인간 필수"},
-  {name:"상담사·심리치료사",cat:"사회복지·상담",emp:85000,pay:3000,edu:4,outlook:6,ai:2.5,aiDesc:"정신건강 관심 증가로 수요 확대, AI 보조 활용"},
-  {name:"직업상담사",cat:"사회복지·상담",emp:35000,pay:2800,edu:3,outlook:2,ai:4.0,aiDesc:"AI 직업추천 시스템 활용 확대"},
-  {name:"보육·아동복지사",cat:"사회복지·상담",emp:120000,pay:2500,edu:2,outlook:-2,ai:1.5,aiDesc:"저출산으로 감소 추세, 돌봄 자체는 대체 어려움"},
-
-  // 과학·연구
-  {name:"자연과학 연구원",cat:"과학·연구",emp:85000,pay:4500,edu:5,outlook:3,ai:3.0,aiDesc:"AI 실험설계 활용 증가, 가설 수립은 인간 주도"},
-  {name:"생명과학 연구원",cat:"과학·연구",emp:65000,pay:4200,edu:5,outlook:5,ai:3.0,aiDesc:"바이오·제약 산업 성장으로 수요 증가"},
-  {name:"사회과학 연구원",cat:"과학·연구",emp:45000,pay:3800,edu:5,outlook:1,ai:4.5,aiDesc:"데이터 분석 AI 활용 증가"},
-  {name:"R&D 관리자",cat:"과학·연구",emp:40000,pay:5500,edu:4,outlook:3,ai:3.5,aiDesc:"연구 기획·관리는 인간 주도"},
-
-  // 식품·조리
-  {name:"한식 조리사",cat:"식품·조리",emp:480000,pay:2500,edu:1,outlook:0,ai:2.0,aiDesc:"조리 과정 자동화 제한적, 맛·감각 영역"},
-  {name:"양식·중식·일식 조리사",cat:"식품·조리",emp:180000,pay:2800,edu:1,outlook:2,ai:2.0,aiDesc:"다양한 외식 수요 지속"},
-  {name:"제과·제빵사",cat:"식품·조리",emp:120000,pay:2300,edu:1,outlook:1,ai:2.5,aiDesc:"수제·프리미엄 트렌드 지속"},
-  {name:"바리스타",cat:"식품·조리",emp:150000,pay:2100,edu:0,outlook:0,ai:3.0,aiDesc:"로봇카페 등장하나 스페셜티 커피 시장 성장"},
-  {name:"영양사",cat:"식품·조리",emp:45000,pay:2800,edu:3,outlook:2,ai:4.0,aiDesc:"건강관심 증가로 수요 유지, AI 식단추천 활용"},
-
-  // 스포츠·레저
-  {name:"체육교사·강사",cat:"스포츠·레저",emp:180000,pay:2800,edu:3,outlook:2,ai:1.5,aiDesc:"건강·여가 관심 증가, 대면 지도 대체 어려움"},
-  {name:"스포츠 트레이너",cat:"스포츠·레저",emp:65000,pay:2500,edu:2,outlook:4,ai:2.0,aiDesc:"헬스케어 관심 증가로 수요 확대"},
-  {name:"레저·오락 서비스원",cat:"스포츠·레저",emp:85000,pay:2200,edu:1,outlook:1,ai:2.5,aiDesc:"체험·여가 산업 성장"},
-  {name:"프로선수·코치",cat:"스포츠·레저",emp:15000,pay:4000,edu:2,outlook:1,ai:2.0,aiDesc:"AI 데이터 분석 활용 증가하나 경기 자체는 인간 영역"},
-];
-
-// ===== 카테고리 색상 =====
 const catColors = {
   "경영·사무":"#2a4a6a","판매·서비스":"#4a3a5a","보건·의료":"#2a5a4a","교육":"#5a4a2a",
   "정보통신(IT)":"#2a3a6a","공학·기술":"#3a4a5a","제조·생산":"#4a4a3a","건설":"#5a3a3a",
@@ -401,475 +155,392 @@ const catColors = {
   "식품·조리":"#5a4a3a","스포츠·레저":"#3a5a5a"
 };
 
-// ===== 모드 설정 =====
 const modes = {
   outlook: {
-    title: "고용 전망",
-    getValue: d => d.outlook,
-    getColor: d => { const v = (d.outlook + 10) / 25; return hsl(120 * (1 - v), 70, 45); },
-    format: d => (d.outlook > 0 ? '+' : '') + d.outlook + '%',
-    gradLow: [80,180,80], gradHigh: [200,60,60],
-    lowLabel: "성장", highLabel: "감소"
+    title:"고용 전망",
+    getValue:d=>d.outlook,
+    getColor:d=>{const v=(d.outlook+10)/25;return hsl(120*(1-v),70,45);},
+    format:d=>(d.outlook>0?'+':'')+d.outlook+'%',
+    gradLow:[80,180,80],gradHigh:[200,60,60],lowLabel:"성장",highLabel:"감소"
   },
   pay: {
-    title: "중위 월급(만원)",
-    getValue: d => d.pay,
-    getColor: d => { const v = Math.min((d.pay - 1800) / 6700, 1); return hsl(120 - 120 * v, 65, 42); },
-    format: d => d.pay.toLocaleString() + '만원',
-    gradLow: [80,180,80], gradHigh: [200,60,60],
-    lowLabel: "1,800만", highLabel: "8,500만"
+    title:"중위 월급(만원)",
+    getValue:d=>d.pay,
+    getColor:d=>{const v=Math.min((d.pay-1800)/6700,1);return hsl(120-120*v,65,42);},
+    format:d=>d.pay.toLocaleString()+'만원',
+    gradLow:[80,180,80],gradHigh:[200,60,60],lowLabel:"1,800만",highLabel:"8,500만"
   },
   education: {
-    title: "학력 요건",
-    getValue: d => d.edu,
-    getColor: d => { const v = d.edu / 5; return hsl(120 - 120 * v, 60, 42); },
-    format: d => eduLabels[d.edu],
-    gradLow: [80,170,80], gradHigh: [180,60,60],
-    lowLabel: "무학력", highLabel: "박사/전문직"
+    title:"학력 요건",
+    getValue:d=>d.edu,
+    getColor:d=>{const v=d.edu/5;return hsl(120-120*v,60,42);},
+    format:d=>eduLabels[d.edu],
+    gradLow:[80,170,80],gradHigh:[180,60,60],lowLabel:"학력 무관",highLabel:"박사/전문직"
   },
   ai: {
-    title: "AI 대체 위험도",
-    getValue: d => d.ai,
-    getColor: d => { const v = d.ai / 10; return hsl(120 - 120 * v, 70, 42); },
-    format: d => d.ai.toFixed(1) + '/10',
-    gradLow: [80,180,80], gradHigh: [220,50,50],
-    lowLabel: "안전", highLabel: "고위험"
+    title:"AI 대체 위험도",
+    getValue:d=>d.ai,
+    getColor:d=>{const v=d.ai/10;return hsl(120-120*v,70,42);},
+    format:d=>d.ai.toFixed(1)+'/10',
+    gradLow:[80,180,80],gradHigh:[220,50,50],lowLabel:"안전",highLabel:"고위험"
   }
 };
 
 const eduLabels = ['학력 무관','고졸','전문대졸','대졸','석사','박사/전문직'];
 
-function hsl(h, s, l) {
-  return `hsl(${h},${s}%,${l}%)`;
-}
+function hsl(h,s,l){return `hsl(${h},${s}%,${l}%)`;}
 
-// ===== Treemap Layout (Squarified) =====
-function squarify(items, x, y, w, h) {
-  const totalVal = items.reduce((s, i) => s + i.emp, 0);
-  const rects = [];
-  let remaining = [...items].sort((a, b) => b.emp - a.emp);
-  let cx = x, cy = y, cw = w, ch = h;
-
-  while (remaining.length > 0) {
-    const isHoriz = cw >= ch;
-    const side = isHoriz ? ch : cw;
-    const totalRemaining = remaining.reduce((s, i) => s + i.emp, 0);
-    let row = [remaining[0]];
-    let rowArea = remaining[0].emp;
-
-    for (let i = 1; i < remaining.length; i++) {
-      const testRow = [...row, remaining[i]];
-      const testArea = rowArea + remaining[i].emp;
-      if (worstRatio(testRow, testArea, side, totalRemaining, isHoriz ? cw : ch) <=
-          worstRatio(row, rowArea, side, totalRemaining, isHoriz ? cw : ch)) {
-        row = testRow;
-        rowArea = testArea;
-      } else break;
+// ===== Squarified Treemap =====
+function squarify(items,x,y,w,h){
+  const rects=[];
+  let rem=[...items].sort((a,b)=>b.emp-a.emp);
+  let cx=x,cy=y,cw=w,ch=h;
+  const totalVal=rem.reduce((s,i)=>s+i.emp,0);
+  while(rem.length>0){
+    const isH=cw>=ch;
+    const side=isH?ch:cw;
+    const totalRem=rem.reduce((s,i)=>s+i.emp,0);
+    let row=[rem[0]],rowA=rem[0].emp;
+    for(let i=1;i<rem.length;i++){
+      const tRow=[...row,rem[i]],tA=rowA+rem[i].emp;
+      if(wr(tRow,tA,side,totalRem,isH?cw:ch)<=wr(row,rowA,side,totalRem,isH?cw:ch)){
+        row=tRow;rowA=tA;
+      }else break;
     }
-
-    const rowFrac = rowArea / totalRemaining;
-    const rowSize = isHoriz ? cw * rowFrac : ch * rowFrac;
-    let pos = isHoriz ? cy : cx;
-
-    for (const item of row) {
-      const itemFrac = item.emp / rowArea;
-      const itemSize = side * itemFrac;
-      if (isHoriz) {
-        rects.push({ ...item, rx: cx, ry: pos, rw: rowSize, rh: itemSize });
-        pos += itemSize;
-      } else {
-        rects.push({ ...item, rx: pos, ry: cy, rw: itemSize, rh: rowSize });
-        pos += itemSize;
-      }
+    const rF=rowA/totalRem;
+    const rS=isH?cw*rF:ch*rF;
+    let pos=isH?cy:cx;
+    for(const item of row){
+      const iF=item.emp/rowA;
+      const iS=side*iF;
+      if(isH){rects.push({...item,rx:cx,ry:pos,rw:rS,rh:iS});pos+=iS;}
+      else{rects.push({...item,rx:pos,ry:cy,rw:iS,rh:rS});pos+=iS;}
     }
-
-    if (isHoriz) { cx += rowSize; cw -= rowSize; }
-    else { cy += rowSize; ch -= rowSize; }
-
-    remaining = remaining.slice(row.length);
+    if(isH){cx+=rS;cw-=rS;}else{cy+=rS;ch-=rS;}
+    rem=rem.slice(row.length);
   }
   return rects;
 }
+function wr(row,rA,side,tA,fS){
+  const rS=(rA/tA)*fS;if(rS===0)return Infinity;
+  let w=0;for(const i of row){const f=i.emp/rA;const ww=rS;const hh=side*f;
+  w=Math.max(w,Math.max(ww/hh,hh/ww));}return w;
+}
 
-function worstRatio(row, rowArea, side, totalArea, fullSide) {
-  const rowSize = (rowArea / totalArea) * fullSide;
-  if (rowSize === 0) return Infinity;
-  let worst = 0;
-  for (const item of row) {
-    const frac = item.emp / rowArea;
-    const w = rowSize;
-    const h = side * frac;
-    const ratio = Math.max(w / h, h / w);
-    worst = Math.max(worst, ratio);
+// ===== Canvas =====
+const canvas=document.getElementById('treemap');
+const ctx=canvas.getContext('2d');
+let currentMode='outlook';
+let rects=[];
+let hoveredIdx=-1;
+let zoomedCat=null; // null = all
+let searchTerm='';
+
+function getVisibleData(){
+  if(zoomedCat) return occupations.filter(d=>d.cat===zoomedCat);
+  return occupations;
+}
+
+function resize(){
+  const container=canvas.parentElement;
+  const w=container.clientWidth;
+  const h=Math.max(500,w*0.65);
+  canvas.width=w*2;canvas.height=h*2;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  ctx.setTransform(2,0,0,2,0,0);
+  const pad=6;
+  const visData=getVisibleData();
+  if(zoomedCat){
+    rects=squarify(visData,pad,pad,w-pad*2,h-pad*2);
+  }else{
+    // Group by category, then layout categories, then within each
+    const cats={};
+    visData.forEach(d=>{if(!cats[d.cat])cats[d.cat]={items:[],emp:0};cats[d.cat].items.push(d);cats[d.cat].emp+=d.emp;});
+    const catList=Object.entries(cats).map(([k,v])=>({name:k,emp:v.emp,items:v.items})).sort((a,b)=>b.emp-a.emp);
+    const catRects=squarify(catList.map(c=>({name:c.name,emp:c.emp,cat:c.name})),pad,pad,w-pad*2,h-pad*2);
+    rects=[];
+    catRects.forEach((cr,ci)=>{
+      const cat=catList[ci];
+      const innerPad=1;
+      const inner=squarify(cat.items,cr.rx+innerPad,cr.ry+innerPad,cr.rw-innerPad*2,cr.rh-innerPad*2);
+      rects.push(...inner);
+    });
   }
-  return worst;
-}
-
-// ===== Rendering =====
-const canvas = document.getElementById('treemap');
-const ctx = canvas.getContext('2d');
-let currentMode = 'outlook';
-let rects = [];
-let hoveredIdx = -1;
-
-function resize() {
-  const container = canvas.parentElement;
-  const w = container.clientWidth;
-  const h = Math.max(500, w * 0.65);
-  canvas.width = w * 2;
-  canvas.height = h * 2;
-  canvas.style.width = w + 'px';
-  canvas.style.height = h + 'px';
-  ctx.scale(2, 2);
-  const pad = 6;
-  rects = squarify(occupations, pad, pad, w - pad * 2, h - pad * 2);
   draw();
+  highlightSearch();
 }
 
-function draw() {
-  const w = canvas.width / 2;
-  const h = canvas.height / 2;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#0a0a0f';
-  ctx.fillRect(0, 0, w, h);
+function draw(){
+  const w=canvas.width/2,h=canvas.height/2;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#0a0a0f';ctx.fillRect(0,0,w,h);
+  const mode=modes[currentMode];
+  const gap=zoomedCat?1.5:0.8;
 
-  const mode = modes[currentMode];
-  const gap = 1;
+  rects.forEach((r,i)=>{
+    const rx=r.rx+gap,ry=r.ry+gap,rw=r.rw-gap*2,rh=r.rh-gap*2;
+    if(rw<0.5||rh<0.5)return;
+    ctx.fillStyle=mode.getColor(r);
+    if(i===hoveredIdx) ctx.fillStyle=brighten(mode.getColor(r),1.4);
+    ctx.beginPath();roundRect(ctx,rx,ry,rw,rh,zoomedCat?3:1.5);ctx.fill();
+    if(i===hoveredIdx){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}
 
-  rects.forEach((r, i) => {
-    const rx = r.rx + gap;
-    const ry = r.ry + gap;
-    const rw = r.rw - gap * 2;
-    const rh = r.rh - gap * 2;
-    if (rw < 1 || rh < 1) return;
-
-    ctx.fillStyle = mode.getColor(r);
-    if (i === hoveredIdx) {
-      ctx.fillStyle = brighten(mode.getColor(r), 1.4);
-    }
-    ctx.beginPath();
-    roundRect(ctx, rx, ry, rw, rh, 2);
-    ctx.fill();
-
-    if (i === hoveredIdx) {
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-
-    // 텍스트
-    if (rw > 30 && rh > 18) {
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      const fontSize = Math.min(Math.max(rw / 8, 8), 14);
-      ctx.font = `600 ${fontSize}px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      const name = truncate(r.name, rw - 6, ctx);
-      ctx.fillText(name, rx + 4, ry + 3);
-
-      if (rh > 30) {
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        const subSize = Math.max(fontSize - 2, 7);
-        ctx.font = `400 ${subSize}px 'Apple SD Gothic Neo',sans-serif`;
-        const sub = mode.format(r);
-        ctx.fillText(sub, rx + 4, ry + 3 + fontSize + 2);
+    // Text
+    const minW=zoomedCat?28:20;
+    const minH=zoomedCat?16:12;
+    if(rw>minW&&rh>minH){
+      ctx.fillStyle='rgba(255,255,255,0.9)';
+      const fs=Math.min(Math.max(rw/(zoomedCat?7:9),7),zoomedCat?14:11);
+      ctx.font=`600 ${fs}px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif`;
+      ctx.textAlign='left';ctx.textBaseline='top';
+      ctx.fillText(truncate(r.name,rw-5,ctx),rx+3,ry+2);
+      if(rh>minH+14){
+        ctx.fillStyle='rgba(255,255,255,0.5)';
+        const ss=Math.max(fs-2,6);
+        ctx.font=`400 ${ss}px 'Apple SD Gothic Neo',sans-serif`;
+        ctx.fillText(mode.format(r),rx+3,ry+2+fs+1);
       }
-      if (rh > 44 && rw > 50) {
-        ctx.fillStyle = 'rgba(255,255,255,0.35)';
-        const empSize = Math.max(fontSize - 3, 7);
-        ctx.font = `400 ${empSize}px 'Apple SD Gothic Neo',sans-serif`;
-        ctx.fillText((r.emp / 10000).toFixed(1) + '만명', rx + 4, ry + 3 + fontSize + (fontSize - 2) + 6);
+      if(rh>minH+28&&rw>40){
+        ctx.fillStyle='rgba(255,255,255,0.3)';
+        const es=Math.max(fs-3,6);
+        ctx.font=`400 ${es}px 'Apple SD Gothic Neo',sans-serif`;
+        ctx.fillText((r.emp/10000).toFixed(1)+'만명',rx+3,ry+2+fs+(fs-2)+4);
       }
     }
   });
+
+  // Category labels in overview mode
+  if(!zoomedCat){
+    const cats={};
+    rects.forEach(r=>{
+      if(!cats[r.cat]) cats[r.cat]={minX:Infinity,minY:Infinity,maxX:0,maxY:0};
+      const c=cats[r.cat];
+      c.minX=Math.min(c.minX,r.rx);c.minY=Math.min(c.minY,r.ry);
+      c.maxX=Math.max(c.maxX,r.rx+r.rw);c.maxY=Math.max(c.maxY,r.ry+r.rh);
+    });
+    Object.entries(cats).forEach(([name,b])=>{
+      const bw=b.maxX-b.minX,bh=b.maxY-b.minY;
+      if(bw>60&&bh>30){
+        const fs=Math.min(Math.max(bw/10,9),16);
+        ctx.font=`700 ${fs}px 'Apple SD Gothic Neo',sans-serif`;
+        ctx.fillStyle='rgba(255,255,255,0.15)';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(name,b.minX+bw/2,b.minY+bh/2);
+      }
+    });
+  }
 }
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
+function roundRect(ctx,x,y,w,h,r){
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
 }
-
-function truncate(text, maxW, ctx) {
-  if (ctx.measureText(text).width <= maxW) return text;
-  let t = text;
-  while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
-  return t + '…';
-}
-
-function brighten(hslStr, factor) {
-  const m = hslStr.match(/hsl\(([^,]+),([^,]+)%,([^)]+)%\)/);
-  if (!m) return hslStr;
-  return `hsl(${m[1]},${m[2]}%,${Math.min(parseFloat(m[3]) * factor, 70)}%)`;
-}
+function truncate(t,mw,ctx){if(ctx.measureText(t).width<=mw)return t;while(t.length>1&&ctx.measureText(t+'…').width>mw)t=t.slice(0,-1);return t+'…';}
+function brighten(hslStr,f){const m=hslStr.match(/hsl\(([^,]+),([^,]+)%,([^)]+)%\)/);if(!m)return hslStr;return `hsl(${m[1]},${m[2]}%,${Math.min(parseFloat(m[3])*f,70)}%)`;}
 
 // ===== Tooltip =====
-const tooltip = document.getElementById('tooltip');
-
-canvas.addEventListener('mousemove', e => {
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-  let found = -1;
-  for (let i = rects.length - 1; i >= 0; i--) {
-    const r = rects[i];
-    if (mx >= r.rx && mx <= r.rx + r.rw && my >= r.ry && my <= r.ry + r.rh) {
-      found = i; break;
-    }
+const tooltip=document.getElementById('tooltip');
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  let found=-1;
+  for(let i=rects.length-1;i>=0;i--){
+    const r=rects[i];
+    if(mx>=r.rx&&mx<=r.rx+r.rw&&my>=r.ry&&my<=r.ry+r.rh){found=i;break;}
   }
-  if (found !== hoveredIdx) {
-    hoveredIdx = found;
-    ctx.setTransform(2, 0, 0, 2, 0, 0);
-    draw();
-  }
-  if (found >= 0) {
-    const d = rects[found];
-    const mode = modes[currentMode];
-    tooltip.style.display = 'block';
-    tooltip.innerHTML = `
+  if(found!==hoveredIdx){hoveredIdx=found;ctx.setTransform(2,0,0,2,0,0);draw();highlightSearch();}
+  if(found>=0){
+    const d=rects[found];const mode=modes[currentMode];
+    tooltip.style.display='block';
+    tooltip.innerHTML=`
       <div class="tt-title">${d.name}</div>
       <div class="tt-row"><span class="tt-label">산업분류</span><span class="tt-value">${d.cat}</span></div>
-      <div class="tt-row"><span class="tt-label">취업자 수</span><span class="tt-value">${(d.emp).toLocaleString()}명</span></div>
+      <div class="tt-row"><span class="tt-label">취업자 수</span><span class="tt-value">${d.emp.toLocaleString()}명</span></div>
       <div class="tt-row"><span class="tt-label">중위 연봉</span><span class="tt-value">${d.pay.toLocaleString()}만원</span></div>
       <div class="tt-row"><span class="tt-label">학력 요건</span><span class="tt-value">${eduLabels[d.edu]}</span></div>
-      <div class="tt-row"><span class="tt-label">고용 전망</span><span class="tt-value" style="color:${d.outlook>=0?'#6c6':'#f66'}">${d.outlook > 0 ? '+' : ''}${d.outlook}%</span></div>
+      <div class="tt-row"><span class="tt-label">고용 전망</span><span class="tt-value" style="color:${d.outlook>=0?'#6c6':'#f66'}">${d.outlook>0?'+':''}${d.outlook}%</span></div>
       <div class="tt-row"><span class="tt-label">AI 대체위험</span><span class="tt-value">${d.ai.toFixed(1)}/10</span></div>
-      <div class="tt-desc">${d.aiDesc}</div>
-    `;
-    let tx = e.clientX + 16;
-    let ty = e.clientY + 16;
-    if (tx + 320 > window.innerWidth) tx = e.clientX - 330;
-    if (ty + 250 > window.innerHeight) ty = e.clientY - 260;
-    tooltip.style.left = tx + 'px';
-    tooltip.style.top = ty + 'px';
-    canvas.style.cursor = 'pointer';
-  } else {
-    tooltip.style.display = 'none';
-    canvas.style.cursor = 'default';
+      <div class="tt-desc">${d.aiDesc}</div>`;
+    let tx=e.clientX+16,ty=e.clientY+16;
+    if(tx+320>window.innerWidth)tx=e.clientX-330;
+    if(ty+250>window.innerHeight)ty=e.clientY-260;
+    tooltip.style.left=tx+'px';tooltip.style.top=ty+'px';
+    canvas.style.cursor='pointer';
+  }else{tooltip.style.display='none';canvas.style.cursor=zoomedCat?'default':'pointer';}
+});
+canvas.addEventListener('mouseleave',()=>{hoveredIdx=-1;tooltip.style.display='none';ctx.setTransform(2,0,0,2,0,0);draw();highlightSearch();});
+
+// ===== Click → Zoom =====
+canvas.addEventListener('click',e=>{
+  if(hoveredIdx<0)return;
+  const d=rects[hoveredIdx];
+  if(!zoomedCat){
+    zoomedCat=d.cat;
+    hoveredIdx=-1;tooltip.style.display='none';
+    updateZoomUI();resize();updateSidebar();
   }
 });
 
-canvas.addEventListener('mouseleave', () => {
-  hoveredIdx = -1;
-  tooltip.style.display = 'none';
-  ctx.setTransform(2, 0, 0, 2, 0, 0);
-  draw();
+function updateZoomUI(){
+  const bc=document.getElementById('breadcrumb');
+  const btn=document.getElementById('zoomReset');
+  if(zoomedCat){
+    bc.innerHTML='<span id="bcAll">전체 직업</span> › <strong style="color:#fff">'+zoomedCat+'</strong>';
+    document.getElementById('bcAll').onclick=()=>{zoomedCat=null;hoveredIdx=-1;updateZoomUI();resize();updateSidebar();};
+    btn.style.display='inline-block';
+  }else{
+    bc.innerHTML='<span id="bcAll">전체 직업</span>';
+    btn.style.display='none';
+  }
+}
+document.getElementById('zoomReset').addEventListener('click',()=>{
+  zoomedCat=null;hoveredIdx=-1;updateZoomUI();resize();updateSidebar();
 });
 
-// ===== Sidebar Stats =====
-function updateSidebar() {
-  const sb = document.getElementById('sidebar');
-  const mode = modes[currentMode];
-  const totalEmp = occupations.reduce((s, d) => s + d.emp, 0);
+// ===== Search =====
+const searchInput=document.getElementById('searchInput');
+searchInput.addEventListener('input',e=>{
+  searchTerm=e.target.value.trim().toLowerCase();
+  highlightSearch();
+});
 
-  // 가중 평균
-  const wavg = occupations.reduce((s, d) => s + mode.getValue(d) * d.emp, 0) / totalEmp;
+function highlightSearch(){
+  const container=document.getElementById('searchResults');
+  container.innerHTML='';
+  if(!searchTerm)return;
+  rects.forEach(r=>{
+    if(r.name.toLowerCase().includes(searchTerm)||r.cat.toLowerCase().includes(searchTerm)){
+      const div=document.createElement('div');
+      div.className='search-highlight';
+      div.style.left=r.rx+'px';div.style.top=r.ry+'px';
+      div.style.width=Math.max(r.rw,4)+'px';div.style.height=Math.max(r.rh,4)+'px';
+      container.appendChild(div);
+    }
+  });
+}
 
-  let html = '';
+// ===== Sidebar =====
+function updateSidebar(){
+  const sb=document.getElementById('sidebar');
+  const mode=modes[currentMode];
+  const visData=getVisibleData();
+  const totalEmp=visData.reduce((s,d)=>s+d.emp,0);
+  const wavg=visData.reduce((s,d)=>s+mode.getValue(d)*d.emp,0)/totalEmp;
+  let html='';
 
-  // 주요 지표
-  html += `<div class="stat-card">
-    <h3>전체 가중 평균 · ${mode.title}</h3>
-    <div class="big-num">${currentMode === 'pay' ? Math.round(wavg).toLocaleString() + '만원' :
-      currentMode === 'outlook' ? (wavg > 0 ? '+' : '') + wavg.toFixed(1) + '%' :
-      currentMode === 'education' ? eduLabels[Math.round(wavg)] :
-      wavg.toFixed(1) + '/10'}</div>
-    <div class="sub">전체 약 ${(totalEmp / 10000).toFixed(0)}만 취업자 가중 평균</div>
+  html+=`<div class="stat-card">
+    <h3>${zoomedCat?zoomedCat+' · ':'전체 가중 평균 · '}${mode.title}</h3>
+    <div class="big-num">${currentMode==='pay'?Math.round(wavg).toLocaleString()+'만원':
+      currentMode==='outlook'?(wavg>0?'+':'')+wavg.toFixed(1)+'%':
+      currentMode==='education'?eduLabels[Math.round(wavg)]:
+      wavg.toFixed(1)+'/10'}</div>
+    <div class="sub">${zoomedCat?'':'전체 '}약 ${(totalEmp/10000).toFixed(0)}만 취업자${zoomedCat?' ('+visData.length+'개 직업)':' ('+occupations.length+'개 직업)'}</div>
   </div>`;
 
-  // 분포 히스토그램
-  if (currentMode === 'outlook') {
-    const buckets = [
-      {label:'성장 (5%+)', min:5, max:99, color:'#2d8a4e'},
-      {label:'증가 (1~4%)', min:1, max:4.9, color:'#5aaa5a'},
-      {label:'보합 (0%)', min:0, max:0, color:'#888'},
-      {label:'감소 (-1~-4%)', min:-4.9, max:-1, color:'#cc7744'},
-      {label:'급감 (-5%~)', min:-99, max:-5, color:'#cc4444'},
-    ];
-    html += buildHistogram('고용 전망 분포', buckets, d => d.outlook, totalEmp);
-  } else if (currentMode === 'pay') {
-    const buckets = [
-      {label:'~2,000만', min:0, max:2000, color:'#cc4444'},
-      {label:'2,000~3,000', min:2001, max:3000, color:'#cc7744'},
-      {label:'3,000~4,000', min:3001, max:4000, color:'#aa8844'},
-      {label:'4,000~5,500', min:4001, max:5500, color:'#5aaa5a'},
-      {label:'5,500만+', min:5501, max:99999, color:'#2d8a4e'},
-    ];
-    html += buildHistogram('임금 분포', buckets, d => d.pay, totalEmp);
-  } else if (currentMode === 'education') {
-    const buckets = eduLabels.map((l, i) => ({label:l, min:i, max:i, color:
-      `hsl(${120 - 120*(i/5)},60%,42%)`}));
-    html += buildHistogram('학력 요건 분포', buckets, d => d.edu, totalEmp);
-  } else {
-    const buckets = [
-      {label:'안전 (0~2)', min:0, max:2.9, color:'#2d8a4e'},
-      {label:'낮음 (3~4)', min:3, max:4.9, color:'#5aaa5a'},
-      {label:'보통 (5~6)', min:5, max:6.9, color:'#aa8844'},
-      {label:'높음 (7~8)', min:7, max:8.9, color:'#cc7744'},
-      {label:'매우높음 (9+)', min:9, max:10, color:'#cc4444'},
-    ];
-    html += buildHistogram('AI 대체위험 분포', buckets, d => d.ai, totalEmp);
+  // Histogram
+  if(currentMode==='outlook'){
+    const b=[{label:'성장(5%+)',min:5,max:99,color:'#2d8a4e'},{label:'증가(1~4%)',min:1,max:4.9,color:'#5aaa5a'},{label:'보합(0%)',min:0,max:0,color:'#888'},{label:'감소(-1~-4%)',min:-4.9,max:-1,color:'#cc7744'},{label:'급감(-5%~)',min:-99,max:-5,color:'#cc4444'}];
+    html+=buildHist('고용 전망 분포',b,d=>d.outlook,visData,totalEmp);
+  }else if(currentMode==='pay'){
+    const b=[{label:'~2,000만',min:0,max:2000,color:'#cc4444'},{label:'2,000~3,000',min:2001,max:3000,color:'#cc7744'},{label:'3,000~4,000',min:3001,max:4000,color:'#aa8844'},{label:'4,000~5,500',min:4001,max:5500,color:'#5aaa5a'},{label:'5,500만+',min:5501,max:99999,color:'#2d8a4e'}];
+    html+=buildHist('임금 분포',b,d=>d.pay,visData,totalEmp);
+  }else if(currentMode==='education'){
+    const b=eduLabels.map((l,i)=>({label:l,min:i,max:i,color:`hsl(${120-120*(i/5)},60%,42%)`}));
+    html+=buildHist('학력 요건 분포',b,d=>d.edu,visData,totalEmp);
+  }else{
+    const b=[{label:'안전(0~2)',min:0,max:2.9,color:'#2d8a4e'},{label:'낮음(3~4)',min:3,max:4.9,color:'#5aaa5a'},{label:'보통(5~6)',min:5,max:6.9,color:'#aa8844'},{label:'높음(7~8)',min:7,max:8.9,color:'#cc7744'},{label:'매우높음(9+)',min:9,max:10,color:'#cc4444'}];
+    html+=buildHist('AI 대체위험 분포',b,d=>d.ai,visData,totalEmp);
   }
 
-  // 산업별 가중평균
-  const cats = {};
-  occupations.forEach(d => {
-    if (!cats[d.cat]) cats[d.cat] = {emp: 0, wsum: 0};
-    cats[d.cat].emp += d.emp;
-    cats[d.cat].wsum += mode.getValue(d) * d.emp;
-  });
-  const catArr = Object.entries(cats).map(([k, v]) => ({
-    name: k, emp: v.emp, avg: v.wsum / v.emp
-  })).sort((a, b) => b.emp - a.emp);
-
-  html += `<div class="stat-card"><h3>산업별 · ${mode.title}</h3>`;
-  const maxEmp = Math.max(...catArr.map(c => c.emp));
-  catArr.forEach(c => {
-    const pct = (c.emp / maxEmp * 100).toFixed(0);
-    const avgStr = currentMode === 'pay' ? Math.round(c.avg).toLocaleString() + '만' :
-      currentMode === 'outlook' ? (c.avg > 0 ? '+' : '') + c.avg.toFixed(1) + '%' :
-      currentMode === 'education' ? eduLabels[Math.round(c.avg)] :
-      c.avg.toFixed(1);
-    html += `<div class="hist-row">
-      <div class="hist-label">${c.name}</div>
-      <div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${mode.getColor({outlook:c.avg,pay:c.avg,edu:c.avg,ai:c.avg})}"></div></div>
-      <div class="hist-val">${avgStr}</div>
-    </div>`;
-  });
-  html += '</div>';
-
-  // AI 모드일 때: 위험 직업 TOP 5
-  if (currentMode === 'ai') {
-    const top5 = [...occupations].sort((a, b) => b.ai - a.ai).slice(0, 8);
-    html += `<div class="stat-card"><h3>AI 대체 고위험 직업 TOP 8</h3>`;
-    top5.forEach(d => {
-      html += `<div class="tier-row">
-        <div class="tier-color" style="background:${modes.ai.getColor(d)}"></div>
-        <div class="tier-label">${d.name}</div>
-        <div class="tier-count">${d.ai.toFixed(1)}</div>
-        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
-      </div>`;
+  // Category breakdown (only in overview)
+  if(!zoomedCat){
+    const cats={};
+    visData.forEach(d=>{if(!cats[d.cat])cats[d.cat]={emp:0,wsum:0,cnt:0};cats[d.cat].emp+=d.emp;cats[d.cat].wsum+=mode.getValue(d)*d.emp;cats[d.cat].cnt++;});
+    const catArr=Object.entries(cats).map(([k,v])=>({name:k,emp:v.emp,avg:v.wsum/v.emp,cnt:v.cnt})).sort((a,b)=>b.emp-a.emp);
+    html+=`<div class="stat-card"><h3>산업별 · ${mode.title}</h3>`;
+    const maxE=Math.max(...catArr.map(c=>c.emp));
+    catArr.forEach(c=>{
+      const pct=(c.emp/maxE*100).toFixed(0);
+      const avgStr=currentMode==='pay'?Math.round(c.avg).toLocaleString()+'만':currentMode==='outlook'?(c.avg>0?'+':'')+c.avg.toFixed(1)+'%':currentMode==='education'?eduLabels[Math.round(c.avg)]:c.avg.toFixed(1);
+      html+=`<div class="hist-row" style="cursor:pointer" onclick="zoomTo('${c.name}')"><div class="hist-label">${c.name}</div><div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${mode.getColor({outlook:c.avg,pay:c.avg,edu:c.avg,ai:c.avg})}"></div></div><div class="hist-val">${avgStr}</div></div>`;
     });
-    html += '</div>';
+    html+='</div>';
   }
 
-  // outlook 모드일 때: 성장/감소 TOP
-  if (currentMode === 'outlook') {
-    const growing = [...occupations].sort((a, b) => b.outlook - a.outlook).slice(0, 5);
-    const declining = [...occupations].sort((a, b) => a.outlook - b.outlook).slice(0, 5);
-    html += `<div class="stat-card"><h3>🔥 성장 직업 TOP 5</h3>`;
-    growing.forEach(d => {
-      html += `<div class="tier-row">
-        <div class="tier-color" style="background:#2d8a4e"></div>
-        <div class="tier-label">${d.name}</div>
-        <div class="tier-count">+${d.outlook}%</div>
-        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
-      </div>`;
-    });
-    html += '</div>';
-    html += `<div class="stat-card"><h3>📉 감소 직업 TOP 5</h3>`;
-    declining.forEach(d => {
-      html += `<div class="tier-row">
-        <div class="tier-color" style="background:#cc4444"></div>
-        <div class="tier-label">${d.name}</div>
-        <div class="tier-count">${d.outlook}%</div>
-        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
-      </div>`;
-    });
-    html += '</div>';
+  // TOP lists
+  const sorted=[...visData];
+  if(currentMode==='ai'){
+    sorted.sort((a,b)=>b.ai-a.ai);
+    html+=`<div class="stat-card"><h3>AI 대체 고위험 TOP 8</h3>`;
+    sorted.slice(0,8).forEach(d=>{html+=`<div class="tier-row"><div class="tier-color" style="background:${modes.ai.getColor(d)}"></div><div class="tier-label">${d.name}</div><div class="tier-count">${d.ai.toFixed(1)}</div><div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div></div>`;});
+    html+='</div>';
+    sorted.sort((a,b)=>a.ai-b.ai);
+    html+=`<div class="stat-card"><h3>AI 안전 직업 TOP 8</h3>`;
+    sorted.slice(0,8).forEach(d=>{html+=`<div class="tier-row"><div class="tier-color" style="background:${modes.ai.getColor(d)}"></div><div class="tier-label">${d.name}</div><div class="tier-count">${d.ai.toFixed(1)}</div><div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div></div>`;});
+    html+='</div>';
+  }
+  if(currentMode==='outlook'){
+    sorted.sort((a,b)=>b.outlook-a.outlook);
+    html+=`<div class="stat-card"><h3>🔥 성장 직업 TOP 8</h3>`;
+    sorted.slice(0,8).forEach(d=>{html+=`<div class="tier-row"><div class="tier-color" style="background:#2d8a4e"></div><div class="tier-label">${d.name}</div><div class="tier-count">+${d.outlook}%</div><div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div></div>`;});
+    html+='</div>';
+    sorted.sort((a,b)=>a.outlook-b.outlook);
+    html+=`<div class="stat-card"><h3>📉 감소 직업 TOP 8</h3>`;
+    sorted.slice(0,8).forEach(d=>{html+=`<div class="tier-row"><div class="tier-color" style="background:#cc4444"></div><div class="tier-label">${d.name}</div><div class="tier-count">${d.outlook}%</div><div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div></div>`;});
+    html+='</div>';
+  }
+  if(currentMode==='pay'){
+    sorted.sort((a,b)=>b.pay-a.pay);
+    html+=`<div class="stat-card"><h3>💎 고임금 직업 TOP 8</h3>`;
+    sorted.slice(0,8).forEach(d=>{html+=`<div class="tier-row"><div class="tier-color" style="background:#2d8a4e"></div><div class="tier-label">${d.name}</div><div class="tier-count">${d.pay.toLocaleString()}만</div><div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div></div>`;});
+    html+='</div>';
   }
 
-  // pay 모드일 때: 고임금/저임금 TOP
-  if (currentMode === 'pay') {
-    const highPay = [...occupations].sort((a, b) => b.pay - a.pay).slice(0, 5);
-    const lowPay = [...occupations].sort((a, b) => a.pay - b.pay).slice(0, 5);
-    html += `<div class="stat-card"><h3>💎 고임금 직업 TOP 5</h3>`;
-    highPay.forEach(d => {
-      html += `<div class="tier-row">
-        <div class="tier-color" style="background:#2d8a4e"></div>
-        <div class="tier-label">${d.name}</div>
-        <div class="tier-count">${d.pay.toLocaleString()}만</div>
-        <div class="tier-pct">${(d.emp/10000).toFixed(1)}만</div>
-      </div>`;
-    });
-    html += '</div>';
-  }
-
-  sb.innerHTML = html;
+  sb.innerHTML=html;
 }
 
-function buildHistogram(title, buckets, getter, totalEmp) {
-  let html = `<div class="stat-card"><h3>${title}</h3>`;
-  const counts = buckets.map(b => {
-    let cnt = 0;
-    occupations.forEach(d => {
-      const v = getter(d);
-      if (b.min <= 0 && b.max <= 0) {
-        if (v >= b.min && v <= b.max) cnt += d.emp;
-      } else if (b.min < 0) {
-        if (v >= b.min && v <= b.max) cnt += d.emp;
-      } else {
-        if (v >= b.min && v <= b.max) cnt += d.emp;
-      }
-    });
-    return cnt;
+window.zoomTo=function(cat){zoomedCat=cat;hoveredIdx=-1;updateZoomUI();resize();updateSidebar();};
+
+function buildHist(title,buckets,getter,visData,totalEmp){
+  let html=`<div class="stat-card"><h3>${title}</h3>`;
+  const counts=buckets.map(b=>{let c=0;visData.forEach(d=>{const v=getter(d);if(v>=b.min&&v<=b.max)c+=d.emp;});return c;});
+  const mx=Math.max(...counts);
+  buckets.forEach((b,i)=>{
+    const pct=(counts[i]/mx*100).toFixed(0);
+    const epct=(counts[i]/totalEmp*100).toFixed(1);
+    html+=`<div class="hist-row"><div class="hist-label">${b.label}</div><div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${b.color}"></div></div><div class="hist-val">${epct}%</div></div>`;
   });
-  const maxCnt = Math.max(...counts);
-  buckets.forEach((b, i) => {
-    const pct = (counts[i] / maxCnt * 100).toFixed(0);
-    const empPct = (counts[i] / totalEmp * 100).toFixed(1);
-    html += `<div class="hist-row">
-      <div class="hist-label">${b.label}</div>
-      <div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${b.color}"></div></div>
-      <div class="hist-val">${empPct}%</div>
-    </div>`;
-  });
-  html += '</div>';
-  return html;
+  html+='</div>';return html;
 }
 
-// ===== Legend Gradient =====
-function updateGradient() {
-  const gc = document.getElementById('gradientCanvas');
-  const gctx = gc.getContext('2d');
-  const g = gctx.createLinearGradient(0, 0, 200, 0);
-  const mode = modes[currentMode];
-  g.addColorStop(0, `rgb(${mode.gradLow.join(',')})`);
-  g.addColorStop(1, `rgb(${mode.gradHigh.join(',')})`);
-  gctx.fillStyle = g;
-  gctx.fillRect(0, 0, 200, 12);
-  document.getElementById('legendLow').textContent = mode.lowLabel;
-  document.getElementById('legendHigh').textContent = mode.highLabel;
+// ===== Legend =====
+function updateGradient(){
+  const gc=document.getElementById('gradientCanvas');
+  const gctx=gc.getContext('2d');
+  const g=gctx.createLinearGradient(0,0,200,0);
+  const mode=modes[currentMode];
+  g.addColorStop(0,`rgb(${mode.gradLow.join(',')})`);
+  g.addColorStop(1,`rgb(${mode.gradHigh.join(',')})`);
+  gctx.fillStyle=g;gctx.fillRect(0,0,200,12);
+  document.getElementById('legendLow').textContent=mode.lowLabel;
+  document.getElementById('legendHigh').textContent=mode.highLabel;
 }
 
-// ===== Button Handlers =====
-document.querySelectorAll('.controls button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+// ===== Mode Buttons =====
+document.querySelectorAll('.controls button[data-mode]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.controls button[data-mode]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    currentMode = btn.dataset.mode;
-    updateGradient();
-    ctx.setTransform(2, 0, 0, 2, 0, 0);
-    draw();
-    updateSidebar();
+    currentMode=btn.dataset.mode;
+    updateGradient();ctx.setTransform(2,0,0,2,0,0);draw();highlightSearch();updateSidebar();
   });
 });
 
 // ===== Init =====
-window.addEventListener('resize', () => {
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  resize();
-  updateSidebar();
-});
-resize();
-updateGradient();
-updateSidebar();
+window.addEventListener('resize',()=>{ctx.setTransform(1,0,0,1,0,0);resize();updateSidebar();});
+resize();updateGradient();updateSidebar();
 </script>
 </body>
 </html>
