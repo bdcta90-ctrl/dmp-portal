@@ -79,6 +79,21 @@ const ASSETS = [
   { name: "비밀번호 해시 DB", type: "시스템", classification: "최고기밀", sensitivity: 5, since: "2015.01", lastAudit: "2026.03" },
   { name: "감사 보고서", type: "문서", classification: "기밀", sensitivity: 4, since: "2015.01", lastAudit: "2025.11" },
   { name: "M&A 검토 자료", type: "문서", classification: "최고기밀", sensitivity: 5, since: "2024.06", lastAudit: "2026.01" },
+  { name: "Slack 메신저 로그", type: "로그", classification: "대외비", sensitivity: 3, since: "2020.06", lastAudit: "2026.02" },
+  { name: "Jira 프로젝트 관리", type: "시스템", classification: "대외비", sensitivity: 3, since: "2019.01", lastAudit: "2026.01" },
+  { name: "Confluence 위키", type: "문서", classification: "대외비", sensitivity: 3, since: "2019.01", lastAudit: "2026.01" },
+  { name: "Jenkins CI/CD 파이프라인", type: "시스템", classification: "기밀", sensitivity: 4, since: "2020.03", lastAudit: "2025.12" },
+  { name: "Docker Registry", type: "시스템", classification: "기밀", sensitivity: 4, since: "2021.06", lastAudit: "2026.02" },
+  { name: "Kubernetes 클러스터", type: "시스템", classification: "최고기밀", sensitivity: 5, since: "2022.01", lastAudit: "2026.03" },
+  { name: "고객 결제 정보 DB", type: "데이터", classification: "최고기밀", sensitivity: 5, since: "2016.01", lastAudit: "2026.03" },
+  { name: "직원 건강검진 기록", type: "문서", classification: "기밀", sensitivity: 4, since: "2017.01", lastAudit: "2025.11" },
+  { name: "경영전략 회의록", type: "문서", classification: "최고기밀", sensitivity: 5, since: "2015.01", lastAudit: "2026.02" },
+  { name: "특허 출원 자료", type: "문서", classification: "최고기밀", sensitivity: 5, since: "2018.06", lastAudit: "2026.01" },
+  { name: "고객 VOC 데이터", type: "데이터", classification: "대외비", sensitivity: 3, since: "2020.01", lastAudit: "2025.10" },
+  { name: "네트워크 토폴로지 도면", type: "문서", classification: "기밀", sensitivity: 4, since: "2019.06", lastAudit: "2025.12" },
+  { name: "서버 인증서/키", type: "시스템", classification: "최고기밀", sensitivity: 5, since: "2015.01", lastAudit: "2026.03" },
+  { name: "백업 테이프 목록", type: "문서", classification: "기밀", sensitivity: 4, since: "2016.01", lastAudit: "2025.09" },
+  { name: "재해복구 계획서", type: "문서", classification: "기밀", sensitivity: 4, since: "2017.01", lastAudit: "2026.01" },
 ];
 
 const CONTEXT_REASONS = [
@@ -236,24 +251,24 @@ var ACTION_GUIDES = {
 
 var DEPT_ASSETS = {
   "재무팀": ["고객계좌DB","급여명세_전체.xlsx","재무제표_Q1.xlsx"],
-  "연구개발1팀": ["기술설계도_v3.dwg","연구개발_소스코드"],
-  "연구개발2팀": ["기술설계도_v3.dwg","연구개발_소스코드"],
-  "인사팀": ["급여명세_전체.xlsx","인사평가_시트.xlsx"],
+  "연구개발1팀": ["기술설계도_v3.dwg","연구개발_소스코드","특허 출원 자료","Jira 프로젝트 관리","Confluence 위키"],
+  "연구개발2팀": ["기술설계도_v3.dwg","연구개발_소스코드","특허 출원 자료","Jira 프로젝트 관리","Confluence 위키"],
+  "인사팀": ["급여명세_전체.xlsx","인사평가_시트.xlsx","직원 건강검진 기록"],
   "마케팅팀": ["2026_전략보고서.pdf","거래처_리스트.csv"],
-  "IT운영팀": ["연구개발_소스코드", "소스코드 Git 저장소", "VPN 접속 로그", "비밀번호 해시 DB", "클라우드 스토리지(AWS S3)"],
-  "법무팀": ["M_A_계약서_draft.pdf"],
-  "보안팀": ["VPN 접속 로그", "CCTV 영상 저장소", "감사 보고서", "비밀번호 해시 DB"],
-  "전략기획팀": ["2026_전략보고서.pdf"],
+  "IT운영팀": ["연구개발_소스코드", "소스코드 Git 저장소", "VPN 접속 로그", "비밀번호 해시 DB", "클라우드 스토리지(AWS S3)", "Jenkins CI/CD 파이프라인", "Docker Registry", "Kubernetes 클러스터", "Jira 프로젝트 관리", "Confluence 위키", "Slack 메신저 로그"],
+  "법무팀": ["M_A_계약서_draft.pdf","특허 출원 자료"],
+  "보안팀": ["VPN 접속 로그", "CCTV 영상 저장소", "감사 보고서", "비밀번호 해시 DB", "서버 인증서/키", "네트워크 토폴로지 도면", "Slack 메신저 로그"],
+  "전략기획팀": ["2026_전략보고서.pdf","경영전략 회의록"],
   "영업1팀": ["거래처_리스트.csv"],
   "영업2팀": ["거래처_리스트.csv"],
-  "고객지원팀": ["고객개인정보_DB"],
-  "리스크관리팀": ["고객계좌DB", "감사 보고서", "M&A 검토 자료"],
-  "컴플라이언스팀": ["고객개인정보_DB", "감사 보고서", "고객계좌DB"],
-  "데이터분석팀": ["고객개인정보_DB","고객계좌DB"],
-  "인프라팀": ["연구개발_소스코드", "VPN 접속 로그", "비밀번호 해시 DB", "클라우드 스토리지(AWS S3)", "소스코드 Git 저장소"],
-  "경영지원팀": ["급여명세_전체.xlsx", "인사 평가 기록", "이사회 의사록", "파트너사 계약서"],
+  "고객지원팀": ["고객개인정보_DB","고객 VOC 데이터","고객 결제 정보 DB"],
+  "리스크관리팀": ["고객계좌DB", "감사 보고서", "M&A 검토 자료", "재해복구 계획서"],
+  "컴플라이언스팀": ["고객개인정보_DB", "감사 보고서", "고객계좌DB", "고객 결제 정보 DB"],
+  "데이터분석팀": ["고객개인정보_DB","고객계좌DB","고객 VOC 데이터","고객 결제 정보 DB"],
+  "인프라팀": ["연구개발_소스코드", "VPN 접속 로그", "비밀번호 해시 DB", "클라우드 스토리지(AWS S3)", "소스코드 Git 저장소", "서버 인증서/키", "네트워크 토폴로지 도면", "백업 테이프 목록", "재해복구 계획서", "Docker Registry", "Kubernetes 클러스터"],
+  "경영지원팀": ["급여명세_전체.xlsx", "인사 평가 기록", "이사회 의사록", "파트너사 계약서", "경영전략 회의록", "직원 건강검진 기록"],
   "해외사업팀": ["2026_전략보고서.pdf", "파트너사 계약서", "M&A 검토 자료"],
-  "신사업개발팀": ["2026_전략보고서.pdf", "기술설계도_v3.dwg", "AI 학습 데이터셋", "M&A 검토 자료"],
+  "신사업개발팀": ["2026_전략보고서.pdf", "기술설계도_v3.dwg", "AI 학습 데이터셋", "M&A 검토 자료", "특허 출원 자료"],
   "디자인팀": [],
 };
 
@@ -1479,6 +1494,20 @@ export default function SecurityDashboard(props) {
   var collapsedPanels = stCollapsed[0], setCollapsedPanels = stCollapsed[1];
   var togglePanel = function(key) { setCollapsedPanels(function(p) { var n = Object.assign({}, p); n[key] = !n[key]; return n; }); };
 
+  var DEFAULT_WEIGHTS = {
+    baseLow: 15, baseMedium: 30, baseHigh: 55, baseCritical: 75,
+    sensitivityLegit: 2, sensitivityUnauth: 5,
+    nightBonus: 20, weekendBonus: 10,
+    freqThree: 10, freqFive: 20,
+    roleMismatch: 20, clearanceMismatch: 20,
+    resignPlanned: 25, recentTransfer: 10, warningMult: 8, lowPerf: 15,
+    employmentBonus: 15, compoundBonus: 15
+  };
+  var stWeights = useState(Object.assign({}, DEFAULT_WEIGHTS));
+  var weights = stWeights[0], setWeights = stWeights[1];
+  var stWeightsSaved = useState(false);
+  var weightsSaved = stWeightsSaved[0], setWeightsSaved = stWeightsSaved[1];
+
   var addEvent = useCallback(function() {
     setEvents(function(p) { return [generateEvent(employees, p)].concat(p).slice(0, 500); });
     setTotalToday(function(p) { return p + 1; });
@@ -1794,37 +1823,37 @@ export default function SecurityDashboard(props) {
         };
 
         var complianceData = [
-          ["개인정보보호법","제15조","개인정보 수집·이용 동의","⚠️ 미구현","직원 모니터링 사전 동의 필요"],
-          ["개인정보보호법","제17조","개인정보 제3자 제공 동의","⚠️ 미구현","외부 기관 공유 시 동의"],
-          ["개인정보보호법","제21조","개인정보 파기","⚠️ 일부 적용","이벤트 500건 제한, 장기보관 미설정"],
-          ["개인정보보호법","제24조의2","주민등록번호 처리 제한","✅ 해당없음","주민번호 미수집"],
-          ["개인정보보호법","제29조","안전조치 의무","⚠️ 일부 적용","접근통제 구현, 암호화 미적용"],
-          ["개인정보보호법","제34조","개인정보 유출 통지","❌ 미구현","유출 시 72시간 내 통지 시스템 없음"],
-          ["개인정보보호법","제35조","개인정보 열람 요구권","❌ 미구현","직원의 자기정보 열람 기능 없음"],
-          ["개인정보보호법","제36조","개인정보 정정·삭제 요구권","❌ 미구현",""],
-          ["개인정보보호법","제37조","개인정보 처리정지 요구권","❌ 미구현",""],
-          ["정보통신망법","제28조","개인정보 보호조치","✅ 적용","접근로그 기록 중"],
-          ["정보통신망법","제28조의2","접속기록 보관","⚠️ 일부 적용","6개월 보관 의무, 현재 메모리만"],
-          ["정보통신망법","제49조","비밀침해 금지","⚠️ 주의필요","모니터링 범위 법적 검토 필요"],
-          ["신용정보법","제19조","신용정보 관리 의무","✅ 적용","고객계좌DB 접근 통제"],
-          ["신용정보법","제32조","개인신용정보 제공·이용","⚠️ 일부 적용","내부 이용 기준 명확화 필요"],
-          ["전자금융거래법","제21조","안전성 확보 의무","✅ 적용","접근통제 + 모니터링"],
-          ["전자금융거래법","제21조의3","전자금융사고 보고","❌ 미구현","금융위 보고 자동화 없음"],
-          ["산업기술보호법","제11조","산업기술 유출 방지","✅ 적용","기술설계도·소스코드 모니터링"],
-          ["산업기술보호법","제14조","산업기술 유출 신고","⚠️ 일부 적용","신고 프로세스 수동"],
-          ["산업기술보호법","제34조","벌칙 (유출 시)","✅ 참조","벌금/징역 기준 안내 가능"],
-          ["근로기준법","제93조","취업규칙 (감시 고지)","⚠️ 미구현","취업규칙에 모니터링 명시 필요"],
-          ["근로기준법","제94조","취업규칙 불이익 변경","⚠️ 주의필요","과반수 동의 필요"],
-          ["ISMS-P","2.5.1","사용자 인증","✅ 적용","IAM 연계 (준비중)"],
-          ["ISMS-P","2.5.4","접근권한 관리","✅ 적용","역할-자산 매트릭스 구현"],
-          ["ISMS-P","2.6.1","접근통제 정책","✅ 적용","DEPT_ASSETS 기반"],
-          ["ISMS-P","2.9.1","보안사고 대응","⚠️ 일부 적용","조치가이드 11종, 자동화 미완"],
-          ["ISMS-P","2.11.1","개인정보 보호대책","⚠️ 일부 적용","영향평가 미실시"],
-          ["ISO 27001","A.7.2","고용 중 보안","⚠️ 일부 적용","HR 연계 준비중"],
-          ["ISO 27001","A.8.1","자산 관리","✅ 적용","25개 자산 분류·등급 관리"],
-          ["ISO 27001","A.9.2","사용자 접근 관리","✅ 적용","보안등급 4단계"],
-          ["ISO 27001","A.12.4","로그 및 모니터링","✅ 적용","실시간 이벤트 감시"],
-          ["ISO 27001","A.16.1","보안사고 관리","⚠️ 일부 적용","조치가이드 있으나 실행 미연동"],
+          ["개인정보보호법","제15조","개인정보 수집·이용 동의","⚠️ 미구현","개인정보 수집 시 정보주체에게 수집·이용 목적, 항목, 보유기간을 고지하고 동의를 받아야 함. 직원 모니터링 시 모니터링 범위, 수집 정보, 활용 목적을 취업규칙에 명시하고 직원 동의 필요."],
+          ["개인정보보호법","제17조","개인정보 제3자 제공 동의","⚠️ 미구현","제3자 제공 시 제공받는 자, 목적, 항목, 보유기간을 고지하고 별도 동의 필요. SIU 의뢰·외부 신고 시 법적 근거 또는 정보주체 동의 확보 절차를 시스템에 구현해야 함."],
+          ["개인정보보호법","제21조","개인정보 파기","⚠️ 일부 적용","보유기간 경과 또는 처리 목적 달성 시 지체없이 파기. 이벤트 로그는 접속기록 보관 의무(6개월) 충족 후 파기 정책 수립 필요. 현재 메모리 500건 제한은 불충분하며 DB 기반 보관·자동파기 구현 필요."],
+          ["개인정보보호법","제24조의2","주민등록번호 처리 제한","✅ 해당없음","주민등록번호는 법률에 구체적 근거가 있는 경우에만 처리 가능. 본 시스템은 주민번호를 수집하지 않으므로 해당 없음. 향후 HR 연동 시 주민번호 마스킹 처리 필수."],
+          ["개인정보보호법","제29조","안전조치 의무","⚠️ 일부 적용","개인정보 처리 시 기술적·관리적·물리적 안전조치 의무. 접근통제(DEPT_ASSETS)는 구현되었으나 전송 구간 암호화(TLS), 저장 암호화(AES-256), 접속기록 위변조 방지 미적용."],
+          ["개인정보보호법","제34조","개인정보 유출 통지","❌ 미구현","1,000명 이상 유출 시 72시간 내 정보주체 통지 및 개인정보보호위원회 신고 의무. 유출 탐지→통지 자동화 워크플로우 및 신고서 자동 생성 기능 구현 필요."],
+          ["개인정보보호법","제35조","개인정보 열람 요구권","❌ 미구현","정보주체는 자신의 개인정보 처리 여부 확인 및 열람을 요구할 수 있음. 직원이 자신의 모니터링 기록, 위험점수, 조치 이력을 열람할 수 있는 셀프서비스 포털 필요."],
+          ["개인정보보호법","제36조","개인정보 정정·삭제 요구권","❌ 미구현","정보주체는 부정확한 개인정보의 정정·삭제를 요구할 수 있음. 오탐 이벤트에 대한 이의제기 및 기록 정정 기능을 구현하여 직원 권리를 보장해야 함."],
+          ["개인정보보호법","제37조","개인정보 처리정지 요구권","❌ 미구현","정보주체는 개인정보 처리정지를 요구할 수 있으며, 정당한 사유 없이 거부 불가. 모니터링 제외 요청 처리 프로세스 및 법적 사유 기반 거부 판단 로직 구현 필요."],
+          ["정보통신망법","제28조","개인정보 보호조치","✅ 적용","정보통신서비스 제공자는 개인정보 분실·도난·유출 방지를 위한 기술적·관리적 조치 의무. 접근로그 기록 및 실시간 모니터링으로 충족 중이나, 로그 무결성 검증(해시) 추가 권장."],
+          ["정보통신망법","제28조의2","접속기록 보관","⚠️ 일부 적용","개인정보 취급자의 접속기록을 최소 6개월 이상 보관·관리해야 함. 현재 메모리 기반 500건 제한은 법적 보관 의무 미충족. DB 저장 및 6개월 보관 정책 즉시 구현 필요."],
+          ["정보통신망법","제49조","비밀침해 금지","⚠️ 주의필요","타인의 비밀을 침해·도용·누설 금지. 직원 행위 모니터링이 사생활 침해에 해당하지 않도록 모니터링 범위를 업무용 시스템으로 한정하고 법적 검토 후 운영해야 함."],
+          ["신용정보법","제19조","신용정보 관리 의무","✅ 적용","신용정보의 정확성·최신성 유지 및 안전한 관리 의무. 고객계좌DB 접근을 DEPT_ASSETS로 통제하고 접근 이력을 기록하여 충족 중."],
+          ["신용정보법","제32조","개인신용정보 제공·이용","⚠️ 일부 적용","개인신용정보 제공 시 이용 목적, 항목을 명확히 하고 최소한으로 처리해야 함. 내부 부서 간 고객 신용정보 공유 기준 및 목적 제한 정책을 문서화하여 시스템에 반영 필요."],
+          ["전자금융거래법","제21조","안전성 확보 의무","✅ 적용","전자금융거래의 안전성과 신뢰성 확보를 위한 기술적 조치 의무. 접근통제(DEPT_ASSETS) + 실시간 모니터링 + 이상거래 탐지(위험점수 기반)로 충족."],
+          ["전자금융거래법","제21조의3","전자금융사고 보고","❌ 미구현","전자금융사고 발생 시 금융위원회에 지체없이 보고해야 함. 사고 탐지(critical 이벤트)→금융위 보고서 자동 생성→담당자 알림의 자동화 파이프라인 구축 필요."],
+          ["산업기술보호법","제11조","산업기술 유출 방지","✅ 적용","국가핵심기술의 유출을 방지하기 위한 보호조치 의무. 기술설계도·소스코드를 최고기밀로 분류하고 USB 복사, 외부 공유, AI 업로드 등 유출 경로를 실시간 모니터링 중."],
+          ["산업기술보호법","제14조","산업기술 유출 신고","⚠️ 일부 적용","산업기술 유출이 발생하거나 발생할 우려가 있는 경우 산업통상자원부장관에게 신고 의무. 현재 수동 신고만 가능하며, 자동 탐지→신고서 생성→제출 워크플로우 구현 필요."],
+          ["산업기술보호법","제34조","벌칙 (유출 시)","✅ 참조","산업기술 유출 시 15년 이하 징역 또는 15억원 이하 벌금. 해외 유출 시 가중 처벌. 조치가이드에 법적 제재 안내를 포함하여 억제 효과 확보 중."],
+          ["근로기준법","제93조","취업규칙 (감시 고지)","⚠️ 미구현","상시 10인 이상 사업장은 취업규칙에 근로자 감시·모니터링 사항을 명시해야 함. 본 시스템의 모니터링 대상, 범위, 데이터 활용 목적을 취업규칙에 추가하고 전 직원 고지 필요."],
+          ["근로기준법","제94조","취업규칙 불이익 변경","⚠️ 주의필요","근로자에게 불이익한 취업규칙 변경 시 과반수 노동조합 또는 근로자 과반수 동의 필요. 모니터링 범위 확대 시 불이익 변경에 해당할 수 있으므로 사전 동의 절차 필수."],
+          ["ISMS-P","2.5.1","사용자 인증","✅ 적용","정보시스템 접근 시 사용자 식별·인증 수행 의무. 현재 EMP-ID 기반 식별은 구현되었으며, IAM(Identity & Access Management) 연계를 통한 MFA 인증 강화 준비 중."],
+          ["ISMS-P","2.5.4","접근권한 관리","✅ 적용","업무 수행에 필요한 최소한의 접근권한 부여 및 정기 검토 의무. 20개 부서별 역할-자산 매트릭스(DEPT_ASSETS)로 최소권한 원칙 적용 중. 분기별 권한 검토 자동화 권장."],
+          ["ISMS-P","2.6.1","접근통제 정책","✅ 적용","비인가 접근을 방지하기 위한 접근통제 정책 수립·이행 의무. DEPT_ASSETS 기반 부서별 자산 접근통제 및 권한외 접근 탐지(+20점) 구현 완료."],
+          ["ISMS-P","2.9.1","보안사고 대응","⚠️ 일부 적용","보안사고 발생 시 탐지·대응·복구 절차를 수립하고 정기 훈련 의무. 조치가이드 11종 구현되었으나, 자동 실행 연동(SIEM/SOAR) 및 모의훈련 기능 미완성."],
+          ["ISMS-P","2.11.1","개인정보 보호대책","⚠️ 일부 적용","개인정보 영향평가를 실시하고 보호대책을 수립해야 함. 직원 행위 모니터링 시스템에 대한 개인정보 영향평가(PIA) 미실시 상태이며, 평가 후 보완조치 필요."],
+          ["ISO 27001","A.7.2","고용 중 보안","⚠️ 일부 적용","고용 기간 중 임직원의 보안 의무 인식 및 교육 의무. HR 프로파일(경고횟수, 성과등급) 연계로 위험 직원 식별 중이나, 정기 보안교육 이수 추적 기능 추가 필요."],
+          ["ISO 27001","A.8.1","자산 관리","✅ 적용","정보자산을 식별·분류하고 적절한 보호수준을 적용해야 함. 40개 자산을 7개 유형, 4단계 등급, 5단계 민감도로 분류·관리 중."],
+          ["ISO 27001","A.9.2","사용자 접근 관리","✅ 적용","사용자 등록·해지 및 접근권한 프로비저닝 절차 수립 의무. 보안등급 4단계(일반/대외비/기밀/최고기밀) 기반 접근 관리 및 등급 위반 탐지(+20점) 적용 중."],
+          ["ISO 27001","A.12.4","로그 및 모니터링","✅ 적용","이벤트 로그를 기록하고 정기적으로 검토하며 이상징후를 모니터링해야 함. 9종 이벤트 유형 실시간 감시, 위험점수 자동 산정, 임계치 초과 시 즉시 알림 구현 완료."],
+          ["ISO 27001","A.16.1","보안사고 관리","⚠️ 일부 적용","보안사고의 일관된 관리를 위한 절차 수립 의무. 11종 조치가이드와 단계별 실행 프로세스는 구현되었으나, SIEM/SOAR 연동을 통한 자동 실행 및 사후 분석 기능 미완성."],
         ];
 
         var DATA_MAP = [
@@ -1836,8 +1865,8 @@ export default function SecurityDashboard(props) {
             ]},
           {cat:"\uD83D\uDD12 자산/보안 데이터", color:"#ff9500", desc:"25개 민감 자산과 보안등급 체계", linkTab:"assets",
             items:[
-              {icon:"\uD83D\uDCC1",name:"자산 목록",size:"25건 / 7컬럼",detail:"자산명, 유형(시스템/문서/데이터/코드/영상/음성), 보안등급(일반/대외비/기밀/최고기밀), 민감도(1~5), 관리시작, 최근감사"},
-              {icon:"\uD83D\uDD10",name:"역할-자산 매트릭스",size:"20부서 \u00D7 25자산",detail:"DEPT_ASSETS: 각 부서별 합법 접근 가능 자산 목록. 매칭 안 되면 '권한외 접근' 플래그"},
+              {icon:"\uD83D\uDCC1",name:"자산 목록",size:"40건 / 7컬럼",detail:"자산명, 유형(시스템/문서/데이터/코드/영상/음성), 보안등급(일반/대외비/기밀/최고기밀), 민감도(1~5), 관리시작, 최근감사"},
+              {icon:"\uD83D\uDD10",name:"역할-자산 매트릭스",size:"20부서 \u00D7 40자산",detail:"DEPT_ASSETS: 각 부서별 합법 접근 가능 자산 목록. 매칭 안 되면 '권한외 접근' 플래그"},
               {icon:"\uD83C\uDFF7\uFE0F",name:"보안등급 체계",size:"4단계",detail:"일반 \u2192 대외비 \u2192 기밀 \u2192 최고기밀. 일반 등급이 기밀+ 접근 시 +20 가중 (단, 합법부서는 면제)"},
             ]},
           {cat:"\u26A1 이벤트/위협 데이터", color:"#ff2d55", desc:"9종 이벤트 유형과 위험도 산정 체계", linkTab:"events",
@@ -2023,7 +2052,7 @@ export default function SecurityDashboard(props) {
               <div style={{fontSize:13,color:"#64748b",marginBottom:16}}>5개 데이터 카테고리의 구조와 세부 항목을 탐색합니다. 카드를 클릭하여 상세 정보를 확인하세요.</div>
               {/* Summary stats - moved to top */}
               <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8,marginBottom:16}}>
-                {[{l:"직원",v:"1,800명",c:"#2563eb"},{l:"자산",v:"25건",c:"#ea580c"},{l:"이벤트 유형",v:"9종",c:"#dc2626"},{l:"조치",v:"11종",c:"#16a34a"},{l:"법규",v:"31건",c:"#0284c7"}].map(function(s) {
+                {[{l:"직원",v:"1,800명",c:"#2563eb"},{l:"자산",v:"40건",c:"#ea580c"},{l:"이벤트 유형",v:"9종",c:"#dc2626"},{l:"조치",v:"11종",c:"#16a34a"},{l:"법규",v:"31건",c:"#0284c7"}].map(function(s) {
                   return <div key={s.l} style={{textAlign:"center",padding:"12px 8px",background:"#fff",border:"1px solid #e2e8f0",borderRadius:10}}>
                     <div style={{fontSize:16,fontWeight:800,color:s.c}}>{s.v}</div>
                     <div style={{fontSize:10,color:"#64748b",marginTop:2}}>{s.l}</div>
@@ -2393,6 +2422,21 @@ export default function SecurityDashboard(props) {
                   {id:"SR18",name:"민감도 가중 (무단)",cat:"자산",priority:1,condition:"무단 접근 시",then:"위험점수 +(민감도 \u00D7 5)",severity:"warning"},
                   {id:"SR19",name:"빈도 이상 (3건+)",cat:"패턴",priority:1,condition:"동일 사용자 이벤트 3건 이상",then:"위험점수 +10",severity:"warning"},
                   {id:"SR20",name:"빈도 이상 (5건+)",cat:"패턴",priority:0,condition:"동일 사용자 이벤트 5건 이상",then:"위험점수 +20",severity:"critical"},
+                  {id:"SR21",name:"대량 다운로드 감지",cat:"패턴",priority:0,condition:"동일 사용자 1시간 내 다운로드 10건 이상",then:"위험점수 +25, 데이터 유출 의심",severity:"critical"},
+                  {id:"SR22",name:"업무시간 외 기밀 접근",cat:"시간",priority:0,condition:"22시~07시 사이 기밀/최고기밀 자산 접근",then:"위험점수 +30 (야간+기밀 복합)",severity:"critical"},
+                  {id:"SR23",name:"퇴사 30일 이내 대량 조회",cat:"패턴",priority:0,condition:"퇴사예정 + Bulk Query",then:"위험점수 +35, SIU 즉시 의뢰",severity:"critical"},
+                  {id:"SR24",name:"비인가 단말 접근",cat:"접근",priority:0,condition:"등록되지 않은 IP/MAC에서 접근",then:"위험점수 +30, 세션 차단",severity:"critical"},
+                  {id:"SR25",name:"동시 다중 세션",cat:"패턴",priority:1,condition:"동일 계정 2개 이상 동시 세션",then:"위험점수 +15, MFA 재인증",severity:"warning"},
+                  {id:"SR26",name:"출력 후 USB 복사 연계",cat:"패턴",priority:0,condition:"Print 후 5분 내 Copy to USB",then:"위험점수 +30, 유출 경로 확보 의심",severity:"critical"},
+                  {id:"SR27",name:"권한 상승 후 기밀 접근",cat:"패턴",priority:0,condition:"Permission Escalation 후 10분 내 기밀 자산 접근",then:"위험점수 +35, 계정 탈취 의심",severity:"critical"},
+                  {id:"SR28",name:"VPN 접속 국가 이상",cat:"접근",priority:0,condition:"해외 IP에서 VPN 접속",then:"위험점수 +25, 국가 확인 필요",severity:"critical"},
+                  {id:"SR29",name:"근무일 미출근자 접근",cat:"HR",priority:1,condition:"휴가/병가 중 시스템 접근",then:"위험점수 +20",severity:"warning"},
+                  {id:"SR30",name:"이메일 대량 첨부",cat:"패턴",priority:1,condition:"1시간 내 첨부파일 포함 이메일 5건 이상 발송",then:"위험점수 +20, 외부 유출 의심",severity:"warning"},
+                  {id:"SR31",name:"클라우드 스토리지 업로드",cat:"이벤트",priority:1,condition:"외부 클라우드(Google Drive, Dropbox 등) 업로드",then:"위험점수 +20",severity:"warning"},
+                  {id:"SR32",name:"스크린 캡처 탐지",cat:"이벤트",priority:1,condition:"화면 캡처 도구 실행 감지",then:"위험점수 +15",severity:"warning"},
+                  {id:"SR33",name:"개인정보 DB 조회",cat:"자산",priority:0,condition:"고객개인정보DB 접근",then:"위험점수 +(민감도×5), 접근 사유 확인",severity:"critical"},
+                  {id:"SR34",name:"삭제 후 휴지통 비우기",cat:"패턴",priority:0,condition:"Delete/Modify 후 2분 내 완전 삭제",then:"위험점수 +30, 증거 인멸 의심",severity:"critical"},
+                  {id:"SR35",name:"감사 로그 접근",cat:"자산",priority:0,condition:"시스템접근로그 파일 열람/수정 시도",then:"위험점수 +35, 흔적 삭제 의심",severity:"critical"},
                 ];
                 var sevColors = {critical:"#ff2d55",warning:"#ff9500",info:"#0a84ff"};
                 var sevLabels = {critical:"CRITICAL",warning:"WARNING",info:"INFO"};
@@ -2458,7 +2502,14 @@ export default function SecurityDashboard(props) {
               {ontoSubView === "formula" && <div>
               {/* Risk Score Formula */}
               <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:14,padding:18,marginBottom:16}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#0f172a",marginBottom:12}}>Risk Score Formula</div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <div style={{fontSize:13,fontWeight:700,color:"#0f172a"}}>Risk Score Formula</div>
+                  <div style={{display:"flex",gap:6}}>
+                    <button onClick={function(){setWeights(Object.assign({},DEFAULT_WEIGHTS));setWeightsSaved(false);}} style={{padding:"4px 10px",fontSize:10,background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:6,cursor:"pointer",color:"#475569",fontWeight:600}}>기본값 복원</button>
+                    <button onClick={function(){setWeightsSaved(true);setTimeout(function(){setWeightsSaved(false);},2000);}} style={{padding:"4px 10px",fontSize:10,background:"#0a84ff",border:"none",borderRadius:6,cursor:"pointer",color:"#fff",fontWeight:600}}>적용</button>
+                    {weightsSaved && <span style={{fontSize:10,color:"#30d158",fontWeight:600,alignSelf:"center"}}>저장 완료</span>}
+                  </div>
+                </div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",marginBottom:14}}>
                   {[{l:"baseScore",sub:"(severity)",c:"#0a84ff"},{l:"+",c:"transparent"},{l:"sensitivityBonus",sub:"(\u00D72~5)",c:"#ff9500"},{l:"+",c:"transparent"},{l:"timeBonus",sub:"(야간/주말)",c:"#ff2d55"},{l:"+",c:"transparent"},{l:"freqBonus",sub:"(빈도)",c:"#5856d6"},{l:"+",c:"transparent"},{l:"roleMismatch",sub:"(역할위반)",c:"#ff375f"},{l:"+",c:"transparent"},{l:"clearanceMismatch",sub:"(등급위반)",c:"#ff9f0a"},{l:"+",c:"transparent"},{l:"profileBonus",sub:"(HR)",c:"#30d158"},{l:"=",c:"transparent"},{l:"riskScore",sub:"(0~200+)",c:"#bf5af2"}].map(function(f,i) {
                     if (f.l === "+" || f.l === "=") return <span key={i} style={{fontSize:14,fontWeight:700,color:"#94a3b8"}}>{f.l}</span>;
@@ -2468,17 +2519,62 @@ export default function SecurityDashboard(props) {
                     </div>;
                   })}
                 </div>
-                {/* Risk Factor Categories */}
-                <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
-                  {RISK_FACTORS.map(function(rf) {
-                    return <div key={rf.cat} style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
-                      <div style={{fontSize:11,fontWeight:700,color:rf.color,marginBottom:6}}>{rf.cat}</div>
-                      {rf.items.map(function(item,i) {
-                        return <div key={i} style={{fontSize:10,color:"#475569",lineHeight:1.7,fontFamily:"'JetBrains Mono',monospace"}}>{item}</div>;
-                      })}
+                {/* Editable Weight Factors */}
+                {(function() {
+                  var wInput = function(key, label) {
+                    return <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4}}>
+                      <span style={{fontSize:10,color:"#475569",fontFamily:"'JetBrains Mono',monospace",minWidth:100}}>{label}:</span>
+                      <input type="number" value={weights[key]} onChange={function(e){var v=parseInt(e.target.value)||0;setWeights(function(p){var n=Object.assign({},p);n[key]=v;return n;});}} style={{width:40,padding:"2px 4px",fontSize:10,border:"1px solid #e2e8f0",borderRadius:4,textAlign:"center",fontFamily:"'JetBrains Mono',monospace",background:"#f8fafc",color:"#1e293b"}} />
                     </div>;
-                  })}
-                </div>
+                  };
+                  return <div>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14}}>
+                      <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
+                        <div style={{fontSize:11,fontWeight:700,color:"#0a84ff",marginBottom:6}}>기본 점수</div>
+                        {wInput("baseLow","low")}
+                        {wInput("baseMedium","medium")}
+                        {wInput("baseHigh","high")}
+                        {wInput("baseCritical","critical")}
+                      </div>
+                      <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
+                        <div style={{fontSize:11,fontWeight:700,color:"#ff9500",marginBottom:6}}>민감도 보너스</div>
+                        {wInput("sensitivityLegit","합법 접근 \u00D7")}
+                        {wInput("sensitivityUnauth","무단 접근 \u00D7")}
+                        <div style={{fontSize:11,fontWeight:700,color:"#ff2d55",marginBottom:6,marginTop:8}}>시간 가중</div>
+                        {wInput("nightBonus","야간(22~07)")}
+                        {wInput("weekendBonus","주말")}
+                      </div>
+                      <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
+                        <div style={{fontSize:11,fontWeight:700,color:"#5856d6",marginBottom:6}}>빈도 가중</div>
+                        {wInput("freqThree","3건 이상")}
+                        {wInput("freqFive","5건 이상")}
+                        <div style={{fontSize:11,fontWeight:700,color:"#ff375f",marginBottom:6,marginTop:8}}>역할/등급 위반</div>
+                        {wInput("roleMismatch","역할 불일치")}
+                        {wInput("clearanceMismatch","등급 위반")}
+                      </div>
+                      <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
+                        <div style={{fontSize:11,fontWeight:700,color:"#30d158",marginBottom:6}}>HR 프로파일</div>
+                        {wInput("resignPlanned","퇴사예정")}
+                        {wInput("recentTransfer","최근이동")}
+                        {wInput("warningMult","경고 \u00D7")}
+                        {wInput("lowPerf","D등급")}
+                        <div style={{fontSize:11,fontWeight:700,color:"#bf5af2",marginBottom:6,marginTop:8}}>기타</div>
+                        {wInput("employmentBonus","외주/협력사")}
+                        {wInput("compoundBonus","복합 위협")}
+                      </div>
+                    </div>
+                    {/* Real-time preview */}
+                    <div style={{padding:"10px 14px",background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8}}>
+                      <div style={{fontSize:10,fontWeight:600,color:"#92400e",marginBottom:4}}>실시간 예시 미리보기</div>
+                      <div style={{fontSize:11,color:"#78350f",fontFamily:"'JetBrains Mono',monospace"}}>
+                        {"야간(+" + weights.nightBonus + ") + 퇴사(+" + weights.resignPlanned + ") + 권한외(+" + weights.roleMismatch + ") = " + (weights.nightBonus + weights.resignPlanned + weights.roleMismatch) + "점 추가"}
+                      </div>
+                      <div style={{fontSize:10,color:"#92400e",marginTop:4,fontFamily:"'JetBrains Mono',monospace"}}>
+                        {"Critical 이벤트 + 민감도5 무단접근: " + weights.baseCritical + " + (5\u00D7" + weights.sensitivityUnauth + ") = " + (weights.baseCritical + 5 * weights.sensitivityUnauth) + "점"}
+                      </div>
+                    </div>
+                  </div>;
+                })()}
               </div>
 
               {/* Entity Relationship Map */}
