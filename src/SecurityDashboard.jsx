@@ -1430,8 +1430,10 @@ export default function SecurityDashboard(props) {
   var graphSelected = stGraphSelected[0], setGraphSelected = stGraphSelected[1];
   var stOntoSubView = useState("graph");
   var ontoSubView = stOntoSubView[0], setOntoSubView = stOntoSubView[1];
-  var stGraphZoom = useState(1);
-  var graphZoom = stGraphZoom[0], setGraphZoom = stGraphZoom[1];
+  var stGraphView = useState({ x: 0, y: 0, w: 2200, h: 900 }); // viewBox
+  var graphView = stGraphView[0], setGraphView = stGraphView[1];
+  var stGraphDrag = useState(null);
+  var graphDrag = stGraphDrag[0], setGraphDrag = stGraphDrag[1];
   var stCollapsed = useState({ compliance: true, integration: true, layer7: true });
   var collapsedPanels = stCollapsed[0], setCollapsedPanels = stCollapsed[1];
   var togglePanel = function(key) { setCollapsedPanels(function(p) { var n = Object.assign({}, p); n[key] = !n[key]; return n; }); };
@@ -2183,21 +2185,24 @@ export default function SecurityDashboard(props) {
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
-                    <button onClick={function(){setGraphZoom(function(z){return Math.min(3,z+0.2);});}} style={{padding:"5px 14px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:16,fontWeight:700,cursor:"pointer",lineHeight:1}}>+</button>
-                    <button onClick={function(){setGraphZoom(function(z){return Math.max(0.2,z-0.2);});}} style={{padding:"5px 14px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:16,fontWeight:700,cursor:"pointer",lineHeight:1}}>−</button>
-                    <button onClick={function(){setGraphZoom(1);}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>전체보기</button>
-                    <button onClick={function(){setGraphZoom(2);}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>상세보기</button>
-                    <span style={{fontSize:11,color:"#94a3b8",marginLeft:4}}>{Math.round(graphZoom*100)}%</span>
-                    <span style={{fontSize:10,color:"#94a3b8",marginLeft:"auto"}}>+/− 버튼으로 확대/축소 · 그래프 영역 내 스크롤로 이동</span>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center", flexWrap: "wrap" }}>
+                    <button onClick={function(){setGraphView(function(v){var cx=v.x+v.w/2,cy=v.y+v.h/2,nw=Math.max(300,v.w*0.7),nh=Math.max(120,v.h*0.7);return{x:cx-nw/2,y:cy-nh/2,w:nw,h:nh};});}} style={{padding:"5px 14px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:16,fontWeight:700,cursor:"pointer",lineHeight:1}}>+</button>
+                    <button onClick={function(){setGraphView(function(v){var cx=v.x+v.w/2,cy=v.y+v.h/2,nw=Math.min(canvasW*1.2,v.w*1.4),nh=Math.min(canvasH*1.2,v.h*1.4);return{x:Math.max(0,cx-nw/2),y:Math.max(0,cy-nh/2),w:nw,h:nh};});}} style={{padding:"5px 14px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:16,fontWeight:700,cursor:"pointer",lineHeight:1}}>−</button>
+                    <button onClick={function(){setGraphView({x:0,y:0,w:canvasW,h:canvasH});}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>전체보기</button>
+                    <button onClick={function(){setGraphView({x:0,y:0,w:canvasW/2,h:canvasH/2});}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>부서+직원</button>
+                    <button onClick={function(){setGraphView({x:0,y:420,w:canvasW,h:480});}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>자산+이벤트+조치</button>
+                    <span style={{fontSize:11,color:"#94a3b8",marginLeft:4}}>{Math.round(canvasW/graphView.w*100)}%</span>
+                    <span style={{fontSize:10,color:"#94a3b8",marginLeft:"auto"}}>+/− 확대축소 · 프리셋으로 영역 이동 · 드래그로 팬</span>
                   </div>
-                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "scroll", position: "relative", height: 480 }}>
-                    <svg width={canvasW * graphZoom} height={canvasH * graphZoom} viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
+                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden", position: "relative", height: 500, cursor: graphDrag ? "grabbing" : "grab" }}>
+                    <svg width="100%" height="100%" viewBox={graphView.x + " " + graphView.y + " " + graphView.w + " " + graphView.h} style={{ display: "block" }}
+                      onMouseDown={function(evt){setGraphDrag({x:evt.clientX,y:evt.clientY,vx:graphView.x,vy:graphView.y});}}
                       onMouseMove={function(evt) {
+                        if(graphDrag){var rect=evt.currentTarget.getBoundingClientRect();var sx=graphView.w/rect.width;var dx=(graphDrag.x-evt.clientX)*sx;var dy=(graphDrag.y-evt.clientY)*sx;setGraphView(function(v){return{x:Math.max(0,Math.min(canvasW-v.w,graphDrag.vx+dx)),y:Math.max(0,Math.min(canvasH-v.h,graphDrag.vy+dy)),w:v.w,h:v.h};});return;}
                         var rect = evt.currentTarget.getBoundingClientRect();
-                        var scaleX = canvasW / rect.width;
-                        var mx = (evt.clientX - rect.left) * scaleX;
-                        var my = (evt.clientY - rect.top) * scaleX;
+                        var scaleX = graphView.w / rect.width;
+                        var mx = (evt.clientX - rect.left) * scaleX + graphView.x;
+                        var my = (evt.clientY - rect.top) * (graphView.h / rect.height) + graphView.y;
                         var found = null;
                         nodes.forEach(function(n) {
                           var dx = mx - n.x, dy = my - n.y;
@@ -2205,11 +2210,14 @@ export default function SecurityDashboard(props) {
                         });
                         setGraphHover(found);
                       }}
+                      onMouseUp={function(){setGraphDrag(null);}}
+                      onMouseLeave={function(){setGraphDrag(null);}}
                       onClick={function(evt) {
+                        if(graphDrag)return;
                         var rect = evt.currentTarget.getBoundingClientRect();
-                        var scaleX = canvasW / rect.width;
-                        var mx = (evt.clientX - rect.left) * scaleX;
-                        var my = (evt.clientY - rect.top) * scaleX;
+                        var scaleX = graphView.w / rect.width;
+                        var mx = (evt.clientX - rect.left) * scaleX + graphView.x;
+                        var my = (evt.clientY - rect.top) * (graphView.h / rect.height) + graphView.y;
                         var found = null;
                         nodes.forEach(function(n) {
                           var dx = mx - n.x, dy = my - n.y;
