@@ -1130,7 +1130,7 @@ function exportToExcel(events) {
 
 function SecurityChatBot(props) {
   var events = props.events, employees = props.employees, onSelectEvent = props.onSelectEvent, onClose = props.onClose;
-  var stMessages = useState([{role:"ai",text:"안녕하세요! 보안관제 AI 어시스턴트입니다.\n\n이벤트 데이터를 자연어로 질의할 수 있습니다.\n\n📋 **기본 검색:**\n• \"위험점수 80점 이상\" · \"심각 등급 이벤트\"\n• \"USB 복사\" · \"외부 AI 업로드\" · \"기밀 자산 접근\"\n\n👤 **HR 프로파일:**\n• \"퇴사예정자 이벤트\" · \"경고이력 보유자\"\n• \"저성과 D등급\" · \"부서이동 직원\"\n\n🕐 **패턴 분석:**\n• \"야간 접근\" · \"주말 접근\" · \"복합 위협\"\n• \"권한외 접근\" · \"외주 직원\"\n\n🏢 **부서/이름:**\n• \"R&D1팀 이벤트\" · \"재무팀 기밀 접근\"",type:"text",ts:new Date()}]);
+  var stMessages = useState([{role:"ai",text:"안녕하세요! 보안관제 AI 어시스턴트입니다.\n\n이벤트 데이터를 자연어로 질의할 수 있습니다.\n\n📋 **기본 검색:**\n• \"위험점수 80점 이상\" · \"심각 등급 이벤트\"\n• \"USB 복사\" · \"외부 AI 업로드\" · \"기밀 자산 접근\"\n\n👤 **HR 프로파일:**\n• \"퇴사예정자 이벤트\" · \"경고이력 보유자\"\n• \"저성과 D등급\" · \"부서이동 직원\"\n\n🕐 **패턴 분석:**\n• \"야간 접근\" · \"주말 접근\" · \"복합 위협\"\n• \"권한외 접근\" · \"외주 직원\"\n\n🏢 **부서/이름:**\n• \"R&D1팀 이벤트\" · \"재무팀 기밀 접근\"\n\n💬 **자연어도 OK:**\n• \"위험한 직원 보여줘\" · \"밤에 접근한 사람\"\n• \"수상한 이벤트\" · \"파일 받은 기록\"",type:"text",ts:new Date()}]);
   var messages = stMessages[0], setMessages = stMessages[1];
   var stInput = useState("");
   var input = stInput[0], setInput = stInput[1];
@@ -1166,30 +1166,32 @@ function SecurityChatBot(props) {
     // Parse event type keywords
     var eventTypeMatch = null;
     var typeKeywords = [
-      { keywords: ["외부 공유", "공유 링크", "링크 생성", "외부공유"], type: "Share Link Created" },
-      { keywords: ["usb", "외부 저장", "저장장치"], type: "Copy to USB" },
-      { keywords: ["다운로드", "download"], type: "File Download" },
-      { keywords: ["출력", "프린트", "인쇄"], type: "Print" },
-      { keywords: ["권한 상승", "권한상승", "escalation"], type: "Permission Escalation" },
-      { keywords: ["대량 조회", "대량조회", "bulk"], type: "Bulk Query" },
-      { keywords: ["삭제", "변조", "delete"], type: "Delete/Modify" },
-      { keywords: ["파일 열람", "파일열람", "열람"], type: "File Open" },
-      { keywords: ["ai 업로드", "외부 ai", "chatgpt", "외부ai"], type: "External AI Upload" },
+      { keywords: ["외부 공유", "공유 링크", "링크 생성", "외부공유", "공유한", "공유된", "링크 만든"], type: "Share Link Created" },
+      { keywords: ["usb", "외부 저장", "저장장치", "usb 복사", "usb로", "유에스비", "이동식"], type: "Copy to USB" },
+      { keywords: ["다운로드", "download", "내려받", "받은 파일", "파일 받"], type: "File Download" },
+      { keywords: ["출력", "프린트", "인쇄", "프린터", "print", "뽑은"], type: "Print" },
+      { keywords: ["권한 상승", "권한상승", "escalation", "권한 올", "권한 변경", "관리자 권한"], type: "Permission Escalation" },
+      { keywords: ["대량 조회", "대량조회", "bulk", "대량으로", "많이 조회", "한꺼번에"], type: "Bulk Query" },
+      { keywords: ["삭제", "변조", "delete", "지운", "지워", "없앤", "수정한", "변경한"], type: "Delete/Modify" },
+      { keywords: ["파일 열람", "파일열람", "열람", "파일 열", "문서 열", "파일 봤", "열어본"], type: "File Open" },
+      { keywords: ["ai 업로드", "외부 ai", "chatgpt", "외부ai", "ai에 올", "ai로 보", "생성형", "claude", "gemini", "copilot"], type: "External AI Upload" },
     ];
     typeKeywords.forEach(function(tk) {
       tk.keywords.forEach(function(kw) { if (q.indexOf(kw) >= 0) eventTypeMatch = tk.type; });
     });
 
-    // Parse severity keywords
+    // Parse severity keywords (자연어 확장)
     var severityMatch = null;
-    if (q.indexOf("심각") >= 0 || q.indexOf("critical") >= 0) severityMatch = "critical";
-    else if (q.indexOf("높음") >= 0 || q.indexOf("high") >= 0) severityMatch = "high";
-    else if (q.indexOf("주의") >= 0 || q.indexOf("medium") >= 0) severityMatch = "medium";
+    if (/심각|critical|치명|긴급|최고 위험|가장 위험/.test(q)) severityMatch = "critical";
+    else if (/높음|high|높은|위험도 높/.test(q)) severityMatch = "high";
+    else if (/주의|medium|보통|중간/.test(q)) severityMatch = "medium";
+    else if (/낮음|low|낮은|경미/.test(q)) severityMatch = "low";
 
-    // Parse asset classification
+    // Parse asset classification (자연어 확장)
     var assetClass = null;
-    if (q.indexOf("기밀") >= 0 || q.indexOf("최고기밀") >= 0) assetClass = q.indexOf("최고기밀") >= 0 ? "최고기밀" : "기밀";
-    else if (q.indexOf("대외비") >= 0) assetClass = "대외비";
+    if (/최고기밀|1급 비밀|극비/.test(q)) assetClass = "최고기밀";
+    else if (/기밀|비밀|민감한|중요한 자산|보호 대상/.test(q)) assetClass = "기밀";
+    else if (/대외비|내부용|사내/.test(q)) assetClass = "대외비";
 
     // Parse department
     var deptMatch = null;
@@ -1201,23 +1203,27 @@ function SecurityChatBot(props) {
     var nameMatch = null;
     employees.forEach(function(e) { if (q.indexOf(e.name) >= 0) nameMatch = e.name; });
 
-    // Parse HR profile conditions
-    var resignFilter = q.indexOf("퇴사") >= 0 || q.indexOf("퇴직") >= 0;
-    var transferFilter = q.indexOf("부서이동") >= 0 || q.indexOf("부서 이동") >= 0 || q.indexOf("전보") >= 0;
-    var warningFilter = q.indexOf("경고") >= 0 || q.indexOf("징계") >= 0;
-    var lowPerfFilter = q.indexOf("저성과") >= 0 || q.indexOf("D등급") >= 0 || q.indexOf("성과 낮") >= 0;
+    // Parse HR profile conditions (자연어 확장)
+    var resignFilter = /퇴사|퇴직|그만|나갈|떠날|이직/.test(q);
+    var transferFilter = /부서이동|부서 이동|전보|전출|이동한|옮긴/.test(q);
+    var warningFilter = /경고|징계|주의|문제 있|이력/.test(q);
+    var lowPerfFilter = /저성과|D등급|성과 낮|성과가 낮|평가 낮|실적 부진/.test(q);
 
-    // Parse access pattern conditions
-    var nightFilter = q.indexOf("야간") >= 0 || q.indexOf("심야") >= 0 || q.indexOf("밤") >= 0;
-    var weekendFilter = q.indexOf("주말") >= 0 || q.indexOf("토요일") >= 0 || q.indexOf("일요일") >= 0;
-    var unauthorizedFilter = q.indexOf("권한외") >= 0 || q.indexOf("권한 외") >= 0 || q.indexOf("무단") >= 0 || q.indexOf("불법") >= 0;
-    var compoundFilter = q.indexOf("복합") >= 0 || q.indexOf("연속") >= 0 || q.indexOf("다중") >= 0;
+    // Parse access pattern conditions (이벤트 플래그 기반 — 시간 무관)
+    var nightFilter = /야간|심야|밤|새벽|퇴근 후|퇴근후|업무시간 외|업무 외|비업무/.test(q);
+    var weekendFilter = /주말|토요일|일요일|휴일|공휴일/.test(q);
+    var unauthorizedFilter = /권한외|권한 외|무단|불법|허가 없|비인가|승인 없/.test(q);
+    var compoundFilter = /복합|연속|다중|동시|반복|여러 번|계속/.test(q);
 
-    // Parse employment type
+    // Parse employment type (자연어 확장)
     var empTypeFilter = null;
-    if (q.indexOf("외주") >= 0) empTypeFilter = "외주";
-    else if (q.indexOf("협력사") >= 0 || q.indexOf("협력") >= 0) empTypeFilter = "협력사";
-    else if (q.indexOf("계약직") >= 0) empTypeFilter = "계약직";
+    if (/외주|외부 인력|아웃소싱|파견/.test(q)) empTypeFilter = "외주";
+    else if (/협력사|협력 업체|파트너/.test(q)) empTypeFilter = "협력사";
+    else if (/계약직|비정규|임시/.test(q)) empTypeFilter = "계약직";
+
+    // Parse general danger/risk queries (자연어)
+    var dangerFilter = /위험한|위험 높|고위험|주의 필요|의심|수상한|이상한/.test(q) && !minScore;
+    if (dangerFilter) minScore = 70;
 
     // Filter events
     var filtered = events.filter(function(e) {
@@ -1235,8 +1241,8 @@ function SecurityChatBot(props) {
       if (transferFilter && !e.employee.profile.recentTransfer) return false;
       if (warningFilter && e.employee.profile.warningCount === 0) return false;
       if (lowPerfFilter && e.employee.profile.performanceRating !== "D") return false;
-      if (nightFilter) { var h = e.timestamp.getHours(); if (h >= 7 && h < 22) return false; }
-      if (weekendFilter) { var d = e.timestamp.getDay(); if (d !== 0 && d !== 6) return false; }
+      if (nightFilter && !e.isOffHours) return false;
+      if (weekendFilter && !e.isWeekend) return false;
       if (unauthorizedFilter && !e.roleMismatch) return false;
       if (compoundFilter && !e.compoundThreat) return false;
       if (empTypeFilter && e.employee.employmentType !== empTypeFilter) return false;
@@ -1267,6 +1273,7 @@ function SecurityChatBot(props) {
     if (unauthorizedFilter) descParts.push("권한외 접근");
     if (compoundFilter) descParts.push("복합 위협");
     if (empTypeFilter) descParts.push("고용형태: " + empTypeFilter);
+    if (dangerFilter && !scoreMatch) descParts.push("고위험(70점+)");
 
     // Determine result type
     var isLinkQuery = eventTypeMatch === "Share Link Created" && (q.indexOf("링크 목록") >= 0 || q.indexOf("링크 정리") >= 0 || q.indexOf("목록") >= 0);
