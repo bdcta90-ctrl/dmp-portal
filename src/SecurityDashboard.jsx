@@ -1430,6 +1430,8 @@ export default function SecurityDashboard(props) {
   var graphSelected = stGraphSelected[0], setGraphSelected = stGraphSelected[1];
   var stOntoSubView = useState("graph");
   var ontoSubView = stOntoSubView[0], setOntoSubView = stOntoSubView[1];
+  var stGraphZoom = useState(0.6);
+  var graphZoom = stGraphZoom[0], setGraphZoom = stGraphZoom[1];
   var stCollapsed = useState({ compliance: true, integration: true, layer7: true });
   var collapsedPanels = stCollapsed[0], setCollapsedPanels = stCollapsed[1];
   var togglePanel = function(key) { setCollapsedPanels(function(p) { var n = Object.assign({}, p); n[key] = !n[key]; return n; }); };
@@ -2044,7 +2046,7 @@ export default function SecurityDashboard(props) {
 
               {/* Sub-view: Knowledge Graph */}
               {ontoSubView === "graph" && (function() {
-                var canvasW = 1100, canvasH = 700;
+                var canvasW = 2200, canvasH = 900;
                 var nodes = [];
                 var edges = [];
                 var empScores = {};
@@ -2066,24 +2068,24 @@ export default function SecurityDashboard(props) {
                 // ═══ 부서 — 상단 고정 바 ═══
                 var deptPositions = {};
                 DEPARTMENTS.forEach(function(d, i) {
-                  var x = 30 + (i % 10) * 108;
-                  var y = i < 10 ? 30 : 60;
+                  var x = 40 + (i % 10) * 210;
+                  var y = i < 10 ? 30 : 70;
                   nodes.push({ id: "dept-" + d, label: d, type: "dept", x: x, y: y, w: 90, h: 24 });
                   deptPositions[d] = { x: x, y: y };
                   deptSet[d] = true;
                 });
                 // ═══ 자산 — 중간 띠 ═══
                 ASSETS.forEach(function(a, i) {
-                  var row = Math.floor(i / 9);
-                  var col = i % 9;
-                  var x = 40 + col * 120;
-                  var y = 380 + row * 35;
+                  var row = Math.floor(i / 13);
+                  var col = i % 13;
+                  var x = 40 + col * 165;
+                  var y = 500 + row * 40;
                   nodes.push({ id: "asset-" + a.name, label: a.name.length > 12 ? a.name.slice(0,12) + ".." : a.name, type: "asset", x: x, y: y, w: 100, h: 24 });
                 });
                 // ═══ 이벤트 유형 — 하단 좌측 ═══
                 EVENT_TYPES.forEach(function(et, i) {
-                  var x = 40 + i * 120;
-                  var y = 480;
+                  var x = 40 + i * 230;
+                  var y = 620;
                   nodes.push({ id: "evt-" + et.type, label: et.icon + " " + et.label.slice(0,6), type: "eventType", x: x, y: y, w: 20, h: 20 });
                 });
                 // ═══ 조치 — 하단 우측 ═══
@@ -2091,8 +2093,8 @@ export default function SecurityDashboard(props) {
                 actionKeys.forEach(function(name, i) {
                   var row = Math.floor(i / 6);
                   var col = i % 6;
-                  var x = 40 + col * 175;
-                  var y = 540 + row * 30;
+                  var x = 40 + col * 340;
+                  var y = 720 + row * 35;
                   nodes.push({ id: "action-" + name, label: name.slice(0,8), type: "action", x: x, y: y, w: 80, h: 24 });
                 });
                 // ═══ 직원 — 부서별 클러스터 (부서 아래 배치) ═══
@@ -2107,10 +2109,10 @@ export default function SecurityDashboard(props) {
                   if (!deptPos) return;
                   var emps = empsByDept[dept];
                   emps.forEach(function(item, i) {
-                    var col = i % 4;
-                    var row = Math.floor(i / 4);
-                    var x = deptPos.x - 15 + col * 28;
-                    var y = deptPos.y + 35 + row * 28;
+                    var col = i % 5;
+                    var row = Math.floor(i / 5);
+                    var x = deptPos.x - 30 + col * 38;
+                    var y = deptPos.y + 45 + row * 35;
                     var isCritical = item.score >= 90;
                     nodes.push({
                       id: "emp-" + item.emp.id,
@@ -2181,8 +2183,16 @@ export default function SecurityDashboard(props) {
                       </div>
                     </div>
                   </div>
-                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden", position: "relative" }}>
-                    <svg width="100%" viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
+                  <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
+                    <button onClick={function(){setGraphZoom(Math.min(3,graphZoom+0.3));}} style={{padding:"5px 12px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:14,fontWeight:700,cursor:"pointer"}}>+</button>
+                    <button onClick={function(){setGraphZoom(Math.max(0.3,graphZoom-0.3));}} style={{padding:"5px 12px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:14,fontWeight:700,cursor:"pointer"}}>−</button>
+                    <button onClick={function(){setGraphZoom(1);}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>리셋</button>
+                    <span style={{fontSize:11,color:"#94a3b8",marginLeft:4}}>{Math.round(graphZoom*100)}%</span>
+                    <span style={{fontSize:10,color:"#94a3b8",marginLeft:"auto"}}>스크롤로 확대/축소 · 드래그로 이동</span>
+                  </div>
+                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "auto", position: "relative", maxHeight: 500, cursor: "grab" }}
+                    onWheel={function(e){e.preventDefault();setGraphZoom(function(z){return Math.max(0.3,Math.min(3,z+(e.deltaY>0?-0.1:0.1)));});}}>
+                    <svg width={canvasW * graphZoom} height={canvasH * graphZoom} viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
                       onMouseMove={function(evt) {
                         var rect = evt.currentTarget.getBoundingClientRect();
                         var scaleX = canvasW / rect.width;
@@ -2208,16 +2218,16 @@ export default function SecurityDashboard(props) {
                         setGraphSelected(graphSelected === found ? null : found);
                       }}>
                       {/* Zone separators */}
-                      <line x1={0} y1={95} x2={canvasW} y2={95} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
-                      <line x1={0} y1={365} x2={canvasW} y2={365} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
-                      <line x1={0} y1={465} x2={canvasW} y2={465} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
-                      <line x1={0} y1={530} x2={canvasW} y2={530} stroke="#e2e8f0" strokeWidth={1} strokeDasharray="4 2" />
+                      <line x1={0} y1={105} x2={canvasW} y2={105} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="6 3" />
+                      <line x1={0} y1={485} x2={canvasW} y2={485} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="6 3" />
+                      <line x1={0} y1={600} x2={canvasW} y2={600} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="6 3" />
+                      <line x1={0} y1={700} x2={canvasW} y2={700} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="6 3" />
                       {/* Section labels */}
-                      <text x={20} y={18} fill="#94a3b8" fontSize="10" fontWeight="600">{"부서 (20)"}</text>
-                      <text x={20} y={115} fill="#94a3b8" fontSize="10" fontWeight="600">{"위험 직원 (부서별 클러스터)"}</text>
-                      <text x={20} y={375} fill="#94a3b8" fontSize="10" fontWeight="600">{"자산 (25)"}</text>
-                      <text x={20} y={475} fill="#94a3b8" fontSize="10" fontWeight="600">{"이벤트 유형 (9)"}</text>
-                      <text x={20} y={535} fill="#94a3b8" fontSize="10" fontWeight="600">{"조치 가이드 (11)"}</text>
+                      <text x={20} y={18} fill="#64748b" fontSize="13" fontWeight="700">{"🏢 부서 (20)"}</text>
+                      <text x={20} y={120} fill="#64748b" fontSize="13" fontWeight="700">{"👤 위험 직원 (부서별 클러스터, 최대 100명)"}</text>
+                      <text x={20} y={498} fill="#64748b" fontSize="13" fontWeight="700">{"📁 자산 ("+ASSETS.length+")"}</text>
+                      <text x={20} y={613} fill="#64748b" fontSize="13" fontWeight="700">{"⚡ 이벤트 유형 (9)"}</text>
+                      <text x={20} y={713} fill="#64748b" fontSize="13" fontWeight="700">{"🛡️ 조치 가이드 ("+actionKeys.length+")"}</text>
                       {edges.map(function(e, i) {
                         var from = nodeMap[e.from], to = nodeMap[e.to];
                         if (!from || !to) return null;
