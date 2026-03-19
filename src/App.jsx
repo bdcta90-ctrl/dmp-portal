@@ -154,6 +154,31 @@ const MVPS = [
   },
 ];
 
+function PasswordGate({ onBack, children }) {
+  const [pw, setPw] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+  const [error, setError] = useState(false);
+  if (unlocked) return children;
+  return (
+    <div style={{width:"100%",height:"100vh",background:"#0a0a0f",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Pretendard',sans-serif"}}>
+      <div style={{background:"#16161e",borderRadius:20,padding:"40px 36px",border:"1px solid rgba(255,255,255,0.08)",width:360,textAlign:"center",boxShadow:"0 20px 60px rgba(0,0,0,0.5)"}}>
+        <div style={{fontSize:36,marginBottom:12}}>🔒</div>
+        <div style={{fontSize:16,fontWeight:700,color:"#fff",marginBottom:6}}>접근 제한</div>
+        <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",marginBottom:24}}>비밀번호를 입력해주세요</div>
+        <input type="password" value={pw} onChange={e=>{setPw(e.target.value);setError(false);}}
+          onKeyDown={e=>{if(e.key==="Enter"){if(pw==="0613")setUnlocked(true);else{setError(true);setPw("");}}}}
+          placeholder="비밀번호 입력"
+          style={{width:"100%",padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,0.05)",border:error?"2px solid #ef4444":"1px solid rgba(255,255,255,0.1)",color:"#fff",fontSize:14,outline:"none",textAlign:"center",letterSpacing:8,fontFamily:"monospace",boxSizing:"border-box"}}/>
+        {error&&<div style={{fontSize:11,color:"#ef4444",marginTop:8}}>비밀번호가 올바르지 않습니다</div>}
+        <div style={{display:"flex",gap:8,marginTop:20}}>
+          <button onClick={onBack} style={{flex:1,padding:"12px 0",borderRadius:10,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",color:"rgba(255,255,255,0.5)",fontSize:13,fontWeight:600,cursor:"pointer"}}>← 돌아가기</button>
+          <button onClick={()=>{if(pw==="0613")setUnlocked(true);else{setError(true);setPw("");}}} style={{flex:1,padding:"12px 0",borderRadius:10,border:"none",background:"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>확인</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [page, setPage] = useState("portal");
   const [theme, setTheme] = useState("dark");
@@ -170,17 +195,19 @@ export default function App() {
   const STATUS_COLORS = { "접수": "#10b981", "검토중": "#f59e0b", "진행중": "#3b82f6", "완료": "#6366f1", "보류": "#ef4444" };
   const CAT_COLORS = { "Security": "#10b981", "Finance": "#6366f1", "AI / ML": "#f43f5e", "Data": "#06b6d4", "DevOps": "#f59e0b", "기타": "#94a3b8" };
 
-  if (page === "claims") return <ClaimsAgentMVP onBack={() => setPage("portal")} />;
+  if (page === "claims") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentMVP onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
   if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
-  if (page === "claimsNew") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
+  if (page === "claimsNew") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentNew onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "claimsNewBackup") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
-  if (page === "stockpilot") return <StockPilot onBack={() => setPage("portal")} />;
+  if (page === "stockpilot") return <PasswordGate onBack={() => setPage("portal")}><StockPilot onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "koreaJobs") return (
-    <div style={{width:"100%",height:"100vh",position:"relative"}}>
-      <button onClick={() => setPage("portal")} style={{position:"fixed",top:16,left:16,zIndex:100,padding:"8px 16px",borderRadius:10,border:"none",background:"rgba(0,0,0,.7)",backdropFilter:"blur(8px)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>← 포털로 돌아가기</button>
-      <iframe src="/korea-jobs.html" style={{width:"100%",height:"100%",border:"none"}} title="대한민국 취업시장"/>
-    </div>
+    <PasswordGate onBack={() => setPage("portal")}>
+      <div style={{width:"100%",height:"100vh",position:"relative"}}>
+        <button onClick={() => setPage("portal")} style={{position:"fixed",top:16,left:16,zIndex:100,padding:"8px 16px",borderRadius:10,border:"none",background:"rgba(0,0,0,.7)",backdropFilter:"blur(8px)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>← 포털로 돌아가기</button>
+        <iframe src="/korea-jobs.html" style={{width:"100%",height:"100%",border:"none"}} title="대한민국 취업시장"/>
+      </div>
+    </PasswordGate>
   );
 
   const handleRequest = () => {
