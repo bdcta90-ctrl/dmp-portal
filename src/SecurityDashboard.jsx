@@ -1430,7 +1430,7 @@ export default function SecurityDashboard(props) {
   var graphSelected = stGraphSelected[0], setGraphSelected = stGraphSelected[1];
   var stOntoSubView = useState("graph");
   var ontoSubView = stOntoSubView[0], setOntoSubView = stOntoSubView[1];
-  var stGraphZoom = useState(0.6);
+  var stGraphZoom = useState(1);
   var graphZoom = stGraphZoom[0], setGraphZoom = stGraphZoom[1];
   var stCollapsed = useState({ compliance: true, integration: true, layer7: true });
   var collapsedPanels = stCollapsed[0], setCollapsedPanels = stCollapsed[1];
@@ -2184,14 +2184,14 @@ export default function SecurityDashboard(props) {
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
-                    <button onClick={function(){setGraphZoom(Math.min(3,graphZoom+0.3));}} style={{padding:"5px 12px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:14,fontWeight:700,cursor:"pointer"}}>+</button>
-                    <button onClick={function(){setGraphZoom(Math.max(0.3,graphZoom-0.3));}} style={{padding:"5px 12px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:14,fontWeight:700,cursor:"pointer"}}>−</button>
-                    <button onClick={function(){setGraphZoom(1);}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>리셋</button>
+                    <button onClick={function(){setGraphZoom(function(z){return Math.min(3,z+0.2);});}} style={{padding:"5px 14px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:16,fontWeight:700,cursor:"pointer",lineHeight:1}}>+</button>
+                    <button onClick={function(){setGraphZoom(function(z){return Math.max(0.2,z-0.2);});}} style={{padding:"5px 14px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#1e293b",fontSize:16,fontWeight:700,cursor:"pointer",lineHeight:1}}>−</button>
+                    <button onClick={function(){setGraphZoom(1);}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>전체보기</button>
+                    <button onClick={function(){setGraphZoom(2);}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid #e2e8f0",background:"#fff",color:"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>상세보기</button>
                     <span style={{fontSize:11,color:"#94a3b8",marginLeft:4}}>{Math.round(graphZoom*100)}%</span>
-                    <span style={{fontSize:10,color:"#94a3b8",marginLeft:"auto"}}>스크롤로 확대/축소 · 드래그로 이동</span>
+                    <span style={{fontSize:10,color:"#94a3b8",marginLeft:"auto"}}>+/− 버튼으로 확대/축소 · 그래프 영역 내 스크롤로 이동</span>
                   </div>
-                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "auto", position: "relative", maxHeight: 500, cursor: "grab" }}
-                    onWheel={function(e){e.preventDefault();setGraphZoom(function(z){return Math.max(0.3,Math.min(3,z+(e.deltaY>0?-0.1:0.1)));});}}>
+                  <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "scroll", position: "relative", height: 480 }}>
                     <svg width={canvasW * graphZoom} height={canvasH * graphZoom} viewBox={"0 0 " + canvasW + " " + canvasH} style={{ display: "block" }}
                       onMouseMove={function(evt) {
                         var rect = evt.currentTarget.getBoundingClientRect();
