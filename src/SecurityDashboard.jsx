@@ -2382,24 +2382,94 @@ export default function SecurityDashboard(props) {
                       </div>
                     )}
                   </div>
+                  {/* 연결선(엣지) 의미 설명 */}
                   <div style={{background:"#fff", borderRadius:12, padding:16, border:"1px solid #e2e8f0", marginTop:12}}>
-                    <div style={{fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:8}}>{"📖"} 지식 그래프 활용 가이드</div>
+                    <div style={{fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:12}}>{"🔗"} 연결선(엣지) 의미</div>
+                    <div style={{display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, fontSize:11.5, marginBottom:16}}>
+                      <div style={{background:"#eff6ff", borderRadius:10, padding:12, border:"1px solid #bfdbfe"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                          <div style={{width:24,height:3,background:"#2563eb",borderRadius:2}}></div>
+                          <span style={{fontWeight:700,color:"#1e40af",fontSize:12}}>접근</span>
+                        </div>
+                        <div style={{color:"#1e40af",lineHeight:1.6,fontSize:11}}>직원이 <strong>실제로 자산에 접근</strong>한 이벤트. 실시간 데이터 기반 (2초마다 갱신). 파일 열람, 다운로드, USB 복사 등의 행위가 발생하면 연결선 생성.</div>
+                      </div>
+                      <div style={{background:"#f5f3ff", borderRadius:10, padding:12, border:"1px solid #c4b5fd"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                          <div style={{width:24,height:3,background:"#6d28d9",borderRadius:2}}></div>
+                          <span style={{fontWeight:700,color:"#5b21b6",fontSize:12}}>소속 / 권한</span>
+                        </div>
+                        <div style={{color:"#5b21b6",lineHeight:1.6,fontSize:11}}>직원→부서: <strong>소속 관계</strong>. 부서→자산: <strong>DEPT_ASSETS에 정의된 합법 접근 권한</strong>. 정적 데이터 기반 (관리자 설정).</div>
+                      </div>
+                      <div style={{background:"#fef2f2", borderRadius:10, padding:12, border:"1px solid #fecaca"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                          <div style={{width:24,height:3,background:"#dc2626",borderRadius:2}}></div>
+                          <span style={{fontWeight:700,color:"#991b1b",fontSize:12}}>트리거</span>
+                        </div>
+                        <div style={{color:"#991b1b",lineHeight:1.6,fontSize:11}}>이벤트→조치: 특정 이벤트가 발생하면 <strong>자동으로 연결되는 대응 조치</strong>. 예: USB 복사 → 계정 잠금, 권한 상승 → CISO 보고.</div>
+                      </div>
+                    </div>
+
+                    {/* 교차 분석 테이블 */}
+                    <div style={{fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:8}}>{"⚡"} 접근 vs 권한 교차 분석 — 핵심 위험 판단 로직</div>
+                    <div style={{fontSize:11.5,color:"#475569",marginBottom:10,lineHeight:1.6}}>자산 노드를 클릭하면 "접근(파란선)"과 "권한(보라선)"이 함께 보입니다. <strong>접근은 있는데 권한이 없는 경우</strong>가 바로 위험 신호입니다.</div>
+                    <table style={{width:"100%",borderCollapse:"collapse",fontSize:11.5,marginBottom:16}}>
+                      <thead><tr style={{background:"#f1f5f9"}}>
+                        <th style={{padding:"8px 10px",textAlign:"left",color:"#475569",fontWeight:700,borderBottom:"2px solid #e2e8f0"}}>상황</th>
+                        <th style={{padding:"8px 10px",textAlign:"center",color:"#2563eb",fontWeight:700,borderBottom:"2px solid #e2e8f0"}}>접근</th>
+                        <th style={{padding:"8px 10px",textAlign:"center",color:"#6d28d9",fontWeight:700,borderBottom:"2px solid #e2e8f0"}}>권한</th>
+                        <th style={{padding:"8px 10px",textAlign:"left",color:"#475569",fontWeight:700,borderBottom:"2px solid #e2e8f0"}}>판단</th>
+                        <th style={{padding:"8px 10px",textAlign:"left",color:"#475569",fontWeight:700,borderBottom:"2px solid #e2e8f0"}}>발동 규칙</th>
+                      </tr></thead>
+                      <tbody>
+                        <tr style={{borderBottom:"1px solid #f1f5f9"}}>
+                          <td style={{padding:"7px 10px",color:"#1e293b"}}>IT운영팀 직원이 Docker Registry 접근</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#16a34a",fontWeight:700}}>✅</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#16a34a",fontWeight:700}}>✅</td>
+                          <td style={{padding:"7px 10px"}}><span style={{padding:"2px 8px",borderRadius:4,background:"#dcfce7",color:"#166534",fontWeight:600,fontSize:10}}>정상</span></td>
+                          <td style={{padding:"7px 10px",color:"#64748b",fontSize:10}}>없음 (합법 접근)</td>
+                        </tr>
+                        <tr style={{borderBottom:"1px solid #f1f5f9",background:"#fef2f2"}}>
+                          <td style={{padding:"7px 10px",color:"#1e293b",fontWeight:600}}>재무팀 직원이 Docker Registry 접근</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#16a34a",fontWeight:700}}>✅</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#dc2626",fontWeight:700}}>❌</td>
+                          <td style={{padding:"7px 10px"}}><span style={{padding:"2px 8px",borderRadius:4,background:"#fef2f2",color:"#991b1b",fontWeight:600,fontSize:10,border:"1px solid #fecaca"}}>⚠️ 권한외 접근</span></td>
+                          <td style={{padding:"7px 10px",color:"#dc2626",fontWeight:600,fontSize:10}}>SR07 (+20점)</td>
+                        </tr>
+                        <tr style={{borderBottom:"1px solid #f1f5f9"}}>
+                          <td style={{padding:"7px 10px",color:"#1e293b"}}>인프라팀 (접근 없음)</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#94a3b8",fontWeight:700}}>−</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#16a34a",fontWeight:700}}>✅</td>
+                          <td style={{padding:"7px 10px"}}><span style={{padding:"2px 8px",borderRadius:4,background:"#f1f5f9",color:"#64748b",fontWeight:600,fontSize:10}}>정상</span></td>
+                          <td style={{padding:"7px 10px",color:"#64748b",fontSize:10}}>없음 (미접근)</td>
+                        </tr>
+                        <tr style={{background:"#fef2f2"}}>
+                          <td style={{padding:"7px 10px",color:"#1e293b",fontWeight:600}}>퇴사예정 외주직원이 야간에 기밀자산 접근</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#16a34a",fontWeight:700}}>✅</td>
+                          <td style={{padding:"7px 10px",textAlign:"center",color:"#dc2626",fontWeight:700}}>❌</td>
+                          <td style={{padding:"7px 10px"}}><span style={{padding:"2px 8px",borderRadius:4,background:"#dc2626",color:"#fff",fontWeight:600,fontSize:10}}>🚨 최고 위험</span></td>
+                          <td style={{padding:"7px 10px",color:"#dc2626",fontWeight:600,fontSize:10}}>SR03+SR07+SR09+SR22</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {/* 기존 가이드 (개선) */}
+                    <div style={{fontSize:13, fontWeight:700, color:"#0f172a", marginBottom:8}}>{"📖"} 활용 가이드</div>
                     <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, fontSize:11.5, color:"#475569", lineHeight:1.7}}>
-                      <div>
+                      <div style={{background:"#f8fafc",borderRadius:8,padding:10,border:"1px solid #e2e8f0"}}>
                         <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"🔍"} 위협 경로 분석</div>
-                        직원→자산 연결선을 통해 누가 어떤 민감 자산에 접근했는지 한눈에 파악할 수 있습니다. 비정상적인 접근 경로(부서 권한 외 자산 접근)를 시각적으로 탐지합니다.
+                        자산 노드를 클릭하면 해당 자산에 접근한 직원(파란선)과 권한 부서(보라선)가 동시에 보입니다. <strong>파란선만 있고 보라선이 없는 직원</strong>이 위험 대상입니다.
                       </div>
-                      <div>
-                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"👥"} 조직 리스크 맵</div>
-                        부서→자산 권한 관계와 실제 접근 패턴을 비교하여 권한 외 접근을 식별합니다. 특정 부서에 위험 이벤트가 집중되는지 확인할 수 있습니다.
+                      <div style={{background:"#f8fafc",borderRadius:8,padding:10,border:"1px solid #e2e8f0"}}>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"👤"} 직원 노드 해석</div>
+                        <strong>파란 원</strong> = 일반 위험 직원. <strong>빨간 원(펄싱)</strong> = 90점+ 최고 위험. 노드 크기는 위험도에 비례. 부서 아래 클러스터링되어 어느 부서에 위험이 집중되는지 파악 가능.
                       </div>
-                      <div>
-                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"⚡"} 이벤트-조치 연계</div>
-                        이벤트 유형별로 어떤 조치가 트리거되는지 확인하고, 조치 실행의 우선순위를 판단할 수 있습니다.
+                      <div style={{background:"#f8fafc",borderRadius:8,padding:10,border:"1px solid #e2e8f0"}}>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"🏢"} 부서 노드 활용</div>
+                        부서를 클릭하면 해당 부서 소속 직원(소속)과 부서의 합법 자산(권한)이 강조됩니다. 부서별 위험 직원 수와 접근 자산 범위를 한눈에 파악할 수 있습니다.
                       </div>
-                      <div>
-                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"🎯"} 노드 클릭 활용법</div>
-                        노드를 클릭하면 해당 노드와 연결된 관계만 강조됩니다. 특정 직원의 접근 자산, 특정 자산에 접근한 직원, 특정 부서의 권한 범위를 빠르게 파악할 수 있습니다.
+                      <div style={{background:"#f8fafc",borderRadius:8,padding:10,border:"1px solid #e2e8f0"}}>
+                        <div style={{fontWeight:600, color:"#0f172a", marginBottom:4}}>{"⚡"} 이벤트→조치 추적</div>
+                        이벤트 유형을 클릭하면 해당 이벤트가 트리거하는 조치(빨간선)가 보입니다. USB 복사→계정 잠금, 권한 상승→CISO 보고 등 자동 대응 경로를 확인할 수 있습니다.
                       </div>
                     </div>
                   </div>
