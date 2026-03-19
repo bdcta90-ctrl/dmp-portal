@@ -1857,30 +1857,30 @@ export default function SecurityDashboard(props) {
         ];
 
         var DATA_MAP = [
-          {cat:"\uD83D\uDC65 직원/조직 데이터", color:"#0a84ff", desc:"1,800명 임직원 정보와 HR 프로파일", linkTab:"employees",
+          {cat:"\uD83D\uDC65 직원/조직 데이터", color:"#2563eb", desc:"1,800명 임직원 정보와 HR 프로파일", linkTab:"employees",
             items:[
               {icon:"\uD83D\uDC64",name:"직원 마스터",size:"1,800명 / 12컬럼",detail:"사번, 이름, 부서, 직급, 고용형태, 보안등급, 상급자, 입사일, 퇴사예정, 부서이동, 경고횟수, 성과등급"},
               {icon:"\uD83C\uDFE2",name:"부서 구조",size:"20개 부서",detail:"재무팀, R&D1/2, 인사, 마케팅, IT운영, 법무, 전략기획, 영업1/2, 고객지원, 리스크관리, 컴플라이언스, 데이터분석, 인프라, 보안, 경영지원, 해외사업, 신사업, 디자인"},
               {icon:"\uD83D\uDCCA",name:"HR 프로파일",size:"5개 필드",detail:"입사일, 퇴사예정(5%), 최근부서이동(8%), 경고횟수(0~2), 성과등급(S/A/B/C/D). 위험점수 가중: 퇴사+25, 이동+10, 경고\u00D78, D등급+15"},
             ]},
-          {cat:"\uD83D\uDD12 자산/보안 데이터", color:"#ff9500", desc:"25개 민감 자산과 보안등급 체계", linkTab:"assets",
+          {cat:"\uD83D\uDD12 자산/보안 데이터", color:"#ea580c", desc:"25개 민감 자산과 보안등급 체계", linkTab:"assets",
             items:[
               {icon:"\uD83D\uDCC1",name:"자산 목록",size:"40건 / 7컬럼",detail:"자산명, 유형(시스템/문서/데이터/코드/영상/음성), 보안등급(일반/대외비/기밀/최고기밀), 민감도(1~5), 관리시작, 최근감사"},
               {icon:"\uD83D\uDD10",name:"역할-자산 매트릭스",size:"20부서 \u00D7 40자산",detail:"DEPT_ASSETS: 각 부서별 합법 접근 가능 자산 목록. 매칭 안 되면 '권한외 접근' 플래그"},
               {icon:"\uD83C\uDFF7\uFE0F",name:"보안등급 체계",size:"4단계",detail:"일반 \u2192 대외비 \u2192 기밀 \u2192 최고기밀. 일반 등급이 기밀+ 접근 시 +20 가중 (단, 합법부서는 면제)"},
             ]},
-          {cat:"\u26A1 이벤트/위협 데이터", color:"#ff2d55", desc:"9종 이벤트 유형과 위험도 산정 체계", linkTab:"events",
+          {cat:"\u26A1 이벤트/위협 데이터", color:"#dc2626", desc:"9종 이벤트 유형과 위험도 산정 체계", linkTab:"events",
             items:[
               {icon:"\uD83D\uDCCB",name:"이벤트 유형",size:"9종",detail:"File Open(30%), Download(25%), Print(15%), USB Copy(8%), Bulk Query(5%), Permission Escalation(2%), Share Link(6%), Delete(3%), AI Upload(6%)"},
               {icon:"\uD83D\uDCCA",name:"위험도 산정",size:"8요소",detail:"기본점수(15~75) + 민감도(\u00D72~5) + 시간(야간+20/주말+10) + 빈도(3건+10/5건+20) + 역할위반(+20) + 등급위반(+20) + HR프로파일(퇴사+25 등)"},
               {icon:"\uD83D\uDD17",name:"복합 위협 탐지",size:"10분 윈도우",detail:"동일 사용자 10분 내 고위험(70+) 3건 이상 \u2192 복합 위협 플래그 + 점수 +15"},
             ]},
-          {cat:"\uD83D\uDEE1\uFE0F 조치/대응 데이터", color:"#30d158", desc:"11종 조치 가이드와 실행 프로세스", linkTab:"actions",
+          {cat:"\uD83D\uDEE1\uFE0F 조치/대응 데이터", color:"#16a34a", desc:"11종 조치 가이드와 실행 프로세스", linkTab:"actions",
             items:[
               {icon:"\uD83D\uDCD6",name:"조치 가이드",size:"11종",detail:"관리자 확인, MFA 인증, 접근 제한, 계정 잠금, 감사 로그, HR 조사, 데이터 백업, 포렌식 의뢰, 보안교육, CISO 보고, 외부 신고"},
               {icon:"\u26A1",name:"자동/수동 구분",size:"단계별",detail:"각 조치의 5~6단계에서 auto=true(자동 실행) / auto=false(수동 승인) 구분. 일괄 자동 실행 기능"},
             ]},
-          {cat:"\uD83D\uDCDC 법규/규제 데이터", color:"#5ac8fa", desc:"31건 법규 준수 항목 (7개 법률/기준)", linkTab:"compliance",
+          {cat:"\uD83D\uDCDC 법규/규제 데이터", color:"#0284c7", desc:"31건 법규 준수 항목 (7개 법률/기준)", linkTab:"compliance",
             items:[
               {icon:"\u2696\uFE0F",name:"법규 준수",size:"31건",detail:"개인정보보호법(9), 정보통신망법(3), 신용정보법(2), 전자금융거래법(2), 산업기술보호법(3), 근로기준법(2), ISMS-P(5), ISO 27001(5)"},
               {icon:"\uD83D\uDD17",name:"시스템 연동",size:"6건",detail:"이벤트로그(연동), SIEM(준비중), IAM(준비중), DLP(준비중), HR Portal(준비중), 메일/메신저(준비중)"},
@@ -1936,32 +1936,32 @@ export default function SecurityDashboard(props) {
         };
 
         var ONTOLOGY_ENTITIES = [
-          {name:"직원 (Employee)", icon:"\uD83D\uDC64", color:"#0a84ff", fields:"사번, 이름, 부서, 직급, 보안등급, HR프로파일"},
-          {name:"부서 (Department)", icon:"\uD83C\uDFE2", color:"#5856d6", fields:"부서명, 소속 직원, 접근가능 자산"},
-          {name:"자산 (Asset)", icon:"\uD83D\uDCC1", color:"#ff9500", fields:"자산명, 유형, 보안등급, 민감도"},
-          {name:"이벤트 (Event)", icon:"\u26A1", color:"#ff2d55", fields:"유형, 심각도, 기본점수, 타임스탬프"},
-          {name:"조치 (Action)", icon:"\uD83D\uDEE1\uFE0F", color:"#30d158", fields:"조치명, 긴급도, 단계, 자동/수동"},
-          {name:"규칙 (Rule)", icon:"\uD83D\uDCDC", color:"#5ac8fa", fields:"법규명, 조항, 준수상태"},
+          {name:"직원 (Employee)", icon:"\uD83D\uDC64", color:"#2563eb", fields:"사번, 이름, 부서, 직급, 보안등급, HR프로파일"},
+          {name:"부서 (Department)", icon:"\uD83C\uDFE2", color:"#6d28d9", fields:"부서명, 소속 직원, 접근가능 자산"},
+          {name:"자산 (Asset)", icon:"\uD83D\uDCC1", color:"#ea580c", fields:"자산명, 유형, 보안등급, 민감도"},
+          {name:"이벤트 (Event)", icon:"\u26A1", color:"#dc2626", fields:"유형, 심각도, 기본점수, 타임스탬프"},
+          {name:"조치 (Action)", icon:"\uD83D\uDEE1\uFE0F", color:"#16a34a", fields:"조치명, 긴급도, 단계, 자동/수동"},
+          {name:"규칙 (Rule)", icon:"\uD83D\uDCDC", color:"#0284c7", fields:"법규명, 조항, 준수상태"},
         ];
 
         var ONTOLOGY_RELATIONS = [
-          {from:"직원", rel:"\u2192 소속 \u2192", to:"부서", color:"#0a84ff"},
-          {from:"직원", rel:"\u2192 접근 \u2192", to:"자산", color:"#ff9500"},
-          {from:"직원", rel:"\u2192 발생 \u2192", to:"이벤트", color:"#ff2d55"},
-          {from:"이벤트", rel:"\u2192 트리거 \u2192", to:"조치", color:"#30d158"},
-          {from:"이벤트", rel:"\u2192 위반 \u2192", to:"규칙", color:"#5ac8fa"},
-          {from:"부서", rel:"\u2192 관할 \u2192", to:"자산", color:"#5856d6"},
+          {from:"직원", rel:"\u2192 소속 \u2192", to:"부서", color:"#2563eb"},
+          {from:"직원", rel:"\u2192 접근 \u2192", to:"자산", color:"#ea580c"},
+          {from:"직원", rel:"\u2192 발생 \u2192", to:"이벤트", color:"#dc2626"},
+          {from:"이벤트", rel:"\u2192 트리거 \u2192", to:"조치", color:"#16a34a"},
+          {from:"이벤트", rel:"\u2192 위반 \u2192", to:"규칙", color:"#0284c7"},
+          {from:"부서", rel:"\u2192 관할 \u2192", to:"자산", color:"#6d28d9"},
         ];
 
         var RISK_FACTORS = [
-          {cat:"기본 점수", color:"#0a84ff", items:["low: 15점","medium: 30점","high: 55점","critical: 75점"]},
-          {cat:"민감도 보너스", color:"#ff9500", items:["민감도 1: +0","민감도 2: +5","민감도 3: +10","민감도 4: +15","민감도 5: +20"]},
-          {cat:"시간 가중", color:"#ff2d55", items:["야간(22~06시): +20","주말: +10","공휴일: +10"]},
-          {cat:"빈도 가중", color:"#5856d6", items:["동일인 3건+: +10","동일인 5건+: +20","동일인 10건+: +30"]},
-          {cat:"역할 위반", color:"#ff375f", items:["권한외 자산 접근: +20","DEPT_ASSETS 미매칭"]},
-          {cat:"등급 위반", color:"#ff9f0a", items:["보안등급 초과 접근: +20","일반\u2192기밀+ 접근 시"]},
-          {cat:"HR 프로파일", color:"#30d158", items:["퇴사예정: +25","최근이동: +10","경고\u00D78 (최대16)","D등급: +15"]},
-          {cat:"복합 위협", color:"#bf5af2", items:["10분내 70+ 3건: +15","복합 플래그 활성화"]},
+          {cat:"기본 점수", color:"#2563eb", items:["low: 15점","medium: 30점","high: 55점","critical: 75점"]},
+          {cat:"민감도 보너스", color:"#ea580c", items:["민감도 1: +0","민감도 2: +5","민감도 3: +10","민감도 4: +15","민감도 5: +20"]},
+          {cat:"시간 가중", color:"#dc2626", items:["야간(22~06시): +20","주말: +10","공휴일: +10"]},
+          {cat:"빈도 가중", color:"#7c3aed", items:["동일인 3건+: +10","동일인 5건+: +20","동일인 10건+: +30"]},
+          {cat:"역할 위반", color:"#e11d48", items:["권한외 자산 접근: +20","DEPT_ASSETS 미매칭"]},
+          {cat:"등급 위반", color:"#d97706", items:["보안등급 초과 접근: +20","일반\u2192기밀+ 접근 시"]},
+          {cat:"HR 프로파일", color:"#16a34a", items:["퇴사예정: +25","최근이동: +10","경고\u00D78 (최대16)","D등급: +15"]},
+          {cat:"복합 위협", color:"#9333ea", items:["10분내 70+ 3건: +15","복합 플래그 활성화"]},
         ];
 
         var EVENT_SCORE_TABLE = [
@@ -2202,7 +2202,7 @@ export default function SecurityDashboard(props) {
                 });
                 topEmps.forEach(function(item) {
                   if (deptSet[item.emp.department]) {
-                    edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "소속", color: "rgba(94,92,230,0.5)" });
+                    edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "소속", color: "rgba(109,40,217,0.5)" });
                   }
                 });
                 var empAssetEdges = {};
@@ -2210,12 +2210,12 @@ export default function SecurityDashboard(props) {
                   var key = e.employee.id + "|" + e.asset.name;
                   if (!empAssetEdges[key] && topEmps.some(function(t) { return t.emp.id === e.employee.id; })) {
                     empAssetEdges[key] = true;
-                    edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "접근", color: "rgba(10,132,255,0.45)" });
+                    edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "접근", color: "rgba(37,99,235,0.45)" });
                   }
                 });
                 Object.keys(DEPT_ASSETS).forEach(function(d) {
                   DEPT_ASSETS[d].forEach(function(a) {
-                    edges.push({ from: "dept-" + d, to: "asset-" + a, label: "권한", color: "rgba(48,209,88,0.35)" });
+                    edges.push({ from: "dept-" + d, to: "asset-" + a, label: "권한", color: "rgba(22,163,74,0.4)" });
                   });
                 });
                 var evtAssetEdges = {};
@@ -2223,20 +2223,20 @@ export default function SecurityDashboard(props) {
                   var key = e.eventType.type + "|" + e.asset.name;
                   if (!evtAssetEdges[key]) {
                     evtAssetEdges[key] = true;
-                    edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "대상", color: "rgba(255,149,0,0.4)" });
+                    edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "대상", color: "rgba(234,88,12,0.45)" });
                   }
                 });
                 EVENT_TYPES.forEach(function(et) {
                   var sev = et.severity;
                   if (sev === "critical") {
-                    edges.push({ from: "evt-" + et.type, to: "action-계정 잠금", label: "트리거", color: "rgba(255,45,85,0.45)" });
+                    edges.push({ from: "evt-" + et.type, to: "action-계정 잠금", label: "트리거", color: "rgba(220,38,38,0.5)" });
                   } else if (sev === "high") {
-                    edges.push({ from: "evt-" + et.type, to: "action-접근 일시 제한", label: "트리거", color: "rgba(255,149,0,0.4)" });
+                    edges.push({ from: "evt-" + et.type, to: "action-접근 일시 제한", label: "트리거", color: "rgba(234,88,12,0.45)" });
                   }
                 });
                 var nodeMap = {};
                 nodes.forEach(function(n) { nodeMap[n.id] = n; });
-                var typeColors = { employee: "#0a84ff", asset: "#30d158", eventType: "#ff9500", dept: "#5e5ce6", action: "#ff2d55" };
+                var typeColors = { employee: "#2563eb", asset: "#16a34a", eventType: "#ea580c", dept: "#6d28d9", action: "#dc2626" };
                 var typeLabels = { employee: "직원", asset: "자산", eventType: "이벤트유형", dept: "부서", action: "조치" };
 
                 return <div>
@@ -2250,7 +2250,7 @@ export default function SecurityDashboard(props) {
                         </div>;
                       })}
                       <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "2px 8px", borderRadius: 6, background: "#fef2f2", border: "1px solid #fecaca" }}>
-                        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff2d55", border: "2px solid #ff2d55" }} />
+                        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#dc2626", border: "2px solid #dc2626" }} />
                         <span style={{ fontSize: 10, color: "#991b1b", fontWeight: 700 }}>90점+ 위험</span>
                       </div>
                     </div>
@@ -2329,16 +2329,16 @@ export default function SecurityDashboard(props) {
                         var dimmed = graphSelected && !isSelected && !isConnected;
                         var nodeOpacity = dimmed ? 0.15 : 1;
                         if (n.type === "employee") {
-                          var empColor = n.critical ? "#ff2d55" : c;
+                          var empColor = n.critical ? "#dc2626" : c;
                           var empR = n.critical ? (isHovered || isSelected ? 22 : 18) : (isHovered || isSelected ? 16 : 12);
                           return <g key={n.id} opacity={nodeOpacity}>
-                            {n.critical && <circle cx={n.x} cy={n.y} r={empR + 6} fill="none" stroke="#ff2d55" strokeWidth={1.5} strokeDasharray="4 2" opacity={0.5}><animate attributeName="r" values={(empR+4)+";"+(empR+8)+";"+(empR+4)} dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite"/></circle>}
+                            {n.critical && <circle cx={n.x} cy={n.y} r={empR + 6} fill="none" stroke="#dc2626" strokeWidth={1.5} strokeDasharray="4 2" opacity={0.5}><animate attributeName="r" values={(empR+4)+";"+(empR+8)+";"+(empR+4)} dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite"/></circle>}
                             <circle cx={n.x} cy={n.y} r={empR} fill={empColor + "30"} stroke={empColor} strokeWidth={n.critical ? 3 : 2} />
-                            {n.critical && <text x={n.x} y={n.y + 4} textAnchor="middle" fill="#ff2d55" fontSize="9" fontWeight="800">{n.score}</text>}
-                            <rect x={n.x - 20} y={n.y + empR + 2} width={40} height={14} rx={4} fill={n.critical ? "rgba(255,45,85,0.85)" : "rgba(0,0,0,0.7)"} />
+                            {n.critical && <text x={n.x} y={n.y + 4} textAnchor="middle" fill="#dc2626" fontSize="9" fontWeight="800">{n.score}</text>}
+                            <rect x={n.x - 20} y={n.y + empR + 2} width={40} height={14} rx={4} fill={n.critical ? "rgba(220,38,38,0.85)" : "rgba(0,0,0,0.7)"} />
                             <text x={n.x} y={n.y + empR + 13} textAnchor="middle" fill="#fff" fontSize={n.critical ? "10" : "9"} fontWeight="700">{n.label}</text>
                             {isHovered && <g>
-                              <rect x={n.x - 55} y={n.y - empR - 22} width={110} height={18} rx={4} fill={n.critical ? "rgba(255,45,85,0.95)" : "rgba(0,0,0,0.85)"} />
+                              <rect x={n.x - 55} y={n.y - empR - 22} width={110} height={18} rx={4} fill={n.critical ? "rgba(220,38,38,0.95)" : "rgba(0,0,0,0.85)"} />
                               <text x={n.x} y={n.y - empR - 8} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700">{n.label + " (위험:" + (n.score || "?") + ")" + (n.critical ? " 🚨" : "")}</text>
                             </g>}
                           </g>;
@@ -2371,7 +2371,7 @@ export default function SecurityDashboard(props) {
                         <div style={{ fontSize: 10, color: "#475569" }}>
                           연결된 노드: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}건
                         </div>
-                        {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
+                        {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#dc2626", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
                       </div>
                     )}
                   </div>
@@ -2438,10 +2438,10 @@ export default function SecurityDashboard(props) {
                   {id:"SR34",name:"삭제 후 휴지통 비우기",cat:"패턴",priority:0,condition:"Delete/Modify 후 2분 내 완전 삭제",then:"위험점수 +30, 증거 인멸 의심",severity:"critical"},
                   {id:"SR35",name:"감사 로그 접근",cat:"자산",priority:0,condition:"시스템접근로그 파일 열람/수정 시도",then:"위험점수 +35, 흔적 삭제 의심",severity:"critical"},
                 ];
-                var sevColors = {critical:"#ff2d55",warning:"#ff9500",info:"#0a84ff"};
+                var sevColors = {critical:"#dc2626",warning:"#ea580c",info:"#2563eb"};
                 var sevLabels = {critical:"CRITICAL",warning:"WARNING",info:"INFO"};
                 var catOrder = ["시간","HR","접근","고용","패턴","이벤트","자산"];
-                var catColors = {"시간":"#5e5ce6","HR":"#30d158","접근":"#ff2d55","고용":"#ff9500","패턴":"#bf5af2","이벤트":"#0a84ff","자산":"#ff9f0a"};
+                var catColors = {"시간":"#5e5ce6","HR":"#16a34a","접근":"#dc2626","고용":"#ea580c","패턴":"#9333ea","이벤트":"#2563eb","자산":"#d97706"};
                 var grouped = {};
                 catOrder.forEach(function(c) { grouped[c] = []; });
                 SECURITY_RULES.forEach(function(r) { if (grouped[r.cat]) grouped[r.cat].push(r); });
@@ -2478,9 +2478,9 @@ export default function SecurityDashboard(props) {
                           </thead>
                           <tbody>
                             {rules.map(function(r) {
-                              var sc = sevColors[r.severity] || "#fff";
+                              var sc = sevColors[r.severity] || "#64748b";
                               var prioLabel = r.priority === 0 ? "P0 (최고)" : r.priority === 1 ? "P1 (높음)" : "P2 (보통)";
-                              var prioColor = r.priority === 0 ? "#ff2d55" : r.priority === 1 ? "#ff9500" : "#0a84ff";
+                              var prioColor = r.priority === 0 ? "#dc2626" : r.priority === 1 ? "#ea580c" : "#2563eb";
                               return <tr key={r.id} style={{borderBottom:"1px solid #f1f5f9"}}>
                                 <td style={{padding:"8px 12px",color:"#64748b",fontFamily:"'JetBrains Mono',monospace",fontWeight:600}}>{r.id}</td>
                                 <td style={{padding:"8px 12px",color:"#1e293b",fontWeight:600}}>{r.name}</td>
@@ -2506,12 +2506,12 @@ export default function SecurityDashboard(props) {
                   <div style={{fontSize:13,fontWeight:700,color:"#0f172a"}}>Risk Score Formula</div>
                   <div style={{display:"flex",gap:6}}>
                     <button onClick={function(){setWeights(Object.assign({},DEFAULT_WEIGHTS));setWeightsSaved(false);}} style={{padding:"4px 10px",fontSize:10,background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:6,cursor:"pointer",color:"#475569",fontWeight:600}}>기본값 복원</button>
-                    <button onClick={function(){setWeightsSaved(true);setTimeout(function(){setWeightsSaved(false);},2000);}} style={{padding:"4px 10px",fontSize:10,background:"#0a84ff",border:"none",borderRadius:6,cursor:"pointer",color:"#fff",fontWeight:600}}>적용</button>
-                    {weightsSaved && <span style={{fontSize:10,color:"#30d158",fontWeight:600,alignSelf:"center"}}>저장 완료</span>}
+                    <button onClick={function(){setWeightsSaved(true);setTimeout(function(){setWeightsSaved(false);},2000);}} style={{padding:"4px 10px",fontSize:10,background:"#2563eb",border:"none",borderRadius:6,cursor:"pointer",color:"#fff",fontWeight:600}}>적용</button>
+                    {weightsSaved && <span style={{fontSize:10,color:"#16a34a",fontWeight:600,alignSelf:"center"}}>저장 완료</span>}
                   </div>
                 </div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",marginBottom:14}}>
-                  {[{l:"baseScore",sub:"(severity)",c:"#0a84ff"},{l:"+",c:"transparent"},{l:"sensitivityBonus",sub:"(\u00D72~5)",c:"#ff9500"},{l:"+",c:"transparent"},{l:"timeBonus",sub:"(야간/주말)",c:"#ff2d55"},{l:"+",c:"transparent"},{l:"freqBonus",sub:"(빈도)",c:"#5856d6"},{l:"+",c:"transparent"},{l:"roleMismatch",sub:"(역할위반)",c:"#ff375f"},{l:"+",c:"transparent"},{l:"clearanceMismatch",sub:"(등급위반)",c:"#ff9f0a"},{l:"+",c:"transparent"},{l:"profileBonus",sub:"(HR)",c:"#30d158"},{l:"=",c:"transparent"},{l:"riskScore",sub:"(0~200+)",c:"#bf5af2"}].map(function(f,i) {
+                  {[{l:"baseScore",sub:"(severity)",c:"#2563eb"},{l:"+",c:"transparent"},{l:"sensitivityBonus",sub:"(\u00D72~5)",c:"#ea580c"},{l:"+",c:"transparent"},{l:"timeBonus",sub:"(야간/주말)",c:"#dc2626"},{l:"+",c:"transparent"},{l:"freqBonus",sub:"(빈도)",c:"#7c3aed"},{l:"+",c:"transparent"},{l:"roleMismatch",sub:"(역할위반)",c:"#e11d48"},{l:"+",c:"transparent"},{l:"clearanceMismatch",sub:"(등급위반)",c:"#d97706"},{l:"+",c:"transparent"},{l:"profileBonus",sub:"(HR)",c:"#16a34a"},{l:"=",c:"transparent"},{l:"riskScore",sub:"(0~200+)",c:"#9333ea"}].map(function(f,i) {
                     if (f.l === "+" || f.l === "=") return <span key={i} style={{fontSize:14,fontWeight:700,color:"#94a3b8"}}>{f.l}</span>;
                     return <div key={i} style={{padding:"6px 10px",background:f.c+"18",border:"1px solid "+f.c+"35",borderRadius:8,textAlign:"center"}}>
                       <div style={{fontSize:11,fontWeight:700,color:f.c,fontFamily:"'JetBrains Mono',monospace"}}>{f.l}</div>
@@ -2530,35 +2530,35 @@ export default function SecurityDashboard(props) {
                   return <div>
                     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14}}>
                       <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
-                        <div style={{fontSize:11,fontWeight:700,color:"#0a84ff",marginBottom:6}}>기본 점수</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#2563eb",marginBottom:6}}>기본 점수</div>
                         {wInput("baseLow","low")}
                         {wInput("baseMedium","medium")}
                         {wInput("baseHigh","high")}
                         {wInput("baseCritical","critical")}
                       </div>
                       <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
-                        <div style={{fontSize:11,fontWeight:700,color:"#ff9500",marginBottom:6}}>민감도 보너스</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#ea580c",marginBottom:6}}>민감도 보너스</div>
                         {wInput("sensitivityLegit","합법 접근 \u00D7")}
                         {wInput("sensitivityUnauth","무단 접근 \u00D7")}
-                        <div style={{fontSize:11,fontWeight:700,color:"#ff2d55",marginBottom:6,marginTop:8}}>시간 가중</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:6,marginTop:8}}>시간 가중</div>
                         {wInput("nightBonus","야간(22~07)")}
                         {wInput("weekendBonus","주말")}
                       </div>
                       <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
-                        <div style={{fontSize:11,fontWeight:700,color:"#5856d6",marginBottom:6}}>빈도 가중</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#7c3aed",marginBottom:6}}>빈도 가중</div>
                         {wInput("freqThree","3건 이상")}
                         {wInput("freqFive","5건 이상")}
-                        <div style={{fontSize:11,fontWeight:700,color:"#ff375f",marginBottom:6,marginTop:8}}>역할/등급 위반</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#e11d48",marginBottom:6,marginTop:8}}>역할/등급 위반</div>
                         {wInput("roleMismatch","역할 불일치")}
                         {wInput("clearanceMismatch","등급 위반")}
                       </div>
                       <div style={{padding:"10px 12px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:10}}>
-                        <div style={{fontSize:11,fontWeight:700,color:"#30d158",marginBottom:6}}>HR 프로파일</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#16a34a",marginBottom:6}}>HR 프로파일</div>
                         {wInput("resignPlanned","퇴사예정")}
                         {wInput("recentTransfer","최근이동")}
                         {wInput("warningMult","경고 \u00D7")}
                         {wInput("lowPerf","D등급")}
-                        <div style={{fontSize:11,fontWeight:700,color:"#bf5af2",marginBottom:6,marginTop:8}}>기타</div>
+                        <div style={{fontSize:11,fontWeight:700,color:"#9333ea",marginBottom:6,marginTop:8}}>기타</div>
                         {wInput("employmentBonus","외주/협력사")}
                         {wInput("compoundBonus","복합 위협")}
                       </div>
@@ -2617,7 +2617,7 @@ export default function SecurityDashboard(props) {
                     </thead>
                     <tbody>
                       {EVENT_SCORE_TABLE.map(function(row) {
-                        var sevColor = {low:"#30d158",medium:"#ff9500",high:"#ff2d55",critical:"#bf5af2"}[row.severity] || "#fff";
+                        var sevColor = {low:"#16a34a",medium:"#ea580c",high:"#dc2626",critical:"#9333ea"}[row.severity] || "#64748b";
                         return <tr key={row.event} style={{borderBottom:"1px solid #f1f5f9"}}>
                           <td style={{padding:"8px 12px",color:"#1e293b",fontWeight:600}}>{row.event}</td>
                           <td style={{padding:"8px 12px"}}><span style={{padding:"2px 8px",borderRadius:4,background:sevColor+"18",color:sevColor,fontSize:10,fontWeight:600}}>{row.severity}</span></td>
@@ -2698,7 +2698,7 @@ export default function SecurityDashboard(props) {
         // Edges: employee -> dept (belongs)
         topEmps.forEach(function(item) {
           if (deptSet[item.emp.department]) {
-            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "소속", color: "rgba(94,92,230,0.5)" });
+            edges.push({ from: "emp-" + item.emp.id, to: "dept-" + item.emp.department, label: "소속", color: "rgba(109,40,217,0.5)" });
           }
         });
 
@@ -2708,14 +2708,14 @@ export default function SecurityDashboard(props) {
           var key = e.employee.id + "|" + e.asset.name;
           if (!empAssetEdges[key] && topEmps.some(function(t) { return t.emp.id === e.employee.id; })) {
             empAssetEdges[key] = true;
-            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "접근", color: "rgba(10,132,255,0.45)" });
+            edges.push({ from: "emp-" + e.employee.id, to: "asset-" + e.asset.name, label: "접근", color: "rgba(37,99,235,0.45)" });
           }
         });
 
         // Edges: dept -> asset (permission)
         Object.keys(DEPT_ASSETS).forEach(function(d) {
           DEPT_ASSETS[d].forEach(function(a) {
-            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "권한", color: "rgba(48,209,88,0.35)" });
+            edges.push({ from: "dept-" + d, to: "asset-" + a, label: "권한", color: "rgba(22,163,74,0.4)" });
           });
         });
 
@@ -2725,7 +2725,7 @@ export default function SecurityDashboard(props) {
           var key = e.eventType.type + "|" + e.asset.name;
           if (!evtAssetEdges[key]) {
             evtAssetEdges[key] = true;
-            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "대상", color: "rgba(255,149,0,0.4)" });
+            edges.push({ from: "evt-" + e.eventType.type, to: "asset-" + e.asset.name, label: "대상", color: "rgba(234,88,12,0.45)" });
           }
         });
 
@@ -2733,9 +2733,9 @@ export default function SecurityDashboard(props) {
         EVENT_TYPES.forEach(function(et) {
           var sev = et.severity;
           if (sev === "critical") {
-            edges.push({ from: "evt-" + et.type, to: "action-계정 잠금", label: "트리거", color: "rgba(255,45,85,0.45)" });
+            edges.push({ from: "evt-" + et.type, to: "action-계정 잠금", label: "트리거", color: "rgba(220,38,38,0.5)" });
           } else if (sev === "high") {
-            edges.push({ from: "evt-" + et.type, to: "action-접근 일시 제한", label: "트리거", color: "rgba(255,149,0,0.4)" });
+            edges.push({ from: "evt-" + et.type, to: "action-접근 일시 제한", label: "트리거", color: "rgba(234,88,12,0.45)" });
           }
         });
 
@@ -2865,7 +2865,7 @@ export default function SecurityDashboard(props) {
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
                     연결된 노드: {edges.filter(function(e) { return e.from === graphSelected || e.to === graphSelected; }).length}건
                   </div>
-                  {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#ff2d55", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
+                  {nodeMap[graphSelected].score && <div style={{ fontSize: 10, color: "#dc2626", marginTop: 4 }}>위험점수: {nodeMap[graphSelected].score}</div>}
                 </div>
               )}
             </div>
