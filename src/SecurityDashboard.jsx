@@ -1115,7 +1115,7 @@ function exportToExcel(events) {
 
 function SecurityChatBot(props) {
   var events = props.events, employees = props.employees, onSelectEvent = props.onSelectEvent, onClose = props.onClose;
-  var stMessages = useState([{role:"ai",text:"안녕하세요! 보안관제 AI 어시스턴트입니다.\n\n이벤트 데이터를 자연어로 질의할 수 있습니다. 예시:\n• \"위험점수 80점 이상 인원 정리해줘\"\n• \"외부 공유 링크 생성된 이벤트 목록\"\n• \"USB 복사 이벤트 보여줘\"\n• \"기밀 자산 접근 목록\"",type:"text",ts:new Date()}]);
+  var stMessages = useState([{role:"ai",text:"안녕하세요! 보안관제 AI 어시스턴트입니다.\n\n이벤트 데이터를 자연어로 질의할 수 있습니다.\n\n📋 **기본 검색:**\n• \"위험점수 80점 이상\" · \"심각 등급 이벤트\"\n• \"USB 복사\" · \"외부 AI 업로드\" · \"기밀 자산 접근\"\n\n👤 **HR 프로파일:**\n• \"퇴사예정자 이벤트\" · \"경고이력 보유자\"\n• \"저성과 D등급\" · \"부서이동 직원\"\n\n🕐 **패턴 분석:**\n• \"야간 접근\" · \"주말 접근\" · \"복합 위협\"\n• \"권한외 접근\" · \"외주 직원\"\n\n🏢 **부서/이름:**\n• \"R&D1팀 이벤트\" · \"재무팀 기밀 접근\"",type:"text",ts:new Date()}]);
   var messages = stMessages[0], setMessages = stMessages[1];
   var stInput = useState("");
   var input = stInput[0], setInput = stInput[1];
@@ -1186,6 +1186,24 @@ function SecurityChatBot(props) {
     var nameMatch = null;
     employees.forEach(function(e) { if (q.indexOf(e.name) >= 0) nameMatch = e.name; });
 
+    // Parse HR profile conditions
+    var resignFilter = q.indexOf("퇴사") >= 0 || q.indexOf("퇴직") >= 0;
+    var transferFilter = q.indexOf("부서이동") >= 0 || q.indexOf("부서 이동") >= 0 || q.indexOf("전보") >= 0;
+    var warningFilter = q.indexOf("경고") >= 0 || q.indexOf("징계") >= 0;
+    var lowPerfFilter = q.indexOf("저성과") >= 0 || q.indexOf("D등급") >= 0 || q.indexOf("성과 낮") >= 0;
+
+    // Parse access pattern conditions
+    var nightFilter = q.indexOf("야간") >= 0 || q.indexOf("심야") >= 0 || q.indexOf("밤") >= 0;
+    var weekendFilter = q.indexOf("주말") >= 0 || q.indexOf("토요일") >= 0 || q.indexOf("일요일") >= 0;
+    var unauthorizedFilter = q.indexOf("권한외") >= 0 || q.indexOf("권한 외") >= 0 || q.indexOf("무단") >= 0 || q.indexOf("불법") >= 0;
+    var compoundFilter = q.indexOf("복합") >= 0 || q.indexOf("연속") >= 0 || q.indexOf("다중") >= 0;
+
+    // Parse employment type
+    var empTypeFilter = null;
+    if (q.indexOf("외주") >= 0) empTypeFilter = "외주";
+    else if (q.indexOf("협력사") >= 0 || q.indexOf("협력") >= 0) empTypeFilter = "협력사";
+    else if (q.indexOf("계약직") >= 0) empTypeFilter = "계약직";
+
     // Filter events
     var filtered = events.filter(function(e) {
       if (minScore !== null && e.riskScore < minScore) return false;
@@ -1198,6 +1216,15 @@ function SecurityChatBot(props) {
       if (assetClass && e.asset.classification !== assetClass) return false;
       if (deptMatch && e.employee.department !== deptMatch) return false;
       if (nameMatch && e.employee.name !== nameMatch) return false;
+      if (resignFilter && !e.employee.profile.resignPlanned) return false;
+      if (transferFilter && !e.employee.profile.recentTransfer) return false;
+      if (warningFilter && e.employee.profile.warningCount === 0) return false;
+      if (lowPerfFilter && e.employee.profile.performanceRating !== "D") return false;
+      if (nightFilter) { var h = e.timestamp.getHours(); if (h >= 7 && h < 22) return false; }
+      if (weekendFilter) { var d = e.timestamp.getDay(); if (d !== 0 && d !== 6) return false; }
+      if (unauthorizedFilter && !e.roleMismatch) return false;
+      if (compoundFilter && !e.compoundThreat) return false;
+      if (empTypeFilter && e.employee.employmentType !== empTypeFilter) return false;
       return true;
     });
 
@@ -1216,6 +1243,15 @@ function SecurityChatBot(props) {
     if (assetClass) descParts.push("자산등급: " + assetClass);
     if (deptMatch) descParts.push("부서: " + deptMatch);
     if (nameMatch) descParts.push("이름: " + nameMatch);
+    if (resignFilter) descParts.push("퇴사예정자");
+    if (transferFilter) descParts.push("최근 부서이동");
+    if (warningFilter) descParts.push("경고이력 보유");
+    if (lowPerfFilter) descParts.push("저성과(D등급)");
+    if (nightFilter) descParts.push("야간 접근");
+    if (weekendFilter) descParts.push("주말 접근");
+    if (unauthorizedFilter) descParts.push("권한외 접근");
+    if (compoundFilter) descParts.push("복합 위협");
+    if (empTypeFilter) descParts.push("고용형태: " + empTypeFilter);
 
     // Determine result type
     var isLinkQuery = eventTypeMatch === "Share Link Created" && (q.indexOf("링크 목록") >= 0 || q.indexOf("링크 정리") >= 0 || q.indexOf("목록") >= 0);
@@ -1247,7 +1283,12 @@ function SecurityChatBot(props) {
         if (result.filtered.length === 0) {
           setMessages(function(prev) { return prev.concat([{ role: "ai", text: "조건에 맞는 이벤트가 없습니다.\n\n조건: " + result.description + "\n\n다른 조건으로 다시 질의해 주세요.", type: "text", ts: new Date() }]); });
         } else {
-          setMessages(function(prev) { return prev.concat([{ role: "ai", text: "총 **" + result.filtered.length + "건** 검색되었습니다.\n조건: " + result.description, type: "table", data: result.filtered, isLinkList: result.isLinkList, ts: new Date() }]); });
+          var avgScore = Math.round(result.filtered.reduce(function(s,e){return s+e.riskScore;},0)/result.filtered.length);
+          var critCount = result.filtered.filter(function(e){return e.riskScore>=90;}).length;
+          var deptDist = {};result.filtered.forEach(function(e){deptDist[e.employee.department]=(deptDist[e.employee.department]||0)+1;});
+          var topDept = Object.keys(deptDist).sort(function(a,b){return deptDist[b]-deptDist[a];})[0];
+          var summary = "총 **" + result.filtered.length + "건** 검색\n조건: " + result.description + "\n\n📊 평균 위험점수: **" + avgScore + "점** | 90점+ 위험: **" + critCount + "건** | 최다 부서: **" + (topDept||"-") + "** (" + (deptDist[topDept]||0) + "건)";
+          setMessages(function(prev) { return prev.concat([{ role: "ai", text: summary, type: "table", data: result.filtered, isLinkList: result.isLinkList, ts: new Date() }]); });
         }
       }
     }, 700);
@@ -1291,7 +1332,7 @@ function SecurityChatBot(props) {
                             <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>자산</th>
                             <th style={{ textAlign: "center", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>위험도</th>
                           </tr></thead>
-                          <tbody>{m.data.slice(0, 20).map(function(ev) {
+                          <tbody>{m.data.slice(0, 50).map(function(ev) {
                             return (
                               <tr key={ev.id} onClick={function() { onSelectEvent(ev.id); }} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "background 0.2s" }}
                                 onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(10,132,255,0.08)"; }}
@@ -1318,7 +1359,7 @@ function SecurityChatBot(props) {
                             <th style={{ textAlign: "center", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>위험도</th>
                             <th style={{ textAlign: "left", padding: "5px 6px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>시간</th>
                           </tr></thead>
-                          <tbody>{m.data.slice(0, 20).map(function(ev, ei) {
+                          <tbody>{m.data.slice(0, 50).map(function(ev, ei) {
                             var sc = sevColors[ev.eventType.severity] || "#fff";
                             return (
                               <tr key={ev.id} onClick={function() { onSelectEvent(ev.id); }} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "background 0.2s" }}
@@ -1335,7 +1376,7 @@ function SecurityChatBot(props) {
                             );
                           })}</tbody>
                         </table>
-                        {m.data.length > 20 && <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 6 }}>외 {m.data.length - 20}건 더 있음</div>}
+                        {m.data.length > 50 && <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: 6 }}>외 {m.data.length - 50}건 더 있음</div>}
                       </div>
                     )}
                     <div style={{ marginTop: 8, fontSize: 10, color: "rgba(10,132,255,0.6)" }}>💡 행을 클릭하면 해당 이벤트의 상세 정보를 확인할 수 있습니다</div>
@@ -1360,7 +1401,7 @@ function SecurityChatBot(props) {
 
       {/* Quick actions */}
       <div style={{ padding: "6px 16px", display: "flex", gap: 5, flexWrap: "wrap", flexShrink: 0 }}>
-        {["위험점수 80점 이상 정리", "외부 공유 링크 목록", "USB 복사 이벤트", "심각 등급 이벤트", "기밀 자산 접근"].map(function(q) {
+        {["위험점수 80점 이상", "퇴사예정자 이벤트", "야간 접근 목록", "복합 위협 건", "권한외 접근", "외주 직원 이벤트", "USB 복사", "외부 AI 업로드", "기밀 자산 접근", "경고이력 보유자"].map(function(q) {
           return <button key={q} onClick={function() { setInput(q); }} style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", fontSize: 10, cursor: "pointer", transition: "all 0.2s" }}
             onMouseEnter={function(e) { e.currentTarget.style.borderColor = "rgba(10,132,255,0.3)"; e.currentTarget.style.color = "#5ac8fa"; }}
             onMouseLeave={function(e) { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}>
