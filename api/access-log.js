@@ -30,8 +30,14 @@ export default async function handler(req, res) {
         body: JSON.stringify(logData),
         redirect: "follow",
       });
-      const data = await response.json();
-      return res.status(200).json({ success: true, ...data });
+      const text = await response.text();
+      try {
+        const data = JSON.parse(text);
+        return res.status(200).json({ success: true, ...data });
+      } catch {
+        // Apps Script 리다이렉트 응답 — 데이터는 전송됨
+        return res.status(200).json({ success: true, result: "logged" });
+      }
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }
