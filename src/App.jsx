@@ -179,8 +179,25 @@ function PasswordGate({ onBack, children }) {
   );
 }
 
+// 접속 로그 전송 (Google Sheets)
+function logAccess(showcase) {
+  try {
+    fetch("/api/access-log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        showcase: showcase,
+        accessTime: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
+        userAgent: navigator.userAgent,
+        screenSize: window.innerWidth + "x" + window.innerHeight,
+      }),
+    }).catch(function() {});  // 실패해도 무시 (로그이므로)
+  } catch (e) {}
+}
+
 export default function App() {
-  const [page, setPage] = useState("portal");
+  const [page, setPageRaw] = useState("portal");
+  const setPage = (p) => { if (p !== "portal") logAccess(p); setPageRaw(p); };
   const [theme, setTheme] = useState("dark");
   const t = THEMES[theme];
   const [requestModal, setRequestModal] = useState(false);
