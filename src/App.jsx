@@ -349,24 +349,29 @@ export default function App() {
   const STATUS_COLORS = { "접수": "#10b981", "검토중": "#f59e0b", "진행중": "#3b82f6", "완료": "#6366f1", "보류": "#ef4444" };
   const CAT_COLORS = { "Security": "#10b981", "Finance": "#6366f1", "AI / ML": "#f43f5e", "Data": "#06b6d4", "DevOps": "#f59e0b", "기타": "#94a3b8" };
 
-  // Offering 페이지 (5개 MVP)
+  // 카드 클릭 → 비밀번호 → Offering
   const OFFERING_IDS = ["claimsNewBackup", "security", "firewall", "crawling", "aidata"];
-  const offeringMatch = page.startsWith("offering_") ? page.replace("offering_", "") : null;
-  if (offeringMatch && OFFERING_IDS.includes(offeringMatch)) {
-    const protoMap = { claimsNewBackup: "claimsNewBackup", security: "security", firewall: "firewall", crawling: "crawling", aidata: "aidata" };
-    return <Offering id={offeringMatch} onBack={() => setPage("portal")} onEnter={() => setPage(protoMap[offeringMatch])} />;
+  const pwOfferingMatch = page.startsWith("pw_offering_") ? page.replace("pw_offering_", "") : null;
+  if (pwOfferingMatch && OFFERING_IDS.includes(pwOfferingMatch)) {
+    return <PasswordGate onBack={() => setPage("portal")}><Offering id={pwOfferingMatch} onBack={() => setPage("portal")} onEnter={() => setPage(pwOfferingMatch)} /></PasswordGate>;
   }
 
-  // 프로토타입 페이지 (비밀번호 보호)
+  // Offering에서 직접 진입 (이미 비밀번호 통과)
+  const offeringMatch = page.startsWith("offering_") ? page.replace("offering_", "") : null;
+  if (offeringMatch && OFFERING_IDS.includes(offeringMatch)) {
+    return <Offering id={offeringMatch} onBack={() => setPage("portal")} onEnter={() => setPage(offeringMatch)} />;
+  }
+
+  // 프로토타입 페이지 (Offering에서 진입 시 비밀번호 이미 통과)
   if (page === "claims") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentMVP onBack={() => setPage("portal")} /></PasswordGate>;
-  if (page === "security") return <PasswordGate onBack={() => setPage("offering_security")}><SecurityDashboard onBack={() => setPage("offering_security")} /></PasswordGate>;
-  if (page === "firewall") return <PasswordGate onBack={() => setPage("offering_firewall")}><AIFirewall onBack={() => setPage("offering_firewall")} /></PasswordGate>;
+  if (page === "security") return <SecurityDashboard onBack={() => setPage("offering_security")} />;
+  if (page === "firewall") return <AIFirewall onBack={() => setPage("offering_firewall")} />;
   if (page === "food") return <PasswordGate onBack={() => setPage("portal")}><FoodPlatform onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "claimsNew") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentNew onBack={() => setPage("portal")} /></PasswordGate>;
-  if (page === "claimsNewBackup") return <PasswordGate onBack={() => setPage("offering_claimsNewBackup")}><ClaimsAgentNew onBack={() => setPage("offering_claimsNewBackup")} /></PasswordGate>;
+  if (page === "claimsNewBackup") return <ClaimsAgentNew onBack={() => setPage("offering_claimsNewBackup")} />;
   if (page === "stockpilot") return <PasswordGate onBack={() => setPage("portal")}><StockPilot onBack={() => setPage("portal")} /></PasswordGate>;
-  if (page === "crawling") return <PasswordGate onBack={() => setPage("offering_crawling")}><CrawlingCenter onBack={() => setPage("offering_crawling")} /></PasswordGate>;
-  if (page === "aidata") return <PasswordGate onBack={() => setPage("offering_aidata")}><AIReadyData onBack={() => setPage("offering_aidata")} /></PasswordGate>;
+  if (page === "crawling") return <CrawlingCenter onBack={() => setPage("offering_crawling")} />;
+  if (page === "aidata") return <AIReadyData onBack={() => setPage("offering_aidata")} />;
   if (page === "koreaJobs") return (
     <PasswordGate onBack={() => setPage("portal")}>
       <div style={{width:"100%",height:"100vh",position:"relative"}}>
@@ -616,7 +621,7 @@ export default function App() {
             return (
               <div
                 key={mvp.id}
-                onClick={() => isClickable && setPage(hasOffering ? "offering_" + mvp.id : mvp.id)}
+                onClick={() => isClickable && setPage(hasOffering ? "pw_offering_" + mvp.id : mvp.id)}
                 style={{
                   background: mvp.gradient, borderRadius: 18, padding: "24px 22px", border: `1px solid ${mvp.border}`,
                   cursor: isClickable ? "pointer" : "default", transition: "all .3s", position: "relative", overflow: "hidden",
