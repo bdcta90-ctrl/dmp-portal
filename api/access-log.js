@@ -1,7 +1,13 @@
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbyHqeoSHB7-N4LAQUB6mtVPLshGgcyzubQ9YorvjeFk1twR5WLpRicUP66IwJsQWin1fw/exec";
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowed = ["https://dmp-portal.vercel.app", "https://dmp-portal.vercel.app/"];
+  const origin = req.headers.origin || "";
+  if (allowed.some(a => origin.startsWith(a))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "https://dmp-portal.vercel.app");
+  }
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
