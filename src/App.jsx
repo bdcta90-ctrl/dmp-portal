@@ -621,7 +621,7 @@ export default function App() {
             return (
               <div
                 key={mvp.id}
-                onClick={() => isClickable && setPage(hasOffering ? "pw_offering_" + mvp.id : mvp.id)}
+                onClick={() => { if(!isClickable) return; sessionStorage.removeItem("dmp_gate_token"); setPage(hasOffering ? "pw_offering_" + mvp.id : mvp.id); }}
                 style={{
                   background: mvp.gradient, borderRadius: 18, padding: "24px 22px", border: `1px solid ${mvp.border}`,
                   cursor: isClickable ? "pointer" : "default", transition: "all .3s", position: "relative", overflow: "hidden",
