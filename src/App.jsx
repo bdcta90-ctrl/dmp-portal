@@ -5,6 +5,8 @@ import AIFirewall from "./AIFirewall.jsx";
 import StockPilot from "./StockPilot.jsx";
 import ClaimsAgentNew from "./ClaimsAgentNew.jsx";
 import FoodPlatform from "./FoodPlatform.jsx";
+import CrawlingCenter from "./CrawlingCenter.jsx";
+import AIReadyData from "./AIReadyData.jsx";
 
 const THEMES = {
   dark: {
@@ -167,6 +169,34 @@ const MVPS = [
     gradient: "linear-gradient(135deg,rgba(244,63,94,0.08),rgba(251,146,60,0.06))",
     border: "rgba(244,63,94,0.2)",
   },
+  {
+    id: "crawling",
+    category: "DATA",
+    catColor: "#06b6d4",
+    icon: "🔬",
+    iconBg: "linear-gradient(135deg,#06b6d4,#3b82f6)",
+    title: "데이터 크롤링 센터",
+    desc: "AI 기반 데이터 소스 추천 · Firecrawl 자동 수집 · AI 정제 · 데이터셋 구축까지 원스톱 데이터 수집 플랫폼",
+    tags: ["크롤링", "AI추천", "데이터수집"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(6,182,212,0.08),rgba(59,130,246,0.06))",
+    border: "rgba(6,182,212,0.2)",
+  },
+  {
+    id: "aidata",
+    category: "DATA",
+    catColor: "#8b5cf6",
+    icon: "🧬",
+    iconBg: "linear-gradient(135deg,#8b5cf6,#6366f1)",
+    title: "AI Ready Data 플랫폼",
+    desc: "보험·손해사정 도메인 특화 8개 데이터셋 · 자동 크롤링 파이프라인 · 품질 대시보드 · API 제공",
+    tags: ["AI데이터", "품질관리", "파이프라인"],
+    date: "2025.03",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(139,92,246,0.08),rgba(99,102,241,0.06))",
+    border: "rgba(139,92,246,0.2)",
+  },
 ];
 
 // SHA-256 해시 (비밀번호 평문 노출 방지)
@@ -327,6 +357,8 @@ export default function App() {
   if (page === "claimsNew") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentNew onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "claimsNewBackup") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
   if (page === "stockpilot") return <PasswordGate onBack={() => setPage("portal")}><StockPilot onBack={() => setPage("portal")} /></PasswordGate>;
+  if (page === "crawling") return <CrawlingCenter onBack={() => setPage("portal")} />;
+  if (page === "aidata") return <AIReadyData onBack={() => setPage("portal")} />;
   if (page === "koreaJobs") return (
     <PasswordGate onBack={() => setPage("portal")}>
       <div style={{width:"100%",height:"100vh",position:"relative"}}>
@@ -571,7 +603,7 @@ export default function App() {
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "security" || mvp.id === "firewall" || mvp.id === "food" || mvp.id === "claimsNew" || mvp.id === "claimsNewBackup" || mvp.id === "stockpilot" || mvp.id === "koreaJobs";
+            const isClickable = mvp.id === "security" || mvp.id === "firewall" || mvp.id === "food" || mvp.id === "claimsNew" || mvp.id === "claimsNewBackup" || mvp.id === "stockpilot" || mvp.id === "koreaJobs" || mvp.id === "crawling" || mvp.id === "aidata";
             return (
               <div
                 key={mvp.id}
