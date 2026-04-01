@@ -199,87 +199,85 @@ const MVPS = [
   },
 ];
 
-// SHA-256 해시 (비밀번호 평문 노출 방지)
-async function sha256Gate(text){
-  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-const GATE_PW_HASH="72137cfc58359eb5bfb940d091c9b7179cea8f84b6fb2d5b4977d482d1fa4c4a";
-const GATE_MAX_ATTEMPTS=5;
-const GATE_LOCKOUT_MIN=30;
-const GATE_LOCKOUT_KEY="dmp_gate_lockout";
+// 서버사이드 인증 (비밀번호 해시·검증 모두 서버에서 처리)
+const GATE_TOKEN_KEY="dmp_gate_token";
 const GATE_AUTO_LOGOUT_MS=15*60*1000;
 
 function PasswordGate({ onBack, children }) {
   const [pw, setPw] = useState("");
-  const [unlocked, setUnlocked] = useState(()=>{try{return sessionStorage.getItem("dmp_gate_auth")==="1";}catch{return false;}});
+  const [unlocked, setUnlocked] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [shake, setShake] = useState(false);
   const [locked, setLocked] = useState(false);
   const [remaining, setRemaining] = useState(0);
+  const [attemptsInfo, setAttemptsInfo] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef(null);
 
-  // 차단 상태 확인
+  // 기존 토큰 검증 (페이지 로드 시)
   useEffect(()=>{
-    try{
-      const lo=JSON.parse(localStorage.getItem(GATE_LOCKOUT_KEY)||"{}");
-      if(lo.until>Date.now()){
-        setLocked(true);
-        const iv=setInterval(()=>{
-          const left=Math.max(0,Math.ceil((lo.until-Date.now())/1000));
-          setRemaining(left);
-          if(left<=0){setLocked(false);localStorage.removeItem(GATE_LOCKOUT_KEY);clearInterval(iv);}
-        },1000);
-        return()=>clearInterval(iv);
-      }
-    }catch{}
+    const token=sessionStorage.getItem(GATE_TOKEN_KEY);
+    if(!token){setChecking(false);return;}
+    fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"verify",token})})
+      .then(r=>r.json())
+      .then(d=>{if(d.valid)setUnlocked(true);else sessionStorage.removeItem(GATE_TOKEN_KEY);})
+      .catch(()=>sessionStorage.removeItem(GATE_TOKEN_KEY))
+      .finally(()=>setChecking(false));
   },[]);
+
+  // 잠금 카운트다운
+  useEffect(()=>{
+    if(!locked||remaining<=0)return;
+    const iv=setInterval(()=>{
+      setRemaining(r=>{if(r<=1){setLocked(false);clearInterval(iv);return 0;}return r-1;});
+    },1000);
+    return()=>clearInterval(iv);
+  },[locked]);
 
   // 자동 로그아웃 (15분 무활동)
   useEffect(()=>{
     if(!unlocked)return;
     let timer;
-    const logout=()=>{setUnlocked(false);try{sessionStorage.removeItem("dmp_gate_auth");}catch{}};
+    const logout=()=>{setUnlocked(false);sessionStorage.removeItem(GATE_TOKEN_KEY);};
     const reset=()=>{clearTimeout(timer);timer=setTimeout(logout,GATE_AUTO_LOGOUT_MS);};
     ["mousedown","keydown","touchstart","scroll"].forEach(e=>window.addEventListener(e,reset));
     reset();
     return()=>{clearTimeout(timer);["mousedown","keydown","touchstart","scroll"].forEach(e=>window.removeEventListener(e,reset));};
   },[unlocked]);
 
-  useEffect(()=>{if(!locked&&!unlocked)inputRef.current?.focus();},[locked,unlocked]);
+  useEffect(()=>{if(!locked&&!unlocked&&!checking)inputRef.current?.focus();},[locked,unlocked,checking]);
 
   const submit=async()=>{
-    if(locked)return;
-    let lo;try{lo=JSON.parse(localStorage.getItem(GATE_LOCKOUT_KEY)||"{}");}catch{lo={};}
-    if(lo.until>Date.now()){setLocked(true);return;}
-
-    const hash=await sha256Gate(pw);
-    if(hash===GATE_PW_HASH){
-      try{localStorage.removeItem(GATE_LOCKOUT_KEY);}catch{}
-      try{sessionStorage.setItem("dmp_gate_auth","1");}catch{}
-      setUnlocked(true);
-    }else{
-      const cnt=(lo.count||0)+1;
-      if(cnt>=GATE_MAX_ATTEMPTS){
-        const until=Date.now()+GATE_LOCKOUT_MIN*60*1000;
-        try{localStorage.setItem(GATE_LOCKOUT_KEY,JSON.stringify({count:cnt,until}));}catch{}
-        setLocked(true);setRemaining(GATE_LOCKOUT_MIN*60);
-        setErrorMsg(`${GATE_MAX_ATTEMPTS}회 실패 — ${GATE_LOCKOUT_MIN}분 차단`);
+    if(locked||submitting||!pw)return;
+    setSubmitting(true);
+    try{
+      const res=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",password:pw})});
+      const data=await res.json();
+      if(data.success&&data.token){
+        sessionStorage.setItem(GATE_TOKEN_KEY,data.token);
+        setUnlocked(true);setAttemptsInfo(null);
+      }else if(data.error==="locked"){
+        setLocked(true);setRemaining(data.remaining||1800);
+        setErrorMsg(data.message||"차단됨");setError(true);setShake(true);setPw("");
+      }else if(data.error==="wrong"){
+        setAttemptsInfo({count:data.attempts,max:data.maxAttempts});
+        setErrorMsg(`비밀번호 오류 (${data.attempts}/${data.maxAttempts}회)`);
+        setError(true);setShake(true);setPw("");
       }else{
-        try{localStorage.setItem(GATE_LOCKOUT_KEY,JSON.stringify({count:cnt,until:0}));}catch{}
-        setErrorMsg(`비밀번호 오류 (${cnt}/${GATE_MAX_ATTEMPTS}회)`);
+        setErrorMsg("인증 오류");setError(true);setShake(true);setPw("");
       }
-      setError(true);setShake(true);setPw("");
       setTimeout(()=>setShake(false),500);
       setTimeout(()=>setError(false),3000);
-    }
+    }catch(e){
+      setErrorMsg("서버 연결 실패");setError(true);
+      setTimeout(()=>setError(false),3000);
+    }finally{setSubmitting(false);}
   };
 
-  if (unlocked) return children;
-
-  let attemptsLeft=GATE_MAX_ATTEMPTS;
-  try{const lo=JSON.parse(localStorage.getItem(GATE_LOCKOUT_KEY)||"{}");attemptsLeft=GATE_MAX_ATTEMPTS-(lo.count||0);}catch{}
+  if(checking)return(<div style={{width:"100%",height:"100vh",background:"#0a0a0f",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"rgba(255,255,255,0.3)",fontSize:13}}>인증 확인 중...</div></div>);
+  if(unlocked)return children;
 
   return (
     <div style={{width:"100%",height:"100vh",background:"#0a0a0f",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Pretendard',sans-serif"}}>
@@ -289,7 +287,7 @@ function PasswordGate({ onBack, children }) {
 
         {locked?(
           <div>
-            <div style={{fontSize:12,color:"#ef4444",marginBottom:16}}>비밀번호 {GATE_MAX_ATTEMPTS}회 연속 실패</div>
+            <div style={{fontSize:12,color:"#ef4444",marginBottom:16}}>{errorMsg}</div>
             <div style={{fontSize:32,fontWeight:800,color:"#ef4444",fontFamily:"monospace"}}>{Math.floor(remaining/60)}:{String(remaining%60).padStart(2,"0")}</div>
             <div style={{fontSize:10,color:"rgba(255,255,255,0.3)",marginTop:8}}>남은 차단 시간</div>
             <button onClick={onBack} style={{marginTop:20,padding:"10px 24px",borderRadius:10,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",color:"rgba(255,255,255,0.5)",fontSize:12,cursor:"pointer"}}>← 돌아가기</button>
@@ -304,10 +302,10 @@ function PasswordGate({ onBack, children }) {
                 style={{width:"100%",padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,0.05)",border:error?"2px solid #ef4444":"1px solid rgba(255,255,255,0.1)",color:"#fff",fontSize:14,outline:"none",textAlign:"center",letterSpacing:8,fontFamily:"monospace",boxSizing:"border-box"}}/>
             </div>
             {error&&<div style={{fontSize:11,color:"#ef4444",marginTop:8,animation:"fadeIn .2s"}}>{errorMsg}</div>}
-            {!error&&attemptsLeft<GATE_MAX_ATTEMPTS&&attemptsLeft>0&&<div style={{fontSize:10,color:"#f59e0b",marginTop:8}}>남은 시도: {attemptsLeft}회</div>}
+            {!error&&attemptsInfo&&attemptsInfo.count>0&&<div style={{fontSize:10,color:"#f59e0b",marginTop:8}}>남은 시도: {attemptsInfo.max-attemptsInfo.count}회</div>}
             <div style={{display:"flex",gap:8,marginTop:20}}>
               <button onClick={onBack} style={{flex:1,padding:"12px 0",borderRadius:10,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",color:"rgba(255,255,255,0.5)",fontSize:13,fontWeight:600,cursor:"pointer"}}>← 돌아가기</button>
-              <button onClick={submit} style={{flex:1,padding:"12px 0",borderRadius:10,border:"none",background:"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>확인</button>
+              <button onClick={submit} disabled={submitting} style={{flex:1,padding:"12px 0",borderRadius:10,border:"none",background:submitting?"#334155":"linear-gradient(135deg,#3b82f6,#6366f1)",color:"#fff",fontSize:13,fontWeight:700,cursor:submitting?"wait":"pointer"}}>{submitting?"확인 중...":"확인"}</button>
             </div>
           </>
         )}
