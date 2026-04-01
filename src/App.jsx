@@ -120,7 +120,7 @@ const MVPS = [
     icon: "🧬",
     iconBg: "linear-gradient(135deg,#8b5cf6,#6366f1)",
     title: "AI Ready Data 플랫폼",
-    desc: "보험·손해사정 도메인 특화 8개 데이터셋 · 자동 크롤링 파이프라인 · 품질 대시보드 · API 제공",
+    desc: "보험·손해사정 도메인 특화 8개 데이터셋 · 자동 크롤링 파이프라인 · 품질 대시보드 · 데이터 판매 · API 제공",
     tags: ["AI데이터", "품질관리", "파이프라인"],
     date: "2025.03",
     status: "Live",
@@ -204,7 +204,7 @@ async function sha256Gate(text){
   const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(text));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
 }
-const GATE_PW_HASH="7b55daf9dfc6646eba69ef4d431a20c58ee679c47e291076e460a8ab48af4889";
+const GATE_PW_HASH="72137cfc58359eb5bfb940d091c9b7179cea8f84b6fb2d5b4977d482d1fa4c4a";
 const GATE_MAX_ATTEMPTS=5;
 const GATE_LOCKOUT_MIN=30;
 const GATE_LOCKOUT_KEY="dmp_gate_lockout";
@@ -351,14 +351,14 @@ export default function App() {
   const CAT_COLORS = { "Security": "#10b981", "Finance": "#6366f1", "AI / ML": "#f43f5e", "Data": "#06b6d4", "DevOps": "#f59e0b", "기타": "#94a3b8" };
 
   if (page === "claims") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentMVP onBack={() => setPage("portal")} /></PasswordGate>;
-  if (page === "security") return <SecurityDashboard onBack={() => setPage("portal")} />;
-  if (page === "firewall") return <AIFirewall onBack={() => setPage("portal")} />;
+  if (page === "security") return <PasswordGate onBack={() => setPage("portal")}><SecurityDashboard onBack={() => setPage("portal")} /></PasswordGate>;
+  if (page === "firewall") return <PasswordGate onBack={() => setPage("portal")}><AIFirewall onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "food") return <PasswordGate onBack={() => setPage("portal")}><FoodPlatform onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "claimsNew") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentNew onBack={() => setPage("portal")} /></PasswordGate>;
-  if (page === "claimsNewBackup") return <ClaimsAgentNew onBack={() => setPage("portal")} />;
+  if (page === "claimsNewBackup") return <PasswordGate onBack={() => setPage("portal")}><ClaimsAgentNew onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "stockpilot") return <PasswordGate onBack={() => setPage("portal")}><StockPilot onBack={() => setPage("portal")} /></PasswordGate>;
-  if (page === "crawling") return <CrawlingCenter onBack={() => setPage("portal")} />;
-  if (page === "aidata") return <AIReadyData onBack={() => setPage("portal")} />;
+  if (page === "crawling") return <PasswordGate onBack={() => setPage("portal")}><CrawlingCenter onBack={() => setPage("portal")} /></PasswordGate>;
+  if (page === "aidata") return <PasswordGate onBack={() => setPage("portal")}><AIReadyData onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "koreaJobs") return (
     <PasswordGate onBack={() => setPage("portal")}>
       <div style={{width:"100%",height:"100vh",position:"relative"}}>
