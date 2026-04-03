@@ -75,6 +75,7 @@ const OFFERINGS = {
       { step: "04", title: "자동 대응", desc: "플레이북 기반 조치 실행" },
     ],
     cta: "프로토타입 체험하기",
+    bizPlan: "/docs/IRIS_사업기획서_KT제안.md",
   },
   firewall: {
     badge: "AI GOVERNANCE",
@@ -207,8 +208,74 @@ function FadeIn({ children, delay = 0, style }) {
   return <div ref={ref} style={{ opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(30px)", transition: "all .7s cubic-bezier(.16,1,.3,1)", ...style }}>{children}</div>;
 }
 
+// ─── 마크다운 뷰어 (사업기획서용) ───
+function BizPlanViewer({ url, onClose }) {
+  const [md, setMd] = useState("");
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(url).then(r => r.text()).then(t => { setMd(t); setLoading(false); }).catch(() => { setMd("문서를 불러올 수 없습니다."); setLoading(false); });
+  }, [url]);
+
+  // 간이 마크다운 → HTML 변환
+  const toHtml = (text) => {
+    return text
+      .replace(/^### (.+)$/gm, '<h3 style="font-size:16px;font-weight:700;margin:28px 0 12px;color:#1a1a1a;border-bottom:1px solid #e5e5e5;padding-bottom:8px">$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2 style="font-size:20px;font-weight:800;margin:36px 0 16px;color:#0a0a0f;border-bottom:2px solid #0a0a0f;padding-bottom:8px">$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1 style="font-size:28px;font-weight:900;margin:0 0 8px;color:#0a0a0f">$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\|(.+)\|/g, (match) => {
+        const cells = match.split("|").filter(c => c.trim());
+        if (cells.every(c => /^[\s:-]+$/.test(c))) return "";
+        const isHeader = cells.some(c => /^\*\*/.test(c.trim()));
+        const tag = isHeader ? "th" : "td";
+        const style = isHeader
+          ? 'style="padding:8px 12px;text-align:left;font-size:12px;font-weight:700;background:#f1f5f9;border-bottom:2px solid #cbd5e1;white-space:nowrap"'
+          : 'style="padding:8px 12px;text-align:left;font-size:12px;border-bottom:1px solid #e2e8f0;color:#334155"';
+        return `<tr>${cells.map(c => `<${tag} ${style}>${c.trim()}</${tag}>`).join("")}</tr>`;
+      })
+      .replace(/(<tr>.*<\/tr>\n?)+/g, (match) => `<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">${match}</table>`)
+      .replace(/^> (.+)$/gm, '<blockquote style="border-left:3px solid #6366f1;padding:12px 16px;margin:16px 0;background:#f8fafc;font-size:13px;color:#475569;font-style:italic">$1</blockquote>')
+      .replace(/^```[\s\S]*?```$/gm, (match) => {
+        const code = match.replace(/^```\w*\n?/, "").replace(/\n?```$/, "");
+        return `<pre style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:8px;font-size:11px;overflow-x:auto;line-height:1.5;margin:12px 0;font-family:monospace">${code}</pre>`;
+      })
+      .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e5e5e5;margin:32px 0">')
+      .replace(/^- (.+)$/gm, '<li style="font-size:13px;margin:4px 0;color:#334155;list-style:disc;margin-left:20px">$1</li>')
+      .replace(/^(\d+)\. (.+)$/gm, '<li style="font-size:13px;margin:4px 0;color:#334155;list-style:decimal;margin-left:20px">$2</li>')
+      .replace(/\n\n/g, '<br/><br/>')
+      .replace(/\n/g, '<br/>');
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,.5)", display: "flex", justifyContent: "center", alignItems: "flex-start", overflow: "auto", padding: "40px 20px" }}>
+      <div style={{ background: "#fff", borderRadius: 16, maxWidth: 960, width: "100%", maxHeight: "calc(100vh - 80px)", overflow: "auto", boxShadow: "0 25px 50px rgba(0,0,0,.25)", position: "relative" }}>
+        {/* 헤더 */}
+        <div style={{ position: "sticky", top: 0, background: "#fff", borderBottom: "1px solid #e5e5e5", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, borderRadius: "16px 16px 0 0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 20 }}>📋</span>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#0a0a0f", fontFamily: FONT }}>IRIS 사업기획서</div>
+              <div style={{ fontSize: 11, color: "#999", fontFamily: FONT }}>Internal Risk Identification System — KT 제안</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#999", padding: "4px 8px" }}>×</button>
+        </div>
+        {/* 본문 */}
+        <div style={{ padding: "32px 40px 48px", fontFamily: FONT }}>
+          {loading ? (
+            <div style={{ textAlign: "center", padding: 60, color: "#999" }}>불러오는 중...</div>
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: toHtml(md) }} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Offering({ id, onBack, onEnter }) {
   const data = OFFERINGS[id];
+  const [showBizPlan, setShowBizPlan] = useState(false);
   if (!data) return null;
 
   const sectionStyle = { maxWidth: 1080, margin: "0 auto", padding: "0 40px" };
@@ -220,7 +287,10 @@ export default function Offering({ id, onBack, onEnter }) {
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "16px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(250,250,250,.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(0,0,0,.06)" }}>
         <button onClick={onBack} style={{ background: "none", border: "none", color: C.sub, fontSize: 13, cursor: "pointer", fontFamily: FONT, fontWeight: 500 }}>← 포털</button>
         <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: C.muted }}>{data.badge}</span>
-        <button onClick={onEnter} style={{ padding: "8px 20px", borderRadius: 6, border: "none", background: C.dark, color: C.white, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>{data.cta}</button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {data.bizPlan && <button onClick={() => setShowBizPlan(true)} style={{ padding: "8px 20px", borderRadius: 6, border: `1.5px solid ${C.dark}`, background: "transparent", color: C.dark, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>사업기획서</button>}
+          <button onClick={onEnter} style={{ padding: "8px 20px", borderRadius: 6, border: "none", background: C.dark, color: C.white, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>{data.cta}</button>
+        </div>
       </nav>
 
       {/* ─── HERO ─── */}
@@ -322,11 +392,20 @@ export default function Offering({ id, onBack, onEnter }) {
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: C.muted, marginBottom: 16, fontFamily: MONO }}>PROTOTYPE</div>
           <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 800, marginBottom: 16, letterSpacing: -0.5 }}>직접 체험해보세요</h2>
           <p style={{ fontSize: 14, color: C.sub, marginBottom: 36 }}>실제 작동하는 프로토타입을 바로 사용할 수 있습니다</p>
-          <button onClick={onEnter} style={{ padding: "16px 48px", borderRadius: 8, border: "none", background: C.dark, color: C.white, fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: FONT, letterSpacing: 0.5, transition: "all .2s" }}
-            onMouseEnter={e => e.currentTarget.style.background = "#333"}
-            onMouseLeave={e => e.currentTarget.style.background = C.dark}>
-            {data.cta} →
-          </button>
+          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+            <button onClick={onEnter} style={{ padding: "16px 48px", borderRadius: 8, border: "none", background: C.dark, color: C.white, fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: FONT, letterSpacing: 0.5, transition: "all .2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#333"}
+              onMouseLeave={e => e.currentTarget.style.background = C.dark}>
+              {data.cta} →
+            </button>
+            {data.bizPlan && (
+              <button onClick={() => setShowBizPlan(true)} style={{ padding: "16px 48px", borderRadius: 8, border: `2px solid ${C.dark}`, background: "transparent", color: C.dark, fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: FONT, letterSpacing: 0.5, transition: "all .2s" }}
+                onMouseEnter={e => { e.currentTarget.style.background = C.dark; e.currentTarget.style.color = C.white; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = C.dark; }}>
+                사업기획서 →
+              </button>
+            )}
+          </div>
         </FadeIn>
       </section>
 
@@ -334,6 +413,11 @@ export default function Offering({ id, onBack, onEnter }) {
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "32px 0", textAlign: "center" }}>
         <div style={{ fontSize: 11, color: C.muted }}>© 2025 kt ds AX BD · Deny MVP Portal</div>
       </footer>
+
+      {/* ─── 사업기획서 모달 ─── */}
+      {showBizPlan && data.bizPlan && (
+        <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} />
+      )}
     </div>
   );
 }
