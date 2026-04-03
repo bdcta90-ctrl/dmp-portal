@@ -765,9 +765,9 @@ export default function Offering({ id, onBack, onEnter }) {
 
       {/* ─── 사업기획서 모달 ─── */}
       {showBizPlan && data.bizPlan && (
-        bizMode === "presentation"
+        bizMode === "presentation" && id === "security"
           ? <BizPlanPresentation onClose={() => setShowBizPlan(false)} onSwitch={() => setBizMode("document")} />
-          : <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} onSwitch={() => setBizMode("presentation")} />
+          : <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} onSwitch={id === "security" ? () => setBizMode("presentation") : null} />
       )}
     </div>
   );
