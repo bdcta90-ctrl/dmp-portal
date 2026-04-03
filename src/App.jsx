@@ -7,6 +7,8 @@ import ClaimsAgentNew from "./ClaimsAgentNew.jsx";
 import FoodPlatform from "./FoodPlatform.jsx";
 import CrawlingCenter from "./CrawlingCenter.jsx";
 import AIReadyData from "./AIReadyData.jsx";
+import GenieKids from "./GenieKids.jsx";
+import SimReview from "./SimReview.jsx";
 import Offering from "./Offering.jsx";
 
 const THEMES = {
@@ -198,6 +200,34 @@ const MVPS = [
     gradient: "linear-gradient(135deg,rgba(244,63,94,0.08),rgba(251,146,60,0.06))",
     border: "rgba(244,63,94,0.2)",
   },
+  {
+    id: "genieKids",
+    category: "AI",
+    catColor: "#ec4899",
+    icon: "🧸",
+    iconBg: "linear-gradient(135deg,#ec4899,#f472b6)",
+    title: "지니야~?",
+    desc: "어린이용 AI 엔터테인먼트 플랫폼 · 인터랙티브 스토리 · AI 캐릭터 대화 · 교육 콘텐츠 · 차세대 핑크퐁/티니핑",
+    tags: ["AI Agent", "Kids", "엔터테인먼트"],
+    date: "2025.04",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(236,72,153,0.08),rgba(244,114,182,0.06))",
+    border: "rgba(236,72,153,0.2)",
+  },
+  {
+    id: "simReview",
+    category: "AI",
+    catColor: "#14b8a6",
+    icon: "⚖️",
+    iconBg: "linear-gradient(135deg,#14b8a6,#2dd4bf)",
+    title: "무엇이든 심사받으세요",
+    desc: "금융 · 부동산 · 법률/세무 · 보험/건강 · 사업/일상 분야를 AI가 심사 시뮬레이션하여 결과를 예측합니다",
+    tags: ["AI심사", "시뮬레이션", "멀티도메인"],
+    date: "2025.04",
+    status: "Live",
+    gradient: "linear-gradient(135deg,rgba(20,184,166,0.08),rgba(45,212,191,0.06))",
+    border: "rgba(20,184,166,0.2)",
+  },
 ];
 
 // 서버사이드 인증 (비밀번호 해시·검증 모두 서버에서 처리)
@@ -372,6 +402,8 @@ export default function App() {
   if (page === "stockpilot") return <PasswordGate onBack={() => setPage("portal")}><StockPilot onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "crawling") return <CrawlingCenter onBack={() => setPage("offering_crawling")} />;
   if (page === "aidata") return <AIReadyData onBack={() => setPage("offering_aidata")} />;
+  if (page === "genieKids") return <GenieKids onBack={() => setPage("portal")} />;
+  if (page === "simReview") return <SimReview onBack={() => setPage("portal")} />;
   if (page === "koreaJobs") return (
     <PasswordGate onBack={() => setPage("portal")}>
       <div style={{width:"100%",height:"100vh",position:"relative"}}>
@@ -616,7 +648,7 @@ export default function App() {
         <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: t.muted, marginBottom: 24 }}>MVP SHOWCASE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
-            const isClickable = mvp.id === "security" || mvp.id === "firewall" || mvp.id === "food" || mvp.id === "claimsNew" || mvp.id === "claimsNewBackup" || mvp.id === "stockpilot" || mvp.id === "koreaJobs" || mvp.id === "crawling" || mvp.id === "aidata";
+            const isClickable = mvp.id === "security" || mvp.id === "firewall" || mvp.id === "food" || mvp.id === "claimsNew" || mvp.id === "claimsNewBackup" || mvp.id === "stockpilot" || mvp.id === "koreaJobs" || mvp.id === "crawling" || mvp.id === "aidata" || mvp.id === "genieKids" || mvp.id === "simReview";
             const hasOffering = ["claimsNewBackup","security","firewall","crawling","aidata"].includes(mvp.id);
             return (
               <div
