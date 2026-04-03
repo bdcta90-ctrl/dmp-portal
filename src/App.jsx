@@ -383,13 +383,13 @@ export default function App() {
   const OFFERING_IDS = ["claimsNewBackup", "security", "firewall", "crawling", "aidata", "genieKids"];
   const pwOfferingMatch = page.startsWith("pw_offering_") ? page.replace("pw_offering_", "") : null;
   if (pwOfferingMatch && OFFERING_IDS.includes(pwOfferingMatch)) {
-    return <PasswordGate onBack={() => setPage("portal")}><Offering id={pwOfferingMatch} onBack={() => setPage("portal")} onEnter={() => setPage(pwOfferingMatch)} /></PasswordGate>;
+    return <PasswordGate onBack={() => setPage("portal")}><Offering key={pwOfferingMatch} id={pwOfferingMatch} onBack={() => setPage("portal")} onEnter={() => setPage(pwOfferingMatch)} /></PasswordGate>;
   }
 
   // Offering에서 직접 진입 (이미 비밀번호 통과)
   const offeringMatch = page.startsWith("offering_") ? page.replace("offering_", "") : null;
   if (offeringMatch && OFFERING_IDS.includes(offeringMatch)) {
-    return <Offering id={offeringMatch} onBack={() => setPage("portal")} onEnter={() => setPage(offeringMatch)} />;
+    return <Offering key={offeringMatch} id={offeringMatch} onBack={() => setPage("portal")} onEnter={() => setPage(offeringMatch)} />;
   }
 
   // 프로토타입 페이지 (Offering에서 진입 시 비밀번호 이미 통과)

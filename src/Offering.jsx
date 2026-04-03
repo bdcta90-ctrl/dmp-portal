@@ -764,10 +764,11 @@ export default function Offering({ id, onBack, onEnter }) {
       </footer>
 
       {/* ─── 사업기획서 모달 ─── */}
-      {showBizPlan && data.bizPlan && (
-        bizMode === "presentation" && id === "security"
-          ? <BizPlanPresentation onClose={() => setShowBizPlan(false)} onSwitch={() => setBizMode("document")} />
-          : <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} onSwitch={id === "security" ? () => setBizMode("presentation") : null} />
+      {showBizPlan && data.bizPlan && id === "security" && bizMode === "presentation" && (
+        <BizPlanPresentation onClose={() => setShowBizPlan(false)} onSwitch={() => setBizMode("document")} />
+      )}
+      {showBizPlan && data.bizPlan && !(id === "security" && bizMode === "presentation") && (
+        <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} onSwitch={id === "security" ? () => setBizMode("presentation") : null} />
       )}
     </div>
   );
