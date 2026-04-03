@@ -43,23 +43,23 @@ const OFFERINGS = {
     badge: "SECURITY",
     title: "내부 보안\n위험 식별",
     subtitle: "Insider Threat Detection",
-    tagline: "1,800명의 이상행위를 실시간으로 탐지합니다",
-    hero: "파일 열람, USB 복사, 대량 조회, 권한 상승.\nAI가 임직원 행동 패턴을 분석하고 위험을 선제적으로 차단합니다.",
+    tagline: "기존 보안 체계를 교체하지 않습니다.\n가장 취약한 곳에 AI 레이어를 올려, 이미 구축한 보안을 더 강하게 만듭니다.",
+    hero: "DLP, DRM, EPP, CCTV — 이미 갖추고 계십니다.\n하지만 내부자가 종이에 적거나, 사진을 찍는 유출은 막지 못합니다.\nIRIS는 기존 보안 위에 AI 상관분석을 올려, 기존 투자의 사각지대를 메웁니다.",
     problem: {
-      title: "내부 위협의 현실",
+      title: "기존 보안 체계의 사각지대",
       points: [
-        { num: "01", title: "사각지대", desc: "기존 SIEM은 외부 위협 중심, 내부자 이상행위 탐지 한계" },
-        { num: "02", title: "오탐 과다", desc: "단순 룰 기반 알림으로 보안팀 피로도 증가, 실제 위협 놓침" },
-        { num: "03", title: "대응 지연", desc: "위협 감지에서 조치까지 평균 72시간, 데이터 유출 이미 발생" },
-        { num: "04", title: "컨텍스트 부재", desc: "알림만 있고 왜 위험한지, 어떻게 대응할지 가이드 없음" },
+        { num: "01", title: "물리적 유출 무방비", desc: "DLP는 디지털만 감시합니다. 수기 기록, 사진 촬영, 출력물 반출은 탐지할 수 없습니다" },
+        { num: "02", title: "개별 솔루션 사일로", desc: "DLP·CCTV·출입통제·HR이 각각 운영되어, 교차 분석이 불가능합니다" },
+        { num: "03", title: "오탐 과다", desc: "단순 룰 기반 알림으로 보안팀 피로도 증가, 진짜 위협을 놓칩니다" },
+        { num: "04", title: "사후 대응", desc: "유출이 발생한 뒤에야 인지합니다. 퇴직 후 수개월 뒤 발각되기도 합니다" },
       ],
     },
     features: [
+      { icon: "🔗", title: "기존 보안 연동 강화", desc: "파수 DRM·소만사 DLP·안랩 EPP·한화비전 CCTV 등 이미 운영 중인 솔루션과 연동하여, 기존 투자의 가치를 높입니다" },
       { icon: "📡", title: "실시간 행위 분석", desc: "1,800명 임직원의 파일 접근·출력·외부 전송 행위를 실시간 모니터링합니다" },
       { icon: "🧠", title: "AI 리스크 스코어링", desc: "이벤트 심각도 × 자산 민감도 × 역할 불일치를 종합한 위험 점수를 산출합니다" },
       { icon: "🎯", title: "의도 추론 엔진", desc: "단순 실수인지 의도적 유출인지 행동 패턴과 맥락을 분석하여 판단합니다" },
       { icon: "📋", title: "10단계 대응 플레이북", desc: "관리자 확인부터 MFA 강제·접근 차단·포렌식·CISO 보고까지 자동 가이드합니다" },
-      { icon: "🔒", title: "자산 분류 관리", desc: "40+개 핵심 자산(DB·소스코드·계약서·재무)을 보안등급별로 분류 관리합니다" },
       { icon: "📊", title: "컴플라이언스 리포트", desc: "감사 대비 증적 자료와 대응 이력을 자동 생성하여 규제 준수를 지원합니다" },
     ],
     metrics: [
@@ -422,11 +422,15 @@ function BizPlanPresentation({ onClose, onSwitch }) {
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 600, background: "radial-gradient(circle,rgba(91,95,246,.12) 0%,transparent 70%)", pointerEvents: "none" }} />
         <Badge>KT DS AX BD</Badge>
         <h1 style={{ fontSize: "clamp(40px,7vw,72px)", fontWeight: 900, lineHeight: 1.05, letterSpacing: -2, marginBottom: 24, background: "linear-gradient(135deg,#f1f3f9 30%,#818cf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-          내부자 위협을<br/>AI로 식별합니다
+          기존 보안을<br/>더 강하게
         </h1>
-        <p style={{ fontSize: 18, color: D.sub, lineHeight: 1.7, maxWidth: 600, margin: "0 auto 48px" }}>
-          기밀을 종이에 적고, 사진을 찍고, 퇴직 시 반출하는<br/>물리적 유출은 기존 DLP로 막을 수 없습니다.
+        <p style={{ fontSize: 18, color: D.sub, lineHeight: 1.7, maxWidth: 640, margin: "0 auto 28px" }}>
+          DLP, DRM, EPP, CCTV — 이미 갖추고 계십니다.<br/>
+          하지만 내부자가 종이에 적거나 사진을 찍는 유출은 막지 못합니다.
         </p>
+        <div style={{ display: "inline-block", padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,rgba(91,95,246,.12),rgba(129,140,248,.08))", border: "1px solid rgba(91,95,246,.25)", marginBottom: 48 }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: D.accent2 }}>IRIS는 기존 보안 위에 AI 상관분석을 올려, 이미 투자한 보안의 사각지대를 메웁니다</span>
+        </div>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <button onClick={() => sRef.current?.querySelector("#sec-solution")?.scrollIntoView({ behavior: "smooth" })} style={{ padding: "14px 36px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#5b5ff6,#818cf8)", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>솔루션 보기</button>
           <button onClick={() => sRef.current?.querySelector("#sec-invest")?.scrollIntoView({ behavior: "smooth" })} style={{ padding: "14px 36px", borderRadius: 10, border: `1px solid ${D.border}`, background: "transparent", color: D.text, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>투자 계획</button>
@@ -472,12 +476,17 @@ function BizPlanPresentation({ onClose, onSwitch }) {
       <Section style={{ padding: "100px 40px" }}>
         <div id="sec-solution" style={{ marginTop: -80, paddingTop: 80 }} />
         <Badge>Solution</Badge>
-        <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>3가지 레이어로 차별화합니다</h2>
-        <p style={{ fontSize: 14, color: D.sub, marginBottom: 48, maxWidth: 600 }}>개별 기능은 경쟁사도 보유. IRIS의 차별화는 물리+디지털+인사 데이터의 통합 상관분석에 있습니다.</p>
+        <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>교체가 아닌 보강</h2>
+        <p style={{ fontSize: 14, color: D.sub, marginBottom: 20, maxWidth: 640 }}>파수 DRM · 소만사 DLP · 안랩 EPP · 한화비전 CCTV — 기존에 운영 중인 솔루션을 그대로 유지합니다. IRIS는 그 위에 AI 상관분석 레이어를 올려, 개별 솔루션이 혼자서는 잡지 못하는 위협을 탐지합니다.</p>
+        <div style={{ display: "inline-flex", gap: 8, flexWrap: "wrap", marginBottom: 48 }}>
+          {["파수 DRM", "소만사 DLP", "안랩 EPP", "한화비전 CCTV", "SIEM", "출입통제"].map(s => (
+            <span key={s} style={{ padding: "6px 14px", borderRadius: 8, fontSize: 11, fontWeight: 600, background: "rgba(34,197,94,.1)", color: D.green, border: "1px solid rgba(34,197,94,.2)" }}>&#10003; {s} 연동</span>
+          ))}
+        </div>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <Card icon="📡" title="물리적 유출 AI 탐지" desc="CCTV AI가 보안구역 내 필기, 사진 촬영, 외부 녹화장치를 자동 감지. 전 경쟁사 탐지 불가." tag="Layer 1 — 유일" />
-          <Card icon="🔗" title="통합 상관분석" desc="디지털(로그) + 물리(CCTV/출입) + HR(퇴직예정) 3종 교차 분석. 오탐 감소, 위험 조기 예측." tag="Layer 2 — 핵심" />
-          <Card icon="🕸️" title="공모/복합 시나리오" desc="그래프 분석(SNA)으로 복수 직원 간 비정상 데이터 전달 체인 자동 식별. 구두 전달 간접 탐지." tag="Layer 3 — 고급" />
+          <Card icon="🔗" title="기존 보안 연동 강화" desc="DLP 로그 + CCTV 영상 + 출입 기록 + HR 데이터를 하나로 연결. 기존 솔루션의 데이터가 IRIS를 통해 비로소 교차 분석됩니다." tag="보강 — 핵심 가치" />
+          <Card icon="📡" title="물리적 유출 AI 탐지" desc="기존 CCTV에 AI를 올려 수기 기록, 사진 촬영, 외부 녹화장치를 자동 감지. 추가 카메라 설치 없이 기존 인프라 활용." tag="Layer 1 — 유일" />
+          <Card icon="🕸️" title="공모/복합 시나리오" desc="그래프 분석(SNA)으로 복수 직원 간 비정상 데이터 전달 체인 자동 식별. 기존 DLP 단독으로는 불가능한 영역." tag="Layer 2 — 고급" />
         </div>
       </Section>
 
