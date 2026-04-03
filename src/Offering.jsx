@@ -212,63 +212,140 @@ function FadeIn({ children, delay = 0, style }) {
 function BizPlanViewer({ url, onClose }) {
   const [md, setMd] = useState("");
   const [loading, setLoading] = useState(true);
+  const [toc, setToc] = useState([]);
+  const contentRef = useRef(null);
+
   useEffect(() => {
-    fetch(url).then(r => r.text()).then(t => { setMd(t); setLoading(false); }).catch(() => { setMd("문서를 불러올 수 없습니다."); setLoading(false); });
+    fetch(url).then(r => r.text()).then(t => {
+      setMd(t);
+      // TOC 추출
+      const heads = [];
+      t.split("\n").forEach(line => {
+        const m2 = line.match(/^## (\d+)\. (.+)/);
+        const m3 = line.match(/^### (\d+-\d+)\. (.+)/);
+        if (m2) heads.push({ level: 2, num: m2[1], text: m2[2], id: "s" + m2[1] });
+        else if (m3) heads.push({ level: 3, num: m3[1], text: m3[2], id: "s" + m3[1].replace(".", "-") });
+      });
+      setToc(heads);
+      setLoading(false);
+    }).catch(() => { setMd("문서를 불러올 수 없습니다."); setLoading(false); });
   }, [url]);
 
-  // 간이 마크다운 → HTML 변환
+  const scrollTo = (id) => {
+    const el = contentRef.current?.querySelector("#" + id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const toHtml = (text) => {
-    return text
-      .replace(/^### (.+)$/gm, '<h3 style="font-size:16px;font-weight:700;margin:28px 0 12px;color:#1a1a1a;border-bottom:1px solid #e5e5e5;padding-bottom:8px">$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2 style="font-size:20px;font-weight:800;margin:36px 0 16px;color:#0a0a0f;border-bottom:2px solid #0a0a0f;padding-bottom:8px">$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1 style="font-size:28px;font-weight:900;margin:0 0 8px;color:#0a0a0f">$1</h1>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\|(.+)\|/g, (match) => {
-        const cells = match.split("|").filter(c => c.trim());
-        if (cells.every(c => /^[\s:-]+$/.test(c))) return "";
-        const isHeader = cells.some(c => /^\*\*/.test(c.trim()));
-        const tag = isHeader ? "th" : "td";
-        const style = isHeader
-          ? 'style="padding:8px 12px;text-align:left;font-size:12px;font-weight:700;background:#f1f5f9;border-bottom:2px solid #cbd5e1;white-space:nowrap"'
-          : 'style="padding:8px 12px;text-align:left;font-size:12px;border-bottom:1px solid #e2e8f0;color:#334155"';
-        return `<tr>${cells.map(c => `<${tag} ${style}>${c.trim()}</${tag}>`).join("")}</tr>`;
-      })
-      .replace(/(<tr>.*<\/tr>\n?)+/g, (match) => `<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">${match}</table>`)
-      .replace(/^> (.+)$/gm, '<blockquote style="border-left:3px solid #6366f1;padding:12px 16px;margin:16px 0;background:#f8fafc;font-size:13px;color:#475569;font-style:italic">$1</blockquote>')
-      .replace(/^```[\s\S]*?```$/gm, (match) => {
-        const code = match.replace(/^```\w*\n?/, "").replace(/\n?```$/, "");
-        return `<pre style="background:#1e293b;color:#e2e8f0;padding:16px;border-radius:8px;font-size:11px;overflow-x:auto;line-height:1.5;margin:12px 0;font-family:monospace">${code}</pre>`;
-      })
-      .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e5e5e5;margin:32px 0">')
-      .replace(/^- (.+)$/gm, '<li style="font-size:13px;margin:4px 0;color:#334155;list-style:disc;margin-left:20px">$1</li>')
-      .replace(/^(\d+)\. (.+)$/gm, '<li style="font-size:13px;margin:4px 0;color:#334155;list-style:decimal;margin-left:20px">$2</li>')
-      .replace(/\n\n/g, '<br/><br/>')
-      .replace(/\n/g, '<br/>');
+    let html = text;
+    // 코드 블록 (먼저 처리)
+    html = html.replace(/```([\s\S]*?)```/g, (_, code) => {
+      const escaped = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `<pre style="background:#0f172a;color:#e2e8f0;padding:20px 24px;border-radius:12px;font-size:12px;overflow-x:auto;line-height:1.7;margin:20px 0;font-family:'JetBrains Mono',monospace;border:1px solid #1e293b">${escaped}</pre>`;
+    });
+    // 헤딩
+    html = html.replace(/^#### (.+)$/gm, '<h4 style="font-size:14px;font-weight:700;margin:24px 0 10px;color:#1e293b;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:4px;height:16px;background:#6366f1;border-radius:2px"></span>$1</h4>');
+    html = html.replace(/^### (\d+-\d+)\. (.+)$/gm, '<h3 id="s$1" style="font-size:15px;font-weight:700;margin:32px 0 14px;color:#1e293b;padding-bottom:10px;border-bottom:1px solid #e2e8f0">$1. $2</h3>');
+    html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:15px;font-weight:700;margin:32px 0 14px;color:#1e293b;padding-bottom:10px;border-bottom:1px solid #e2e8f0">$1</h3>');
+    html = html.replace(/^## (\d+)\. (.+)$/gm, '<h2 id="s$1" style="font-size:22px;font-weight:800;margin:56px 0 20px;color:#0a0a0f;padding:16px 0 12px;border-bottom:3px solid #0a0a0f;letter-spacing:-0.5px">$1. $2</h2>');
+    html = html.replace(/^## (.+)$/gm, '<h2 style="font-size:22px;font-weight:800;margin:56px 0 20px;color:#0a0a0f;padding:16px 0 12px;border-bottom:3px solid #0a0a0f">$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<div style="margin-bottom:32px"><h1 style="font-size:32px;font-weight:900;color:#0a0a0f;letter-spacing:-1px;line-height:1.2;margin:0">$1</h1></div>');
+    // 볼드
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:700;color:#0f172a">$1</strong>');
+    // 테이블
+    html = html.replace(/\|(.+)\|/g, (match) => {
+      const cells = match.split("|").filter(c => c.trim() !== "");
+      if (cells.every(c => /^[\s:-]+$/.test(c))) return '<tr class="sep"></tr>';
+      return `<tr>${cells.map(c => `<td>${c.trim()}</td>`).join("")}</tr>`;
+    });
+    html = html.replace(/(<tr>[\s\S]*?<\/tr>\s*(<tr class="sep"><\/tr>)\s*<tr>[\s\S]*?)+/g, (match) => {
+      const rows = match.split("\n").filter(r => r.trim() && !r.includes('class="sep"'));
+      if (rows.length === 0) return match;
+      const firstRow = rows[0];
+      const restRows = rows.slice(1);
+      const headerRow = firstRow.replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>');
+      return `<div style="overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid #e2e8f0"><table class="bp-table"><thead>${headerRow}</thead><tbody>${restRows.join("\n")}</tbody></table></div>`;
+    });
+    // 남은 단독 테이블
+    html = html.replace(/(<tr>.*?<\/tr>\n?)+/g, (match) => {
+      if (match.includes('<table')) return match;
+      const rows = match.split("\n").filter(r => r.trim() && !r.includes('class="sep"'));
+      if (rows.length === 0) return match;
+      const headerRow = rows[0].replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>');
+      const restRows = rows.slice(1);
+      return `<div style="overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid #e2e8f0"><table class="bp-table"><thead>${headerRow}</thead><tbody>${restRows.join("\n")}</tbody></table></div>`;
+    });
+    // 인용
+    html = html.replace(/^> (.+)$/gm, '<blockquote style="border-left:4px solid #6366f1;padding:14px 20px;margin:20px 0;background:linear-gradient(135deg,#f8fafc,#eef2ff);border-radius:0 10px 10px 0;font-size:13.5px;color:#334155;line-height:1.7">$1</blockquote>');
+    // 구분선
+    html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:40px 0">');
+    // 리스트
+    html = html.replace(/^- (.+)$/gm, '<div style="display:flex;gap:8px;margin:5px 0 5px 8px;font-size:13px;color:#334155;line-height:1.6"><span style="color:#6366f1;font-weight:700">•</span><span>$1</span></div>');
+    html = html.replace(/^(\d+)\. (.+)$/gm, '<div style="display:flex;gap:8px;margin:5px 0 5px 8px;font-size:13px;color:#334155;line-height:1.6"><span style="color:#6366f1;font-weight:700;min-width:16px">$1.</span><span>$2</span></div>');
+    // 줄바꿈
+    html = html.replace(/\n\n/g, '<div style="height:12px"></div>');
+    html = html.replace(/\n/g, '<br/>');
+    return html;
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,.5)", display: "flex", justifyContent: "center", alignItems: "flex-start", overflow: "auto", padding: "40px 20px" }}>
-      <div style={{ background: "#fff", borderRadius: 16, maxWidth: 960, width: "100%", maxHeight: "calc(100vh - 80px)", overflow: "auto", boxShadow: "0 25px 50px rgba(0,0,0,.25)", position: "relative" }}>
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,.6)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "center", alignItems: "flex-start", overflow: "auto", padding: "24px 16px" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 20, maxWidth: 1040, width: "100%", maxHeight: "calc(100vh - 48px)", display: "flex", flexDirection: "column", boxShadow: "0 25px 60px rgba(0,0,0,.3)", overflow: "hidden" }}>
         {/* 헤더 */}
-        <div style={{ position: "sticky", top: 0, background: "#fff", borderBottom: "1px solid #e5e5e5", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10, borderRadius: "16px 16px 0 0" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 20 }}>📋</span>
+        <div style={{ flexShrink: 0, background: "linear-gradient(135deg,#0a0a0f,#1e293b)", padding: "20px 32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#818cf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#fff" }}>IR</div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#0a0a0f", fontFamily: FONT }}>IRIS 사업기획서</div>
-              <div style={{ fontSize: 11, color: "#999", fontFamily: FONT }}>Internal Risk Identification System — KT 제안</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#f1f5f9", fontFamily: FONT, letterSpacing: "-0.3px" }}>IRIS 사업기획서</div>
+              <div style={{ fontSize: 11, color: "#64748b", fontFamily: FONT }}>Internal Risk Identification System — KT 제안</div>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#999", padding: "4px 8px" }}>×</button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div style={{ padding: "5px 12px", borderRadius: 6, background: "rgba(99,102,241,.15)", color: "#818cf8", fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>2026.04</div>
+            <button onClick={onClose} style={{ background: "rgba(255,255,255,.1)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, cursor: "pointer", color: "#94a3b8", transition: "all .2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.2)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.1)"}>×</button>
+          </div>
         </div>
-        {/* 본문 */}
-        <div style={{ padding: "32px 40px 48px", fontFamily: FONT }}>
+
+        {/* 본문 영역 */}
+        <div ref={contentRef} style={{ flex: 1, overflow: "auto", padding: "32px 40px 60px", fontFamily: FONT }}>
           {loading ? (
-            <div style={{ textAlign: "center", padding: 60, color: "#999" }}>불러오는 중...</div>
+            <div style={{ textAlign: "center", padding: 80, color: "#999" }}>
+              <div style={{ width: 40, height: 40, border: "3px solid #e2e8f0", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
+              불러오는 중...
+            </div>
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: toHtml(md) }} />
+            <>
+              {/* TOC */}
+              {toc.length > 0 && (
+                <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 14, padding: "20px 24px", marginBottom: 40 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: "#94a3b8", marginBottom: 12, textTransform: "uppercase" }}>Contents</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {toc.map((h, i) => (
+                      <button key={i} onClick={() => scrollTo(h.id)}
+                        style={{ background: "none", border: "none", textAlign: "left", cursor: "pointer", fontFamily: FONT, fontSize: 13, color: h.level === 2 ? "#1e293b" : "#64748b", fontWeight: h.level === 2 ? 700 : 500, padding: "4px 8px", paddingLeft: h.level === 3 ? 24 : 8, borderRadius: 6, transition: "all .15s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
+                        onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                        {h.level === 3 ? "└ " : ""}{h.num}. {h.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div dangerouslySetInnerHTML={{ __html: toHtml(md) }} />
+            </>
           )}
         </div>
       </div>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .bp-table{width:100%;border-collapse:collapse;font-size:12.5px;font-family:${FONT}}
+        .bp-table thead th{padding:10px 14px;text-align:left;font-weight:700;background:#f1f5f9;color:#0f172a;border-bottom:2px solid #cbd5e1;font-size:11.5px;letter-spacing:0.3px;white-space:nowrap}
+        .bp-table tbody td{padding:10px 14px;text-align:left;border-bottom:1px solid #f1f5f9;color:#334155;line-height:1.6;vertical-align:top}
+        .bp-table tbody tr:hover{background:#f8fafc}
+        .bp-table tbody tr:last-child td{border-bottom:none}
+      `}</style>
     </div>
   );
 }
