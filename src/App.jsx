@@ -380,7 +380,7 @@ export default function App() {
   const CAT_COLORS = { "Security": "#10b981", "Finance": "#6366f1", "AI / ML": "#f43f5e", "Data": "#06b6d4", "DevOps": "#f59e0b", "기타": "#94a3b8" };
 
   // 카드 클릭 → 비밀번호 → Offering
-  const OFFERING_IDS = ["claimsNewBackup", "security", "firewall", "crawling", "aidata"];
+  const OFFERING_IDS = ["claimsNewBackup", "security", "firewall", "crawling", "aidata", "genieKids"];
   const pwOfferingMatch = page.startsWith("pw_offering_") ? page.replace("pw_offering_", "") : null;
   if (pwOfferingMatch && OFFERING_IDS.includes(pwOfferingMatch)) {
     return <PasswordGate onBack={() => setPage("portal")}><Offering id={pwOfferingMatch} onBack={() => setPage("portal")} onEnter={() => setPage(pwOfferingMatch)} /></PasswordGate>;
