@@ -188,6 +188,44 @@ const OFFERINGS = {
     ],
     cta: "프로토타입 체험하기",
   },
+  genieKids: {
+    badge: "AI KIDS",
+    title: "지니야~?",
+    subtitle: "AI Kids Entertainment Platform",
+    tagline: "핑크퐁은 보여주기만 합니다.\n지니야~?는 아이와 대화합니다.\n기가지니 400만 가구의 거실에서 시작합니다.",
+    hero: "동요, 동화, 퀴즈, 역할놀이 — 아이가 \"지니야~?\"라고 부르면\nAI 캐릭터가 대답합니다. 집, 외출, 차 어디서든.\n기가지니 요금제에 부가 옵션 하나로 시작합니다.",
+    problem: {
+      title: "기존 키즈 콘텐츠의 한계",
+      points: [
+        { num: "01", title: "일방향 시청", desc: "아이는 화면만 봅니다. 상호작용 없이 수동적 소비. 부모는 '틀어놓기' 죄책감" },
+        { num: "02", title: "스크린타임 과다", desc: "유아 일일 스마트폰 평균 2시간+. 시력 저하, 발달 지연 우려" },
+        { num: "03", title: "개인화 부재", desc: "모든 아이에게 같은 콘텐츠. 성장 단계/관심사에 맞춤 불가" },
+        { num: "04", title: "조부모 양육 어려움", desc: "맞벌이 증가로 조부모 양육 늘지만, 디지털 콘텐츠 조작이 어려움" },
+      ],
+    },
+    features: [
+      { icon: "🎙️", title: "양방향 AI 대화", desc: "아이가 말하면 AI 캐릭터가 대답합니다. 끝말잇기, 퀴즈, 역할놀이까지 음성으로" },
+      { icon: "🌟", title: "AI 캐릭터 8종", desc: "지니(메인친구), 별이(음악), 달이(수면), 해나(학습), 구름이(동화), 무지(놀이), 나라(과학), 하늘이(감정)" },
+      { icon: "📊", title: "성장 리포트", desc: "언어/수리/창의/사회성 발달 추적. 주간 리포트를 부모 앱에 자동 발송" },
+      { icon: "📱", title: "멀티 디바이스", desc: "집(기가지니) + 외출(핸드폰) + 차(블루투스). 조부모 댁 기가지니에서도 동일 경험" },
+      { icon: "⏰", title: "부모 안심 컨트롤", desc: "이용시간 제한, 콘텐츠 필터, 학습/놀이 비율 설정, 긴급 종료 음성 명령" },
+      { icon: "🔒", title: "아동 안전 설계", desc: "음성 데이터 즉시 삭제, 부적절 콘텐츠 AI 필터링, 부모 동의 필수" },
+    ],
+    metrics: [
+      { value: "960", label: "론칭 콘텐츠" },
+      { value: "8종", label: "AI 캐릭터" },
+      { value: "400만", label: "기가지니 가입자" },
+      { value: "3~9세", label: "타겟 연령" },
+    ],
+    process: [
+      { step: "01", title: "\"지니야~?\"", desc: "아이가 기가지니/핸드폰에 말을 걸면" },
+      { step: "02", title: "AI 캐릭터 응답", desc: "8종 캐릭터 중 맞는 친구가 대답" },
+      { step: "03", title: "상호작용", desc: "노래, 동화, 퀴즈, 역할놀이 진행" },
+      { step: "04", title: "성장 기록", desc: "부모에게 주간 성장 리포트 발송" },
+    ],
+    cta: "프로토타입 체험하기",
+    bizPlan: "/docs/GenieKids_사업기획서_KT제안.md",
+  },
 };
 
 // ─── 스타일 상수 ───
@@ -586,7 +624,7 @@ function BizPlanPresentation({ onClose, onSwitch }) {
 export default function Offering({ id, onBack, onEnter }) {
   const data = OFFERINGS[id];
   const [showBizPlan, setShowBizPlan] = useState(false);
-  const [bizMode, setBizMode] = useState("presentation"); // "presentation" | "document"
+  const [bizMode, setBizMode] = useState(id === "security" ? "presentation" : "document"); // "presentation" (IRIS only) | "document"
   if (!data) return null;
 
   const sectionStyle = { maxWidth: 1080, margin: "0 auto", padding: "0 40px" };

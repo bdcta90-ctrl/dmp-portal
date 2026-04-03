@@ -402,7 +402,7 @@ export default function App() {
   if (page === "stockpilot") return <PasswordGate onBack={() => setPage("portal")}><StockPilot onBack={() => setPage("portal")} /></PasswordGate>;
   if (page === "crawling") return <CrawlingCenter onBack={() => setPage("offering_crawling")} />;
   if (page === "aidata") return <AIReadyData onBack={() => setPage("offering_aidata")} />;
-  if (page === "genieKids") return <GenieKids onBack={() => setPage("portal")} />;
+  if (page === "genieKids") return <GenieKids onBack={() => setPage("offering_genieKids")} />;
   if (page === "simReview") return <SimReview onBack={() => setPage("portal")} />;
   if (page === "koreaJobs") return (
     <PasswordGate onBack={() => setPage("portal")}>
@@ -649,7 +649,7 @@ export default function App() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
           {MVPS.map((mvp, idx) => {
             const isClickable = mvp.id === "security" || mvp.id === "firewall" || mvp.id === "food" || mvp.id === "claimsNew" || mvp.id === "claimsNewBackup" || mvp.id === "stockpilot" || mvp.id === "koreaJobs" || mvp.id === "crawling" || mvp.id === "aidata" || mvp.id === "genieKids" || mvp.id === "simReview";
-            const hasOffering = ["claimsNewBackup","security","firewall","crawling","aidata"].includes(mvp.id);
+            const hasOffering = ["claimsNewBackup","security","firewall","crawling","aidata","genieKids"].includes(mvp.id);
             return (
               <div
                 key={mvp.id}
