@@ -209,7 +209,7 @@ function FadeIn({ children, delay = 0, style }) {
 }
 
 // ─── 마크다운 뷰어 (사업기획서용) ───
-function BizPlanViewer({ url, onClose }) {
+function BizPlanViewer({ url, onClose, onSwitch }) {
   const [md, setMd] = useState("");
   const [loading, setLoading] = useState(true);
   const [toc, setToc] = useState([]);
@@ -301,6 +301,11 @@ function BizPlanViewer({ url, onClose }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {onSwitch && <button onClick={onSwitch} style={{ padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(255,255,255,.15)", background: "transparent", color: "#94a3b8", fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: FONT, transition: "all .2s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "#818cf8"; e.currentTarget.style.color = "#f1f5f9"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.15)"; e.currentTarget.style.color = "#94a3b8"; }}>
+              프레젠테이션으로 보기
+            </button>}
             <div style={{ padding: "5px 12px", borderRadius: 6, background: "rgba(99,102,241,.15)", color: "#818cf8", fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>2026.04</div>
             <button onClick={onClose} style={{ background: "rgba(255,255,255,.1)", border: "none", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, cursor: "pointer", color: "#94a3b8", transition: "all .2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.2)"}
@@ -350,9 +355,229 @@ function BizPlanViewer({ url, onClose }) {
   );
 }
 
+// ─── Coinbase 스타일 프레젠테이션 뷰어 ───
+function BizPlanPresentation({ onClose, onSwitch }) {
+  const D = { bg: "#0a0b0f", card: "#12141a", border: "#1e2028", text: "#f1f3f9", sub: "#8b8fa3", accent: "#5b5ff6", accent2: "#818cf8", green: "#22c55e", red: "#ef4444", yellow: "#f59e0b" };
+  const sRef = useRef(null);
+
+  const Section = ({ children, style: s }) => <section style={{ padding: "100px 0", maxWidth: 1100, margin: "0 auto", padding: "100px 40px", ...s }}>{children}</section>;
+  const Badge = ({ children, color = D.accent }) => <span style={{ display: "inline-block", padding: "5px 14px", borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", background: color + "18", color, border: `1px solid ${color}30`, marginBottom: 20 }}>{children}</span>;
+  const Metric = ({ value, label, sub: s }) => (
+    <div style={{ flex: 1, minWidth: 160, padding: "28px 24px", background: D.card, borderRadius: 16, border: `1px solid ${D.border}`, textAlign: "center" }}>
+      <div style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, background: "linear-gradient(135deg,#5b5ff6,#818cf8,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1, marginBottom: 8 }}>{value}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: D.text, marginBottom: 4 }}>{label}</div>
+      {s && <div style={{ fontSize: 11, color: D.sub }}>{s}</div>}
+    </div>
+  );
+  const Card = ({ icon, title, desc, tag }) => (
+    <div style={{ flex: "1 1 280px", padding: "28px 24px", background: D.card, borderRadius: 16, border: `1px solid ${D.border}`, transition: "all .3s" }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = D.accent + "60"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = D.border; e.currentTarget.style.transform = "none"; }}>
+      <div style={{ fontSize: 28, marginBottom: 14 }}>{icon}</div>
+      <div style={{ fontSize: 15, fontWeight: 700, color: D.text, marginBottom: 8 }}>{title}</div>
+      <div style={{ fontSize: 12.5, color: D.sub, lineHeight: 1.7, marginBottom: 12 }}>{desc}</div>
+      {tag && <span style={{ padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: D.accent + "15", color: D.accent2 }}>{tag}</span>}
+    </div>
+  );
+  const TierCard = ({ name, price, color, period, features, threats, data: dd, highlight }) => (
+    <div style={{ flex: "1 1 220px", padding: "28px 24px", background: highlight ? "linear-gradient(135deg," + color + "10," + D.card + ")" : D.card, borderRadius: 16, border: `1px solid ${highlight ? color + "40" : D.border}`, position: "relative", transition: "all .3s" }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = color + "60"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = highlight ? color + "40" : D.border; e.currentTarget.style.transform = "none"; }}>
+      {highlight && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", padding: "3px 14px", borderRadius: 10, fontSize: 10, fontWeight: 700, background: color, color: "#fff" }}>RECOMMENDED</div>}
+      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color, textTransform: "uppercase", marginBottom: 12 }}>{name}</div>
+      <div style={{ fontSize: 28, fontWeight: 900, color: D.text, marginBottom: 4 }}>{price}<span style={{ fontSize: 13, fontWeight: 500, color: D.sub }}>/인/월</span></div>
+      <div style={{ fontSize: 11, color: D.sub, marginBottom: 20 }}>{period}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: D.sub, letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>수집 데이터</div>
+      {dd.map((d, i) => <div key={i} style={{ fontSize: 12, color: D.sub, marginBottom: 4, display: "flex", gap: 6 }}><span style={{ color }}>+</span>{d}</div>)}
+      <div style={{ height: 1, background: D.border, margin: "16px 0" }} />
+      <div style={{ fontSize: 11, fontWeight: 700, color: D.sub, letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>대응 위협</div>
+      {threats.map((t, i) => <div key={i} style={{ fontSize: 12, color: D.text, marginBottom: 4, display: "flex", gap: 6 }}><span style={{ color: D.green }}>&#10003;</span>{t}</div>)}
+      <div style={{ height: 1, background: D.border, margin: "16px 0" }} />
+      <div style={{ fontSize: 11, fontWeight: 700, color: D.sub, letterSpacing: 1, marginBottom: 8 }}>기능</div>
+      {features.map((f, i) => <div key={i} style={{ fontSize: 12, color: D.sub, marginBottom: 4, display: "flex", gap: 6 }}><span style={{ color: D.accent2 }}>&#9679;</span>{f}</div>)}
+    </div>
+  );
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: D.bg, overflow: "auto", fontFamily: FONT, color: D.text }} ref={sRef}>
+      {/* NAV */}
+      <nav style={{ position: "sticky", top: 0, zIndex: 10, padding: "14px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", background: D.bg + "ee", backdropFilter: "blur(12px)", borderBottom: `1px solid ${D.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#5b5ff6,#818cf8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff" }}>IR</div>
+          <span style={{ fontSize: 14, fontWeight: 700 }}>IRIS</span>
+          <span style={{ fontSize: 11, color: D.sub }}>Business Plan</span>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={onSwitch} style={{ padding: "7px 16px", borderRadius: 8, border: `1px solid ${D.border}`, background: "transparent", color: D.sub, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: FONT, transition: "all .2s" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = D.accent; e.currentTarget.style.color = D.text; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = D.border; e.currentTarget.style.color = D.sub; }}>
+            문서형으로 보기
+          </button>
+          <button onClick={onClose} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: D.card, color: D.sub, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>닫기</button>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section style={{ padding: "160px 40px 120px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 600, background: "radial-gradient(circle,rgba(91,95,246,.12) 0%,transparent 70%)", pointerEvents: "none" }} />
+        <Badge>KT DS AX BD</Badge>
+        <h1 style={{ fontSize: "clamp(40px,7vw,72px)", fontWeight: 900, lineHeight: 1.05, letterSpacing: -2, marginBottom: 24, background: "linear-gradient(135deg,#f1f3f9 30%,#818cf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          내부자 위협을<br/>AI로 식별합니다
+        </h1>
+        <p style={{ fontSize: 18, color: D.sub, lineHeight: 1.7, maxWidth: 600, margin: "0 auto 48px" }}>
+          기밀을 종이에 적고, 사진을 찍고, 퇴직 시 반출하는<br/>물리적 유출은 기존 DLP로 막을 수 없습니다.
+        </p>
+        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+          <button onClick={() => sRef.current?.querySelector("#sec-solution")?.scrollIntoView({ behavior: "smooth" })} style={{ padding: "14px 36px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#5b5ff6,#818cf8)", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>솔루션 보기</button>
+          <button onClick={() => sRef.current?.querySelector("#sec-invest")?.scrollIntoView({ behavior: "smooth" })} style={{ padding: "14px 36px", borderRadius: 10, border: `1px solid ${D.border}`, background: "transparent", color: D.text, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>투자 계획</button>
+        </div>
+      </section>
+
+      {/* METRICS */}
+      <Section>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <Metric value="25조" label="기술유출 피해액" sub="최근 6년 누적 (국정원)" />
+          <Metric value="88.3%" label="내부자 소행" sub="기술유출 665건 중 587건" />
+          <Metric value="2,000억" label="TAM (한국)" sub="내부자 위협 보호 시장" />
+          <Metric value="0" label="국내 전문 솔루션" sub="물리+디지털 통합 = 없음" />
+        </div>
+      </Section>
+
+      {/* 사고 사례 */}
+      <section style={{ background: "#0e1017", padding: "100px 0" }}>
+        <Section style={{ padding: "0 40px" }}>
+          <Badge color={D.red}>2025 보안 사고</Badge>
+          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 48, letterSpacing: -1 }}>이 사건들이 시장을 열었습니다</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 16 }}>
+            {[
+              { co: "삼성전자 → CXMT", date: "2025.12", damage: "수십조 원", method: "수백 단계 공정 레시피를 손으로 필기하여 반출", color: D.red },
+              { co: "SK하이닉스", date: "2025.6", damage: "수천억 원", method: "협력업체 부사장이 HKMG 기술 도면/레시피 반출", color: D.yellow },
+              { co: "쿠팡", date: "2025.11", damage: "3,370만 계정", method: "퇴직 중국인 직원이 5개월간 잔존 권한으로 접근", color: D.yellow },
+              { co: "카드 3사", date: "2014", damage: "1억 580만 건", method: "협력업체 파견직원이 USB로 고객 개인정보 복사", color: D.accent },
+            ].map((c, i) => (
+              <div key={i} style={{ padding: "24px", background: D.card, borderRadius: 14, border: `1px solid ${D.border}`, borderLeft: `3px solid ${c.color}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700 }}>{c.co}</span>
+                  <span style={{ fontSize: 11, color: D.sub }}>{c.date}</span>
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: c.color, marginBottom: 8 }}>{c.damage}</div>
+                <div style={{ fontSize: 12, color: D.sub, lineHeight: 1.6 }}>{c.method}</div>
+              </div>
+            ))}
+          </div>
+        </Section>
+      </section>
+
+      {/* 솔루션 */}
+      <Section style={{ padding: "100px 40px" }}>
+        <div id="sec-solution" style={{ marginTop: -80, paddingTop: 80 }} />
+        <Badge>Solution</Badge>
+        <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>3가지 레이어로 차별화합니다</h2>
+        <p style={{ fontSize: 14, color: D.sub, marginBottom: 48, maxWidth: 600 }}>개별 기능은 경쟁사도 보유. IRIS의 차별화는 물리+디지털+인사 데이터의 통합 상관분석에 있습니다.</p>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <Card icon="📡" title="물리적 유출 AI 탐지" desc="CCTV AI가 보안구역 내 필기, 사진 촬영, 외부 녹화장치를 자동 감지. 전 경쟁사 탐지 불가." tag="Layer 1 — 유일" />
+          <Card icon="🔗" title="통합 상관분석" desc="디지털(로그) + 물리(CCTV/출입) + HR(퇴직예정) 3종 교차 분석. 오탐 감소, 위험 조기 예측." tag="Layer 2 — 핵심" />
+          <Card icon="🕸️" title="공모/복합 시나리오" desc="그래프 분석(SNA)으로 복수 직원 간 비정상 데이터 전달 체인 자동 식별. 구두 전달 간접 탐지." tag="Layer 3 — 고급" />
+        </div>
+      </Section>
+
+      {/* 패키지 */}
+      <section style={{ background: "#0e1017", padding: "100px 0" }}>
+        <Section style={{ padding: "0 40px" }}>
+          <Badge>Packages</Badge>
+          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>단계적으로 시작하세요</h2>
+          <p style={{ fontSize: 14, color: D.sub, marginBottom: 48 }}>Small Start로 법적 부담 없이 시작. 효과 확인 후 확장.</p>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
+            <TierCard name="Small Start" price="5,000원" color="#22c55e" period="구축 4~6주 · 법적 부담 없음" highlight={false}
+              data={["파일 접근 메타데이터", "USB/외부장치 로그", "출력 메타+워터마크", "네트워크 접속 로그", "SW 실행/캡처 차단"]}
+              threats={["USB 유출 차단", "출력물 추적", "클라우드 업로드 탐지", "권한 남용 조회", "퇴직 전 대량 반출", "외주 인력 모니터링"]}
+              features={["룰 기반 스코어링", "컴플라이언스 대시보드", "위험 이벤트 알림"]} />
+            <TierCard name="Lite" price="8,000원" color="#3b82f6" period="추가 2~3주 · PIA 간이" highlight={false}
+              data={["+ AI 행위 프로파일", "+ 이메일/메신저 메타", "+ 퇴직자 플래그"]}
+              threats={["기존 + 오탐 60% 감소", "이메일 정밀 탐지", "퇴직자 강화 추적"]}
+              features={["AI UEBA 동적 베이스라인", "피어그룹 비교 분석"]} />
+            <TierCard name="Standard" price="15,000원" color="#8b5cf6" period="추가 10~16주 · 노사협의" highlight={true}
+              data={["+ CCTV AI 영상분석", "+ 출입통제 데이터", "+ 비가시 워터마크", "+ 디지털+물리 상관분석"]}
+              threats={["+ 수기 기록 반출", "+ 사진 촬영", "+ 외부 녹화장치", "+ 출력물 물리 반출 추적"]}
+              features={["CCTV AI 자동 감지", "통합 상관분석 엔진", "10~11개 위협 커버"]} />
+            <TierCard name="Full" price="25,000원" color="#f59e0b" period="추가 20~30주 · PIA 상세" highlight={false}
+              data={["+ HR 연동 (퇴직예정)", "+ 그래프(SNA) 데이터", "+ 자동 대응 워크플로우"]}
+              threats={["+ 공모 반출", "+ 구두 전달(간접)", "12개 위협 전량 커버"]}
+              features={["Agentic AI 자동 대응", "SNA 공모 탐지", "자동 포렌식 리포트"]} />
+          </div>
+        </Section>
+      </section>
+
+      {/* 투자 계획 */}
+      <Section>
+        <div id="sec-invest" style={{ marginTop: -80, paddingTop: 80 }} />
+        <Badge color={D.green}>Investment</Badge>
+        <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>6,000만 원으로 시장의 답을 듣습니다</h2>
+        <p style={{ fontSize: 14, color: D.sub, marginBottom: 48 }}>각 단계마다 Go/Drop을 판단. 최악의 경우에도 6,000만 원 손실로 종료.</p>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 60 }}>
+          {[
+            { phase: "Phase 0", name: "Prototype", cost: "6,000만", period: "2개월", team: "2명", goal: "CISO 5곳+ 데모\nPoC 의향 2곳+ 확보", gate: "PoC 의향 0곳 → Drop", color: D.green },
+            { phase: "Phase 1", name: "MVP", cost: "1.3억", period: "3개월", team: "4명", goal: "고객 1곳 실데이터 4주\n유상 전환 의향 확인", gate: "전환 거부 → Drop", color: D.accent },
+            { phase: "Phase 2", name: "상용화", cost: "2.3억", period: "3개월", team: "6명", goal: "유상 고객 3곳+ 확보\n세일즈 킷 완성", gate: "계약 3건 미달 → 재검토", color: D.accent2 },
+          ].map((p, i) => (
+            <div key={i} style={{ flex: "1 1 280px", padding: "32px 28px", background: D.card, borderRadius: 16, border: `1px solid ${D.border}`, borderTop: `3px solid ${p.color}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: p.color, textTransform: "uppercase" }}>{p.phase}</span>
+                <span style={{ fontSize: 11, color: D.sub }}>{p.period} · {p.team}</span>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{p.name}</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: p.color, marginBottom: 16 }}>{p.cost}</div>
+              <div style={{ fontSize: 12, color: D.sub, lineHeight: 1.7, whiteSpace: "pre-line", marginBottom: 16 }}>{p.goal}</div>
+              <div style={{ padding: "8px 12px", borderRadius: 8, background: D.red + "10", fontSize: 11, color: D.red, fontWeight: 600 }}>Drop 기준: {p.gate}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* P&L */}
+        <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 24 }}>3년 재무 전망</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ padding: "28px", background: D.card, borderRadius: 16, border: `1px solid ${D.border}` }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: D.sub, marginBottom: 16, textTransform: "uppercase" }}>보수적 시나리오</div>
+            {[{ label: "3년차 매출", value: "38.9억", sub: "고객 15곳" }, { label: "영업이익", value: "10.8억", sub: "이익률 28%" }, { label: "BEP", value: "3년차", sub: "상반기 도달" }, { label: "누적 영업이익", value: "+5.3억", sub: "투자 회수 완료" }].map((r, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: i < 3 ? `1px solid ${D.border}` : "none" }}>
+                <span style={{ fontSize: 13, color: D.sub }}>{r.label}</span>
+                <div style={{ textAlign: "right" }}><span style={{ fontSize: 15, fontWeight: 700 }}>{r.value}</span><div style={{ fontSize: 10, color: D.sub }}>{r.sub}</div></div>
+              </div>
+            ))}
+          </div>
+          <div style={{ padding: "28px", background: "linear-gradient(135deg,rgba(91,95,246,.08)," + D.card + ")", borderRadius: 16, border: `1px solid ${D.accent}30` }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: D.accent2, marginBottom: 16, textTransform: "uppercase" }}>이상적 시나리오</div>
+            {[{ label: "3년차 매출", value: "250.2억", sub: "고객 35곳" }, { label: "영업이익", value: "148.1억", sub: "이익률 59%" }, { label: "BEP", value: "1년차", sub: "즉시 달성" }, { label: "누적 영업이익", value: "+210.8억", sub: "" }].map((r, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: i < 3 ? `1px solid ${D.border}` : "none" }}>
+                <span style={{ fontSize: 13, color: D.sub }}>{r.label}</span>
+                <div style={{ textAlign: "right" }}><span style={{ fontSize: 15, fontWeight: 700 }}>{r.value}</span><div style={{ fontSize: 10, color: D.sub }}>{r.sub}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* CTA */}
+      <section style={{ padding: "120px 40px", textAlign: "center", position: "relative" }}>
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 500, height: 500, background: "radial-gradient(circle,rgba(91,95,246,.1) 0%,transparent 70%)", pointerEvents: "none" }} />
+        <h2 style={{ fontSize: "clamp(28px,5vw,48px)", fontWeight: 900, marginBottom: 20, letterSpacing: -1 }}>6,000만 원으로<br/>시장의 답을 듣겠습니다.</h2>
+        <p style={{ fontSize: 15, color: D.sub, marginBottom: 40 }}>답이 Yes면 확대하고, No면 깔끔하게 접겠습니다.</p>
+        <button onClick={() => sRef.current?.scrollTo({ top: 0, behavior: "smooth" })} style={{ padding: "16px 48px", borderRadius: 12, border: "none", background: "linear-gradient(135deg,#5b5ff6,#818cf8)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>
+          Phase 0 착수 승인 요청
+        </button>
+      </section>
+
+      <footer style={{ borderTop: `1px solid ${D.border}`, padding: "32px 40px", textAlign: "center", fontSize: 11, color: D.sub }}>
+        &copy; 2026 KT DS AX BD &middot; IRIS Business Plan &middot; Confidential
+      </footer>
+    </div>
+  );
+}
+
 export default function Offering({ id, onBack, onEnter }) {
   const data = OFFERINGS[id];
   const [showBizPlan, setShowBizPlan] = useState(false);
+  const [bizMode, setBizMode] = useState("presentation"); // "presentation" | "document"
   if (!data) return null;
 
   const sectionStyle = { maxWidth: 1080, margin: "0 auto", padding: "0 40px" };
@@ -493,7 +718,9 @@ export default function Offering({ id, onBack, onEnter }) {
 
       {/* ─── 사업기획서 모달 ─── */}
       {showBizPlan && data.bizPlan && (
-        <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} />
+        bizMode === "presentation"
+          ? <BizPlanPresentation onClose={() => setShowBizPlan(false)} onSwitch={() => setBizMode("document")} />
+          : <BizPlanViewer url={data.bizPlan} onClose={() => setShowBizPlan(false)} onSwitch={() => setBizMode("presentation")} />
       )}
     </div>
   );
